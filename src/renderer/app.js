@@ -313,20 +313,16 @@ let probeResult = null;
 
 function libCard () { return document.querySelector('.gate-card'); }
 
-function switchTab (name) {
-  for (const tab of document.querySelectorAll('.lib-tab')) {
-    tab.classList.toggle('is-on', tab.dataset.tab === name);
-  }
-  el('lib-mine').hidden = name !== 'mine';
-  el('lib-add').hidden = name !== 'add';
-  el('lib-suggest').hidden = name !== 'suggest';
-}
-
 async function loadLibrary () {
   const data = await api.library();
   if (!data || !data.ok) return;
   renderMine(data.mine);
   renderSuggestions(data.suggestions);
+
+  const live = data.mine.filter((a) => a.enabled).length;
+  el('mine-count').textContent = data.mine.length
+    ? `${live} of ${data.mine.length} showing`
+    : '';
 }
 
 function dot (color) {
@@ -487,49 +483,65 @@ function renderMine (mine) {
   }
 }
 
+/**
+ * Suggestions are cards you tap, not rows with an Add button on the end.
+ *
+ * They sit directly under the list of what is already set up, on the same page:
+ * seeing what you have and adding to it is one task, and splitting it across
+ * tabs made it feel like two.
+ */
 function renderSuggestions (list) {
   const wrap = el('lib-suggest-list');
   wrap.textContent = '';
 
-  const byCategory = new Map();
-  for (const s of list) {
-    if (!byCategory.has(s.category)) byCategory.set(s.category, []);
-    byCategory.get(s.category).push(s);
-  }
+  for (const sug of list) {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'card' + (sug.added ? ' is-added' : '');
+    card.disabled = sug.added;
+    card.style.setProperty('--card', sug.color);
+    card.title = sug.notes || sug.url;
 
-  for (const [category, items] of byCategory) {
-    const head = document.createElement('div');
-    head.className = 'lib-cat';
-    head.textContent = category;
-    wrap.appendChild(head);
+    const badge = document.createElement('span');
+    badge.className = 'card-badge';
+    badge.appendChild(shapeIcon(sug.shape));
 
-    for (const s of items) {
-      const name = document.createElement('span');
-      name.textContent = s.title;
-      name.appendChild(s.adSupported
-        ? tag('has ads', 'lib-tag--ads')
-        : tag('no ads', 'lib-tag--free'));
-      if (!s.blockAds) name.appendChild(tag('left as-is'));
+    const body = document.createElement('span');
+    body.className = 'card-body';
 
-      const add = button(s.added ? 'Added' : 'Add', s.added ? '' : 'lib-btn--add', async (e) => {
-        e.target.disabled = true;
-        const r = await api.addSuggestion(s.id);
-        if (!r || !r.ok) {
-          e.target.disabled = false;
-          showToast((r && r.message) || 'Could not add that.');
-          return;
-        }
-        loadLibrary();
-      });
-      add.disabled = s.added;
+    const name = document.createElement('span');
+    name.className = 'card-name';
+    name.textContent = sug.title;
 
-      wrap.appendChild(row({
-        color: s.color, name,
-        sub: s.url,
-        note: s.notes,
-        actions: [add]
-      }));
-    }
+    const meta = document.createElement('span');
+    meta.className = 'card-meta';
+    meta.textContent = sug.category;
+    meta.appendChild(sug.adSupported
+      ? tag('has ads', 'lib-tag--ads')
+      : tag('no ads', 'lib-tag--free'));
+
+    body.append(name, meta);
+
+    const state = document.createElement('span');
+    state.className = 'card-state';
+    state.textContent = sug.added ? 'Added' : 'Add';
+
+    card.append(badge, body, state);
+
+    card.addEventListener('click', async () => {
+      card.disabled = true;
+      state.textContent = 'Adding…';
+      const r = await api.addSuggestion(sug.id);
+      if (!r || !r.ok) {
+        card.disabled = false;
+        state.textContent = 'Add';
+        showToast((r && r.message) || 'Could not add that.');
+        return;
+      }
+      loadLibrary();
+    });
+
+    wrap.appendChild(card);
   }
 }
 
@@ -600,8 +612,10 @@ async function checkSite () {
     }
     el('lib-url').value = '';
     out.textContent = '';
-    switchTab('mine');
     loadLibrary();
+    // Scroll the panel back to the list so the new entry is visibly there.
+    const body = document.querySelector('.panel-body');
+    if (body) body.scrollTo({ top: 0, behavior: 'smooth' });
   });
   nameRow.append(nameInput, addBtn);
   out.appendChild(nameRow);
@@ -620,7 +634,6 @@ function showPanel () {
   el('gate-step-answer').hidden = true;
   el('gate-step-library').hidden = false;
   libCard().classList.add('is-wide');
-  switchTab('mine');
   loadLibrary();
   el('lib-done').focus();
 }
@@ -687,7 +700,6 @@ function wire () {
   on('home-btn', 'click', () => api.goHome());
   on('exit-btn', 'click', () => api.openGate('quit'));
   on('parent-btn', 'click', () => api.openGate('quit'));
-  on('close-btn', 'click', () => api.openGate('quit'));
   on('empty-add', 'click', () => api.openGate('quit'));
 
   on('ob-parent', 'click', () => obShow(2));
@@ -721,9 +733,6 @@ function wire () {
   on('gate-cancel-pin', 'click', () => api.closeGate());
   on('lib-check', 'click', checkSite);
   on('lib-url', 'keydown', (e) => { if (e.key === 'Enter') checkSite(); });
-  for (const tab of document.querySelectorAll('.lib-tab')) {
-    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-  }
 
   const hold = el('hold-btn');
   hold.addEventListener('pointerdown', startHold);

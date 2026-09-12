@@ -43,30 +43,23 @@
             <path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6" fill="none"
                   stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
           </svg>
-          <span>Grown-ups</span>
-        </button>
-        <button id="close-btn" class="top-btn top-btn--close" type="button" title="Close Sukhi Play">
-          <svg class="top-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor"
-                  stroke-width="2.6" stroke-linecap="round"/>
-          </svg>
-          <span>Close</span>
+          <span>Parents</span>
         </button>
       </div>
     </header>
 
     <div class="launcher-inner">
-      <h1 class="launcher-title">What do you want to play?</h1>
+      <h1 class="launcher-title">What do you want to do?</h1>
       <div id="tiles" class="tiles" role="list"></div>
 
       <div id="launcher-empty" class="empty" hidden>
         <img class="empty-mark" src="assets/mascot.png" alt="" width="512" height="512">
-        <h2 class="empty-title">No games yet</h2>
+        <h2 class="empty-title">Nothing here yet</h2>
         <p class="empty-text">
-          A grown-up needs to choose which games and websites are allowed.
-          It takes about a minute.
+          A grown-up needs to choose what you can open.
+          It only takes a minute.
         </p>
-        <button id="empty-add" class="empty-btn" type="button">Add games</button>
+        <button id="empty-add" class="empty-btn" type="button">Set it up</button>
       </div>
 
       <footer class="launcher-foot">
@@ -170,10 +163,13 @@
       <span id="bar-blocked" class="badge" hidden></span>
     </div>
 
-    <button id="exit-btn" class="bar-btn bar-btn--exit" type="button" title="Close the app (grown-ups)">
+    <button id="exit-btn" class="bar-btn bar-btn--parent" type="button" title="Parent portal">
       <svg class="bar-icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="12" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2.1"/>
+        <path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6" fill="none"
+              stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
       </svg>
+      <span>Parents</span>
     </button>
   </header>
 
@@ -214,11 +210,22 @@
 
       <!-- Unlocked. Straight into the panel: managing games is what a parent
            came here to do, so it is not hidden behind a menu of two items. -->
+      <!-- One page, not tabs. You land on what is set up, and adding more is
+           directly beneath it rather than behind a separate screen. -->
       <div id="gate-step-library" hidden>
         <header class="panel-head">
-          <div class="panel-titles">
-            <h2 class="panel-title">Parent settings</h2>
-            <p class="panel-sub">Choose what <span id="panel-kid">your child</span> can open.</p>
+          <div class="panel-brand">
+            <span class="panel-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2.1"/>
+                <path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6" fill="none"
+                      stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <div class="panel-titles">
+              <h2 class="panel-title">Parent Portal</h2>
+              <p class="panel-sub">Choose what your child can open.</p>
+            </div>
           </div>
           <button id="lib-done" class="panel-close" type="button" aria-label="Done">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -228,35 +235,39 @@
           </button>
         </header>
 
-        <div class="lib-tabs" role="tablist">
-          <button class="lib-tab is-on" data-tab="mine" type="button">Games</button>
-          <button class="lib-tab" data-tab="add" type="button">Add a site</button>
-          <button class="lib-tab" data-tab="suggest" type="button">Suggestions</button>
-        </div>
+        <div class="panel-body">
+          <section class="sec">
+            <h3 class="sec-head">
+              <span>On the tiles</span>
+              <span id="mine-count" class="sec-count"></span>
+            </h3>
+            <div id="lib-mine"></div>
+          </section>
 
-        <div id="lib-mine" class="lib-pane"></div>
+          <section class="sec">
+            <h3 class="sec-head"><span>Ready to add</span></h3>
+            <p class="sec-note">
+              Set up by other parents. Nothing here is installed or endorsed by
+              Sukhi Play, and none of these sites is connected to it — you are
+              responsible for checking each one's terms.
+            </p>
+            <div id="lib-suggest-list" class="cards"></div>
+          </section>
 
-        <div id="lib-add" class="lib-pane" hidden>
-          <p class="lib-help">
-            Type a web address. Sukhi Play opens it once, watches what it loads,
-            and works out which hosts it needs. Nothing is saved until you press
-            Add.
-          </p>
-          <div class="lib-row">
-            <input id="lib-url" class="lib-input" type="text" inputmode="url"
-                   autocomplete="off" spellcheck="false" placeholder="example.com">
-            <button id="lib-check" class="lib-go" type="button">Check</button>
-          </div>
-          <div id="lib-result" class="lib-result"></div>
-        </div>
-
-        <div id="lib-suggest" class="lib-pane" hidden>
-          <p class="lib-help">
-            Sites other parents use. Nothing here is installed or endorsed by
-            Sukhi Play, and none of these sites is connected to it. You are
-            responsible for checking each site's terms before enabling it.
-          </p>
-          <div id="lib-suggest-list"></div>
+          <section class="sec">
+            <h3 class="sec-head"><span>Add any other website</span></h3>
+            <p class="sec-note">
+              Type an address. Sukhi Play opens it once, watches what it loads,
+              and works out which hosts it needs. Nothing is saved until you
+              press Add.
+            </p>
+            <div class="lib-row">
+              <input id="lib-url" class="lib-input" type="text" inputmode="url"
+                     autocomplete="off" spellcheck="false" placeholder="example.com">
+              <button id="lib-check" class="lib-go" type="button">Check</button>
+            </div>
+            <div id="lib-result" class="lib-result"></div>
+          </section>
         </div>
 
         <footer class="panel-foot">
