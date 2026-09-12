@@ -82,7 +82,7 @@ img, svg { -webkit-user-drag: none; }
 
 [data-mode="boot"]       #boot       { display: flex; }
 [data-mode="onboarding"] #onboarding { display: flex; }
-[data-mode="launcher"]   #launcher   { display: block; }
+[data-mode="launcher"]   #launcher   { display: flex; }
 [data-mode="gate"]       #gate       { display: flex; }
 [data-mode="playing"]    #bar        { display: flex; }
 
@@ -183,17 +183,21 @@ img, svg { -webkit-user-drag: none; }
 
 /* ---------------- the tile screen ---------------- */
 
+/* The launcher itself does not scroll. It is a column holding a rigid bar and
+   one scrolling body underneath. The bar used to be `position: sticky` inside
+   a scrolling launcher, which made its placement depend on the scroll offset
+   of a container that was always 2px overflowing (a 76px bar above a
+   `calc(100% - 74px)` body). Under a different scrollbar width, or a window
+   whose content box is a hair taller than the screen, that let the bar ride up
+   under the top edge. A rigid flex child cannot move at all. */
 #launcher {
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(23, 21, 58, .22) transparent;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Wide enough for a small hand to grab. */
-#launcher::-webkit-scrollbar { width: 16px; }
-#launcher::-webkit-scrollbar-thumb {
+.launcher-inner::-webkit-scrollbar { width: 16px; }
+.launcher-inner::-webkit-scrollbar-thumb {
   background: rgba(23, 21, 58, .22);
   border: 5px solid transparent;
   background-clip: content-box;
@@ -205,16 +209,18 @@ img, svg { -webkit-user-drag: none; }
    was a small link in the footer, which is why closing the app meant going via
    "Add games". */
 .top {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 3;
+  /* Never shrinks, never scrolls. flex-shrink: 0 matters as much as the height
+     floor: a shrinkable bar with centred 44px controls clips them
+     symmetrically, so they vanish under its own top edge. */
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  /* An explicit floor, because the controls inside are 44px and a taller
-     fallback font on another platform was letting them push past the bar and
-     get clipped by the top of the screen. */
+  /* A floor, because the controls inside are 44px and a taller fallback font
+     on another platform was letting them push past the bar. */
   min-height: 76px;
   box-sizing: border-box;
   padding: 16px 20px;
@@ -256,11 +262,20 @@ img, svg { -webkit-user-drag: none; }
 .top-icon { width: 20px; height: 20px; flex: none; }
 
 .launcher-inner {
-  min-height: calc(100% - 74px);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(23, 21, 58, .22) transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* `safe center` so that when the tiles are taller than the area, the
+     overflow goes downward and stays reachable. Plain `center` puts half of it
+     above the scroll origin, where nothing can scroll to it. */
   justify-content: center;
+  justify-content: safe center;
   gap: 34px;
   padding: 40px 40px 32px;
 }

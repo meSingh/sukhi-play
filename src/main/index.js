@@ -30,6 +30,11 @@ const CHECK_SECONDS = Number(process.env.CHECK_SECONDS || 14);
 
 // `--probe <url>` visits a site once and prints the allowlist it would need.
 // Same machinery the in-app "Add a site" wizard uses, driven from a terminal.
+// `--diagnose` prints where the window actually ended up, and where the top bar
+// ended up inside it, then quits. Paste the output into a bug report: window
+// geometry is the one thing that cannot be reasoned about from another machine.
+const DIAGNOSE = process.argv.includes('--diagnose');
+
 const PROBE_ARG = process.argv.find((a) => a.startsWith('--probe='));
 const PROBE_URL = PROBE_ARG ? PROBE_ARG.split('=').slice(1).join('=') : null;
 const PROBE_MODE = Boolean(PROBE_URL);
@@ -582,6 +587,78 @@ async function runCheck () {
   app.exit(problems.length ? 1 : 0);
 }
 
+async function runDiagnose () {
+  const { screen } = require('electron');
+  const win = shellApp.win;
+  const wc = shellApp.shellView.webContents;
+
+  const display = screen.getPrimaryDisplay();
+  const lines = [];
+  const say = (k, v) => lines.push(`  ${String(k).padEnd(22)} ${v}`);
+
+  say('app version', app.getVersion());
+  say('platform', `${process.platform} ${process.arch}`);
+  say('electron', process.versions.electron);
+  say('desktop', process.env.XDG_CURRENT_DESKTOP || '(none)');
+  say('session type', process.env.XDG_SESSION_TYPE || '(none)');
+  say('wayland display', process.env.WAYLAND_DISPLAY || '(none)');
+  say('shortcut capture', shortcuts.sessionCanHoldKeys().session +
+      (shortcuts.sessionCanHoldKeys().ok ? ' (works)' : ' (CANNOT intercept)'));
+  say('gnome borrowing', gnome.available() ? 'available' : 'not a gnome session');
+
+  say('display bounds', JSON.stringify(display.bounds));
+  say('display workArea', JSON.stringify(display.workArea));
+  say('scaleFactor', display.scaleFactor);
+
+  say('window bounds', JSON.stringify(win.getBounds()));
+  say('window content', JSON.stringify(win.getContentBounds()));
+  say('content size', JSON.stringify(win.getContentSize()));
+  say('isFullScreen', win.isFullScreen());
+  say('isVisible', win.isVisible());
+  say('kiosk setting', settings.kiosk);
+  say('alwaysOnTop', settings.alwaysOnTop);
+
+  try {
+    const dom = await wc.executeJavaScript(`(() => {
+      const pick = (sel) => {
+        const el = document.querySelector(sel);
+        if (!el) return 'missing';
+        const r = el.getBoundingClientRect();
+        return JSON.stringify({
+          top: Math.round(r.top), left: Math.round(r.left),
+          w: Math.round(r.width), h: Math.round(r.height)
+        });
+      };
+      const bar = document.querySelector('.top');
+      return JSON.stringify({
+        mode: document.getElementById('app').dataset.mode,
+        viewport: window.innerWidth + 'x' + window.innerHeight,
+        devicePixelRatio: window.devicePixelRatio,
+        topBar: pick('.top'),
+        topBarStyle: bar ? getComputedStyle(bar).minHeight + ' / ' + getComputedStyle(bar).paddingTop : 'n/a',
+        firstButton: pick('.top-actions .top-btn'),
+        brandMark: pick('.top-mark'),
+        scrollTop: document.getElementById('launcher') ? document.getElementById('launcher').scrollTop : 'n/a'
+      });
+    })()`);
+    const d = JSON.parse(dom);
+    for (const [k, v] of Object.entries(d)) say(k, v);
+  } catch (err) {
+    say('renderer', 'could not be measured: ' + err.message);
+  }
+
+  console.log('\n  ===== Sukhi Play diagnostics =====\n');
+  console.log(lines.join('\n'));
+  console.log('\n  A top bar that reads top:0 with a positive height is correctly placed.');
+  console.log('  A negative top, or a window whose y is less than the display y,');
+  console.log('  means the window manager and the app disagree about the geometry.\n');
+
+  try { shortcuts.releaseAll(); } catch { /* nothing held */ }
+  gnome.giveBack(paths.userData);
+  shellApp.allowQuit = true;
+  app.exit(0);
+}
+
 async function runProbe () {
   console.log(`\n  Probing ${PROBE_URL}\n  This takes about ${probe.PROBE_SECONDS} seconds...\n`);
 
@@ -786,6 +863,11 @@ app.whenReady().then(() => {
     gnome.restoreFromDisk(paths.userData);
   }
 
+  if (DIAGNOSE) {
+    ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runDiagnose(); }, 1800));
+    return;
+  }
+
   if (PROBE_MODE) {
     ipcMain.once('shell:renderer-idle', () => setTimeout(() => { runProbe(); }, 200));
     return;
@@ -810,7 +892,7 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', (event) => {
-  if (CHECK_MODE || PROBE_MODE) return;
+  if (CHECK_MODE || PROBE_MODE || DIAGNOSE) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');

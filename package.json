@@ -1,7 +1,7 @@
 {
   "name": "sukhi-play",
   "productName": "Sukhi Play",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A locked-down, ad-free kiosk browser that lets a small child open only the sites you choose.",
   "main": "src/main/index.js",
   "private": true,
@@ -10,14 +10,16 @@
     "start": "electron .",
     "dev": "electron . --dev",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder",
+    "dist": "npm run metainfo && electron-builder",
     "dist:mac": "electron-builder --mac",
     "dist:win": "electron-builder --win",
-    "dist:linux": "electron-builder --linux",
+    "dist:linux": "npm run metainfo && electron-builder --linux",
     "check": "electron . --check",
     "test": "node --test",
     "lint": "node -e \"for (const f of require('fs').readdirSync('src/main')) if (f.endsWith('.js')) require('child_process').execSync(`node --check src/main/${f}`); console.log('ok')\"",
-    "probe": "electron . --probe="
+    "probe": "electron . --probe=",
+    "metainfo": "node scripts/make-metainfo.js",
+    "diagnose": "electron . --diagnose"
   },
   "devDependencies": {
     "electron": "^44.3.0",

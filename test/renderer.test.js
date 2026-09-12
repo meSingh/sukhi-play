@@ -106,6 +106,36 @@ test('hidden elements stay hidden', () => {
     'styles.css needs [hidden] { display: none !important }');
 });
 
+test('the launcher bar cannot be scrolled under the top edge', () => {
+  // The bar clipped at the top of the screen on Linux for two releases. The
+  // cause was structural, not a number that needed nudging: the bar was
+  // `position: sticky` inside a launcher that scrolled, so where it landed
+  // depended on a scroll offset. And the launcher always had one, because a
+  // 76px bar sat above a body with `min-height: calc(100% - 74px)` -- a
+  // permanent 2px overflow. Both halves are asserted here because fixing
+  // either one alone leaves the bar's position a function of scroll state.
+  const bar = css.match(/^\.top \{([^}]*)\}/m);
+  assert.ok(bar, 'no .top rule in styles.css');
+  assert.ok(!/position:\s*sticky/.test(bar[1]),
+    '.top must not be sticky: a sticky bar moves with its scroll container');
+  assert.ok(/flex:\s*0 0 auto/.test(bar[1]),
+    '.top needs flex: 0 0 auto, or a squeezed bar clips its own 44px controls');
+
+  const launcher = css.match(/^#launcher \{([^}]*)\}/m);
+  assert.ok(launcher, 'no #launcher rule in styles.css');
+  assert.ok(/overflow:\s*hidden/.test(launcher[1]),
+    '#launcher must not scroll; .launcher-inner is the scroller');
+
+  const inner = css.match(/^\.launcher-inner \{([^}]*)\}/m);
+  assert.ok(inner, 'no .launcher-inner rule in styles.css');
+  assert.ok(/overflow-y:\s*auto/.test(inner[1]),
+    '.launcher-inner must be the scrolling element');
+  assert.ok(!/calc\(100% - \d+px\)/.test(inner[1]),
+    'a height guessed against the bar drifts the moment the bar changes');
+  assert.ok(/justify-content:\s*safe center/.test(inner[1]),
+    'plain centring puts overflow above the scroll origin, out of reach');
+});
+
 test('every shape a catalog entry may use has artwork', () => {
   const { SHAPES } = require('../src/main/catalog');
   for (const shape of SHAPES) {

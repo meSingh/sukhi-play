@@ -328,6 +328,21 @@ kiosk). Both are per-account and leave your own login untouched.
 **This is not a substitute for supervision.** It reduces what a small child can
 reach; it does not childproof a computer.
 
+### Reporting a layout or window bug
+
+Window geometry cannot be reasoned about from another machine, so paste real
+numbers rather than a description:
+
+```bash
+npm run diagnose
+```
+
+It prints the display bounds, the window bounds, whether the window believes it
+is fullscreen, the session type (X11 or Wayland), and the measured position of
+the top bar, then quits. A top bar reporting `top: 0` with a positive height is
+correctly placed; a negative top, or a window whose `y` is above the display's,
+means the window manager and the app disagree.
+
 ## If it ever locks you out
 
 The app is built to **fail open**. If the launcher does not appear within 12
@@ -358,6 +373,7 @@ npm run dev      # no screen-covering, no OS shortcut capture
 npm test         # unit tests
 npm run check    # drive a real site, report what loaded and what was cut
 npm run probe -- --probe=https://example.com   # derive an allowlist for a site
+npm run diagnose # print window and layout geometry, then quit
 npm run pack     # unpackaged build
 npm run dist     # installers for the current platform
 ```

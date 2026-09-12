@@ -1,4 +1,4 @@
-appId: com.sukhi.play
+appId: com.msingh.sukhi.play
 productName: Sukhi Play
 copyright: Copyright © 2026
 
@@ -42,6 +42,15 @@ win:
     - target: portable
       arch: [x64]
   icon: build/icon.png
+
+deb:
+  # A .deb control file has nowhere to put a licence, a developer name or a
+  # release date, which is why Ubuntu's App Center reported all three as
+  # unknown. Software centres read that from AppStream metadata instead, and
+  # electron-builder does not generate it, so scripts/make-metainfo.js does and
+  # fpm places it where the centres look.
+  fpm:
+    - "build/linux/com.msingh.sukhi.play.metainfo.xml=/usr/share/metainfo/com.msingh.sukhi.play.metainfo.xml"
 
 nsis:
   artifactName: ${productName}-${version}-win-${arch}-setup.${ext}
