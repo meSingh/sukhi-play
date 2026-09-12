@@ -6,10 +6,10 @@
 
 **A locked-down browser that lets a small child open only the sites you choose — and nothing else.**
 
-[![CI](https://github.com/OWNER/sukhi-play/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/sukhi-play/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/OWNER/sukhi-play?sort=semver)](https://github.com/OWNER/sukhi-play/releases/latest)
+[![CI](https://github.com/YOURNAME/sukhi-play/actions/workflows/ci.yml/badge.svg)](https://github.com/YOURNAME/sukhi-play/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/YOURNAME/sukhi-play?sort=semver)](https://github.com/YOURNAME/sukhi-play/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/OWNER/sukhi-play/releases/latest)
+[![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/YOURNAME/sukhi-play/releases/latest)
 
 </div>
 
@@ -27,7 +27,7 @@ Closing it needs an adult.
 ## Install
 
 Grab the file for your machine from the
-**[latest release](https://github.com/OWNER/sukhi-play/releases/latest)**:
+**[latest release](https://github.com/YOURNAME/sukhi-play/releases/latest)**:
 
 | Platform | File |
 | --- | --- |
@@ -46,46 +46,78 @@ Grab the file for your machine from the
 Or run it from source:
 
 ```bash
-git clone https://github.com/OWNER/sukhi-play.git
+git clone https://github.com/YOURNAME/sukhi-play.git
 cd sukhi-play
 npm install
 npm start
 ```
 
-## First run: nothing is enabled
+## First run: you choose what he can open
 
-**Sukhi Play ships with an empty launcher on purpose.** It does not pick sites
-for you and does not endorse any. You decide where it may go.
+**Sukhi Play ships with an empty launcher.** It does not pick sites for you. But
+it does make picking easy — you never need to work out hostnames yourself.
 
-1. Start the app, press **For grown-ups**, hold the button for 3 seconds.
-2. Press **Open that folder** to find `catalog.json`.
-3. Add a site, set `"enabled": true`, restart.
+Open the grown-up screen (**For grown-ups**, hold 3 seconds) → **Add or remove
+games**. Three tabs:
 
-```json
-{
-  "id": "my-games",
-  "title": "Games",
-  "url": "https://example.com/",
-  "shape": "rocket",
-  "color": "#3b82f6",
-  "enabled": true,
-  "allowHosts": ["example.com", "example-cdn.com"],
-  "denyHosts": ["ads.example.com"]
-}
+### Suggestions — one tap
+
+A bundled list of sites other parents use, grouped by category, each labelled
+**no ads** or **has ads**. Tap *Add* and it appears on the tile screen.
+
+Nothing here is installed, enabled, or endorsed by this project, and none of
+these sites is connected to it. Read [DISCLAIMER.md](DISCLAIMER.md).
+
+| | Site | |
+| --- | --- | --- |
+| Creative | Scratch | MIT, non-profit, no advertising |
+| Learning | Blockly Games | Open source puzzles that teach programming |
+| Learning | NASA Space Place | US government, no advertising |
+| Learning | Starfall | Letters, phonics, early reading |
+| Learning | Nat Geo Kids | Animals and photography |
+| Learning | ABCya | Educational games by grade, ad-supported |
+| Games | PBS Kids | US public broadcasting, made for pre-schoolers |
+| Games | Toy Theater | Simple educational games |
+| Games | Poki | Large free game portal, ad-supported |
+| Video | YouTube Kids | Ad filtering **off** by design — see below |
+
+### Add a site — type a domain, it works the rest out
+
+Type `pbskids.org`. The app opens it once, watches every request it makes, and
+tells you:
+
+```
+Found 1 host. 2 looked like advertising or tracking and will be blocked.
+  pbskids.org
 ```
 
-Then check your allowlist is right:
+Give the tile a name, press **Add**. It fetches the site's favicon for the tile
+and writes the allowlist for you. This is the same machinery as `npm run check`,
+driven from the interface.
 
-```bash
-npm run check -- --check=my-games
-```
+### My games — turn things on and off
 
-That opens the site, watches it, and prints every host it loaded and everything
-that was cut, with example URLs. If the site looked broken, the report names the
-host to add.
+Toggle each tile on or off, or remove it.
 
-**Please read [DISCLAIMER.md](DISCLAIMER.md) before you add anything.** You are
-responsible for complying with the terms of service of every site you enable.
+### About YouTube Kids
+
+That profile ships with **ad filtering switched off** on purpose. Some sites are
+explicit in their terms about not interfering with their advertising, and
+YouTube is the clearest example. You do not need ad blocking there anyway — what
+you need is *containment*, and that still applies in full: your child cannot
+leave the site, open a popup, or reach anything else.
+
+`blockAds: false` is available on any site you add, if you would rather leave it
+as its operator intended.
+
+**youtube.com itself is deliberately not suggested.** Recommendations, comments
+and autoplay make it unsuitable for a small child. Use YouTube Kids, and set the
+age profile up inside YouTube Kids first.
+
+## Editing by hand
+
+Everything above writes to `catalog.json`, which you can edit directly — the
+grown-up screen has a button that opens the folder.
 
 | Field | Meaning |
 | --- | --- |
@@ -96,7 +128,15 @@ responsible for complying with the terms of service of every site you enable.
 | `color` | Tile colour, `#rrggbb` |
 | `allowHosts` | **Only** these hosts may load. `example.com` also covers `a.example.com`, never `evil-example.com` |
 | `denyHosts` | Overrides `allowHosts` — for ad subdomains of an allowed domain |
+| `blockAds` | `false` leaves the site's advertising alone |
 | `enabled` | `true` to show the tile |
+
+Check your work from a terminal:
+
+```bash
+npm run probe -- --probe=https://example.com   # what hosts does this site need?
+npm run check -- --check=my-games              # does my profile actually work?
+```
 
 ## What your child sees
 
@@ -228,6 +268,7 @@ reach; it does not childproof a computer.
 npm run dev      # no screen-covering, no OS shortcut capture
 npm test         # unit tests
 npm run check    # drive a real site, report what loaded and what was cut
+npm run probe -- --probe=https://example.com   # derive an allowlist for a site
 npm run pack     # unpackaged build
 npm run dist     # installers for the current platform
 ```
@@ -247,6 +288,8 @@ src/
     shortcuts.js   takes 64 shortcuts off the OS while focused
     catalog.js     loads and sanitises catalog.json
     settings.js    loads and sanitises settings.json
+    library.js     the parent's site list, and the bundled suggestions
+    probe.js       visits a site once and works out the allowlist it needs
   preload/
     shell.js       the only bridge between the UI and the app
     guest.js       runs in the page: hides leftover ad boxes

@@ -1,0 +1,199 @@
+{
+  "$comment": [
+    "SUGGESTED SITE PROFILES.",
+    "",
+    "These are compatibility profiles: the hostnames each site needs in order to",
+    "work. They are suggestions a parent can add with one tap. NOTHING here is",
+    "enabled, installed, or endorsed by this project, and none of these sites is",
+    "affiliated with it. See DISCLAIMER.md.",
+    "",
+    "Every allowHosts list below was measured by visiting the site and recording",
+    "what it loaded. Analytics-only hosts are left out on purpose - the site works",
+    "without them. Treat each list as a floor, not a ceiling: if something is",
+    "missing, the app will tell you which host to add.",
+    "",
+    "Sites change. If one stops working, use 'Add a site' in the app to re-probe",
+    "it, or run:  npm run probe -- --probe=https://example.com",
+    "",
+    "blockAds:false means the site is left exactly as its operator intended. The",
+    "kiosk still contains the child; only the ad filtering is off."
+  ],
+  "suggestions": [
+    {
+      "id": "scratch",
+      "title": "Scratch",
+      "url": "https://scratch.mit.edu/",
+      "shape": "blocks",
+      "color": "#f59e0b",
+      "blockAds": true,
+      "adSupported": false,
+      "category": "Creative",
+      "notes": "Make your own games and animations. Run by MIT, non-profit, no advertising.",
+      "allowHosts": [
+        "mit.edu"
+      ],
+      "denyHosts": []
+    },
+    {
+      "id": "blockly",
+      "title": "Puzzles",
+      "url": "https://blockly.games/",
+      "shape": "bolt",
+      "color": "#8b5cf6",
+      "blockAds": true,
+      "adSupported": false,
+      "category": "Learning",
+      "notes": "Puzzle games that quietly teach programming. Open source, no advertising.",
+      "allowHosts": [
+        "blockly.games"
+      ],
+      "denyHosts": []
+    },
+    {
+      "id": "pbskids",
+      "title": "PBS Kids",
+      "url": "https://pbskids.org/games/",
+      "shape": "star",
+      "color": "#10b981",
+      "blockAds": true,
+      "adSupported": false,
+      "category": "Games",
+      "notes": "Games from US public broadcasting. Made for pre-schoolers.",
+      "allowHosts": [
+        "pbskids.org"
+      ],
+      "denyHosts": []
+    },
+    {
+      "id": "nasakids",
+      "title": "Space",
+      "url": "https://spaceplace.nasa.gov/",
+      "shape": "rocket",
+      "color": "#3b82f6",
+      "blockAds": true,
+      "adSupported": false,
+      "category": "Learning",
+      "notes": "NASA's space games and pictures for children. US government, no advertising.",
+      "allowHosts": [
+        "nasa.gov",
+        "digitalgov.gov",
+        "googleapis.com",
+        "gstatic.com"
+      ],
+      "denyHosts": []
+    },
+    {
+      "id": "toytheater",
+      "title": "Toy Theater",
+      "url": "https://toytheater.com/",
+      "shape": "ball",
+      "color": "#ec4899",
+      "blockAds": true,
+      "adSupported": true,
+      "category": "Games",
+      "notes": "Simple educational games. No advertising, no accounts.",
+      "allowHosts": [
+        "toytheater.com"
+      ],
+      "denyHosts": []
+    },
+    {
+      "id": "starfall",
+      "title": "Reading",
+      "url": "https://www.starfall.com/h/",
+      "shape": "note",
+      "color": "#06b6d4",
+      "blockAds": true,
+      "adSupported": false,
+      "category": "Learning",
+      "notes": "Letters, phonics and early reading. Much of it is free.",
+      "allowHosts": [
+        "starfall.com"
+      ],
+      "denyHosts": []
+    },
+    {
+      "id": "natgeokids",
+      "title": "Animals",
+      "url": "https://kids.nationalgeographic.com/",
+      "shape": "leaf",
+      "color": "#84cc16",
+      "blockAds": true,
+      "adSupported": true,
+      "category": "Learning",
+      "notes": "Animal facts, photos and videos.",
+      "allowHosts": [
+        "nationalgeographic.com",
+        "natgeofe.com",
+        "bamgrid.com",
+        "disneyaccount.com",
+        "go.com"
+      ],
+      "denyHosts": []
+    },
+    {
+      "id": "youtubekids",
+      "title": "YouTube Kids",
+      "url": "https://www.youtubekids.com/",
+      "shape": "drop",
+      "color": "#ef4444",
+      "blockAds": false,
+      "adSupported": true,
+      "category": "Video",
+      "notes": "Ad filtering is OFF for this profile on purpose, so the site runs exactly as intended. The kiosk still stops your child leaving it. Set up profiles and age settings in YouTube Kids itself first. This is NOT youtube.com, which is not suitable for small children.",
+      "allowHosts": [
+        "youtubekids.com",
+        "youtube.com",
+        "googlevideo.com",
+        "ytimg.com",
+        "ggpht.com",
+        "googleusercontent.com",
+        "googleapis.com",
+        "google.com",
+        "gstatic.com"
+      ],
+      "denyHosts": []
+    },
+    {
+      "id": "abcya",
+      "title": "ABCya",
+      "url": "https://www.abcya.com/",
+      "shape": "blocks",
+      "color": "#a855f7",
+      "blockAds": true,
+      "adSupported": true,
+      "category": "Learning",
+      "notes": "Educational games by school grade. The free tier carries advertising.",
+      "allowHosts": [
+        "abcya.com",
+        "abcyacdn.com",
+        "kidsafe.com",
+        "google.com",
+        "gstatic.com"
+      ],
+      "denyHosts": []
+    },
+    {
+      "id": "poki",
+      "title": "Poki",
+      "url": "https://poki.com/",
+      "shape": "rocket",
+      "color": "#1e40af",
+      "blockAds": true,
+      "adSupported": true,
+      "category": "Games",
+      "notes": "A large free browser-game portal. Ad-supported; please read DISCLAIMER.md before enabling.",
+      "allowHosts": [
+        "poki.com",
+        "poki-cdn.com",
+        "poki.io",
+        "poki-user-content.com"
+      ],
+      "denyHosts": [
+        "ads.poki.com",
+        "ad.poki.com",
+        "adservice.poki.com"
+      ]
+    }
+  ]
+}

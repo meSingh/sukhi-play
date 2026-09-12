@@ -94,6 +94,8 @@ function resetGate () {
   el('gate-step-hold').hidden = false;
   el('gate-step-answer').hidden = true;
   el('gate-step-choice').hidden = true;
+  el('gate-step-library').hidden = true;
+  libCard().classList.remove('is-wide');
   el('gate-input').value = '';
   el('gate-error').textContent = '';
 }
@@ -141,6 +143,251 @@ async function revealChallenge () {
 
   // Holding was the whole check.
   showChoices();
+}
+
+/* ---------------- grown-up library ---------------- */
+
+let probeResult = null;
+
+function libCard () { return document.querySelector('.gate-card'); }
+
+function showLibrary () {
+  el('gate-step-choice').hidden = true;
+  el('gate-step-library').hidden = false;
+  libCard().classList.add('is-wide');
+  switchTab('mine');
+  loadLibrary();
+}
+
+function hideLibrary () {
+  el('gate-step-library').hidden = true;
+  libCard().classList.remove('is-wide');
+  showChoices();
+}
+
+function switchTab (name) {
+  for (const tab of document.querySelectorAll('.lib-tab')) {
+    tab.classList.toggle('is-on', tab.dataset.tab === name);
+  }
+  el('lib-mine').hidden = name !== 'mine';
+  el('lib-add').hidden = name !== 'add';
+  el('lib-suggest').hidden = name !== 'suggest';
+}
+
+async function loadLibrary () {
+  const data = await api.library();
+  if (!data || !data.ok) return;
+  renderMine(data.mine);
+  renderSuggestions(data.suggestions);
+}
+
+function dot (color) {
+  const d = document.createElement('div');
+  d.className = 'lib-dot';
+  d.style.background = color;
+  return d;
+}
+
+function row ({ color, name, sub, note, actions }) {
+  const item = document.createElement('div');
+  item.className = 'lib-item';
+
+  const body = document.createElement('div');
+  body.className = 'lib-body';
+
+  const title = document.createElement('div');
+  title.className = 'lib-name';
+  title.append(name);
+
+  const subEl = document.createElement('div');
+  subEl.className = 'lib-sub';
+  subEl.textContent = sub;
+
+  body.append(title, subEl);
+  if (note) {
+    const n = document.createElement('div');
+    n.className = 'lib-note';
+    n.textContent = note;
+    body.appendChild(n);
+  }
+
+  const acts = document.createElement('div');
+  acts.className = 'lib-actions';
+  for (const a of actions) acts.appendChild(a);
+
+  item.append(dot(color), body, acts);
+  return item;
+}
+
+function button (label, cls, onClick) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'lib-btn' + (cls ? ' ' + cls : '');
+  b.textContent = label;
+  b.addEventListener('click', onClick);
+  return b;
+}
+
+function tag (text, cls) {
+  const t = document.createElement('span');
+  t.className = 'lib-tag' + (cls ? ' ' + cls : '');
+  t.textContent = text;
+  return t;
+}
+
+function renderMine (mine) {
+  const wrap = el('lib-mine');
+  wrap.textContent = '';
+
+  if (!mine.length) {
+    const p = document.createElement('p');
+    p.className = 'lib-empty';
+    p.textContent = 'No games yet. Use "Add a site" or pick one from Suggestions.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  for (const app of mine) {
+    const name = document.createElement('span');
+    name.textContent = app.title;
+    if (!app.blockAds) name.appendChild(tag('ads allowed'));
+
+    wrap.appendChild(row({
+      color: app.color,
+      name,
+      sub: `${app.url}  ·  ${app.hostCount} host${app.hostCount === 1 ? '' : 's'} allowed`,
+      actions: [
+        button(app.enabled ? 'On' : 'Off', app.enabled ? 'lib-btn--on' : '', async () => {
+          await api.updateSite(app.id, { enabled: !app.enabled });
+          loadLibrary();
+        }),
+        button('Remove', 'lib-btn--danger', async () => {
+          await api.removeSite(app.id);
+          loadLibrary();
+        })
+      ]
+    }));
+  }
+}
+
+function renderSuggestions (list) {
+  const wrap = el('lib-suggest-list');
+  wrap.textContent = '';
+
+  const byCategory = new Map();
+  for (const s of list) {
+    if (!byCategory.has(s.category)) byCategory.set(s.category, []);
+    byCategory.get(s.category).push(s);
+  }
+
+  for (const [category, items] of byCategory) {
+    const head = document.createElement('div');
+    head.className = 'lib-cat';
+    head.textContent = category;
+    wrap.appendChild(head);
+
+    for (const s of items) {
+      const name = document.createElement('span');
+      name.textContent = s.title;
+      name.appendChild(s.adSupported
+        ? tag('has ads', 'lib-tag--ads')
+        : tag('no ads', 'lib-tag--free'));
+      if (!s.blockAds) name.appendChild(tag('left as-is'));
+
+      const add = button(s.added ? 'Added' : 'Add', s.added ? '' : 'lib-btn--add', async (e) => {
+        e.target.disabled = true;
+        const r = await api.addSuggestion(s.id);
+        if (!r || !r.ok) {
+          e.target.disabled = false;
+          showToast((r && r.message) || 'Could not add that.');
+          return;
+        }
+        loadLibrary();
+      });
+      add.disabled = s.added;
+
+      wrap.appendChild(row({
+        color: s.color, name,
+        sub: s.url,
+        note: s.notes,
+        actions: [add]
+      }));
+    }
+  }
+}
+
+/* --- add a site by address --- */
+
+async function checkSite () {
+  const url = el('lib-url').value.trim();
+  if (!url) return;
+
+  const out = el('lib-result');
+  const go = el('lib-check');
+  go.disabled = true;
+  out.textContent = '';
+
+  const busy = document.createElement('p');
+  busy.className = 'lib-spinner';
+  busy.textContent = 'Opening the site and watching what it loads. About 15 seconds...';
+  out.appendChild(busy);
+
+  const r = await api.probeSite(url);
+  go.disabled = false;
+  out.textContent = '';
+
+  if (!r || !r.ok) {
+    out.textContent = (r && r.message) || 'That site could not be checked.';
+    return;
+  }
+
+  probeResult = r;
+
+  const summary = document.createElement('p');
+  summary.textContent = r.warning
+    ? r.warning
+    : `Found ${r.hostCount} host${r.hostCount === 1 ? '' : 's'}. ` +
+      `${r.blockedCount} looked like advertising or tracking and will be blocked.`;
+  out.appendChild(summary);
+
+  const hosts = document.createElement('div');
+  hosts.className = 'lib-hosts';
+  hosts.textContent = r.allowHosts.join('  ·  ') || '(nothing)';
+  out.appendChild(hosts);
+
+  if (!r.allowHosts.length) return;
+
+  const nameRow = document.createElement('div');
+  nameRow.className = 'lib-row';
+  const nameInput = document.createElement('input');
+  nameInput.className = 'lib-input';
+  nameInput.value = r.suggestedTitle;
+  nameInput.setAttribute('aria-label', 'Name for the tile');
+  const addBtn = document.createElement('button');
+  addBtn.className = 'lib-go';
+  addBtn.type = 'button';
+  addBtn.textContent = 'Add';
+  addBtn.addEventListener('click', async () => {
+    addBtn.disabled = true;
+    const res = await api.addSite({
+      title: nameInput.value.trim() || r.suggestedTitle,
+      url: r.url,
+      allowHosts: r.allowHosts,
+      iconUrls: r.iconUrls,
+      blockAds: true
+    });
+    if (!res || !res.ok) {
+      addBtn.disabled = false;
+      showToast((res && res.message) || 'Could not add that.');
+      return;
+    }
+    el('lib-url').value = '';
+    out.textContent = '';
+    switchTab('mine');
+    loadLibrary();
+  });
+  nameRow.append(nameInput, addBtn);
+  out.appendChild(nameRow);
 }
 
 function showChoices () {
@@ -225,6 +472,13 @@ function wire () {
     }
   });
   el('choice-home').addEventListener('click', () => api.goHomeUnlocked());
+  el('choice-library').addEventListener('click', showLibrary);
+  el('lib-done').addEventListener('click', hideLibrary);
+  el('lib-check').addEventListener('click', checkSite);
+  el('lib-url').addEventListener('keydown', (e) => { if (e.key === 'Enter') checkSite(); });
+  for (const tab of document.querySelectorAll('.lib-tab')) {
+    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+  }
 
   const hold = el('hold-btn');
   hold.addEventListener('pointerdown', startHold);

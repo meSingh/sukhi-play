@@ -8,6 +8,8 @@ const settingsStore = require('./settings');
 const catalogStore = require('./catalog');
 const security = require('./security');
 const shortcuts = require('./shortcuts');
+const probe = require('./probe');
+const library = require('./library');
 const { Shell } = require('./windowing');
 
 const IS_DEV = process.argv.includes('--dev');
@@ -20,6 +22,12 @@ const CHECK_ARG = process.argv.find((a) => a === '--check' || a.startsWith('--ch
 const CHECK_MODE = Boolean(CHECK_ARG);
 const CHECK_APP_ID = CHECK_ARG && CHECK_ARG.includes('=') ? CHECK_ARG.split('=')[1] : null;
 const CHECK_SECONDS = Number(process.env.CHECK_SECONDS || 14);
+
+// `--probe <url>` visits a site once and prints the allowlist it would need.
+// Same machinery the in-app "Add a site" wizard uses, driven from a terminal.
+const PROBE_ARG = process.argv.find((a) => a.startsWith('--probe='));
+const PROBE_URL = PROBE_ARG ? PROBE_ARG.split('=').slice(1).join('=') : null;
+const PROBE_MODE = Boolean(PROBE_URL);
 
 // --- one instance only ------------------------------------------------------
 // Two copies of a kiosk app fighting over always-on-top is a bad time.
@@ -41,6 +49,8 @@ let policy = null;
 let settings = null;
 let catalog = null;
 let paths = {};
+let suggestions = [];
+let probeBusy = false;
 
 // --- the grown-up gate ------------------------------------------------------
 
@@ -169,7 +179,7 @@ function registerIpc () {
     paths,
     catalogSource: catalog.source,
     isDev: IS_DEV,
-    checkMode: CHECK_MODE
+    checkMode: CHECK_MODE || PROBE_MODE
   }));
 
   ipcMain.handle('shell:launch', (_e, appId) => {
@@ -228,6 +238,110 @@ function registerIpc () {
     gate.unlockedUntil = 0;
     shellApp.closeGateAndGoHome();
     return { ok: true };
+  });
+
+  // ---- the grown-up library. Every handler needs an unlocked gate. ----
+
+  const locked = () => ({ ok: false, message: 'Not unlocked.' });
+
+  function reloadCatalog () {
+    catalog = catalogStore.load({
+      userDataDir: paths.userData,
+      bundledPath: path.join(__dirname, '..', '..', 'config', 'catalog.json')
+    });
+    paths.catalog = catalog.file;
+    if (shellApp) shellApp.pushState();
+  }
+
+  ipcMain.handle('shell:library', () => {
+    if (!isUnlocked()) return locked();
+    return {
+      ok: true,
+      mine: catalog.apps.map(({ id, title, url, shape, color, enabled, blockAds, allowHosts, notes }) =>
+        ({ id, title, url, shape, color, enabled, blockAds, hostCount: allowHosts.length, notes })),
+      suggestions: suggestions.map((s) => ({
+        id: s.id, title: s.title, url: s.url, shape: s.shape, color: s.color,
+        category: s.category, adSupported: s.adSupported, blockAds: s.blockAds,
+        notes: s.notes, hostCount: s.allowHosts.length,
+        added: catalog.apps.some((a) => a.url === s.url)
+      }))
+    };
+  });
+
+  ipcMain.handle('shell:probe-site', async (_e, url) => {
+    if (!isUnlocked()) return locked();
+    if (probeBusy) return { ok: false, message: 'Already checking a site.' };
+    probeBusy = true;
+    try {
+      return await probe.probeSite({
+        win: shellApp.win,
+        shellView: shellApp.shellView,
+        session: session.fromPartition(SESSION_PARTITION),
+        policy,
+        url: String(url || '')
+      });
+    } catch (err) {
+      console.warn('[probe] failed:', err.message);
+      return { ok: false, message: 'That site could not be checked.' };
+    } finally {
+      probeBusy = false;
+      // The probe borrowed the policy; put it back how the launcher expects it.
+      policy.clear();
+    }
+  });
+
+  ipcMain.handle('shell:add-site', async (_e, entry) => {
+    if (!isUnlocked()) return locked();
+    if (!entry || typeof entry !== 'object') return { ok: false, message: 'Nothing to add.' };
+
+    const result = library.addSite(paths.catalog, {
+      title: entry.title,
+      url: entry.url,
+      allowHosts: entry.allowHosts,
+      denyHosts: entry.denyHosts,
+      blockAds: entry.blockAds !== false,
+      notes: entry.notes,
+      enabled: true
+    });
+    if (!result.ok) return result;
+
+    // A real favicon makes a far better tile than a coloured shape.
+    if (Array.isArray(entry.iconUrls) && entry.iconUrls.length) {
+      const icon = await probe.downloadIcon({
+        urls: entry.iconUrls, userDataDir: paths.userData, id: result.app.id
+      });
+      if (icon) library.updateSite(paths.catalog, result.app.id, { icon });
+    }
+
+    reloadCatalog();
+    console.log(`[library] added ${result.app.id} -> ${result.app.url}`);
+    return { ok: true, app: result.app };
+  });
+
+  ipcMain.handle('shell:add-suggestion', async (_e, id) => {
+    if (!isUnlocked()) return locked();
+    const found = suggestions.find((s) => s.id === id);
+    if (!found) return { ok: false, message: 'Unknown suggestion.' };
+
+    const result = library.addSite(paths.catalog, { ...found, enabled: true });
+    if (!result.ok) return result;
+    reloadCatalog();
+    console.log(`[library] added suggestion ${found.id}`);
+    return { ok: true, app: result.app };
+  });
+
+  ipcMain.handle('shell:update-site', (_e, id, patch) => {
+    if (!isUnlocked()) return locked();
+    const result = library.updateSite(paths.catalog, String(id), patch || {});
+    if (result.ok) reloadCatalog();
+    return result;
+  });
+
+  ipcMain.handle('shell:remove-site', (_e, id) => {
+    if (!isUnlocked()) return locked();
+    const result = library.removeSite(paths.catalog, String(id));
+    if (result.ok) reloadCatalog();
+    return result;
   });
 
   ipcMain.handle('shell:open-config-folder', () => {
@@ -330,6 +444,40 @@ async function runCheck () {
   app.exit(problems.length ? 1 : 0);
 }
 
+async function runProbe () {
+  console.log(`\n  Probing ${PROBE_URL}\n  This takes about ${probe.PROBE_SECONDS} seconds...\n`);
+
+  const result = await probe.probeSite({
+    win: shellApp.win,
+    shellView: shellApp.shellView,
+    session: session.fromPartition(SESSION_PARTITION),
+    policy,
+    url: PROBE_URL,
+    onProgress: (stage) => console.log(`  [${stage}]`)
+  });
+
+  if (!result.ok) {
+    console.error(`\n  ${result.message}\n`);
+    shellApp.allowQuit = true;
+    return app.exit(1);
+  }
+
+  console.log(`\n  == ${result.url} ==`);
+  console.log(`  title: ${result.title}`);
+  console.log(`  suggested tile name: ${result.suggestedTitle}\n`);
+  console.log(`  allowHosts (${result.allowHosts.length}) -- paste into catalog.json:`);
+  console.log('    ' + JSON.stringify(result.allowHosts));
+  console.log(`\n  blocked as ads/trackers (${result.blockedHosts.length}):`);
+  console.log('    ' + (result.blockedHosts.length ? JSON.stringify(result.blockedHosts) : '(none)'));
+  if (result.iconUrls.length) console.log(`\n  icon: ${result.iconUrls[0]}`);
+  if (result.warning) console.log(`\n  WARNING: ${result.warning}`);
+  console.log('');
+
+  shortcuts.releaseAll();
+  shellApp.allowQuit = true;
+  app.exit(0);
+}
+
 // --- boot -------------------------------------------------------------------
 
 app.whenReady().then(() => {
@@ -349,7 +497,11 @@ app.whenReady().then(() => {
   });
   paths.catalog = catalog.file;
 
-  console.log(`[boot] ${catalog.apps.length} apps from ${catalog.source} catalog`);
+  suggestions = library.loadSuggestions(
+    path.join(__dirname, '..', '..', 'config', 'suggestions.json'));
+
+  console.log(`[boot] ${catalog.apps.length} apps from ${catalog.source} catalog, ` +
+              `${suggestions.length} suggestions available`);
   console.log(`[boot] config folder: ${paths.userData}`);
 
   policy = security.createPolicy();
@@ -367,7 +519,7 @@ app.whenReady().then(() => {
     settings,
     session: kidSession,
     isDev: IS_DEV,
-    checkMode: CHECK_MODE
+    checkMode: CHECK_MODE || PROBE_MODE
   });
 
   const win = shellApp.create();
@@ -378,9 +530,14 @@ app.whenReady().then(() => {
   // but only while this window is in front. Disabled in dev so the machine
   // stays usable while working on the app.
   shortcuts.install(win, {
-    enabled: !IS_DEV && !CHECK_MODE,
+    enabled: !IS_DEV && !CHECK_MODE && !PROBE_MODE,
     onParentEscape: () => shellApp.openGate('exit')
   });
+
+  if (PROBE_MODE) {
+    ipcMain.once('shell:renderer-idle', () => setTimeout(() => { runProbe(); }, 200));
+    return;
+  }
 
   if (CHECK_MODE) {
     // Wait for the renderer to finish booting before launching anything:
@@ -401,7 +558,7 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', (event) => {
-  if (CHECK_MODE) return;
+  if (CHECK_MODE || PROBE_MODE) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');

@@ -36,14 +36,37 @@ application, its icon, or its user interface.
 
 ## No site is enabled by default
 
-**The application ships with an empty launcher.** Example configurations are
-included in the documentation and in `config/catalog.json`, all marked
-`"enabled": false`. Nothing loads until a parent explicitly turns an entry on or
-writes their own.
+**The application ships with an empty launcher.** Nothing loads until a parent
+explicitly adds a site. This is enforced in continuous integration: a build
+fails if the shipped catalog enables anything.
 
-This is deliberate. The maintainers do not select, endorse, recommend, or
-curate any destination. The person who installs the software decides where it
-may go, exactly as they would by typing an address into any other browser.
+### About the suggestions list
+
+The app includes a list of **suggested site profiles** a parent can add with one
+tap. To be precise about what that is and is not:
+
+- A profile is **compatibility data** — the hostnames a site needs in order to
+  function, measured by visiting it once and recording what it loaded. It is a
+  factual description of how a site is put together, in the same way a browser
+  compatibility table is.
+- **Nothing in the list is enabled, installed, bundled, or pre-configured.** It
+  is inert until a parent chooses an entry.
+- **No listed site is affiliated with, endorsed by, or a partner of this
+  project**, and this project claims no relationship with any of them. Equally,
+  this project does not endorse any listed site. Naming a site is not a
+  recommendation of its content; parents should look at what their own child is
+  using.
+- Some profiles are shipped with **ad filtering switched off** (`blockAds:
+  false`), so those sites run exactly as their operators intend. Where a site's
+  terms are explicit about not interfering with its advertising, that is the
+  setting we ship.
+- The list is **bundled with the release**, not fetched at runtime. A children's
+  kiosk that downloads a list of destinations at start-up is a
+  configuration-injection path; whoever controlled that list would control where
+  children are sent.
+
+**If you operate a listed site and would like your profile removed, open an
+issue and we will remove it.** No argument required.
 
 ## About content blocking
 
@@ -79,10 +102,24 @@ who make it.
 
 ## Children's privacy
 
-Sukhi Play collects nothing, sends nothing, and has no telemetry, analytics,
-accounts, or network services of its own. It stores settings and browser data
-locally in the operating system's standard application-data folder, in a
-browser profile kept separate from your own.
+Sukhi Play has **no telemetry, no analytics, and no accounts.** It does not
+report anything about you, your child, or your usage to anyone, and the
+maintainers receive nothing.
+
+It stores settings and browser data locally in the operating system's standard
+application-data folder, in a browser profile kept separate from your own.
+
+For completeness, the app does make network requests in exactly three
+situations, all of them initiated by you:
+
+1. **Opening a site** your child selected — the whole point of the program.
+2. **Checking a site** when you use *Add a site*. It loads that address once,
+   records the hostnames it requests, and discards the page.
+3. **Fetching a site's icon** when you add it, so the tile shows the site's own
+   favicon rather than a coloured shape.
+
+There is no fourth. Nothing is contacted at start-up, on a schedule, or in the
+background.
 
 Websites a parent enables may themselves collect data and set cookies. Sukhi
 Play cannot change what a third-party site does once it is allowed to load.

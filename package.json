@@ -16,7 +16,8 @@
     "dist:linux": "electron-builder --linux",
     "check": "electron . --check",
     "test": "node --test \"test/*.test.js\"",
-    "lint": "node -e \"for (const f of require('fs').readdirSync('src/main')) if (f.endsWith('.js')) require('child_process').execSync(`node --check src/main/${f}`); console.log('ok')\""
+    "lint": "node -e \"for (const f of require('fs').readdirSync('src/main')) if (f.endsWith('.js')) require('child_process').execSync(`node --check src/main/${f}`); console.log('ok')\"",
+    "probe": "electron . --probe="
   },
   "devDependencies": {
     "electron": "^44.3.0",
@@ -32,13 +33,13 @@
     "launcher",
     "toddler"
   ],
-  "homepage": "https://github.com/OWNER/sukhi-play#readme",
+  "homepage": "https://github.com/YOURNAME/sukhi-play#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OWNER/sukhi-play.git"
+    "url": "https://github.com/YOURNAME/sukhi-play.git"
   },
   "bugs": {
-    "url": "https://github.com/OWNER/sukhi-play/issues"
+    "url": "https://github.com/YOURNAME/sukhi-play/issues"
   },
   "author": "Sukhi Play contributors",
   "engines": {

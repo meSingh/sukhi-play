@@ -41,7 +41,16 @@ function sanitizeApp (raw, index) {
     color: HEX.test(raw.color) ? raw.color : '#3b82f6',
     enabled: raw.enabled !== false,
     allowHosts,
-    denyHosts
+    denyHosts,
+    // Some sites say plainly in their terms that you may not block their
+    // advertising. Set this false for those: the kiosk still contains the
+    // child -- no other sites, no popups, no wandering off -- while the site
+    // is left to run exactly as its operator intended.
+    blockAds: raw.blockAds !== false,
+    // A local icon file (usually a favicon fetched when the site was added).
+    // Falls back to the coloured shape tile when absent.
+    icon: typeof raw.icon === 'string' && raw.icon.trim() ? raw.icon.trim() : null,
+    notes: typeof raw.notes === 'string' ? raw.notes.trim() : ''
   };
 }
 

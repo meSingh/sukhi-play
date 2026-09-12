@@ -29,12 +29,29 @@ function schemeOf (url) {
 function createPolicy () {
   let gate = createHostGate({ allow: [], deny: [] });
   let activeAppId = null;
+  let blockAds = true;
+  // While probing a new site we want to SEE what it loads rather than cut it.
+  // Known ad hosts are still refused -- there is no reason to pull adverts down
+  // just to find out a site's hostnames.
+  let probing = false;
   const counts = { ads: 0, offlist: 0, popups: 0, navigations: 0, downloads: 0 };
   // Kept so `npm run check` can report which hosts a site actually needed.
   const seen = { allowed: new Map(), blocked: new Map() };
 
   return {
     get activeAppId () { return activeAppId; },
+    get blockAds () { return blockAds; },
+    get probing () { return probing; },
+    startProbe () {
+      probing = true;
+      blockAds = true;
+      activeAppId = '__probe__';
+      gate = createHostGate({ allow: [], deny: [] });
+      for (const key of Object.keys(counts)) counts[key] = 0;
+      seen.allowed.clear();
+      seen.blocked.clear();
+    },
+    endProbe () { probing = false; },
     get counts () { return { ...counts }; },
     get seenHosts () {
       const toSorted = (map) => [...map.entries()]
@@ -56,6 +73,7 @@ function createPolicy () {
     },
     setApp (app) {
       activeAppId = app ? app.id : null;
+      blockAds = app ? app.blockAds !== false : true;
       gate = createHostGate({
         allow: app ? app.allowHosts : [],
         deny: app ? app.denyHosts : []
@@ -69,7 +87,13 @@ function createPolicy () {
     allowsUrl (url) {
       return WEB_SCHEMES.has(schemeOf(url)) && gate.allows(hostFromUrl(url));
     },
-    verdict (host) { return gate.verdict(host); },
+    verdict (host) {
+      const v = gate.verdict(host);
+      // Everything real is permitted during a probe, so the recorded list is
+      // the site's actual set of hosts rather than whatever survived a guess.
+      if (probing && v === 'deny-not-allowed') return 'allow';
+      return v;
+    },
     tally (key) { if (key in counts) counts[key] += 1; }
   };
 }
@@ -94,8 +118,10 @@ function configureSession (ses, policy, { onBlocked } = {}) {
 
     const host = hostFromUrl(url);
 
-    // Layer 1: known ad / tracker / popunder infrastructure.
-    const ad = blocklist.inspect(url, host, resourceType);
+    // Layer 1: known ad / tracker / popunder infrastructure. Skipped for sites
+    // the parent has chosen to leave monetised -- the allowlist below still
+    // confines the child to that site.
+    const ad = policy.blockAds ? blocklist.inspect(url, host, resourceType) : null;
     if (ad) {
       policy.tally('ads');
       policy.note('blocked', host, ad.reason, url);

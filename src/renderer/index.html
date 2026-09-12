@@ -79,9 +79,49 @@
           <button id="choice-quit" class="choice-btn choice-btn--quit" type="button">
             Close Sukhi Play
           </button>
+          <button id="choice-library" class="choice-btn" type="button">
+            Add or remove games
+          </button>
           <button id="choice-home" class="choice-btn" type="button">
             Back to the game list
           </button>
+        </div>
+      </div>
+
+      <div id="gate-step-library" hidden>
+        <div class="lib-tabs" role="tablist">
+          <button class="lib-tab is-on" data-tab="mine" type="button">My games</button>
+          <button class="lib-tab" data-tab="add" type="button">Add a site</button>
+          <button class="lib-tab" data-tab="suggest" type="button">Suggestions</button>
+        </div>
+
+        <div id="lib-mine" class="lib-pane"></div>
+
+        <div id="lib-add" class="lib-pane" hidden>
+          <p class="lib-help">
+            Type a web address. Sukhi Play will open it once, watch what it
+            loads, and work out which hosts it needs. Nothing is saved until you
+            press Add.
+          </p>
+          <div class="lib-row">
+            <input id="lib-url" class="lib-input" type="text" inputmode="url"
+                   autocomplete="off" spellcheck="false" placeholder="example.com">
+            <button id="lib-check" class="lib-go" type="button">Check</button>
+          </div>
+          <div id="lib-result" class="lib-result"></div>
+        </div>
+
+        <div id="lib-suggest" class="lib-pane" hidden>
+          <p class="lib-help">
+            Sites other parents use. Nothing here is installed or endorsed by
+            Sukhi Play, and none of these sites is connected to it. You are
+            responsible for checking each site's terms before enabling it.
+          </p>
+          <div id="lib-suggest-list"></div>
+        </div>
+
+        <div class="gate-actions">
+          <button id="lib-done" class="ghost-btn" type="button">Done</button>
         </div>
       </div>
 

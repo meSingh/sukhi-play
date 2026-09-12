@@ -57,6 +57,26 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))"
           echo "config files are valid"
 
+      - name: Suggestions must be valid and none may ship enabled
+        shell: bash
+        run: |
+          node -e "
+            const lib = require('./src/main/library');
+            const list = lib.loadSuggestions('config/suggestions.json');
+            if (!list.length) { console.error('suggestions.json produced nothing usable'); process.exit(1); }
+            const on = list.filter(s => s.enabled);
+            if (on.length) {
+              console.error('Suggestions must never ship enabled: ' + on.map(s=>s.id).join(', '));
+              process.exit(1);
+            }
+            const noHosts = list.filter(s => !s.allowHosts.length);
+            if (noHosts.length) {
+              console.error('Suggestions without an allowlist: ' + noHosts.map(s=>s.id).join(', '));
+              process.exit(1);
+            }
+            console.log(list.length + ' suggestions, all valid, none enabled');
+          "
+
       - name: The shipped catalog must not enable any site
         shell: bash
         run: |
