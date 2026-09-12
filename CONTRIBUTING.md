@@ -6,7 +6,7 @@ Thanks for looking. This started as one parent trying to hand a laptop to a
 ## Getting set up
 
 ```bash
-git clone https://github.com/YOURNAME/sukhi-play.git
+git clone https://github.com/meSingh/sukhi-play.git
 cd sukhi-play
 npm install
 npm run dev      # dev mode: no screen-covering, no OS shortcut capture

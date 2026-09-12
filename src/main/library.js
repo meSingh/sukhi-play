@@ -155,7 +155,19 @@ async function refreshFrom (url, fetchImpl) {
   }
 }
 
+/**
+ * The shape the tile screen needs. Kept here rather than inline in the IPC so
+ * it can be tested: the launcher showing a stale list after a parent adds a
+ * game is exactly the sort of bug that hides behind an untested payload.
+ */
+function toTilePayload (apps) {
+  return (apps || [])
+    .filter((a) => a.enabled)
+    .map(({ id, title, shape, color, icon }) => ({ id, title, shape, color, icon: icon || null }));
+}
+
 module.exports = {
+  toTilePayload,
   loadSuggestions, addSite, updateSite, removeSite, refreshFrom,
   readCatalogFile, writeCatalogFile, uniqueId, pickLook, SHAPES, COLORS
 };

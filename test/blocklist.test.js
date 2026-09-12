@@ -41,3 +41,28 @@ test('beacon-style resource types are dropped', () => {
   assert.ok(inspect('https://example.com/x', 'example.com', 'ping'));
   assert.ok(inspect('https://example.com/x', 'example.com', 'cspReport'));
 });
+
+test('probe mode never survives past the probe', () => {
+  // If `probing` were left set, every host would be allowed for the child's
+  // next session -- the allowlist is the primary defence, so this matters more
+  // than any single blocked domain.
+  const Module = require('node:module');
+  const realLoad = Module._load;
+  Module._load = (req, ...rest) =>
+    req === 'electron' ? { shell: { openExternal: async () => {} } } : realLoad(req, ...rest);
+  const security = require('../src/main/security');
+  Module._load = realLoad;
+
+  const policy = security.createPolicy();
+  policy.setApp({ id: 'x', allowHosts: ['example.com'], denyHosts: [] });
+  assert.equal(policy.allowsUrl('https://anything-else.net/x'), false);
+
+  policy.startProbe();
+  assert.equal(policy.probing, true);
+  assert.equal(policy.allowsUrl('https://anything-else.net/x'), true, 'probe records everything');
+
+  policy.endProbe();
+  policy.setApp({ id: 'x', allowHosts: ['example.com'], denyHosts: [] });
+  assert.equal(policy.probing, false);
+  assert.equal(policy.allowsUrl('https://anything-else.net/x'), false, 'allowlist must be back');
+});

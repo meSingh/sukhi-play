@@ -6,10 +6,10 @@
 
 **A locked-down browser that lets a small child open only the sites you choose — and nothing else.**
 
-[![CI](https://github.com/YOURNAME/sukhi-play/actions/workflows/ci.yml/badge.svg)](https://github.com/YOURNAME/sukhi-play/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/YOURNAME/sukhi-play?sort=semver)](https://github.com/YOURNAME/sukhi-play/releases/latest)
+[![CI](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml/badge.svg)](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/meSingh/sukhi-play?sort=semver)](https://github.com/meSingh/sukhi-play/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/YOURNAME/sukhi-play/releases/latest)
+[![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/meSingh/sukhi-play/releases/latest)
 
 </div>
 
@@ -27,7 +27,7 @@ Closing it needs an adult.
 ## Install
 
 Grab the file for your machine from the
-**[latest release](https://github.com/YOURNAME/sukhi-play/releases/latest)**:
+**[latest release](https://github.com/meSingh/sukhi-play/releases/latest)**:
 
 | Platform | File |
 | --- | --- |
@@ -46,7 +46,7 @@ Grab the file for your machine from the
 Or run it from source:
 
 ```bash
-git clone https://github.com/YOURNAME/sukhi-play.git
+git clone https://github.com/meSingh/sukhi-play.git
 cd sukhi-play
 npm install
 npm start

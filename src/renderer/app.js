@@ -493,6 +493,7 @@ function wire () {
   buildKeypad();
 
   api.on('state', applyState);
+  api.on('apps', (payload) => renderTiles(payload.apps || []));
   api.on('toast', (payload) => showToast(payload.message));
 }
 

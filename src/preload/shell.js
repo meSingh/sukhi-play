@@ -10,7 +10,7 @@ const { contextBridge, ipcRenderer } = require('electron');
  * validates every argument regardless.
  */
 
-const VALID_EVENTS = new Set(['state', 'blocked', 'toast']);
+const VALID_EVENTS = new Set(['state', 'apps', 'blocked', 'toast']);
 
 contextBridge.exposeInMainWorld('sukhi', {
   /** Initial payload: catalog, settings, version, paths. */

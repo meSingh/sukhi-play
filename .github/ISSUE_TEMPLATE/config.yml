@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
   - name: Security report
-    url: https://github.com/YOURNAME/sukhi-play/security/advisories/new
+    url: https://github.com/meSingh/sukhi-play/security/advisories/new
     about: Report a kiosk escape or a way past the exit gate privately.
   - name: Website operator concern
-    url: https://github.com/YOURNAME/sukhi-play/issues/new
+    url: https://github.com/meSingh/sukhi-play/issues/new
     about: If you run a site and have a concern, please see DISCLAIMER.md and get in touch.

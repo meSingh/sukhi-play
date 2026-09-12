@@ -162,13 +162,20 @@ function installFocusGuard (win) {
 
 // --- ipc --------------------------------------------------------------------
 
+function pushApps () {
+  if (!shellApp || !shellApp.shellView) return;
+  const wc = shellApp.shellView.webContents;
+  if (wc.isDestroyed()) return;
+  wc.send('shell:apps', { apps: library.toTilePayload(catalog.apps) });
+}
+
 function findApp (appId) {
   return catalog.apps.find((a) => a.id === appId && a.enabled) || null;
 }
 
 function registerIpc () {
   ipcMain.handle('shell:ready', () => ({
-    apps: catalog.apps.filter((a) => a.enabled).map(({ id, title, shape, color }) => ({ id, title, shape, color })),
+    apps: library.toTilePayload(catalog.apps),
     state: shellApp.state(),
     settings: {
       holdSeconds: settings.holdSeconds,
@@ -250,6 +257,10 @@ function registerIpc () {
       bundledPath: path.join(__dirname, '..', '..', 'config', 'catalog.json')
     });
     paths.catalog = catalog.file;
+    // The tile screen is rendered once at start-up, so it has to be told when
+    // the list changes -- otherwise a game the parent just added is written to
+    // disk correctly and never drawn.
+    pushApps();
     if (shellApp) shellApp.pushState();
   }
 
@@ -285,7 +296,10 @@ function registerIpc () {
       return { ok: false, message: 'That site could not be checked.' };
     } finally {
       probeBusy = false;
-      // The probe borrowed the policy; put it back how the launcher expects it.
+      // The probe borrowed the policy. Put it back, and end probe mode here as
+      // well as inside probeSite: if the probe threw part-way, leaving `probing`
+      // set would quietly disable the allowlist for the child's next session.
+      policy.endProbe();
       policy.clear();
     }
   });

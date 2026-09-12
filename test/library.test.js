@@ -68,6 +68,38 @@ test('a catalog written by the app survives being read back', () => {
   assert.equal(back.apps[0].url, 'https://x.com/');
 });
 
+test('the tile payload carries only enabled apps, with what a tile needs', () => {
+  const payload = library.toTilePayload([
+    { id: 'a', title: 'A', shape: 'star', color: '#111111', enabled: true, icon: '/tmp/a.png' },
+    { id: 'b', title: 'B', shape: 'ball', color: '#222222', enabled: false },
+    { id: 'c', title: 'C', shape: 'note', color: '#333333', enabled: true }
+  ]);
+  assert.deepEqual(payload.map((a) => a.id), ['a', 'c']);
+  assert.deepEqual(payload[0], { id: 'a', title: 'A', shape: 'star', color: '#111111', icon: '/tmp/a.png' });
+  assert.equal(payload[1].icon, null);
+});
+
+test('a newly added site appears in the tile payload straight away', () => {
+  // The regression this guards: the app was written to disk correctly but the
+  // launcher was never told, so the parent added a game and nothing appeared.
+  const file = tmpCatalog();
+  const before = library.toTilePayload(library.readCatalogFile(file).apps);
+  assert.equal(before.length, 0);
+
+  library.addSite(file, { title: 'New', url: 'https://new.example/', allowHosts: ['new.example'] });
+
+  const after = library.toTilePayload(library.readCatalogFile(file).apps);
+  assert.equal(after.length, 1);
+  assert.equal(after[0].title, 'New');
+});
+
+test('turning a site off removes it from the tile payload', () => {
+  const file = tmpCatalog();
+  const { app } = library.addSite(file, { title: 'X', url: 'https://x.com/', allowHosts: ['x.com'] });
+  library.updateSite(file, app.id, { enabled: false });
+  assert.equal(library.toTilePayload(library.readCatalogFile(file).apps).length, 0);
+});
+
 test('probed hostnames collapse to a short allowlist', () => {
   assert.deepEqual(
     summarise(['a.poki-cdn.com', 'img.poki-cdn.com', 'poki.com', 'x.y.poki.com']),

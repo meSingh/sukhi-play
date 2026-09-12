@@ -83,16 +83,20 @@ function createPolicy () {
       seen.blocked.clear();
     },
     clear () { this.setApp(null); },
-    allowsHost (host) { return gate.allows(host); },
-    allowsUrl (url) {
-      return WEB_SCHEMES.has(schemeOf(url)) && gate.allows(hostFromUrl(url));
-    },
     verdict (host) {
       const v = gate.verdict(host);
       // Everything real is permitted during a probe, so the recorded list is
       // the site's actual set of hosts rather than whatever survived a guess.
       if (probing && v === 'deny-not-allowed') return 'allow';
       return v;
+    },
+    // Both of these go through verdict() rather than the raw gate, so there is
+    // exactly one place that decides whether a host is permitted. Reading the
+    // gate directly here meant navigation and request filtering could disagree
+    // with each other during a probe.
+    allowsHost (host) { return this.verdict(host) === 'allow'; },
+    allowsUrl (url) {
+      return WEB_SCHEMES.has(schemeOf(url)) && this.verdict(hostFromUrl(url)) === 'allow';
     },
     tally (key) { if (key in counts) counts[key] += 1; }
   };

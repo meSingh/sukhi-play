@@ -33,13 +33,13 @@
     "launcher",
     "toddler"
   ],
-  "homepage": "https://github.com/YOURNAME/sukhi-play#readme",
+  "homepage": "https://github.com/meSingh/sukhi-play#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOURNAME/sukhi-play.git"
+    "url": "https://github.com/meSingh/sukhi-play.git"
   },
   "bugs": {
-    "url": "https://github.com/YOURNAME/sukhi-play/issues"
+    "url": "https://github.com/meSingh/sukhi-play/issues"
   },
   "author": "Sukhi Play contributors",
   "engines": {
