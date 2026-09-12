@@ -602,6 +602,7 @@ function wire () {
   el('home-btn').addEventListener('click', () => api.goHome());
   el('exit-btn').addEventListener('click', () => api.openGate('quit'));
   el('parent-btn').addEventListener('click', () => api.openGate('quit'));
+  el('close-btn').addEventListener('click', () => api.openGate('quit'));
   el('empty-add').addEventListener('click', () => api.openGate('quit'));
 
   el('ob-parent').addEventListener('click', () => obShow(2));

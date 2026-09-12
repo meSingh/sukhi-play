@@ -11,16 +11,15 @@
 <div id="app" data-mode="boot">
 
   <!-- Soft background scenery for the child-facing screens. Purely decorative. -->
+  <!-- Background for the child-facing screens: big saturated shapes, heavily
+       blurred into a mesh, with a fine grain over the top. Decorative only. -->
   <div class="sky" aria-hidden="true">
-    <span class="cloud cloud--1"></span>
-    <span class="cloud cloud--2"></span>
-    <span class="cloud cloud--3"></span>
-    <span class="blob blob--1"></span>
-    <span class="blob blob--2"></span>
-    <svg class="twinkle twinkle--1" viewBox="0 0 100 100"><use href="#shape-star"></use></svg>
-    <svg class="twinkle twinkle--2" viewBox="0 0 100 100"><use href="#shape-star"></use></svg>
-    <svg class="twinkle twinkle--3" viewBox="0 0 100 100"><use href="#shape-star"></use></svg>
-    <span class="hills"></span>
+    <span class="orb orb--1"></span>
+    <span class="orb orb--2"></span>
+    <span class="orb orb--3"></span>
+    <span class="orb orb--4"></span>
+    <span class="orb orb--5"></span>
+    <span class="grain"></span>
   </div>
 
   <!-- ============ loading screen ============ -->
@@ -34,11 +33,32 @@
 
   <!-- ============ pick something ============ -->
   <section id="launcher" class="screen">
+    <header class="top">
+      <div class="top-brand">
+        <img class="top-mark" src="assets/mascot.png" alt="" width="512" height="512">
+        <span class="top-name">Sukhi&nbsp;Play</span>
+      </div>
+      <div class="top-actions">
+        <button id="parent-btn" class="top-btn" type="button">
+          <svg class="top-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2.1"/>
+            <path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6" fill="none"
+                  stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+          </svg>
+          <span>Grown-ups</span>
+        </button>
+        <button id="close-btn" class="top-btn top-btn--close" type="button" title="Close Sukhi Play">
+          <svg class="top-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor"
+                  stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+          <span>Close</span>
+        </button>
+      </div>
+    </header>
+
     <div class="launcher-inner">
-      <h1 class="launcher-title">
-        <img class="launcher-mark" src="assets/mascot.png" alt="" width="512" height="512">
-        What do you want to play?
-      </h1>
+      <h1 class="launcher-title">What do you want to play?</h1>
       <div id="tiles" class="tiles" role="list"></div>
 
       <div id="launcher-empty" class="empty" hidden>
@@ -52,7 +72,6 @@
       </div>
 
       <footer class="launcher-foot">
-        <button id="parent-btn" class="ghost-btn" type="button">For grown-ups</button>
         <span id="version" class="version"></span>
       </footer>
     </div>

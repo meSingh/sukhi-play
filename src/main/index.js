@@ -2,7 +2,7 @@
 
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { app, session, ipcMain, Menu, shell: electronShell } = require('electron');
+const { app, session, ipcMain, Menu, nativeImage, shell: electronShell } = require('electron');
 
 const settingsStore = require('./settings');
 const catalogStore = require('./catalog');
@@ -523,7 +523,26 @@ async function runProbe () {
 
 // --- boot -------------------------------------------------------------------
 
+/**
+ * Shows the real app icon while running from source.
+ *
+ * A packaged build gets its icon from the bundle, but `npm start` runs the
+ * Electron binary directly and inherits Electron's own icon. Setting the Dock
+ * image fixes that for development; it is a no-op everywhere else.
+ */
+function applyDevIcon () {
+  if (process.platform !== 'darwin' || !app.dock) return;
+  try {
+    const icon = nativeImage.createFromPath(
+      path.join(__dirname, '..', '..', 'build', 'icon.png'));
+    if (!icon.isEmpty()) app.dock.setIcon(icon);
+  } catch (err) {
+    console.warn('[boot] could not set the dock icon:', err.message);
+  }
+}
+
 app.whenReady().then(() => {
+  applyDevIcon();
   paths = {
     userData: app.getPath('userData'),
     catalog: null,
