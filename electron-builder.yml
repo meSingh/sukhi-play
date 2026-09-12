@@ -80,3 +80,19 @@ linux:
     entry:
       Name: Sukhi Play
       Categories: Education;Game;
+
+# Snap, for the Ubuntu App Center listing. Strict confinement on purpose: it is
+# what makes the store show restricted rather than unrestricted permissions.
+#
+# One consequence to know about. Under strict confinement the app cannot write
+# to the host's dconf, so the GNOME shortcut borrowing in src/main/gnome.js
+# (Alt+Tab, the Super key) does not apply. gnome.available() detects that and
+# skips it, so nothing breaks -- but that one lockdown layer is absent in the
+# snap and present in the .deb.
+snap:
+  confinement: strict
+  grade: stable
+  autoStart: false
+  plugs:
+    - default
+    - audio-playback
