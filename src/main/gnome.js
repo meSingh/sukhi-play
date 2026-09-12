@@ -56,7 +56,15 @@ let active = false;
 let stateFile = null;
 
 function gsettings (args) {
-  return execFileSync('gsettings', args, { encoding: 'utf8', timeout: 4000 }).trim();
+  // stderr is piped rather than inherited. Probing for a binding this GNOME
+  // version does not have is expected and handled, but with inherited stderr
+  // gsettings prints `No such key "open-application-menu"` straight to the
+  // user's terminal, which reads like a failure.
+  return execFileSync('gsettings', args, {
+    encoding: 'utf8',
+    timeout: 4000,
+    stdio: ['ignore', 'pipe', 'pipe']
+  }).trim();
 }
 
 /** Is this a GNOME session with gsettings available? */

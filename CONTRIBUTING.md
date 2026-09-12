@@ -59,6 +59,10 @@ npm run shots
 npm run metainfo   # refresh the AppStream list that software centres read
 ```
 
+On Linux add `--no-sandbox` to any local Electron run: the bundled
+`chrome-sandbox` is not root-owned in `node_modules`, so a fresh clone aborts
+before it starts. It has no effect on layout or geometry.
+
 It runs the app twice against throwaway profiles, because the interesting
 states do not coexist: onboarding only exists before setup, and the tile screen
 only has anything on it after. The seeded profile is built from

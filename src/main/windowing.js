@@ -4,7 +4,15 @@ const path = require('node:path');
 const { BaseWindow, WebContentsView, screen, nativeImage } = require('electron');
 const security = require('./security');
 
-const BAR_HEIGHT = 72;
+// Fallback only; the real value is read from the stylesheet at startup.
+//
+// This governs the in-game bar (#bar), which is `height: var(--bar-h)`. It was
+// 72 against a --bar-h of 76, so the shell view was given 72px for a 76px bar:
+// the bottom 4px was clipped and the game view was drawn over it. Issue #1
+// spotted the mismatch but measured `.top` instead, the launcher's bar at 80px;
+// setting this to 80 would have left a 4px strip of empty shell under the bar
+// and pushed the game view down instead of up. Two bars, two heights.
+const BAR_HEIGHT = 76;
 
 /** The window icon, used by Linux window managers for the taskbar entry. */
 function appIcon () {
@@ -37,12 +45,13 @@ const PRELOAD_DIR = path.join(__dirname, '..', 'preload');
  * the game, and the game cannot paint over it.
  */
 class Shell {
-  constructor ({ policy, settings, session, isDev, checkMode = false, onModeChange }) {
+  constructor ({ policy, settings, session, isDev, checkMode = false, noLockdown = false, onModeChange }) {
     this.policy = policy;
     this.settings = settings;
     this.session = session;
     this.isDev = isDev;
     this.checkMode = checkMode;
+    this.noLockdown = noLockdown;
     this.onModeChange = onModeChange || (() => {});
 
     this.win = null;
@@ -53,6 +62,9 @@ class Shell {
     this.activeApp = null;
     this.htmlFullscreen = false;
     this.allowQuit = false;
+    // Replaced by measureBar() once the shell has loaded.
+    this.barHeight = BAR_HEIGHT;
+    this.barSource = 'fallback';
   }
 
   /**
@@ -60,7 +72,7 @@ class Shell {
    * neither working on the app nor verifying a site takes over the display.
    */
   get lockdownEnabled () {
-    return !this.isDev && !this.checkMode;
+    return !this.isDev && !this.checkMode && !this.noLockdown;
   }
 
   /** The rectangle we want to own: the whole primary display, menu bar included. */
@@ -89,7 +101,15 @@ class Shell {
       title: 'Sukhi Play',
       frame: !cover,
       movable: !cover,
-      resizable: !cover,
+      // Must stay true on Linux. A non-resizable frameless window that is then
+      // sent fullscreen keeps a client-side decoration inset (16px sides, 10px
+      // top) that Electron folds into the content size, so getContentSize()
+      // comes back larger than the screen and the whole UI is laid out off the
+      // top-left edge. Costs nothing here: the window is frameless, so there
+      // are no resize handles, and the window manager's resize shortcuts are
+      // already held for the duration. Reported and bisected on GNOME Wayland
+      // in issue #1.
+      resizable: process.platform === 'linux' ? true : !cover,
       minimizable: !cover,
       maximizable: !cover,
       closable: true,
@@ -157,8 +177,9 @@ class Shell {
 
     this.setMode('boot');
     this.win.once('ready-to-show', () => this.win.show());
-    this.shellView.webContents.once('did-finish-load', () => {
+    this.shellView.webContents.once('did-finish-load', async () => {
       if (!this.win.isVisible()) this.win.show();
+      await this.measureBar();
       this.layout();
     });
 
@@ -220,8 +241,15 @@ class Shell {
     try {
       const b = win.getBounds();
       const s = this.screenBounds();
-      const covered = b.x <= s.x && b.y <= s.y &&
-                      b.width >= s.width && b.height >= s.height;
+      // Must MATCH the screen, not merely contain it. The old check was
+      // `x <= s.x && width >= s.width`, which happily passed a window at
+      // -16,-10 sized 32x42 larger than the display -- exactly the broken
+      // Wayland geometry in issue #1 -- and logged "covering screen: yes"
+      // while the interface was visibly off the edge.
+      const slack = 2;
+      const covered = Math.abs(b.x - s.x) <= slack && Math.abs(b.y - s.y) <= slack &&
+                      Math.abs(b.width - s.width) <= slack &&
+                      Math.abs(b.height - s.height) <= slack;
       // Only worth saying once, or whenever it goes wrong.
       if (!covered || !this._loggedCover) {
         this._loggedCover = true;
@@ -305,12 +333,47 @@ class Shell {
     return { width, height };
   }
 
+  /**
+   * Reads the in-game bar's height from the stylesheet and caches it.
+   *
+   * Reads the --bar-h custom property rather than measuring the element,
+   * because #bar is display:none outside playing mode: a measurement taken at
+   * startup returns zero, and one taken on entering playing mode is too late,
+   * since layout() has already placed the game view by then. The property is
+   * the stylesheet's own source of truth and is readable in any mode.
+   *
+   * layout() runs on every resize and mode change and must stay synchronous,
+   * hence the cache. Falls back to the constant, which is the same value: if
+   * these two ever disagree the stylesheet wins, and a test asserts they match.
+   */
+  async measureBar () {
+    if (!this.shellView || this.shellView.webContents.isDestroyed()) return;
+    try {
+      const raw = await this.shellView.webContents.executeJavaScript(
+        "getComputedStyle(document.documentElement).getPropertyValue('--bar-h')"
+      );
+      const h = Math.ceil(parseFloat(raw));
+      if (Number.isFinite(h) && h >= 40 && h <= 200) {
+        if (h !== this.barHeight) {
+          console.log(`[window] in-game bar is ${h}px (was assuming ${this.barHeight})`);
+        }
+        this.barHeight = h;
+        this.barSource = 'stylesheet';
+        return;
+      }
+      console.warn(`[window] --bar-h read back as "${raw}", keeping ${this.barHeight}px`);
+    } catch (err) {
+      console.warn('[window] could not read --bar-h:', err.message);
+    }
+  }
+
   layout () {
     if (!this.win || this.win.isDestroyed() || !this.shellView) return;
     const { width, height } = this.contentSize();
+    const BAR = this.barHeight || BAR_HEIGHT;
 
     if (this.mode === 'playing' && this.gameView) {
-      const bar = this.htmlFullscreen ? 0 : BAR_HEIGHT;
+      const bar = this.htmlFullscreen ? 0 : BAR;
       this.shellView.setBounds({ x: 0, y: 0, width, height: bar });
       this.gameView.setBounds({ x: 0, y: bar, width, height: Math.max(0, height - bar) });
       return;
@@ -320,7 +383,7 @@ class Shell {
     this.shellView.setBounds({ x: 0, y: 0, width, height });
     if (this.gameView) {
       // Keep it laid out underneath so returning from the gate is instant.
-      this.gameView.setBounds({ x: 0, y: BAR_HEIGHT, width, height: Math.max(0, height - BAR_HEIGHT) });
+      this.gameView.setBounds({ x: 0, y: BAR, width, height: Math.max(0, height - BAR) });
     }
   }
 

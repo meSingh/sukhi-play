@@ -13,7 +13,7 @@ const shortcuts = require('./shortcuts');
 const gnome = require('./gnome');
 const probe = require('./probe');
 const library = require('./library');
-const { Shell } = require('./windowing');
+const { Shell, BAR_HEIGHT: BAR_HEIGHT_FALLBACK } = require('./windowing');
 
 const RELEASES_URL = 'https://github.com/meSingh/sukhi-play/releases/latest';
 
@@ -787,6 +787,11 @@ async function runDiagnose () {
   say('isFullScreen', win.isFullScreen());
   say('isVisible', win.isVisible());
   say('kiosk setting', settings.kiosk);
+  say('lockdown', shellApp.lockdownEnabled ? 'ON' : 'off (diagnostic run)');
+  say('in-game bar', `${shellApp.barHeight}px from the ${shellApp.barSource}` +
+      (shellApp.barSource === 'fallback'
+        ? ` -- could not read --bar-h, using the ${BAR_HEIGHT_FALLBACK}px constant`
+        : ''));
   say('alwaysOnTop', settings.alwaysOnTop);
 
   try {
@@ -939,7 +944,16 @@ app.whenReady().then(() => {
     settings,
     session: kidSession,
     isDev: IS_DEV,
-    checkMode: CHECK_MODE || PROBE_MODE
+    checkMode: CHECK_MODE || PROBE_MODE,
+    // Diagnostics and screenshots must not take over the display: --diagnose
+    // used to cover the screen, go always-on-top and borrow 25 GNOME shortcuts
+    // including Alt+Tab and the Super key, which made the one tool you would
+    // ask someone to run the most intimidating thing in the project.
+    //
+    // Deliberately not folded into checkMode. That flag means "the main
+    // process drives the UI", which parks the renderer on the splash, and with
+    // it set every measurement the diagnostic takes comes back zero.
+    noLockdown: DIAGNOSE || Boolean(SHOTS_DIR)
   });
 
   // If the lockdown is abandoned, the desktop gets its shortcuts back too.
@@ -1042,7 +1056,8 @@ app.whenReady().then(() => {
 
   // On Linux the desktop owns Alt+Tab and the Super key, and on Wayland it owns
   // every shortcut. Borrowed for the session and given back on quit.
-  if (!IS_DEV && !CHECK_MODE && !PROBE_MODE && settings.borrowDesktopShortcuts) {
+  if (!IS_DEV && !CHECK_MODE && !PROBE_MODE && !DIAGNOSE && !SHOTS_DIR &&
+      settings.borrowDesktopShortcuts) {
     gnome.borrow(paths.userData);
   } else if (gnome.available()) {
     // A previous run may have died mid-session; never leave them borrowed.

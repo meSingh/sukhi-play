@@ -177,3 +177,27 @@ test('the dated glass and blur treatments are gone', () => {
   assert.ok(!css.includes('backdrop-filter'), 'frosted glass reads as 2021');
   assert.ok(!/filter:\s*blur\(/.test(css), 'blurred background orbs read as 2021');
 });
+
+test('BAR_HEIGHT matches the stylesheet --bar-h', () => {
+  // These drifted: the constant said 72 and --bar-h said 76, so in playing
+  // mode the shell view was given 72px for a 76px bar. The bottom 4px was
+  // clipped and the game view was drawn over it. The running app reads the
+  // property, but the constant is the fallback and must not be wrong.
+  const { BAR_HEIGHT } = require('../src/main/windowing');
+  const declared = css.match(/--bar-h:\s*(\d+(?:\.\d+)?)px/);
+  assert.ok(declared, 'styles.css no longer declares --bar-h');
+  assert.strictEqual(BAR_HEIGHT, Math.ceil(Number(declared[1])),
+    `BAR_HEIGHT is ${BAR_HEIGHT} but --bar-h is ${declared[1]}px`);
+});
+
+test('the in-game bar and the launcher bar are not confused for each other', () => {
+  // They are different elements with different heights: #bar is the in-game
+  // strip sized by --bar-h, .top is the launcher header sized by its contents.
+  // BAR_HEIGHT governs only the first. Conflating them sends the game view the
+  // wrong way, so keep the two selectors distinguishable.
+  assert.ok(/^#bar \{[^}]*height:\s*var\(--bar-h\)/m.test(css),
+    '#bar must take its height from --bar-h');
+  const top = css.match(/^\.top \{([^}]*)\}/m);
+  assert.ok(top && !/height:\s*var\(--bar-h\)/.test(top[1]),
+    '.top must not be sized by --bar-h; it is not the in-game bar');
+});
