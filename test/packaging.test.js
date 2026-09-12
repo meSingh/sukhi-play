@@ -83,13 +83,12 @@ test('the snap declares the metadata a fresh store listing would use', () => {
   // this one has been, so they matter for a fresh listing rather than for the
   // current one. Licence, links, icon and screenshots are never carried by the
   // snap and are set on the store page.
-  // Reads snapcraft.core24, not the deprecated snap: block. electron-builder
-  // warns that `snap` configuration is deprecated, and a future release
-  // dropping it would silently stop applying all of this.
-  assert.ok(!builder.snap,
-    'the deprecated snap: block is back; configuration belongs under snapcraft');
-  const snap = builder.snapcraft && builder.snapcraft.core24;
-  assert.ok(snap, 'no snapcraft.core24 block in electron-builder.yml');
+  // Reads the snap: block. It is deprecated, and staying: snapcraft.core24
+  // builds in a container that cannot be made to work on a GitHub runner.
+  // electron-builder.yml explains why. Whichever block is in use, these
+  // fields have to be in it.
+  const snap = builder.snap || (builder.snapcraft && builder.snapcraft.core24);
+  assert.ok(snap, 'no snap or snapcraft.core24 block in electron-builder.yml');
 
   for (const field of ['title', 'summary', 'description', 'category']) {
     assert.ok(snap[field], `snapcraft.core24.${field} is not set, so a fresh listing is bare`);

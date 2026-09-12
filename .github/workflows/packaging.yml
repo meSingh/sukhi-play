@@ -34,21 +34,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends fakeroot dpkg rpm
           sudo snap install snapcraft --classic
-          # core24 builds inside a container. Destructive mode looked like the
-          # way round that on CI, but the gnome extension Electron needs cannot
-          # be used with it, so LXD is the only path left.
-          sudo snap install lxd
-          sudo lxd init --auto
-          sudo usermod -aG lxd "$USER"
 
       - name: Install
         run: npm ci
 
-      # Run under `sg lxd` so the whole process tree has the group added
-      # above. usermod does not affect the running shell, and electron-builder
-      # spawns snapcraft itself, so there is nowhere else to inject it.
       - name: Build AppImage, deb and snap
-        run: sg lxd -c "npm run dist:linux:all"
+        run: npm run dist:linux:all
 
       - name: What came out
         run: ls -lh dist/

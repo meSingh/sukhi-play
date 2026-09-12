@@ -104,55 +104,61 @@ linux:
 # (Alt+Tab, the Super key) does not apply. gnome.available() detects that and
 # skips it, so nothing breaks -- but that one lockdown layer is absent in the
 # snap and present in the .deb.
-# Migrated from the deprecated `snap:` block. electron-builder warned that
-# `snap` configuration is deprecated in favour of `snapcraft.<core>`; the old
-# key still works today but a future release may drop it, and builds would then
-# break with no warning. core24 is the current base.
-snapcraft:
-  # Required. Selects which core the options below apply to.
-  base: core24
-  core24:
-    confinement: strict
-    grade: stable
-    autoStart: false
-    # These travel inside the snap, but do NOT assume they reach the store. The
-    # Snap Store adopts a snap's metadata on upload only until the publisher
-    # makes a manual change to the listing, after which the listing is
-    # authoritative and uploads no longer touch it. This listing has been edited
-    # by hand, so these values apply only to a fresh listing, or if someone runs
-    # `snapcraft upload-metadata --force` to push them deliberately. Do not put
-    # that in CI: it would overwrite the longer description in
-    # docs/store-description.md every release.
-    #
-    # Licence, links, icon and screenshots were never carried by the snap at
-    # all. The format has no screenshots field, and the listing icon comes from
-    # an icon: key in snapcraft.yaml that electron-builder does not always
-    # write. Set those four on the store listing page.
-    title: Sukhi Play
-    summary: Let a small child open only the sites you choose
-    category: Education
-    description: |
-      Sukhi Play turns a computer into a safe place for a small child to play.
+# Deprecated in favour of `snapcraft.<core>`, and staying here on purpose.
+#
+# The migration to snapcraft.core24 was tried and reverted. core24 builds
+# inside a container, and neither route works on a GitHub runner:
+# destructive mode cannot be used with the gnome extension Electron needs for
+# its GTK runtime, and an LXD container comes up with no outbound network
+# because Docker's iptables rules on the runner conflict with LXD's bridge.
+# This block builds from a prebuilt template with no container at all, works
+# the same locally and in CI, and has shipped every revision so far.
+#
+# Revisit when electron-builder actually threatens to remove it. Run
+# `gh workflow run packaging.yml` to test any change before tagging: a snap
+# cannot be built on macOS.
+snap:
+  confinement: strict
+  grade: stable
+  autoStart: false
+  # These travel inside the snap, but do NOT assume they reach the store. The
+  # Snap Store adopts a snap's metadata on upload only until the publisher
+  # makes a manual change to the listing, after which the listing is
+  # authoritative and uploads no longer touch it. This listing has been edited
+  # by hand, so these values apply only to a fresh listing, or if someone runs
+  # `snapcraft upload-metadata --force` to push them deliberately. Do not put
+  # that in CI: it would overwrite the longer description in
+  # docs/store-description.md every release.
+  #
+  # Licence, links, icon and screenshots were never carried by the snap at
+  # all. The format has no screenshots field, and the listing icon comes from
+  # an icon: key in snapcraft.yaml that electron-builder does not always
+  # write. Set those four on the store listing page.
+  title: Sukhi Play
+  summary: Let a small child open only the sites you choose
+  category: Education
+  description: |
+    Sukhi Play turns a computer into a safe place for a small child to play.
 
-      A grown-up chooses which sites are allowed. The child gets a full screen of
-      large, brightly coloured buttons and nothing else: no address bar, no tabs,
-      no other websites, no popups, and no way out without an adult.
+    A grown-up chooses which sites are allowed. The child gets a full screen of
+    large, brightly coloured buttons and nothing else: no address bar, no tabs,
+    no other websites, no popups, and no way out without an adult.
 
-      Everything outside the approved list is blocked, along with ads and
-      trackers. Keyboard shortcuts are neutralised so a child mashing keys cannot
-      escape or break anything, while the arrow keys and letters games need keep
-      working. Closing the app takes a sustained press a toddler will not manage.
+    Everything outside the approved list is blocked, along with ads and
+    trackers. Keyboard shortcuts are neutralised so a child mashing keys cannot
+    escape or break anything, while the arrow keys and letters games need keep
+    working. Closing the app takes a sustained press a toddler will not manage.
 
-      Sukhi Play is not affiliated with any of the sites it can open and does not
-      endorse them. You choose where it may go and are responsible for complying
-      with each site's terms.
-    # No `plugs` override. electron-builder's `default` already expands to
-    # desktop, desktop-legacy, home, x11, wayland, unity7, browser-support,
-    # network, gsettings, audio-playback, pulseaudio and opengl. Listing
-    # audio-playback on top of `default` produced a duplicate, and the store
-    # rejects the upload: "$.apps.sukhi-play.plugs ... has non-unique elements".
-    #
-    # Snap artifacts are named without spaces, unlike the other targets: the
-    # store tooling and the documented upload command both expect the
-    # name_version_arch form.
-    artifactName: ${name}_${version}_${arch}.snap
+    Sukhi Play is not affiliated with any of the sites it can open and does not
+    endorse them. You choose where it may go and are responsible for complying
+    with each site's terms.
+  # No `plugs` override. electron-builder's `default` already expands to
+  # desktop, desktop-legacy, home, x11, wayland, unity7, browser-support,
+  # network, gsettings, audio-playback, pulseaudio and opengl. Listing
+  # audio-playback on top of `default` produced a duplicate, and the store
+  # rejects the upload: "$.apps.sukhi-play.plugs ... has non-unique elements".
+  #
+  # Snap artifacts are named without spaces, unlike the other targets: the
+  # store tooling and the documented upload command both expect the
+  # name_version_arch form.
+  artifactName: ${name}_${version}_${arch}.snap
