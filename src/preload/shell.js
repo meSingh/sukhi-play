@@ -49,23 +49,20 @@ contextBridge.exposeInMainWorld('sukhi', {
   /** The grown-up library: my sites plus the bundled suggestions. */
   library: () => ipcRenderer.invoke('shell:library'),
 
+  /** Is this address already set up? Asked before the slow probe. */
+  siteExists: (url) => ipcRenderer.invoke('shell:site-exists', String(url)),
+
   /** Visit a site once and report the hosts it needs. */
   probeSite: (url) => ipcRenderer.invoke('shell:probe-site', String(url)),
 
   /** Add a site discovered by probeSite. */
   addSite: (entry) => ipcRenderer.invoke('shell:add-site', entry),
 
-  /** Add one of the bundled suggestions. */
-  addSuggestion: (id) => ipcRenderer.invoke('shell:add-suggestion', String(id)),
-
   /** Change a site (enable/disable, ad filtering, title). */
   updateSite: (id, patch) => ipcRenderer.invoke('shell:update-site', String(id), patch),
 
   /** Delete a site. */
   removeSite: (id) => ipcRenderer.invoke('shell:remove-site', String(id)),
-
-  /** Reveal the folder holding catalog.json / settings.json. */
-  openConfigFolder: () => ipcRenderer.invoke('shell:open-config-folder'),
 
   /** Renderer signals it has finished booting (used by --check). */
   rendererIdle: () => ipcRenderer.send('shell:renderer-idle'),

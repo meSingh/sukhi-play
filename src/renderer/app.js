@@ -27,6 +27,7 @@ const app = el('app');
 const MIN_SPLASH_MS = 1400; // long enough to read as "it is starting", not a flash
 
 let config = null;
+let gateIntent = 'portal';
 let holdTimer = null;
 let holdStart = 0;
 let toastTimer = null;
@@ -133,6 +134,7 @@ async function launch (tile, appId) {
 function applyState (state) {
   if (!state) return;
   app.dataset.mode = state.mode;
+  if (state.gateIntent) gateIntent = state.gateIntent;
 
   // "Back" and "Stop this game" are only distinguishable if we know whether a
   // game is actually open. When none is, "stop" is meaningless and is hidden
@@ -164,6 +166,7 @@ function resetGate () {
   el('gate-step-hold').hidden = false;
   el('gate-step-answer').hidden = true;
   el('gate-step-library').hidden = true;
+  el('gate-step-form').hidden = true;
   libCard().classList.remove('is-wide');
   el('gate-input').value = '';
   el('gate-error').textContent = '';
@@ -211,7 +214,7 @@ async function revealChallenge () {
   }
 
   // Holding was the whole check.
-  showPanel();
+  afterUnlock();
 }
 
 /* ---------------- first-run walkthrough ---------------- */
@@ -253,29 +256,68 @@ async function loadObSuggestions () {
     return;
   }
 
+  if (!data.suggestions.length) {
+    const p = document.createElement('p');
+    p.className = 'lib-empty';
+    p.textContent = 'All set up. You can change any of it later.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  // One tap here on purpose: this is the two-minute setup path. Everything is
+  // editable afterwards from the parent portal, which the next step explains.
   for (const sug of data.suggestions) {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'card';
+    card.style.setProperty('--card', sug.color);
+
+    const badge = document.createElement('span');
+    badge.className = 'card-badge';
+    badge.appendChild(shapeIcon(sug.shape));
+
+    const body = document.createElement('span');
+    body.className = 'card-body';
+
     const name = document.createElement('span');
+    name.className = 'card-name';
     name.textContent = sug.title;
-    name.appendChild(sug.adSupported
+
+    const meta = document.createElement('span');
+    meta.className = 'card-meta';
+    meta.textContent = sug.category;
+    meta.appendChild(sug.adSupported
       ? tag('has ads', 'lib-tag--ads')
       : tag('no ads', 'lib-tag--free'));
 
-    const add = button(sug.added ? 'Added' : 'Add', sug.added ? '' : 'lib-btn--add', async (e) => {
-      e.target.disabled = true;
-      const r = await api.addSuggestion(sug.id);
+    body.append(name, meta);
+
+    const state = document.createElement('span');
+    state.className = 'card-state';
+    state.textContent = 'Add';
+
+    card.append(badge, body, state);
+
+    card.addEventListener('click', async () => {
+      card.disabled = true;
+      state.textContent = 'Adding…';
+      const r = await api.addSite({
+        title: sug.title, url: sug.url, shape: sug.shape, color: sug.color,
+        allowHosts: sug.allowHosts, denyHosts: sug.denyHosts,
+        blockAds: sug.blockAds, enabled: true
+      });
       if (!r || !r.ok) {
-        e.target.disabled = false;
+        card.disabled = false;
+        state.textContent = 'Add';
         showToast((r && r.message) || 'Could not add that.');
         return;
       }
       obAdded += 1;
       loadObSuggestions();
     });
-    add.disabled = sug.added;
 
-    wrap.appendChild(row({ color: sug.color, name, sub: sug.url, note: sug.notes, actions: [add] }));
+    wrap.appendChild(card);
   }
-  obAdded = data.suggestions.filter((x) => x.added).length;
 }
 
 /** A no-stakes run of the real exit gesture, so the parent knows the feel of it. */
@@ -307,70 +349,9 @@ async function finishOnboarding () {
   await api.finishOnboarding();
 }
 
-/* ---------------- grown-up library ---------------- */
-
-let probeResult = null;
+/* ---------------- the parent portal ---------------- */
 
 function libCard () { return document.querySelector('.gate-card'); }
-
-async function loadLibrary () {
-  const data = await api.library();
-  if (!data || !data.ok) return;
-  renderMine(data.mine);
-  renderSuggestions(data.suggestions);
-
-  const live = data.mine.filter((a) => a.enabled).length;
-  el('mine-count').textContent = data.mine.length
-    ? `${live} of ${data.mine.length} showing`
-    : '';
-}
-
-function dot (color) {
-  const d = document.createElement('div');
-  d.className = 'lib-dot';
-  d.style.background = color;
-  return d;
-}
-
-function row ({ color, name, sub, note, actions }) {
-  const item = document.createElement('div');
-  item.className = 'lib-item';
-
-  const body = document.createElement('div');
-  body.className = 'lib-body';
-
-  const title = document.createElement('div');
-  title.className = 'lib-name';
-  title.append(name);
-
-  const subEl = document.createElement('div');
-  subEl.className = 'lib-sub';
-  subEl.textContent = sub;
-
-  body.append(title, subEl);
-  if (note) {
-    const n = document.createElement('div');
-    n.className = 'lib-note';
-    n.textContent = note;
-    body.appendChild(n);
-  }
-
-  const acts = document.createElement('div');
-  acts.className = 'lib-actions';
-  for (const a of actions) acts.appendChild(a);
-
-  item.append(dot(color), body, acts);
-  return item;
-}
-
-function button (label, cls, onClick) {
-  const b = document.createElement('button');
-  b.type = 'button';
-  b.className = 'lib-btn' + (cls ? ' ' + cls : '');
-  b.textContent = label;
-  b.addEventListener('click', onClick);
-  return b;
-}
 
 function tag (text, cls) {
   const t = document.createElement('span');
@@ -379,22 +360,97 @@ function tag (text, cls) {
   return t;
 }
 
+let catalogue = { mine: [], suggestions: [], shapes: [], colors: [] };
+
+async function loadLibrary () {
+  const data = await api.library();
+  if (!data || !data.ok) return;
+  catalogue = data;
+  renderMine(data.mine);
+  renderSuggestions(data.suggestions);
+
+  const live = data.mine.filter((a) => a.enabled).length;
+  el('mine-count').textContent = data.mine.length
+    ? `${live} of ${data.mine.length} on the tiles`
+    : '';
+  // With nothing left to suggest there is nothing to show.
+  el('sec-suggest').hidden = data.suggestions.length === 0;
+}
+
+/* --- what is set up --- */
+
+function appArtwork (entry, size) {
+  const art = document.createElement('span');
+  art.className = 'art';
+  art.style.setProperty('--art', entry.color);
+  if (size) art.style.setProperty('--art-size', size + 'px');
+
+  const coin = document.createElement('span');
+  coin.className = 'art-coin';
+  if (entry.icon) {
+    const img = document.createElement('img');
+    img.src = entry.icon;
+    img.alt = '';
+    img.addEventListener('error', () => {
+      coin.textContent = '';
+      coin.appendChild(shapeIcon(entry.shape));
+    }, { once: true });
+    coin.appendChild(img);
+  } else {
+    coin.appendChild(shapeIcon(entry.shape));
+  }
+  art.appendChild(coin);
+  return art;
+}
+
 /**
- * A real switch for visibility, and a delete that asks first.
- *
- * A button reading "On" told a parent the current state but not what pressing
- * it would do, and "Remove" is the label every site on the internet uses for
- * everything. A switch shows state and affordance at once, and delete is
- * irreversible so it takes two taps.
+ * Each app is a box that looks like the tile the child sees, so a parent can
+ * match what is on this screen to what is on theirs at a glance.
  */
-function visibilitySwitch (app) {
+function renderMine (mine) {
+  const wrap = el('lib-mine');
+  wrap.textContent = '';
+
+  if (!mine.length) {
+    const p = document.createElement('p');
+    p.className = 'lib-empty';
+    p.textContent = 'Nothing set up yet. Add one below, or pick a ready-made one.';
+    wrap.appendChild(p);
+    return;
+  }
+
+  for (const entry of mine) {
+    const box = document.createElement('div');
+    box.className = 'app' + (entry.enabled ? '' : ' is-off');
+
+    box.appendChild(appArtwork(entry));
+
+    const name = document.createElement('div');
+    name.className = 'app-name';
+    name.textContent = entry.title;
+    if (!entry.blockAds) name.appendChild(tag('ads on', 'lib-tag--ads'));
+
+    const host = document.createElement('div');
+    host.className = 'app-host';
+    try { host.textContent = new URL(entry.url).hostname; } catch { host.textContent = entry.url; }
+
+    const controls = document.createElement('div');
+    controls.className = 'app-controls';
+    controls.append(visibilitySwitch(entry), editButton(entry));
+
+    box.append(name, host, controls);
+    wrap.appendChild(box);
+  }
+}
+
+function visibilitySwitch (entry) {
   const label = document.createElement('label');
   label.className = 'switch';
 
   const input = document.createElement('input');
   input.type = 'checkbox';
-  input.checked = app.enabled;
-  input.setAttribute('aria-label', `Show ${app.title} to your child`);
+  input.checked = entry.enabled;
+  input.setAttribute('aria-label', `Show ${entry.title} to your child`);
 
   const track = document.createElement('span');
   track.className = 'switch-track';
@@ -402,17 +458,13 @@ function visibilitySwitch (app) {
 
   const text = document.createElement('span');
   text.className = 'switch-text';
-  text.textContent = app.enabled ? 'On the tiles' : 'Hidden';
+  text.textContent = entry.enabled ? 'Showing' : 'Hidden';
 
   input.addEventListener('change', async () => {
     input.disabled = true;
-    text.textContent = input.checked ? 'On the tiles' : 'Hidden';
-    const r = await api.updateSite(app.id, { enabled: input.checked });
-    if (!r || !r.ok) {
-      input.checked = !input.checked;
-      text.textContent = input.checked ? 'On the tiles' : 'Hidden';
-      showToast((r && r.message) || 'Could not change that.');
-    }
+    text.textContent = input.checked ? 'Showing' : 'Hidden';
+    const r = await api.updateSite(entry.id, { enabled: input.checked });
+    if (!r || !r.ok) showToast((r && r.message) || 'Could not change that.');
     input.disabled = false;
     loadLibrary();
   });
@@ -421,75 +473,18 @@ function visibilitySwitch (app) {
   return label;
 }
 
-function deleteButton (app) {
-  let armed = false;
-  let timer = null;
-
-  const btn = button('Delete', 'lib-btn--danger', async () => {
-    if (!armed) {
-      // Nothing here is recoverable, so ask before doing it.
-      armed = true;
-      btn.textContent = 'Tap to confirm';
-      btn.classList.add('is-armed');
-      timer = setTimeout(() => {
-        armed = false;
-        btn.textContent = 'Delete';
-        btn.classList.remove('is-armed');
-      }, 4000);
-      return;
-    }
-
-    clearTimeout(timer);
-    btn.disabled = true;
-    const r = await api.removeSite(app.id);
-    if (!r || !r.ok) {
-      btn.disabled = false;
-      armed = false;
-      btn.textContent = 'Delete';
-      btn.classList.remove('is-armed');
-      showToast((r && r.message) || 'Could not delete that.');
-      return;
-    }
-    loadLibrary();
-  });
-
-  btn.title = `Delete ${app.title}`;
-  return btn;
+function editButton (entry) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'app-edit';
+  b.textContent = 'Edit';
+  b.title = `Edit ${entry.title}`;
+  b.addEventListener('click', () => openForm('edit', entry));
+  return b;
 }
 
-function renderMine (mine) {
-  const wrap = el('lib-mine');
-  wrap.textContent = '';
+/* --- ready-made --- */
 
-  if (!mine.length) {
-    const p = document.createElement('p');
-    p.className = 'lib-empty';
-    p.textContent = 'Nothing added yet. Pick something from Suggestions, or add a site by address.';
-    wrap.appendChild(p);
-    return;
-  }
-
-  for (const app of mine) {
-    const name = document.createElement('span');
-    name.textContent = app.title;
-    if (!app.blockAds) name.appendChild(tag('ads allowed'));
-
-    wrap.appendChild(row({
-      color: app.color,
-      name,
-      sub: `${app.url}  ·  ${app.hostCount} host${app.hostCount === 1 ? '' : 's'} allowed`,
-      actions: [visibilitySwitch(app), deleteButton(app)]
-    }));
-  }
-}
-
-/**
- * Suggestions are cards you tap, not rows with an Add button on the end.
- *
- * They sit directly under the list of what is already set up, on the same page:
- * seeing what you have and adding to it is one task, and splitting it across
- * tabs made it feel like two.
- */
 function renderSuggestions (list) {
   const wrap = el('lib-suggest-list');
   wrap.textContent = '';
@@ -497,8 +492,7 @@ function renderSuggestions (list) {
   for (const sug of list) {
     const card = document.createElement('button');
     card.type = 'button';
-    card.className = 'card' + (sug.added ? ' is-added' : '');
-    card.disabled = sug.added;
+    card.className = 'card';
     card.style.setProperty('--card', sug.color);
     card.title = sug.notes || sug.url;
 
@@ -524,102 +518,323 @@ function renderSuggestions (list) {
 
     const state = document.createElement('span');
     state.className = 'card-state';
-    state.textContent = sug.added ? 'Added' : 'Add';
+    state.textContent = 'Set up';
 
     card.append(badge, body, state);
-
-    card.addEventListener('click', async () => {
-      card.disabled = true;
-      state.textContent = 'Adding…';
-      const r = await api.addSuggestion(sug.id);
-      if (!r || !r.ok) {
-        card.disabled = false;
-        state.textContent = 'Add';
-        showToast((r && r.message) || 'Could not add that.');
-        return;
-      }
-      loadLibrary();
-    });
-
+    // A suggestion is a starting point, not a decision: choosing one opens the
+    // same form as anything else so every value can be changed first.
+    card.addEventListener('click', () => openForm('add', sug));
     wrap.appendChild(card);
   }
 }
 
-/* --- add a site by address --- */
+/* ---------------- the app form ---------------- */
+
+let form = null;
+let probeTimer = null;
+
+const BLANK = {
+  id: null, title: '', url: '', shape: 'star', color: '#3B6BFF',
+  allowHosts: [], denyHosts: [], blockAds: true, enabled: true, iconUrls: []
+};
+
+function openForm (mode, entry) {
+  form = { mode, ...BLANK, ...(entry || {}) };
+  if (!form.color) form.color = catalogue.colors[0] || BLANK.color;
+  if (!form.shape) form.shape = 'star';
+
+  el('gate-step-library').hidden = true;
+  el('gate-step-form').hidden = false;
+
+  const addingByAddress = mode === 'address';
+  el('form-address').hidden = !addingByAddress;
+  el('form-fields').hidden = addingByAddress;
+  el('form-delete').hidden = mode !== 'edit';
+  el('form-notice').hidden = true;
+  el('form-found').hidden = true;
+  el('form-progress').hidden = true;
+  el('form-url').value = '';
+  el('form-adv').open = false;
+
+  el('form-title').textContent =
+    mode === 'edit' ? `Edit ${entry.title}` : 'Add a new app';
+  el('form-sub').textContent = addingByAddress
+    ? 'Start with the address and change anything it suggests.'
+    : 'Change anything here before you save.';
+
+  el('form-badge').textContent = '';
+  el('form-badge').appendChild(shapeIcon(form.shape));
+
+  buildShapePicker();
+  buildColorPicker();
+  fillFormFields();
+  updatePreview();
+  validateForm();
+
+  (addingByAddress ? el('form-url') : el('form-name')).focus();
+}
+
+function closeForm () {
+  clearInterval(probeTimer);
+  probeTimer = null;
+  form = null;
+  el('gate-step-form').hidden = true;
+  el('gate-step-library').hidden = false;
+  loadLibrary();
+}
+
+function fillFormFields () {
+  el('form-name').value = form.title || '';
+  el('form-addr').value = form.url || '';
+  el('form-allow').value = (form.allowHosts || []).join('\n');
+  el('form-deny').value = (form.denyHosts || []).join('\n');
+  const ads = el('form-blockads');
+  ads.checked = form.blockAds !== false;
+  el('form-blockads-text').textContent = ads.checked ? 'Filtering ads' : 'Ads left on';
+}
+
+function buildShapePicker () {
+  const wrap = el('form-shapes');
+  wrap.textContent = '';
+  for (const shape of (catalogue.shapes.length ? catalogue.shapes : [form.shape])) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'swatch' + (shape === form.shape ? ' is-on' : '');
+    b.title = shape;
+    b.setAttribute('aria-label', shape);
+    b.appendChild(shapeIcon(shape));
+    b.addEventListener('click', () => {
+      form.shape = shape;
+      buildShapePicker();
+      updatePreview();
+    });
+    wrap.appendChild(b);
+  }
+}
+
+function buildColorPicker () {
+  const wrap = el('form-colors');
+  wrap.textContent = '';
+  const palette = catalogue.colors.length ? catalogue.colors : [form.color];
+  for (const color of palette) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'swatch swatch--color' + (color === form.color ? ' is-on' : '');
+    b.style.background = color;
+    b.title = color;
+    b.setAttribute('aria-label', `Colour ${color}`);
+    b.addEventListener('click', () => {
+      form.color = color;
+      buildColorPicker();
+      updatePreview();
+    });
+    wrap.appendChild(b);
+  }
+}
+
+/** Shows the parent exactly the tile their child will see. */
+function updatePreview () {
+  const wrap = el('form-preview');
+  wrap.textContent = '';
+
+  const tile = document.createElement('div');
+  tile.className = 'tile tile--preview';
+  tile.style.setProperty('--tile', form.color);
+  tile.style.setProperty('--tile-ink', inkFor(form.color));
+
+  const badge = document.createElement('span');
+  badge.className = 'tile-badge';
+  badge.appendChild(shapeIcon(form.shape));
+
+  const label = document.createElement('span');
+  label.className = 'tile-name';
+  label.textContent = el('form-name').value.trim() || 'Name';
+
+  tile.append(badge, label);
+  wrap.appendChild(tile);
+
+  el('form-badge').textContent = '';
+  el('form-badge').appendChild(shapeIcon(form.shape));
+}
+
+function linesOf (value) {
+  return String(value || '')
+    .split(/[\n,]/)
+    .map((h) => h.trim())
+    .filter(Boolean);
+}
+
+function validateForm () {
+  const name = el('form-name').value.trim();
+  const url = el('form-addr').value.trim();
+  const hosts = linesOf(el('form-allow').value);
+  const ok = Boolean(name) && /^https?:\/\/.+\..+/.test(url) && hosts.length > 0;
+  el('form-save').disabled = !ok;
+  return ok;
+}
+
+async function saveForm () {
+  if (!validateForm()) return;
+
+  const payload = {
+    title: el('form-name').value.trim(),
+    url: el('form-addr').value.trim(),
+    shape: form.shape,
+    color: form.color,
+    allowHosts: linesOf(el('form-allow').value),
+    denyHosts: linesOf(el('form-deny').value),
+    blockAds: el('form-blockads').checked,
+    enabled: true
+  };
+
+  const save = el('form-save');
+  save.disabled = true;
+  save.textContent = 'Saving…';
+
+  const result = form.mode === 'edit'
+    ? await api.updateSite(form.id, payload)
+    : await api.addSite({ ...payload, iconUrls: form.iconUrls });
+
+  save.textContent = 'Save';
+  if (!result || !result.ok) {
+    save.disabled = false;
+    showToast((result && result.message) || 'Could not save that.');
+    return;
+  }
+  closeForm();
+}
+
+async function deleteFromForm () {
+  const btn = el('form-delete');
+  if (btn.dataset.armed !== 'yes') {
+    btn.dataset.armed = 'yes';
+    btn.textContent = 'Tap again to delete';
+    btn.classList.add('is-armed');
+    setTimeout(() => {
+      btn.dataset.armed = 'no';
+      btn.textContent = 'Delete this app';
+      btn.classList.remove('is-armed');
+    }, 4000);
+    return;
+  }
+  btn.disabled = true;
+  const r = await api.removeSite(form.id);
+  if (!r || !r.ok) {
+    btn.disabled = false;
+    showToast((r && r.message) || 'Could not delete that.');
+    return;
+  }
+  closeForm();
+}
+
+/* --- finding out what an address needs --- */
+
+const PROBE_STEPS = [
+  [0, 'Opening the page…'],
+  [22, 'Watching what it loads…'],
+  [70, 'Sorting the adverts from the rest…'],
+  [90, 'Working out what it needs…']
+];
+
+function runProgress (seconds) {
+  const fill = el('probe-fill');
+  const step = el('probe-step');
+  const started = Date.now();
+  el('form-progress').hidden = false;
+  fill.style.width = '0%';
+
+  clearInterval(probeTimer);
+  probeTimer = setInterval(() => {
+    // Stops just short of full: the bar completes when the answer arrives.
+    const pct = Math.min(96, ((Date.now() - started) / (seconds * 1000)) * 100);
+    fill.style.width = pct + '%';
+    for (const [at, text] of PROBE_STEPS) {
+      if (pct >= at) step.textContent = text;
+    }
+  }, 120);
+}
+
+function stopProgress (done) {
+  clearInterval(probeTimer);
+  probeTimer = null;
+  if (done) {
+    el('probe-fill').style.width = '100%';
+    el('probe-step').textContent = 'Done.';
+  }
+}
 
 async function checkSite () {
-  const url = el('lib-url').value.trim();
-  if (!url) return;
+  const raw = el('form-url').value.trim();
+  if (!raw) return;
 
-  const out = el('lib-result');
-  const go = el('lib-check');
-  go.disabled = true;
-  out.textContent = '';
+  const notice = el('form-notice');
+  const go = el('form-check');
+  notice.hidden = true;
+  el('form-found').hidden = true;
 
-  const busy = document.createElement('p');
-  busy.className = 'lib-spinner';
-  busy.textContent = 'Opening the site and watching what it loads. About 15 seconds...';
-  out.appendChild(busy);
-
-  const r = await api.probeSite(url);
-  go.disabled = false;
-  out.textContent = '';
-
-  if (!r || !r.ok) {
-    out.textContent = (r && r.message) || 'That site could not be checked.';
+  // Asked BEFORE the slow part. Being told "you already have this" after
+  // twelve seconds of watching a progress bar is just rude.
+  const dup = await api.siteExists(raw);
+  if (!dup || !dup.ok) {
+    notice.hidden = false;
+    notice.className = 'form-notice is-bad';
+    notice.textContent = (dup && dup.message) || 'That does not look like an address.';
+    return;
+  }
+  if (dup.exists) {
+    notice.hidden = false;
+    notice.className = 'form-notice is-bad';
+    notice.textContent = `You already have this one, as “${dup.title}”. Edit it from the list instead.`;
     return;
   }
 
-  probeResult = r;
+  go.disabled = true;
+  runProgress(13);
+
+  const r = await api.probeSite(raw);
+
+  go.disabled = false;
+  stopProgress(Boolean(r && r.ok));
+
+  if (!r || !r.ok) {
+    notice.hidden = false;
+    notice.className = 'form-notice is-bad';
+    notice.textContent = (r && r.message) || 'That site could not be checked.';
+    return;
+  }
+
+  // Suggestions, not decisions: every one of these is editable below.
+  form.url = r.url;
+  form.title = r.suggestedTitle;
+  form.allowHosts = r.allowHosts;
+  form.iconUrls = r.iconUrls || [];
+
+  const found = el('form-found');
+  found.textContent = '';
+  found.hidden = false;
 
   const summary = document.createElement('p');
+  summary.className = 'found-line';
   summary.textContent = r.warning
     ? r.warning
-    : `Found ${r.hostCount} host${r.hostCount === 1 ? '' : 's'}. ` +
+    : `Needs ${r.hostCount} host${r.hostCount === 1 ? '' : 's'}. ` +
       `${r.blockedCount} looked like advertising or tracking and will be blocked.`;
-  out.appendChild(summary);
+  found.appendChild(summary);
 
-  const hosts = document.createElement('div');
-  hosts.className = 'lib-hosts';
-  hosts.textContent = r.allowHosts.join('  ·  ') || '(nothing)';
-  out.appendChild(hosts);
+  if (r.allowHosts.length) {
+    const hosts = document.createElement('div');
+    hosts.className = 'lib-hosts';
+    hosts.textContent = r.allowHosts.join('  ·  ');
+    found.appendChild(hosts);
+  }
 
-  if (!r.allowHosts.length) return;
-
-  const nameRow = document.createElement('div');
-  nameRow.className = 'lib-row';
-  const nameInput = document.createElement('input');
-  nameInput.className = 'lib-input';
-  nameInput.value = r.suggestedTitle;
-  nameInput.setAttribute('aria-label', 'Name for the tile');
-  const addBtn = document.createElement('button');
-  addBtn.className = 'lib-go';
-  addBtn.type = 'button';
-  addBtn.textContent = 'Add';
-  addBtn.addEventListener('click', async () => {
-    addBtn.disabled = true;
-    const res = await api.addSite({
-      title: nameInput.value.trim() || r.suggestedTitle,
-      url: r.url,
-      allowHosts: r.allowHosts,
-      iconUrls: r.iconUrls,
-      blockAds: true
-    });
-    if (!res || !res.ok) {
-      addBtn.disabled = false;
-      showToast((res && res.message) || 'Could not add that.');
-      return;
-    }
-    el('lib-url').value = '';
-    out.textContent = '';
-    loadLibrary();
-    // Scroll the panel back to the list so the new entry is visibly there.
-    const body = document.querySelector('.panel-body');
-    if (body) body.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-  nameRow.append(nameInput, addBtn);
-  out.appendChild(nameRow);
+  el('form-fields').hidden = false;
+  fillFormFields();
+  updatePreview();
+  validateForm();
+  el('form-name').focus();
 }
+
 
 /**
  * Unlocking opens the panel directly.
@@ -628,8 +843,21 @@ async function checkSite () {
  * two options were "manage games" and "quit" was a screen that existed to be
  * clicked through. Quit now lives at the bottom of the panel, separated.
  */
-function showPanel () {
+/**
+ * What happens after unlocking depends on why the gate was opened.
+ *
+ * Close asked to quit, so it quits. Sending it to the portal to hunt for a quit
+ * button was an extra step for no reason.
+ */
+async function afterUnlock () {
   el('gate-error').textContent = '';
+
+  if (gateIntent === 'quit') {
+    const r = await api.quitApp();
+    if (r && r.ok) return;
+    showToast((r && r.message) || 'Could not quit.');
+  }
+
   el('gate-step-hold').hidden = true;
   el('gate-step-answer').hidden = true;
   el('gate-step-library').hidden = false;
@@ -644,7 +872,7 @@ async function submitAnswer () {
   const result = await api.answerGate(value);
   if (result && result.ok) {
     // Unlocking decides nothing by itself. The grown-up picks what happens next.
-    showPanel();
+    afterUnlock();
     return;
   }
   el('gate-input').value = '';
@@ -698,9 +926,13 @@ function showToast (message) {
 
 function wire () {
   on('home-btn', 'click', () => api.goHome());
-  on('exit-btn', 'click', () => api.openGate('quit'));
-  on('parent-btn', 'click', () => api.openGate('quit'));
-  on('empty-add', 'click', () => api.openGate('quit'));
+  // Two controls, the same pair on both screens. Close means quit -- it does
+  // not detour through the portal to find a quit button.
+  on('parent-btn', 'click', () => api.openGate('portal'));
+  on('close-btn', 'click', () => api.openGate('quit'));
+  on('exit-btn', 'click', () => api.openGate('portal'));
+  on('bar-close-btn', 'click', () => api.openGate('quit'));
+  on('empty-add', 'click', () => api.openGate('portal'));
 
   on('ob-parent', 'click', () => obShow(2));
   on('ob-child', 'click', finishOnboarding);
@@ -716,7 +948,6 @@ function wire () {
   obHold.addEventListener('pointerleave', obCancelHold);
   obHold.addEventListener('pointercancel', obCancelHold);
   on('gate-cancel', 'click', () => api.closeGate());
-  on('open-config', 'click', () => api.openConfigFolder());
 
   on('choice-quit', 'click', async () => {
     const btn = el('choice-quit');
@@ -731,8 +962,22 @@ function wire () {
   });
   on('lib-done', 'click', () => api.closeGate());
   on('gate-cancel-pin', 'click', () => api.closeGate());
-  on('lib-check', 'click', checkSite);
-  on('lib-url', 'keydown', (e) => { if (e.key === 'Enter') checkSite(); });
+  on('add-new', 'click', () => openForm('address'));
+
+  on('form-close', 'click', closeForm);
+  on('form-cancel', 'click', closeForm);
+  on('form-save', 'click', saveForm);
+  on('form-delete', 'click', deleteFromForm);
+  on('form-check', 'click', checkSite);
+  on('form-url', 'keydown', (e) => { if (e.key === 'Enter') checkSite(); });
+
+  on('form-name', 'input', () => { updatePreview(); validateForm(); });
+  on('form-addr', 'input', validateForm);
+  on('form-allow', 'input', validateForm);
+  on('form-blockads', 'change', () => {
+    el('form-blockads-text').textContent =
+      el('form-blockads').checked ? 'Filtering ads' : 'Ads left on';
+  });
 
   const hold = el('hold-btn');
   hold.addEventListener('pointerdown', startHold);
@@ -760,7 +1005,6 @@ async function boot () {
 
   el('version').textContent = `v${config.version}`;
   el('hold-secs').textContent = String(config.settings.holdSeconds);
-  el('config-path').textContent = config.paths.userData;
 
   // Hold the splash briefly so it reads as a loading screen rather than a blink.
   // Under --check the main process drives instead, so skip it entirely.

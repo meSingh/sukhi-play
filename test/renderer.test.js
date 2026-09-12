@@ -32,6 +32,45 @@ test('every element the renderer reaches for actually exists', () => {
   assert.deepEqual(missing, [], `ids missing from index.html: ${missing.join(', ')}`);
 });
 
+test('every function the renderer calls is actually defined', () => {
+  // The gap this closes: the id test checks elements, not functions. Removing
+  // helper functions while callers remained left calls to row() and button()
+  // that only blew up at runtime, in the middle of the setup walkthrough.
+  const KEYWORDS = new Set([
+    'if', 'for', 'while', 'switch', 'catch', 'return', 'typeof', 'function',
+    'await', 'new', 'delete', 'void', 'in', 'of', 'do', 'else', 'yield',
+    'async', 'throw', 'case', 'instanceof'
+  ]);
+  const GLOBALS = new Set([
+    'console', 'document', 'window', 'navigator', 'setTimeout', 'clearTimeout',
+    'setInterval', 'clearInterval', 'requestAnimationFrame', 'fetch', 'alert',
+    'Number', 'String', 'Boolean', 'Array', 'Object', 'JSON', 'Math', 'Date',
+    'parseInt', 'parseFloat', 'isNaN', 'isFinite', 'Promise', 'Set', 'Map',
+    'URL', 'URLSearchParams', 'Error', 'RegExp', 'Symbol', 'Proxy', 'Reflect',
+    'encodeURIComponent', 'decodeURIComponent', 'structuredClone', 'queueMicrotask'
+  ]);
+
+  const defined = new Set();
+  for (const m of code.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)/g)) defined.add(m[1]);
+  for (const m of code.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/g)) defined.add(m[1]);
+  // destructured and parameter names, kept loose on purpose
+  for (const m of code.matchAll(/\(([^)]*)\)\s*=>/g)) {
+    for (const part of m[1].split(',')) {
+      const name = part.trim().replace(/[=:].*$/, '').replace(/[{}\[\].]/g, '').trim();
+      if (/^[A-Za-z_$][\w$]*$/.test(name)) defined.add(name);
+    }
+  }
+
+  const called = new Set();
+  for (const m of code.matchAll(/(^|[^.\w$'"`])([A-Za-z_$][\w$]*)\s*\(/gm)) called.add(m[2]);
+
+  const undefinedCalls = [...called].filter((name) =>
+    !defined.has(name) && !KEYWORDS.has(name) && !GLOBALS.has(name));
+
+  assert.deepEqual(undefinedCalls, [],
+    `called but never defined: ${undefinedCalls.join(', ')}`);
+});
+
 test('nothing binds a listener without going through the safe helper', () => {
   // Direct el('x').addEventListener throws on a missing element; on() does not.
   const direct = [...code.matchAll(/el\('[^']+'\)\.addEventListener/g)];

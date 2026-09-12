@@ -43,7 +43,14 @@
             <path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6" fill="none"
                   stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
           </svg>
-          <span>Parents</span>
+          <span>Grown-ups</span>
+        </button>
+        <button id="close-btn" class="top-btn top-btn--close" type="button">
+          <svg class="top-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor"
+                  stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+          <span>Close</span>
         </button>
       </div>
     </header>
@@ -163,13 +170,20 @@
       <span id="bar-blocked" class="badge" hidden></span>
     </div>
 
-    <button id="exit-btn" class="bar-btn bar-btn--parent" type="button" title="Parent portal">
+    <button id="exit-btn" class="bar-btn bar-btn--parent" type="button">
       <svg class="bar-icon" viewBox="0 0 24 24" aria-hidden="true">
         <circle cx="12" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2.1"/>
         <path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6" fill="none"
               stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
       </svg>
-      <span>Parents</span>
+      <span>Grown-ups</span>
+    </button>
+    <button id="bar-close-btn" class="bar-btn bar-btn--close" type="button">
+      <svg class="bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor"
+              stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+      <span>Close</span>
     </button>
   </header>
 
@@ -210,6 +224,123 @@
 
       <!-- Unlocked. Straight into the panel: managing games is what a parent
            came here to do, so it is not hidden behind a menu of two items. -->
+      <!-- One form for adding and editing. Every value the catalog understands is
+           editable here, because a parent should never need to open a text file. -->
+      <div id="gate-step-form" hidden>
+        <header class="panel-head">
+          <div class="panel-brand">
+            <span class="panel-badge" id="form-badge" aria-hidden="true"></span>
+            <div class="panel-titles">
+              <h2 class="panel-title" id="form-title">Add a new app</h2>
+              <p class="panel-sub" id="form-sub">Choose what it is called and how it looks.</p>
+            </div>
+          </div>
+          <button id="form-close" class="panel-close" type="button" aria-label="Cancel">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor"
+                    stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </header>
+
+        <div class="panel-body">
+          <!-- Step 1, only when adding by address. -->
+          <section class="sec" id="form-address" hidden>
+            <h3 class="sec-head"><span>Where is it?</span></h3>
+            <p class="sec-note">
+              Type the address. Sukhi Play opens it once and works out which
+              hosts it needs, then suggests everything else — you can change all
+              of it before saving.
+            </p>
+            <div class="lib-row">
+              <input id="form-url" class="lib-input" type="text" inputmode="url"
+                     autocomplete="off" spellcheck="false" placeholder="example.com">
+              <button id="form-check" class="lib-go" type="button">Check</button>
+            </div>
+
+            <div id="form-progress" class="probe" hidden>
+              <div class="probe-bar"><span class="probe-fill" id="probe-fill"></span></div>
+              <p class="probe-step" id="probe-step">Opening the page…</p>
+            </div>
+
+            <p id="form-notice" class="form-notice" hidden></p>
+            <div id="form-found" class="found" hidden></div>
+          </section>
+
+          <!-- Step 2: everything about the app. -->
+          <section class="sec" id="form-fields" hidden>
+            <h3 class="sec-head"><span>How it looks</span></h3>
+
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="form-name">Name your child sees</label>
+                <input id="form-name" class="lib-input" type="text" maxlength="18"
+                       autocomplete="off" placeholder="Games">
+              </div>
+              <div class="tile-preview" id="form-preview" aria-hidden="true"></div>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Picture</span>
+              <div class="picker" id="form-shapes"></div>
+            </div>
+
+            <div class="field">
+              <span class="field-label">Colour</span>
+              <div class="picker picker--colors" id="form-colors"></div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="form-addr">Address</label>
+              <input id="form-addr" class="lib-input" type="text" inputmode="url"
+                     autocomplete="off" spellcheck="false">
+            </div>
+
+            <details class="adv" id="form-adv">
+              <summary class="adv-head">Advanced — what it may load</summary>
+
+              <div class="field">
+                <label class="field-label" for="form-allow">Allowed hosts</label>
+                <p class="field-note">
+                  Only these may load anything. One per line.
+                  <code>example.com</code> also covers <code>a.example.com</code>.
+                </p>
+                <textarea id="form-allow" class="lib-area" rows="4" spellcheck="false"></textarea>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="form-deny">Blocked hosts</label>
+                <p class="field-note">
+                  Overrides the list above. Use for ad subdomains of an allowed
+                  domain. One per line.
+                </p>
+                <textarea id="form-deny" class="lib-area" rows="3" spellcheck="false"></textarea>
+              </div>
+
+              <div class="field field--inline">
+                <label class="switch">
+                  <input id="form-blockads" type="checkbox" checked>
+                  <span class="switch-track"><span class="switch-knob"></span></span>
+                  <span class="switch-text" id="form-blockads-text">Filtering ads</span>
+                </label>
+                <p class="field-note">
+                  Turn this off to leave a site exactly as its owner intended.
+                  Your child still cannot leave it.
+                </p>
+              </div>
+            </details>
+          </section>
+        </div>
+
+        <footer class="panel-foot panel-foot--form">
+          <button id="form-delete" class="btn-danger" type="button" hidden>Delete this app</button>
+          <div class="foot-actions">
+            <button id="form-cancel" class="ghost-btn" type="button">Cancel</button>
+            <button id="form-save" class="lib-go" type="button" disabled>Save</button>
+          </div>
+        </footer>
+      </div>
+
       <!-- One page, not tabs. You land on what is set up, and adding more is
            directly beneath it rather than behind a separate screen. -->
       <div id="gate-step-library" hidden>
@@ -238,43 +369,30 @@
         <div class="panel-body">
           <section class="sec">
             <h3 class="sec-head">
-              <span>On the tiles</span>
+              <span>Your apps</span>
               <span id="mine-count" class="sec-count"></span>
             </h3>
-            <div id="lib-mine"></div>
+            <div id="lib-mine" class="apps"></div>
+            <button id="add-new" class="add-new" type="button">
+              <span class="add-new-plus" aria-hidden="true">+</span>
+              <span>Add a new app</span>
+            </button>
           </section>
 
-          <section class="sec">
+          <section class="sec" id="sec-suggest">
             <h3 class="sec-head"><span>Ready to add</span></h3>
             <p class="sec-note">
               Set up by other parents. Nothing here is installed or endorsed by
               Sukhi Play, and none of these sites is connected to it — you are
-              responsible for checking each one's terms.
+              responsible for checking each one's terms. Choosing one opens the
+              same settings as any other app, so you can change anything first.
             </p>
             <div id="lib-suggest-list" class="cards"></div>
-          </section>
-
-          <section class="sec">
-            <h3 class="sec-head"><span>Add any other website</span></h3>
-            <p class="sec-note">
-              Type an address. Sukhi Play opens it once, watches what it loads,
-              and works out which hosts it needs. Nothing is saved until you
-              press Add.
-            </p>
-            <div class="lib-row">
-              <input id="lib-url" class="lib-input" type="text" inputmode="url"
-                     autocomplete="off" spellcheck="false" placeholder="example.com">
-              <button id="lib-check" class="lib-go" type="button">Check</button>
-            </div>
-            <div id="lib-result" class="lib-result"></div>
           </section>
         </div>
 
         <footer class="panel-foot">
-          <div class="panel-meta">
-            <button id="open-config" class="link-btn" type="button">Settings folder</button>
-            <span class="lib-path" id="config-path"></span>
-          </div>
+          <p class="foot-note">Changes take effect straight away.</p>
           <button id="choice-quit" class="btn-danger" type="button">Quit Sukhi Play</button>
         </footer>
       </div>

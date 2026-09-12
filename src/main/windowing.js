@@ -306,6 +306,9 @@ class Shell {
   state () {
     return {
       mode: this.mode,
+      // The renderer needs to know why the gate opened: Close should quit once
+      // unlocked, not drop the parent into the portal to find a quit button.
+      gateIntent: this.gateIntent || null,
       activeAppId: this.activeApp ? this.activeApp.id : null,
       activeAppTitle: this.activeApp ? this.activeApp.title : null,
       htmlFullscreen: this.htmlFullscreen,

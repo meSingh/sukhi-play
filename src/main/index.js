@@ -2,7 +2,7 @@
 
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { app, session, ipcMain, Menu, nativeImage, shell: electronShell } = require('electron');
+const { app, session, ipcMain, Menu, nativeImage } = require('electron');
 
 const settingsStore = require('./settings');
 const catalogStore = require('./catalog');
@@ -290,15 +290,33 @@ function registerIpc () {
     if (!isUnlocked()) return locked();
     return {
       ok: true,
-      mine: catalog.apps.map(({ id, title, url, shape, color, enabled, blockAds, allowHosts, notes }) =>
-        ({ id, title, url, shape, color, enabled, blockAds, hostCount: allowHosts.length, notes })),
-      suggestions: suggestions.map((s) => ({
-        id: s.id, title: s.title, url: s.url, shape: s.shape, color: s.color,
-        category: s.category, adSupported: s.adSupported, blockAds: s.blockAds,
-        notes: s.notes, hostCount: s.allowHosts.length,
-        added: catalog.apps.some((a) => a.url === s.url)
-      }))
+      // Everything an editor needs, not a read-only summary: a parent has to be
+      // able to change any of this without opening a text file.
+      mine: catalog.apps.map((a) => ({
+        id: a.id, title: a.title, url: a.url, shape: a.shape, color: a.color,
+        enabled: a.enabled, blockAds: a.blockAds, icon: a.icon,
+        allowHosts: a.allowHosts, denyHosts: a.denyHosts, notes: a.notes
+      })),
+      // Ones already set up are dropped rather than greyed out -- a suggestion
+      // you have taken is not a suggestion any more.
+      suggestions: suggestions
+        .filter((s) => !catalog.apps.some((a) => a.url === s.url))
+        .map((s) => ({
+          id: s.id, title: s.title, url: s.url, shape: s.shape, color: s.color,
+          category: s.category, adSupported: s.adSupported, blockAds: s.blockAds,
+          notes: s.notes, allowHosts: s.allowHosts, denyHosts: s.denyHosts
+        })),
+      shapes: library.SHAPES,
+      colors: library.COLORS
     };
+  });
+
+  ipcMain.handle('shell:site-exists', (_e, url) => {
+    if (!isUnlocked()) return locked();
+    const target = probe.normalizeUrl(String(url || ''));
+    if (!target) return { ok: false, message: 'That does not look like a web address.' };
+    const clash = catalog.apps.find((a) => a.url === target);
+    return { ok: true, exists: Boolean(clash), title: clash ? clash.title : null, url: target };
   });
 
   ipcMain.handle('shell:probe-site', async (_e, url) => {
@@ -333,11 +351,13 @@ function registerIpc () {
     const result = library.addSite(paths.catalog, {
       title: entry.title,
       url: entry.url,
+      shape: entry.shape,
+      color: entry.color,
       allowHosts: entry.allowHosts,
       denyHosts: entry.denyHosts,
       blockAds: entry.blockAds !== false,
       notes: entry.notes,
-      enabled: true
+      enabled: entry.enabled !== false
     });
     if (!result.ok) return result;
 
@@ -351,18 +371,6 @@ function registerIpc () {
 
     reloadCatalog();
     console.log(`[library] added ${result.app.id} -> ${result.app.url}`);
-    return { ok: true, app: result.app };
-  });
-
-  ipcMain.handle('shell:add-suggestion', async (_e, id) => {
-    if (!isUnlocked()) return locked();
-    const found = suggestions.find((s) => s.id === id);
-    if (!found) return { ok: false, message: 'Unknown suggestion.' };
-
-    const result = library.addSite(paths.catalog, { ...found, enabled: true });
-    if (!result.ok) return result;
-    reloadCatalog();
-    console.log(`[library] added suggestion ${found.id}`);
     return { ok: true, app: result.app };
   });
 
@@ -380,13 +388,6 @@ function registerIpc () {
     return result;
   });
 
-  ipcMain.handle('shell:open-config-folder', () => {
-    if (!isUnlocked()) return { ok: false, message: 'not unlocked' };
-    // The one place a real OS action is wanted, and it only ever opens the
-    // app's own settings folder -- never a URL from a page.
-    electronShell.openPath(paths.userData);
-    return { ok: true };
-  });
 }
 
 // --- allowlist check ---------------------------------------------------------
