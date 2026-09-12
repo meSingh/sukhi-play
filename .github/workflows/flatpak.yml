@@ -1,0 +1,84 @@
+name: Flatpak
+
+# Builds the Flathub manifest and validates the AppStream metadata.
+#
+# The point of this workflow is to fail here rather than in Flathub's review
+# queue. A manifest cannot be built or tested on macOS at all, so without this
+# there is no way to know whether a submission works before a reviewer looks at
+# it. Everything here mirrors what Flathub's own CI does.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packaging/flathub/**'
+      - '.github/workflows/flatpak.yml'
+  pull_request:
+    paths:
+      - 'packaging/flathub/**'
+  workflow_dispatch:
+
+jobs:
+  metadata:
+    name: Validate metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: The committed metainfo must not be stale
+        # The flatpak build installs a committed copy, because the freedesktop
+        # SDK has no node to generate one. If someone edits the generator or the
+        # screenshots and forgets to re-run it, Flathub ships the old metadata.
+        run: |
+          npm run metainfo
+          if ! git diff --quiet packaging/flathub/com.msingh.sukhi.play.metainfo.xml; then
+            echo "::error::packaging/flathub metainfo is stale. Run 'npm run metainfo' and commit."
+            git diff --stat packaging/flathub/com.msingh.sukhi.play.metainfo.xml
+            exit 1
+          fi
+          echo "committed metainfo matches the generator"
+
+      - name: Install AppStream tooling
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends appstream desktop-file-utils
+
+      - name: Validate the AppStream metainfo
+        # Flathub requires this to pass. --explain because a bare failure here
+        # is almost impossible to act on.
+        run: appstreamcli validate --explain packaging/flathub/com.msingh.sukhi.play.metainfo.xml
+
+      - name: Validate the desktop entry
+        run: desktop-file-validate packaging/flathub/com.msingh.sukhi.play.desktop
+
+      - name: Every screenshot the metainfo points at must resolve
+        # Software centres fetch these over the network. A 404 means the listing
+        # silently shows no screenshots, which is the bug that started this.
+        run: |
+          fail=0
+          for url in $(grep -oP '(?<=<image>)[^<]+' packaging/flathub/com.msingh.sukhi.play.metainfo.xml); do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "$url" || echo 000)
+            printf '  %s  %s\n' "$code" "$url"
+            [ "$code" = "200" ] || fail=1
+          done
+          exit $fail
+
+  build:
+    name: Build the flatpak
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-24.08
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: sukhi-play.flatpak
+          manifest-path: packaging/flathub/com.msingh.sukhi.play.yml
+          cache-key: flatpak-builder-${{ github.sha }}

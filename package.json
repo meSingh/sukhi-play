@@ -20,11 +20,13 @@
     "probe": "electron . --probe=",
     "metainfo": "node scripts/make-metainfo.js",
     "diagnose": "electron . --diagnose",
-    "shots": "node scripts/shots.js"
+    "shots": "node scripts/shots.js",
+    "flathub:lint": "node scripts/flathub-lint.js"
   },
   "devDependencies": {
     "electron": "^44.3.0",
-    "electron-builder": "^26.15.3"
+    "electron-builder": "^26.15.3",
+    "js-yaml": "^5.4.1"
   },
   "keywords": [
     "kids",
