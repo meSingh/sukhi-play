@@ -63,6 +63,20 @@ test('the macOS download button is ours, not Apple\'s', () => {
     'the README must not use Apple official badge artwork');
 });
 
+test('the Windows button is ours, not Microsoft\'s', () => {
+  // Sukhi Play is not in the Microsoft Store, so their "Get it from Microsoft"
+  // badge would claim a listing that does not exist.
+  for (const variant of ['light', 'dark']) {
+    const file = path.join(ROOT, 'docs', `badge-windows-${variant}.svg`);
+    assert.ok(fs.existsSync(file), `docs/badge-windows-${variant}.svg is missing`);
+    const svg = fs.readFileSync(file, 'utf8');
+    assert.match(svg, /not the Microsoft Store/i,
+      'the button has to say it is not a Microsoft Store download');
+    assert.ok(!/microsoft\.com|<image|xlink:href/i.test(svg),
+      'the button must not pull in Microsoft artwork');
+  }
+});
+
 test('the macOS page offers both architectures by their permanent names', () => {
   // The release job aliases the two disk images to version-free names so these
   // links keep working. If the names drift apart the page 404s silently.
@@ -72,6 +86,14 @@ test('the macOS page offers both architectures by their permanent names', () => 
   for (const name of ['Sukhi-Play-macOS-AppleSilicon.dmg', 'Sukhi-Play-macOS-Intel.dmg']) {
     assert.ok(page.includes(`releases/latest/download/${name}`),
       `docs/macos.md does not link ${name}`);
+    assert.ok(workflow.includes(name),
+      `the release job does not produce ${name}, so the link would 404`);
+  }
+
+  const win = fs.readFileSync(path.join(ROOT, 'docs', 'windows.md'), 'utf8');
+  for (const name of ['Sukhi-Play-Windows-Setup.exe', 'Sukhi-Play-Windows-Portable.exe']) {
+    assert.ok(win.includes(`releases/latest/download/${name}`),
+      `docs/windows.md does not link ${name}`);
     assert.ok(workflow.includes(name),
       `the release job does not produce ${name}, so the link would 404`);
   }

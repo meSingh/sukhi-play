@@ -12,6 +12,24 @@ const builder = yaml.load(fs.readFileSync(path.join(ROOT, 'electron-builder.yml'
 const release = yaml.load(fs.readFileSync(
   path.join(ROOT, '.github', 'workflows', 'release.yml'), 'utf8'));
 
+test('electron-builder.yml validates against electron-builder\'s own schema', () => {
+  // An unrecognised key does not warn, it invalidates the block it sits in.
+  // A stray `desktopName` under linux: once silently broke the build for all
+  // three platforms, and `snapcraft:` without its required `base` made the
+  // whole config invalid. Both were found by a failing build rather than here.
+  const Ajv = require('ajv');
+  const schema = JSON.parse(fs.readFileSync(
+    path.join(ROOT, 'node_modules', 'app-builder-lib', 'scheme.json'), 'utf8'));
+  const validate = new Ajv({ allErrors: true, strict: false }).compile(schema);
+
+  if (!validate(builder)) {
+    const detail = validate.errors
+      .map((e) => `${e.instancePath || '(root)'} ${e.keyword} ${JSON.stringify(e.params)}`)
+      .join('\n    ');
+    assert.fail(`electron-builder.yml does not match the schema:\n    ${detail}`);
+  }
+});
+
 test('every dist script CI runs refuses to publish', () => {
   // electron-builder's default publish policy is onTagOrDraft. On a tag it
   // inferred a Snap Store publish from the snap target and tried to upload
@@ -65,11 +83,19 @@ test('the snap declares the metadata a fresh store listing would use', () => {
   // this one has been, so they matter for a fresh listing rather than for the
   // current one. Licence, links, icon and screenshots are never carried by the
   // snap and are set on the store page.
+  // Reads snapcraft.core24, not the deprecated snap: block. electron-builder
+  // warns that `snap` configuration is deprecated, and a future release
+  // dropping it would silently stop applying all of this.
+  assert.ok(!builder.snap,
+    'the deprecated snap: block is back; configuration belongs under snapcraft');
+  const snap = builder.snapcraft && builder.snapcraft.core24;
+  assert.ok(snap, 'no snapcraft.core24 block in electron-builder.yml');
+
   for (const field of ['title', 'summary', 'description', 'category']) {
-    assert.ok(builder.snap[field], `snap.${field} is not set, so the listing will be bare`);
+    assert.ok(snap[field], `snapcraft.core24.${field} is not set, so a fresh listing is bare`);
   }
-  assert.ok(builder.snap.summary.length <= 78,
-    `snap.summary is ${builder.snap.summary.length} chars; the store limit is 78`);
-  assert.equal(builder.snap.confinement, 'strict',
+  assert.ok(snap.summary.length <= 78,
+    `summary is ${snap.summary.length} chars; the store limit is 78`);
+  assert.equal(snap.confinement, 'strict',
     'strict confinement is what makes the store report restricted permissions');
 });

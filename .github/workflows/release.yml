@@ -139,12 +139,14 @@ jobs:
           # /releases/latest/download/<name> is a permanent link that docs and
           # buttons can point at. Every other asset keeps its versioned name.
           cd release
-          for pair in "mac-arm64:Sukhi-Play-macOS-AppleSilicon.dmg" \
-                      "mac-x64:Sukhi-Play-macOS-Intel.dmg"; do
+          for pair in "mac-arm64.dmg:Sukhi-Play-macOS-AppleSilicon.dmg" \
+                      "mac-x64.dmg:Sukhi-Play-macOS-Intel.dmg" \
+                      "win-x64-setup.exe:Sukhi-Play-Windows-Setup.exe" \
+                      "win-x64.exe:Sukhi-Play-Windows-Portable.exe"; do
             match=${pair%%:*}; alias=${pair##*:}
-            src=$(find . -maxdepth 1 -name "*${match}.dmg" -print -quit)
+            src=$(find . -maxdepth 1 -name "*${match}" -print -quit)
             if [ -z "$src" ]; then
-              echo "::error::no .dmg matching ${match}"
+              echo "::error::no artifact matching ${match}"
               exit 1
             fi
             cp "$src" "$alias"
@@ -190,7 +192,7 @@ jobs:
             | --- | --- |
             | **macOS** (Apple Silicon) | `Sukhi-Play-macOS-AppleSilicon.dmg` |
             | **macOS** (Intel) | `Sukhi-Play-macOS-Intel.dmg` |
-            | **Windows 10/11** | `.exe` installer, or the portable `.exe` |
+            | **Windows 10/11** | `Sukhi-Play-Windows-Setup.exe`, or `-Portable.exe` |
             | **Ubuntu / Debian** | `.deb`, or `sudo snap install sukhi-play` |
             | **Other Linux** | `.AppImage` (`chmod +x`, then run) |
 
@@ -212,7 +214,13 @@ jobs:
             Once per install. Full walkthrough:
             [docs/macos.md](https://github.com/${{ github.repository }}/blob/main/docs/macos.md).
 
-            **Windows** SmartScreen will warn: *More info*, then *Run anyway*.
+            ### Windows blocks the first run too
+
+            SmartScreen shows *"Windows protected your PC"*. Click **More
+            info**, then **Run anyway**. The button only appears after More
+            info, which is easy to miss.
+            [docs/windows.md](https://github.com/${{ github.repository }}/blob/main/docs/windows.md)
+            has the detail, including how to check the download's hash.
 
             Notarising needs a paid Apple Developer account and Windows wants an
             EV certificate, both annual, and this is a free project. Verify the

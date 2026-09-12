@@ -26,6 +26,7 @@
     "dist:linux:all": "npm run metainfo && electron-builder --linux AppImage deb snap --publish never"
   },
   "devDependencies": {
+    "ajv": "^8.20.0",
     "electron": "^44.3.0",
     "electron-builder": "^26.15.3",
     "js-yaml": "^5.4.1"

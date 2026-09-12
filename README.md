@@ -18,6 +18,12 @@
     <img src="docs/badge-macos-light.svg" alt="Download for macOS, Apple Silicon or Intel. Not from the Mac App Store." height="56">
   </picture>
 </a>
+<a href="docs/windows.md">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/badge-windows-dark.svg">
+    <img src="docs/badge-windows-light.svg" alt="Download for Windows 10 and 11. Not from the Microsoft Store." height="56">
+  </picture>
+</a>
 <a href="https://snapcraft.io/sukhi-play">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://snapcraft.io/en/dark/install.svg">
@@ -63,7 +69,7 @@ first-launch warning.
 | --- | --- |
 | macOS (Apple Silicon) | **[Sukhi-Play-macOS-AppleSilicon.dmg](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-AppleSilicon.dmg)** |
 | macOS (Intel) | **[Sukhi-Play-macOS-Intel.dmg](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-Intel.dmg)** |
-| Windows 10 / 11 | `.exe` installer, or the portable `.exe` |
+| Windows 10 / 11 | **[Sukhi-Play-Windows-Setup.exe](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-Windows-Setup.exe)**, or [portable](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-Windows-Portable.exe) |
 | Ubuntu / Debian | `.deb` |
 | Other Linux | `.AppImage`, `chmod +x` then run |
 
@@ -83,7 +89,9 @@ page.
 > Once per install. [Full walkthrough, with the one-line
 > alternative](docs/macos.md).
 >
-> **Windows** SmartScreen will warn: *More info*, then *Run anyway*.
+> **Windows** SmartScreen shows *"Windows protected your PC"*. Click **More
+> info**, then **Run anyway** — the button only appears after More info.
+> [Full walkthrough, including how to check the hash](docs/windows.md).
 
 Or run it from source:
 
