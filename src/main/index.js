@@ -537,6 +537,50 @@ app.whenReady().then(() => {
   });
 
   const win = shellApp.create();
+
+  // A test run must never be able to take over the machine. SUKHI_EXIT_AFTER
+  // gives any run a hard deadline.
+  const exitAfter = Number(process.env.SUKHI_EXIT_AFTER || 0);
+  if (exitAfter > 0) {
+    setTimeout(() => {
+      console.log(`[boot] SUKHI_EXIT_AFTER=${exitAfter}s reached, exiting`);
+      try { shortcuts.releaseAll(); } catch { /* nothing held */ }
+      if (shellApp) shellApp.allowQuit = true;
+      app.exit(0);
+    }, exitAfter * 1000);
+  }
+
+  // The launcher must prove it is on screen. If it does not, everything is
+  // unlocked: a kiosk whose interface never appeared has no exit gate either,
+  // and with Cmd+Q and Cmd+Tab held at the OS level the only way out would be a
+  // force quit. Fail open, not locked.
+  const READY_TIMEOUT_MS = 12_000;
+  let rendererReady = false;
+
+  const watchdog = setTimeout(() => {
+    if (rendererReady) return;
+    shortcuts.disable('the launcher did not appear');
+    shellApp.releaseLockdown('the launcher did not appear within 12 seconds');
+    shellApp.showFailure(
+      'Sukhi Play could not start properly.',
+      'Everything has been unlocked so you can close this window normally. ' +
+      'Please report this at github.com/meSingh/sukhi-play/issues'
+    );
+  }, READY_TIMEOUT_MS);
+
+  ipcMain.on('shell:renderer-ready', () => {
+    if (rendererReady) return;
+    rendererReady = true;
+    clearTimeout(watchdog);
+    console.log('[boot] launcher is on screen');
+  });
+
+  shellApp.shellView.webContents.on('render-process-gone', (_e, details) => {
+    clearTimeout(watchdog);
+    shortcuts.disable('the launcher crashed');
+    shellApp.releaseLockdown(`the launcher crashed (${details.reason})`);
+  });
+
   installFocusGuard(win);
   registerIpc();
 

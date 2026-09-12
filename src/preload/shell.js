@@ -64,6 +64,9 @@ contextBridge.exposeInMainWorld('sukhi', {
   /** Renderer signals it has finished booting (used by --check). */
   rendererIdle: () => ipcRenderer.send('shell:renderer-idle'),
 
+  /** Renderer confirms the launcher actually rendered. Clears the watchdog. */
+  rendererReady: () => ipcRenderer.send('shell:renderer-ready'),
+
   /** Subscribe to main-process events. Returns an unsubscribe function. */
   on: (event, handler) => {
     if (!VALID_EVENTS.has(event) || typeof handler !== 'function') return () => {};

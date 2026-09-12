@@ -61,12 +61,17 @@ const MISSION_CONTROL = process.platform === 'darwin'
 
 let registered = [];
 let active = false;
+// Once this is set, nothing re-takes the keyboard for the rest of the session.
+// It exists because releasing the lockdown calls win.focus(), which fires the
+// focus handler, which cheerfully re-registered all 64 shortcuts and put the
+// parent straight back in the trap the release was meant to open.
+let disabled = false;
 
 /**
  * @param {{onParentEscape: Function}} handlers
  */
 function acquire ({ onParentEscape } = {}) {
-  if (active) return;
+  if (disabled || active) return;
   active = true;
 
   // The grown-up chord is registered too, so it works even when the OS would
@@ -109,11 +114,23 @@ function releaseAll () {
 }
 
 /**
+ * Gives the keyboard back and refuses to take it again for the rest of the
+ * session. Use when the lockdown is being abandoned, never for a normal blur.
+ */
+function disable (reason) {
+  disabled = true;
+  releaseAll();
+  console.log(`[shortcuts] disabled for this session: ${reason}`);
+}
+
+function isDisabled () { return disabled; }
+
+/**
  * Binds acquire/release to the window's focus so the machine only loses these
  * keys while the kiosk is actually in front.
  */
 function install (win, { onParentEscape, enabled = true } = {}) {
-  if (!enabled) return;
+  if (!enabled) { disabled = true; return; }
 
   if (win.isFocused()) acquire({ onParentEscape });
   win.on('focus', () => acquire({ onParentEscape }));
@@ -122,6 +139,6 @@ function install (win, { onParentEscape, enabled = true } = {}) {
 }
 
 module.exports = {
-  install, acquire, release, releaseAll,
+  install, acquire, release, releaseAll, disable, isDisabled,
   FUNCTION_KEYS, APP_SHORTCUTS, SWITCHERS, MISSION_CONTROL
 };

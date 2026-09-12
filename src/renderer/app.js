@@ -518,6 +518,10 @@ async function boot () {
   }
 
   applyState(config.state);
+
+  // Tell the main process the launcher is genuinely on screen. Until this
+  // arrives, a watchdog is holding the lockdown open to be released.
+  requestAnimationFrame(() => requestAnimationFrame(() => api.rendererReady()));
 }
 
 boot().catch((err) => {

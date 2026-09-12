@@ -6,6 +6,12 @@ const security = require('./security');
 
 const BAR_HEIGHT = 72;
 
+function escapeHtml (text) {
+  return String(text).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
 const RENDERER_DIR = path.join(__dirname, '..', 'renderer');
 const PRELOAD_DIR = path.join(__dirname, '..', 'preload');
 
@@ -84,16 +90,7 @@ class Shell {
     });
 
     if (cover) {
-      // 'screen-saver' is above the Dock and the menu bar.
-      this.win.setAlwaysOnTop(true, 'screen-saver');
-      // Follow the child onto whatever Space they swipe to, and stay above any
-      // other app that is itself fullscreen.
-      if (process.platform !== 'win32') {
-        try {
-          this.win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-        } catch { /* unsupported on some Linux window managers */ }
-      }
-      this.win.setBounds(bounds);
+      this.applyCover();
       // A resolution or display change must not leave a gap around the edges.
       screen.on('display-metrics-changed', () => this.refitToScreen());
       screen.on('display-added', () => this.refitToScreen());
@@ -119,6 +116,22 @@ class Shell {
       onParentEscape: () => this.openGate('quit')
     });
 
+    // Surface renderer errors in the terminal. Without this a script error in
+    // the launcher shows up as a blank window and nothing else, which is
+    // exactly as much help as it sounds.
+    this.shellView.webContents.on('console-message', (event) => {
+      const level = event.level || 'info';
+      if (level === 'error' || level === 'warning') {
+        console.error(`[renderer:${level}] ${event.message}  (${event.sourceId || '?'}:${event.lineNumber || 0})`);
+      }
+    });
+    this.shellView.webContents.on('did-fail-load', (_e, code, desc, url) => {
+      console.error(`[shell] failed to load: ${code} ${desc} ${url}`);
+    });
+    this.shellView.webContents.on('render-process-gone', (_e, d) => {
+      console.error(`[shell] renderer gone: ${d.reason}`);
+    });
+
     this.win.contentView.addChildView(this.shellView);
     this.shellView.webContents.loadFile(path.join(RENDERER_DIR, 'index.html'));
 
@@ -134,14 +147,114 @@ class Shell {
     return this.win;
   }
 
+  /**
+   * Takes over the screen.
+   *
+   * On macOS this uses "simple" fullscreen -- the pre-Lion kind -- rather than
+   * placing a window by hand at screen-saver level. Simple fullscreen genuinely
+   * covers the menu bar and Dock and does NOT create its own Space, which is
+   * the whole reason we avoid native fullscreen. Setting bounds by hand did not
+   * work: macOS refuses to put an ordinary window under the menu bar, so the
+   * window ended up offset down the screen and hanging off the bottom.
+   *
+   * `skipTransformProcessType` matters too. Without it, asking to be visible on
+   * fullscreen Spaces makes Electron hide the Dock and switch the process type,
+   * which is disruptive while the window is still being set up.
+   */
+  applyCover () {
+    const win = this.win;
+    if (!win || win.isDestroyed()) return;
+
+    try {
+      if (process.platform === 'darwin') {
+        win.setSimpleFullScreen(true);
+      } else {
+        win.setBounds(this.screenBounds());
+      }
+    } catch (err) {
+      console.warn('[window] could not cover the screen:', err.message);
+      try { win.setBounds(this.screenBounds()); } catch { /* nothing more to try */ }
+    }
+
+    try {
+      win.setAlwaysOnTop(true, 'screen-saver');
+    } catch { /* not supported on Wayland */ }
+
+    if (process.platform !== 'win32') {
+      try {
+        // Follow the child onto whatever Space they swipe to.
+        win.setVisibleOnAllWorkspaces(true, { skipTransformProcessType: true });
+      } catch { /* unsupported on some Linux window managers */ }
+    }
+
+    // Worth logging: a window that is not where it should be is the difference
+    // between covering the screen and leaving a strip of desktop showing.
+    try {
+      const b = win.getBounds();
+      const s = this.screenBounds();
+      const covered = b.x <= s.x && b.y <= s.y &&
+                      b.width >= s.width && b.height >= s.height;
+      // Only worth saying once, or whenever it goes wrong.
+      if (!covered || !this._loggedCover) {
+        this._loggedCover = true;
+        console.log(`[window] covering screen: ${covered ? 'yes' : 'NO'} ` +
+                    `window=${b.x},${b.y} ${b.width}x${b.height} ` +
+                    `screen=${s.x},${s.y} ${s.width}x${s.height}`);
+      }
+    } catch { /* window going away */ }
+  }
+
+  /**
+   * Drops every lock: shortcuts, always-on-top, screen covering, and the quit
+   * guard. Called when the interface fails to appear.
+   *
+   * A kiosk that breaks must break OPEN. If the launcher does not render, the
+   * grown-up gate is not on screen either -- and with Cmd+Q and Cmd+Tab held at
+   * the OS level, there would be nothing left but a force quit. That happened,
+   * and this is the fix for it.
+   */
+  releaseLockdown (reason) {
+    console.error(`[window] RELEASING LOCKDOWN: ${reason}`);
+    this.lockdownReleased = true;
+    this.allowQuit = true;
+
+    const win = this.win;
+    if (!win || win.isDestroyed()) return;
+    try { if (process.platform === 'darwin') win.setSimpleFullScreen(false); } catch {}
+    try { win.setAlwaysOnTop(false); } catch {}
+    try { win.setVisibleOnAllWorkspaces(false); } catch {}
+    try { win.setBounds({ x: 80, y: 80, width: 900, height: 620 }); } catch {}
+    try { win.setClosable(true); } catch {}
+    try { win.show(); win.focus(); } catch {}
+  }
+
+  /**
+   * Replaces the launcher with a plain message the parent can read and act on.
+   * Used only after lockdown has been released.
+   */
+  showFailure (title, detail) {
+    if (!this.shellView || this.shellView.webContents.isDestroyed()) return;
+    const page = 'data:text/html;charset=utf-8,' + encodeURIComponent(`
+      <style>
+        body { margin:0; height:100vh; display:flex; flex-direction:column;
+               align-items:center; justify-content:center; gap:16px;
+               background:#0f172a; color:#f8fafc; text-align:center; padding:40px;
+               font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+        h1 { margin:0; font-size:26px; }
+        p  { margin:0; max-width:46ch; line-height:1.6; color:#94a3b8; font-size:16px; }
+      </style>
+      <h1>${escapeHtml(title)}</h1>
+      <p>${escapeHtml(detail)}</p>
+    `);
+    this.shellView.webContents.loadURL(page).catch(() => {});
+  }
+
   /** Re-claim the full display after a resolution or monitor change. */
   refitToScreen () {
     if (!this.win || this.win.isDestroyed()) return;
+    if (this.lockdownReleased) return;
     if (!(this.lockdownEnabled && this.settings.kiosk)) return;
-    try {
-      this.win.setBounds(this.screenBounds());
-      this.win.setAlwaysOnTop(true, 'screen-saver');
-    } catch { /* window going away */ }
+    this.applyCover();
     this.layout();
   }
 
