@@ -372,8 +372,8 @@ function registerIpc () {
     });
     if (!result.ok) return result;
 
-    // A real favicon makes a far better tile than a coloured shape.
-    if (Array.isArray(entry.iconUrls) && entry.iconUrls.length) {
+    // Only when the parent actually chose the site's own icon over a shape.
+    if (entry.useIcon && Array.isArray(entry.iconUrls) && entry.iconUrls.length) {
       const icon = await probe.downloadIcon({
         urls: entry.iconUrls, userDataDir: paths.userData, id: result.app.id
       });

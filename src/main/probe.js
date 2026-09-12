@@ -56,6 +56,7 @@ async function probeSite ({ win, shellView, session, policy, url, seconds = PROB
   let finalUrl = target;
   let title = '';
   let iconUrls = [];
+  let iconData = null;
 
   try {
     report('loading');
@@ -69,6 +70,9 @@ async function probeSite ({ win, shellView, session, policy, url, seconds = PROB
     finalUrl = safeUrl(contents) || finalUrl;
     title = (contents.getTitle() || title).trim();
     iconUrls = await collectIconUrls(contents).catch(() => []);
+    // Fetched now, not on save, so the parent can actually see the site's own
+    // icon while choosing rather than discovering it afterwards.
+    iconData = await fetchIconData(iconUrls).catch(() => null);
   } finally {
     try { win.contentView.removeChildView(view); } catch { /* already detached */ }
     try { if (!contents.isDestroyed()) contents.close(); } catch { /* gone */ }
@@ -90,6 +94,7 @@ async function probeSite ({ win, shellView, session, policy, url, seconds = PROB
     hostCount: allowed.length,
     blockedCount: blocked.length,
     iconUrls,
+    icon: iconData,
     // A site that loaded nothing is usually offline or refused to render.
     warning: allowed.length === 0
       ? 'Nothing loaded. Check the address, and check this machine is online.'
@@ -160,6 +165,38 @@ async function collectIconUrls (contents) {
     .slice(0, 6);
 }
 
+const ICON_TYPES = {
+  'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp',
+  'image/svg+xml': 'svg', 'image/x-icon': 'ico', 'image/vnd.microsoft.icon': 'ico'
+};
+
+function typeOf (header) {
+  const base = String(header || '').split(';')[0].trim().toLowerCase();
+  return ICON_TYPES[base] ? base : null;
+}
+
+/**
+ * Fetches the first usable icon and hands it back as a data URI, without
+ * touching the disk. Nothing is saved for a site the parent may not add.
+ */
+async function fetchIconData (urls) {
+  for (const url of (urls || []).slice(0, 4)) {
+    try {
+      const res = await net.fetch(url, { credentials: 'omit' });
+      if (!res.ok) continue;
+      const type = typeOf(res.headers.get('content-type'));
+      if (!type) continue;
+
+      const buf = Buffer.from(await res.arrayBuffer());
+      if (buf.length < 64 || buf.length > 256 * 1024) continue;
+      return { url, dataUri: `data:${type};base64,${buf.toString('base64')}` };
+    } catch {
+      // try the next candidate
+    }
+  }
+  return null;
+}
+
 /**
  * Downloads the first icon that works and stores it beside the catalog.
  * Returns a path, or null -- a missing icon just means the tile keeps its shape.
@@ -196,4 +233,6 @@ async function downloadIcon ({ urls, userDataDir, id }) {
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-module.exports = { probeSite, downloadIcon, normalizeUrl, summarise, prettyTitle, PROBE_SECONDS };
+module.exports = {
+  probeSite, downloadIcon, fetchIconData, normalizeUrl, summarise, prettyTitle, PROBE_SECONDS
+};

@@ -444,7 +444,9 @@ function renderMine (mine) {
 
   for (const entry of mine) {
     const box = document.createElement('div');
-    box.className = 'app' + (entry.enabled ? '' : ' is-off');
+    // Not greyed out when hidden: a dimmed card reads as "you cannot touch
+    // this", when in fact it is the one you most likely came to change.
+    box.className = 'app' + (entry.enabled ? '' : ' is-hidden-app');
 
     box.appendChild(appArtwork(entry));
 
@@ -457,14 +459,33 @@ function renderMine (mine) {
     host.className = 'app-host';
     try { host.textContent = new URL(entry.url).hostname; } catch { host.textContent = entry.url; }
 
-    // Top corner, where a card's own state control belongs, rather than in a
-    // stack under the name competing with Edit.
     const toggle = visibilitySwitch(entry);
     toggle.classList.add('app-toggle');
+    // The switch sits inside the card, so its clicks must not also open the
+    // editor behind it.
+    toggle.addEventListener('click', (e) => e.stopPropagation());
 
-    box.append(toggle, name, host, editButton(entry));
+    box.append(toggle, name, host);
+
+    // The whole card opens the editor. A separate Edit button was one more
+    // thing to read on a card that is already a picture of the thing.
+    box.setAttribute('role', 'button');
+    box.tabIndex = 0;
+    box.title = `Change ${entry.title}`;
+    box.addEventListener('click', () => openForm('edit', entry));
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openForm('edit', entry);
+      }
+    });
     wrap.appendChild(box);
   }
+
+  const hint = document.createElement('p');
+  hint.className = 'apps-hint';
+  hint.textContent = 'Tap an app to change its name, picture or address.';
+  wrap.appendChild(hint);
 }
 
 function visibilitySwitch (entry) {
@@ -482,11 +503,11 @@ function visibilitySwitch (entry) {
 
   const text = document.createElement('span');
   text.className = 'switch-text';
-  text.textContent = entry.enabled ? 'On' : 'Off';
+  text.hidden = true;   // the switch itself says which way it is set
 
   input.addEventListener('change', async () => {
     input.disabled = true;
-    text.textContent = input.checked ? 'On' : 'Off';
+    text.hidden = true;
     const r = await api.updateSite(entry.id, { enabled: input.checked });
     if (!r || !r.ok) showToast((r && r.message) || 'Could not change that.');
     input.disabled = false;
@@ -495,16 +516,6 @@ function visibilitySwitch (entry) {
 
   label.append(input, track, text);
   return label;
-}
-
-function editButton (entry) {
-  const b = document.createElement('button');
-  b.type = 'button';
-  b.className = 'app-edit';
-  b.textContent = 'Edit';
-  b.title = `Edit ${entry.title}`;
-  b.addEventListener('click', () => openForm('edit', entry));
-  return b;
 }
 
 /* --- ready-made --- */
@@ -554,16 +565,20 @@ function renderSuggestions (list) {
 
 /* ---------------- the app form ---------------- */
 
+
 let form = null;
 let probeTimer = null;
 
 const BLANK = {
   id: null, title: '', url: '', shape: 'star', color: '#3B6BFF',
-  allowHosts: [], denyHosts: [], blockAds: true, enabled: true, iconUrls: []
+  allowHosts: [], denyHosts: [], blockAds: true, enabled: true,
+  iconUrls: [], icon: null, useIcon: false
 };
 
 function openForm (mode, entry) {
   form = { mode, ...BLANK, ...(entry || {}) };
+  // An app that already wears the site's own icon keeps it selected.
+  form.useIcon = Boolean(form.icon);
   if (!form.color) form.color = catalogue.colors[0] || BLANK.color;
   if (!form.shape) form.shape = 'star';
 
@@ -573,7 +588,16 @@ function openForm (mode, entry) {
   const addingByAddress = mode === 'address';
   el('form-address').hidden = !addingByAddress;
   el('form-fields').hidden = addingByAddress;
-  el('form-delete').hidden = mode !== 'edit';
+  // Every bit of this button's state has to be reset, not just its visibility.
+  // Leaving `disabled` set after a successful delete meant the first deletion
+  // disabled the button for every app opened afterwards, which looked exactly
+  // like certain apps being undeletable.
+  const del = el('form-delete');
+  del.hidden = mode !== 'edit';
+  del.disabled = false;
+  del.dataset.armed = 'no';
+  del.textContent = 'Delete this app';
+  del.classList.remove('is-armed');
   el('form-notice').hidden = true;
   el('form-found').hidden = true;
   el('form-progress').hidden = true;
@@ -620,15 +644,36 @@ function fillFormFields () {
 function buildShapePicker () {
   const wrap = el('form-shapes');
   wrap.textContent = '';
+
+  // The site's own icon, when we have one, sits first and is the obvious pick.
+  if (form.icon) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'swatch swatch--icon' + (form.useIcon ? ' is-on' : '');
+    b.title = "The site's own icon";
+    b.setAttribute('aria-label', "The site's own icon");
+    const img = document.createElement('img');
+    img.src = form.icon;
+    img.alt = '';
+    b.appendChild(img);
+    b.addEventListener('click', () => {
+      form.useIcon = true;
+      buildShapePicker();
+      updatePreview();
+    });
+    wrap.appendChild(b);
+  }
+
   for (const shape of (catalogue.shapes.length ? catalogue.shapes : [form.shape])) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'swatch' + (shape === form.shape ? ' is-on' : '');
+    b.className = 'swatch' + (!form.useIcon && shape === form.shape ? ' is-on' : '');
     b.title = shape;
     b.setAttribute('aria-label', shape);
     b.appendChild(shapeIcon(shape));
     b.addEventListener('click', () => {
       form.shape = shape;
+      form.useIcon = false;
       buildShapePicker();
       updatePreview();
     });
@@ -668,7 +713,14 @@ function updatePreview () {
 
   const badge = document.createElement('span');
   badge.className = 'tile-badge';
-  badge.appendChild(shapeIcon(form.shape));
+  if (form.useIcon && form.icon) {
+    const img = document.createElement('img');
+    img.src = form.icon;
+    img.alt = '';
+    badge.appendChild(img);
+  } else {
+    badge.appendChild(shapeIcon(form.shape));
+  }
 
   const label = document.createElement('span');
   label.className = 'tile-name';
@@ -715,9 +767,16 @@ async function saveForm () {
   save.disabled = true;
   save.textContent = 'Saving…';
 
+  if (form.mode === 'edit' && !form.useIcon) {
+    // Dropping the site's icon in favour of a shape has to clear the stored
+    // file. The icon we were handed is an inline copy for display, never a
+    // path, so it is not sent back.
+    payload.icon = null;
+  }
+
   const result = form.mode === 'edit'
     ? await api.updateSite(form.id, payload)
-    : await api.addSite({ ...payload, iconUrls: form.iconUrls });
+    : await api.addSite({ ...payload, iconUrls: form.iconUrls, useIcon: form.useIcon });
 
   save.textContent = 'Save';
   if (!result || !result.ok) {
@@ -832,6 +891,8 @@ async function checkSite () {
   form.title = r.suggestedTitle;
   form.allowHosts = r.allowHosts;
   form.iconUrls = r.iconUrls || [];
+  form.icon = r.icon ? r.icon.dataUri : null;
+  form.useIcon = Boolean(form.icon);
 
   const found = el('form-found');
   found.textContent = '';
@@ -854,6 +915,7 @@ async function checkSite () {
 
   el('form-fields').hidden = false;
   fillFormFields();
+  buildShapePicker();
   updatePreview();
   validateForm();
   el('form-name').focus();

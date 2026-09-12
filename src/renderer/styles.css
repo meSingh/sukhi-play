@@ -141,15 +141,14 @@ img, svg { -webkit-user-drag: none; }
 }
 
 .boot-badge {
-  width: 210px; height: 210px;
   display: grid; place-items: center;
-  border-radius: 50%;
-  background: var(--paper);
-  box-shadow: var(--drop);
   animation: bob 2.8s ease-in-out infinite;
 }
 
-.boot-mark { width: 178px; height: 178px; border-radius: 50%; }
+.boot-mark {
+  width: 210px; height: 210px;
+  filter: drop-shadow(0 14px 22px rgba(23, 21, 58, .22));
+}
 
 @keyframes bob {
   0%, 100% { transform: translateY(0)     rotate(-2deg); }
@@ -219,13 +218,7 @@ img, svg { -webkit-user-drag: none; }
 
 .top-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
 
-.top-mark {
-  width: 46px; height: 46px;
-  border-radius: 50%;
-  background: var(--paper);
-  box-shadow: 0 3px 0 rgba(23, 21, 58, .12);
-  flex: none;
-}
+.top-mark { width: 48px; height: 48px; flex: none; }
 
 .top-name {
   font-size: 19px; font-weight: 900; letter-spacing: -.3px;
@@ -390,12 +383,7 @@ img, svg { -webkit-user-drag: none; }
   text-align: center;
 }
 
-.empty-mark {
-  width: 118px; height: 118px;
-  border-radius: 50%;
-  background: var(--paper);
-  box-shadow: 0 6px 0 rgba(23, 21, 58, .12);
-}
+.empty-mark { width: 124px; height: 124px; }
 .empty-title { margin: 6px 0 0; font-size: 31px; font-weight: 900; }
 .empty-text  { margin: 0; font-size: 17.5px; line-height: 1.6; color: var(--ink-soft); }
 
@@ -927,13 +915,7 @@ img, svg { -webkit-user-drag: none; }
   text-align: center;
 }
 
-.ob-mark {
-  width: 112px; height: 112px;
-  border-radius: 50%;
-  background: #F4F2FC;
-  box-shadow: 0 6px 0 rgba(23, 21, 58, .1);
-  margin-bottom: 10px;
-}
+.ob-mark { width: 118px; height: 118px; margin-bottom: 8px; }
 .ob-title { margin: 0 0 16px; font-size: 31px; font-weight: 900; letter-spacing: -.3px; }
 .ob-text  { margin: 0 0 16px; font-size: 16.5px; line-height: 1.68; color: var(--ink-soft); }
 .ob-text strong { color: var(--ink); font-weight: 800; }
@@ -1010,8 +992,26 @@ img, svg { -webkit-user-drag: none; }
   text-align: center;
   transition: border-color .14s ease, opacity .14s ease;
 }
-.app:hover { border-color: #DCD8F0; }
-.app.is-off { opacity: .55; }
+.app { cursor: pointer; }
+.app:hover {
+  border-color: var(--blue);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 rgba(23, 21, 58, .08);
+}
+.app:active { transform: translateY(1px); box-shadow: none; }
+.app:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
+
+/* Hidden from the child, but still fully editable, so it is marked rather than
+   dimmed. A faded card reads as "you cannot touch this". */
+.app.is-hidden-app { border-style: dashed; border-color: #CFCBE6; }
+.app.is-hidden-app .art { opacity: .5; }
+
+.apps-hint {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+}
 
 .art {
   width: var(--art-size, 64px);
@@ -1052,36 +1052,31 @@ img, svg { -webkit-user-drag: none; }
 .app-toggle .switch-track { width: 36px; height: 21px; }
 .app-toggle .switch-knob  { width: 15px; height: 15px; top: 3px; left: 3px; }
 .app-toggle input:checked + .switch-track .switch-knob { transform: translateX(15px); }
-.app-toggle .switch-text { min-width: 0; font-size: 11px; }
-
-.app-edit {
-  width: 100%;
-  margin-top: 6px;
-  padding: 8px 0;
-  border: 2px solid #EDEBF8; border-radius: 999px;
-  background: var(--paper); color: var(--ink-soft);
-  font: inherit; font-size: 12.5px; font-weight: 800;
-  cursor: pointer;
-}
-.app-edit:hover { border-color: var(--blue); color: var(--blue); }
+.app-toggle .switch-text { display: none; }
 
 /* Sits beside the close button so adding is the obvious thing to do here. */
 .panel-actions { display: flex; align-items: center; gap: 10px; flex: none; }
 
 .add-new {
-  display: inline-flex; align-items: center; gap: 8px;
-  height: 40px;
-  padding: 0 18px;
-  border: none; border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 46px;
+  padding: 0 24px;
+  border: 2px solid var(--blue); border-radius: 999px;
   background: var(--blue); color: #fff;
-  font: inherit; font-size: 14px; font-weight: 800;
+  font: inherit; font-size: 15px; font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;   /* stops the plus and the words stacking */
+  flex: none;
   cursor: pointer;
-  box-shadow: 0 4px 0 rgba(23, 21, 58, .16);
-  transition: background .14s ease, transform .12s ease, box-shadow .12s ease;
+  transition: background .14s ease, border-color .14s ease, transform .12s ease;
 }
-.add-new:hover  { background: #2A55E0; }
-.add-new:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(23, 21, 58, .16); }
-.add-new-plus { font-size: 18px; line-height: 1; }
+.add-new:hover  { background: #2A55E0; border-color: #2A55E0; }
+.add-new:active { transform: scale(.97); }
+.add-new:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
+.add-new-plus { font-size: 20px; line-height: 1; font-weight: 700; }
 
 /* The disclaimer stays, quietly, without taking over the section. */
 .sec-fine {
@@ -1145,6 +1140,7 @@ img, svg { -webkit-user-drag: none; }
 }
 .tile--preview .tile-badge { width: 54px; height: 54px; box-shadow: none; }
 .tile--preview .tile-badge svg { width: 30px; height: 30px; }
+.tile--preview .tile-badge img { width: 38px; height: 38px; object-fit: contain; }
 .tile--preview::after { display: none; }
 
 .picker { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1162,6 +1158,9 @@ img, svg { -webkit-user-drag: none; }
 .swatch:active { transform: scale(.94); }
 .swatch.is-on  { border-color: var(--ink); }
 .swatch.is-on svg { fill: var(--ink); }
+
+.swatch--icon { padding: 6px; }
+.swatch--icon img { width: 100%; height: 100%; object-fit: contain; }
 
 .swatch--color { border-width: 3px; border-color: transparent; }
 .swatch--color.is-on { border-color: var(--ink); }

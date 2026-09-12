@@ -97,6 +97,26 @@ test('every shape a catalog entry may use has artwork', () => {
   }
 });
 
+test('opening the editor resets the delete button completely', () => {
+  // The bug this guards: delete set `disabled = true` and, on success, closed
+  // the form without ever clearing it. Every app opened afterwards showed a
+  // dead Delete button, which looked exactly like certain apps being
+  // undeletable.
+  const openForm = code.slice(code.indexOf('function openForm'), code.indexOf('function closeForm'));
+  assert.ok(openForm.length > 100, 'openForm should be findable');
+
+  for (const reset of ['disabled = false', "dataset.armed = 'no'", 'classList.remove']) {
+    assert.ok(openForm.includes(reset),
+      `openForm must reset the delete button: missing ${reset}`);
+  }
+});
+
+test('a card opens the editor and the switch does not', () => {
+  assert.ok(code.includes("openForm('edit'"), 'cards should open the editor');
+  assert.ok(/stopPropagation/.test(code),
+    'the switch inside a clickable card must stop its click bubbling');
+});
+
 test('no em dashes in anything a person reads', () => {
   // They are the clearest tell that a machine wrote the text, and this is a
   // product for parents, not a generated artefact.
