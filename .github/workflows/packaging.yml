@@ -40,6 +40,17 @@ jobs:
 
       - name: Build AppImage, deb and snap
         run: npm run dist:linux:all
+        # core24 builds in an LXD container by default, and a GitHub runner
+        # has no usable one: snapcraft aborts with "user must be manually added
+        # to 'lxd' group". Building on the host instead is the usual answer for
+        # CI. Snapcraft warns that destructive mode can pull host libraries
+        # into the snap, which is a fair objection on a developer's machine but
+        # bounded here: the runner is a pinned, ephemeral image.
+        #
+        # Set here rather than as useDestructiveMode in electron-builder.yml so
+        # that a local `npm run dist:snap` still builds in a container.
+        env:
+          SNAPCRAFT_BUILD_ENVIRONMENT: host
 
       - name: What came out
         run: ls -lh dist/

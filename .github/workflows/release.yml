@@ -100,6 +100,9 @@ jobs:
         run: npm run ${{ matrix.script }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # snapcraft core24 builds in LXD by default and a runner has none.
+          # Ignored by the macOS and Windows legs. See packaging.yml.
+          SNAPCRAFT_BUILD_ENVIRONMENT: host
           # Unsigned builds. See the README for what users will see on first run.
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
 
