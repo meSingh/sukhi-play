@@ -19,15 +19,108 @@
 
   <!-- ============ pick something ============ -->
   <section id="launcher" class="screen">
-    <h1 class="launcher-title">
-      <img class="launcher-mark" src="assets/mascot.png" alt="" width="512" height="512">
-      What do you want to play?
-    </h1>
-    <div id="tiles" class="tiles" role="list"></div>
-    <footer class="launcher-foot">
-      <button id="parent-btn" class="ghost-btn" type="button">For grown-ups</button>
-      <span id="version" class="version"></span>
-    </footer>
+    <div class="launcher-inner">
+      <h1 class="launcher-title">
+        <img class="launcher-mark" src="assets/mascot.png" alt="" width="512" height="512">
+        What do you want to play?
+      </h1>
+      <div id="tiles" class="tiles" role="list"></div>
+
+      <div id="launcher-empty" class="empty" hidden>
+        <img class="empty-mark" src="assets/mascot.png" alt="" width="512" height="512">
+        <h2 class="empty-title">No games yet</h2>
+        <p class="empty-text">
+          A grown-up needs to choose which games and websites are allowed.
+          It takes about a minute.
+        </p>
+        <button id="empty-add" class="empty-btn" type="button">Add games</button>
+      </div>
+
+      <footer class="launcher-foot">
+        <button id="parent-btn" class="ghost-btn" type="button">For grown-ups</button>
+        <span id="version" class="version"></span>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ============ first-run walkthrough ============ -->
+  <section id="onboarding" class="screen">
+    <div class="ob-card">
+
+      <div class="ob-step" data-step="1">
+        <img class="ob-mark" src="assets/mascot.png" alt="" width="512" height="512">
+        <h1 class="ob-title">Welcome to Sukhi Play</h1>
+        <p class="ob-text">
+          This turns the computer into a safe place for a small child to play.
+          They get a few big buttons, and nothing else — no other websites, no
+          popups, no way out without you.
+        </p>
+        <p class="ob-question">Who is using the computer right now?</p>
+        <div class="ob-choices">
+          <button id="ob-parent" class="ob-choice ob-choice--primary" type="button">
+            <span class="ob-choice-title">I'm a grown-up</span>
+            <span class="ob-choice-sub">Set it up — about a minute</span>
+          </button>
+          <button id="ob-child" class="ob-choice" type="button">
+            <span class="ob-choice-title">Just let me look</span>
+            <span class="ob-choice-sub">Skip setup for now</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="ob-step" data-step="2" hidden>
+        <h1 class="ob-title">Choose what they can open</h1>
+        <p class="ob-text">
+          Pick one or two to start. You can add, remove or change these at any
+          time from the grown-up screen.
+        </p>
+        <div id="ob-suggestions" class="ob-list"></div>
+        <p class="ob-note">
+          Nothing here is installed or endorsed by Sukhi Play, and none of these
+          sites is connected to it. You are responsible for checking each site's
+          terms.
+        </p>
+        <div class="ob-actions">
+          <button id="ob-back-1" class="ghost-btn" type="button">Back</button>
+          <button id="ob-next-2" class="ob-next" type="button">Next</button>
+        </div>
+      </div>
+
+      <div class="ob-step" data-step="3" hidden>
+        <h1 class="ob-title">How you get back out</h1>
+        <p class="ob-text">
+          While your child is playing there is a small <strong>✕</strong> in the
+          corner. Pressing it asks you to <strong>hold a button for three
+          seconds</strong> — long enough that a toddler will not manage it.
+        </p>
+        <p class="ob-text">
+          You can also press <strong id="ob-chord">Ctrl+Shift+X</strong> at any
+          time. Try the hold now so you know what it feels like.
+        </p>
+        <button id="ob-hold" class="hold-btn" type="button">
+          <span class="hold-fill" id="ob-hold-fill"></span>
+          <span class="hold-label" id="ob-hold-label">Hold</span>
+        </button>
+        <div class="ob-actions">
+          <button id="ob-back-2" class="ghost-btn" type="button">Back</button>
+          <button id="ob-next-3" class="ob-next" type="button">Next</button>
+        </div>
+      </div>
+
+      <div class="ob-step" data-step="4" hidden>
+        <img class="ob-mark" src="assets/mascot.png" alt="" width="512" height="512">
+        <h1 class="ob-title">All set</h1>
+        <p class="ob-text" id="ob-summary"></p>
+        <p class="ob-note">
+          One last thing: this reduces what a small child can reach, but it does
+          not childproof a computer. Keep an eye on what they are playing.
+        </p>
+        <div class="ob-actions ob-actions--single">
+          <button id="ob-done" class="ob-next ob-next--big" type="button">Hand it over</button>
+        </div>
+      </div>
+
+    </div>
   </section>
 
   <!-- ============ the bar shown over a game ============ -->

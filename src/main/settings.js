@@ -24,7 +24,11 @@ const DEFAULTS = {
   refocusOnBlur: true,
 
   // Show the "blocked N things" counter in the top bar.
-  showBlockCounter: true
+  showBlockCounter: true,
+
+  // Set once the grown-up has been walked through setting the app up. Until
+  // then the first thing anyone sees is the walkthrough, not an empty screen.
+  onboarded: false
 };
 
 function clampInt (value, min, max, fallback) {
@@ -45,7 +49,8 @@ function coerce (raw) {
   // A hold of zero would make the gate no gate at all.
   out.holdSeconds = clampInt(raw.holdSeconds, 1, 15, DEFAULTS.holdSeconds);
 
-  for (const key of ['kiosk', 'alwaysOnTop', 'fullscreenOnLaunch', 'refocusOnBlur', 'showBlockCounter']) {
+  for (const key of ['kiosk', 'alwaysOnTop', 'fullscreenOnLaunch', 'refocusOnBlur',
+                     'showBlockCounter', 'onboarded']) {
     if (typeof raw[key] === 'boolean') out[key] = raw[key];
   }
   return out;
@@ -74,4 +79,24 @@ function load (userDataDir) {
   return { settings, file };
 }
 
-module.exports = { DEFAULTS, coerce, load };
+/** Writes a patch over the stored settings and returns the merged result. */
+function save (userDataDir, patch) {
+  const file = path.join(userDataDir, 'settings.json');
+  let current = {};
+  try {
+    current = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch { /* start from defaults */ }
+
+  const merged = coerce({ ...current, ...patch });
+  try {
+    fs.mkdirSync(userDataDir, { recursive: true });
+    const tmp = file + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(merged, null, 2) + '\n', 'utf8');
+    fs.renameSync(tmp, file);
+  } catch (err) {
+    console.warn('[settings] could not save:', err.message);
+  }
+  return merged;
+}
+
+module.exports = { DEFAULTS, coerce, load, save };

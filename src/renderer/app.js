@@ -20,15 +20,16 @@ function renderTiles (apps) {
   const wrap = el('tiles');
   wrap.textContent = '';
 
+  // An empty screen with no instruction is where a parent gets stuck, so the
+  // empty state is a call to action rather than a note.
+  const empty = el('launcher-empty');
   if (!apps.length) {
-    const note = document.createElement('p');
-    note.className = 'empty-note';
-    note.textContent =
-      'No games are turned on yet. A grown-up can add them in catalog.json — ' +
-      'use the "For grown-ups" button below to find the file.';
-    wrap.appendChild(note);
+    empty.hidden = false;
+    wrap.hidden = true;
     return;
   }
+  empty.hidden = true;
+  wrap.hidden = false;
 
   for (const entry of apps) {
     const tile = document.createElement('button');
@@ -143,6 +144,99 @@ async function revealChallenge () {
 
   // Holding was the whole check.
   showChoices();
+}
+
+/* ---------------- first-run walkthrough ---------------- */
+
+let obStep = 1;
+let obAdded = 0;
+let obHoldTimer = null;
+let obKeepAlive = null;
+
+function obShow (step) {
+  obStep = step;
+  for (const el2 of document.querySelectorAll('.ob-step')) {
+    el2.hidden = Number(el2.dataset.step) !== step;
+  }
+  const card = document.querySelector('.ob-card');
+  if (card) card.scrollTop = 0;
+  if (step === 2) loadObSuggestions();
+  if (step === 4) {
+    el('ob-summary').textContent = obAdded
+      ? `${obAdded} game${obAdded === 1 ? '' : 's'} ready. Press the button below and hand the computer over.`
+      : 'You have not added anything yet. You can do that any time from the grown-up screen — press "For grown-ups" on the tile screen.';
+  }
+}
+
+async function startOnboarding () {
+  await api.beginOnboarding();
+  obShow(1);
+  // The walkthrough can easily take longer than the unlock window.
+  clearInterval(obKeepAlive);
+  obKeepAlive = setInterval(() => api.keepUnlocked(), 30_000);
+}
+
+async function loadObSuggestions () {
+  const data = await api.library();
+  const wrap = el('ob-suggestions');
+  wrap.textContent = '';
+  if (!data || !data.ok) {
+    wrap.textContent = 'Could not load the suggestions.';
+    return;
+  }
+
+  for (const sug of data.suggestions) {
+    const name = document.createElement('span');
+    name.textContent = sug.title;
+    name.appendChild(sug.adSupported
+      ? tag('has ads', 'lib-tag--ads')
+      : tag('no ads', 'lib-tag--free'));
+
+    const add = button(sug.added ? 'Added' : 'Add', sug.added ? '' : 'lib-btn--add', async (e) => {
+      e.target.disabled = true;
+      const r = await api.addSuggestion(sug.id);
+      if (!r || !r.ok) {
+        e.target.disabled = false;
+        showToast((r && r.message) || 'Could not add that.');
+        return;
+      }
+      obAdded += 1;
+      loadObSuggestions();
+    });
+    add.disabled = sug.added;
+
+    wrap.appendChild(row({ color: sug.color, name, sub: sug.url, note: sug.notes, actions: [add] }));
+  }
+  obAdded = data.suggestions.filter((x) => x.added).length;
+}
+
+/** A no-stakes run of the real exit gesture, so the parent knows the feel of it. */
+function obPractiseHold () {
+  if (obHoldTimer) return;
+  const seconds = config ? config.settings.holdSeconds : 3;
+  const started = Date.now();
+  obHoldTimer = setInterval(() => {
+    const progress = Math.min(1, (Date.now() - started) / (seconds * 1000));
+    el('ob-hold-fill').style.height = `${progress * 100}%`;
+    if (progress >= 1) {
+      clearInterval(obHoldTimer);
+      obHoldTimer = null;
+      el('ob-hold-label').textContent = 'That’s it';
+    }
+  }, 60);
+}
+
+function obCancelHold () {
+  if (!obHoldTimer) return;
+  clearInterval(obHoldTimer);
+  obHoldTimer = null;
+  el('ob-hold-fill').style.height = '0%';
+}
+
+async function finishOnboarding () {
+  clearInterval(obKeepAlive);
+  obKeepAlive = null;
+  await api.finishOnboarding();
 }
 
 /* ---------------- grown-up library ---------------- */
@@ -460,6 +554,21 @@ function wire () {
   el('home-btn').addEventListener('click', () => api.goHome());
   el('exit-btn').addEventListener('click', () => api.openGate('quit'));
   el('parent-btn').addEventListener('click', () => api.openGate('quit'));
+  el('empty-add').addEventListener('click', () => api.openGate('quit'));
+
+  el('ob-parent').addEventListener('click', () => obShow(2));
+  el('ob-child').addEventListener('click', finishOnboarding);
+  el('ob-next-2').addEventListener('click', () => obShow(3));
+  el('ob-next-3').addEventListener('click', () => obShow(4));
+  el('ob-back-1').addEventListener('click', () => obShow(1));
+  el('ob-back-2').addEventListener('click', () => obShow(2));
+  el('ob-done').addEventListener('click', finishOnboarding);
+
+  const obHold = el('ob-hold');
+  obHold.addEventListener('pointerdown', obPractiseHold);
+  obHold.addEventListener('pointerup', obCancelHold);
+  obHold.addEventListener('pointerleave', obCancelHold);
+  obHold.addEventListener('pointercancel', obCancelHold);
   el('gate-cancel').addEventListener('click', () => api.closeGate());
   el('open-config').addEventListener('click', () => api.openConfigFolder());
 
@@ -513,6 +622,10 @@ async function boot () {
   const elapsed = Date.now() - startedAt;
   if (config.checkMode) {
     api.rendererIdle();
+  } else if (config.needsOnboarding) {
+    el('ob-chord').textContent =
+      navigator.platform.toLowerCase().includes('mac') ? 'Cmd+Shift+X' : 'Ctrl+Shift+X';
+    setTimeout(startOnboarding, Math.max(0, MIN_SPLASH_MS - elapsed));
   } else {
     setTimeout(() => api.goHome(), Math.max(0, MIN_SPLASH_MS - elapsed));
   }

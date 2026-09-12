@@ -25,6 +25,31 @@ test('hold time is clamped so the gate always exists', () => {
   assert.equal(coerce({ holdSeconds: 'abc' }).holdSeconds, DEFAULTS.holdSeconds);
 });
 
+test('the walkthrough runs until it has been completed once', () => {
+  assert.equal(coerce({}).onboarded, false, 'a fresh install must be walked through');
+  assert.equal(coerce({ onboarded: true }).onboarded, true);
+  // A junk value must not skip setup and leave a parent on an empty screen.
+  assert.equal(coerce({ onboarded: 'yes' }).onboarded, false);
+});
+
+test('settings survive a save and reload', () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const path = require('node:path');
+  const { save, load } = require('../src/main/settings');
+
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sukhi-set-'));
+  assert.equal(load(dir).settings.onboarded, false);
+  assert.equal(save(dir, { onboarded: true }).onboarded, true);
+  assert.equal(load(dir).settings.onboarded, true, 'must persist across restarts');
+
+  // Saving one field must not wipe the others.
+  save(dir, { holdSeconds: 5 });
+  const back = load(dir).settings;
+  assert.equal(back.holdSeconds, 5);
+  assert.equal(back.onboarded, true);
+});
+
 test('garbage input yields usable defaults', () => {
   for (const bad of [null, undefined, 'nope', 42, []]) {
     assert.equal(coerce(bad).gateMode, 'hold');

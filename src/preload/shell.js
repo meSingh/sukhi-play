@@ -40,6 +40,15 @@ contextBridge.exposeInMainWorld('sukhi', {
   /** Leave the gate for the tile screen. Only works after the gate is answered. */
   goHomeUnlocked: () => ipcRenderer.invoke('shell:go-home-unlocked'),
 
+  /** Enter the first-run walkthrough. */
+  beginOnboarding: () => ipcRenderer.invoke('shell:begin-onboarding'),
+
+  /** Mark the walkthrough done and go to the tile screen. */
+  finishOnboarding: () => ipcRenderer.invoke('shell:finish-onboarding'),
+
+  /** Keep the walkthrough's unlock alive while the parent works through it. */
+  keepUnlocked: () => ipcRenderer.invoke('shell:keep-unlocked'),
+
   /** The grown-up library: my sites plus the bundled suggestions. */
   library: () => ipcRenderer.invoke('shell:library'),
 

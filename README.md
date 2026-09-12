@@ -52,7 +52,25 @@ npm install
 npm start
 ```
 
-## First run: you choose what he can open
+## First run: a one-minute walkthrough
+
+The first time you open Sukhi Play it asks **who is using the computer right
+now** — a grown-up setting it up, or someone just looking. Choose *I'm a
+grown-up* and it walks you through four short steps:
+
+1. **What this is** — what your child will and will not be able to reach.
+2. **Choose what they can open** — pick one or two sites from the suggestions.
+3. **How you get back out** — it explains the ✕ and the three-second hold, and
+   lets you practise the hold once so you know the feel of it.
+4. **Hand it over.**
+
+That is the whole setup. Afterwards the walkthrough never appears again, and the
+tile screen is what opens.
+
+If the tile screen is ever empty it says so plainly and offers an **Add games**
+button that takes you to the grown-up screen — no hunting through files.
+
+## Adding and removing sites
 
 **Sukhi Play ships with an empty launcher.** It does not pick sites for you. But
 it does make picking easy — you never need to work out hostnames yourself.
@@ -146,6 +164,9 @@ npm run check -- --check=my-games              # does my profile actually work?
 3. **The site**, with a thin bar on top: a large blue **Back** button and a small
    grey **✕** in the corner.
 
+The tile screen scrolls once there are more games than fit on the screen, so
+nothing ends up stranded above or below where a small child cannot reach it.
+
 There is no fullscreen button. The app already covers the screen, and there is
 nothing a child can press to shrink it.
 
@@ -229,6 +250,7 @@ hold:
 | `alwaysOnTop` | `true` | Keep the window above everything else |
 | `refocusOnBlur` | `true` | Pull the window back if the child clicks away |
 | `showBlockCounter` | `true` | Show "N ads blocked" in the bar |
+| `onboarded` | `false` | Set to `false` to see the first-run walkthrough again |
 
 `refocusOnBlur` switches itself off if it ever starts fighting another window,
 so it can never make the machine unusable.

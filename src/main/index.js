@@ -186,7 +186,10 @@ function registerIpc () {
     paths,
     catalogSource: catalog.source,
     isDev: IS_DEV,
-    checkMode: CHECK_MODE || PROBE_MODE
+    checkMode: CHECK_MODE || PROBE_MODE,
+    // The walkthrough runs when nobody has set the app up yet. Without it a
+    // parent's first sight of the app is an empty screen with no clue what to do.
+    needsOnboarding: !settings.onboarded
   }));
 
   ipcMain.handle('shell:launch', (_e, appId) => {
@@ -197,6 +200,32 @@ function registerIpc () {
   });
 
   ipcMain.handle('shell:go-home', () => shellApp.goHome());
+
+  ipcMain.handle('shell:begin-onboarding', () => {
+    // Setting the app up IS the grown-up task, and at this point there is
+    // nothing configured to protect. Granting the unlock lets the walkthrough
+    // use the same add-a-site machinery as the grown-up screen.
+    gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+    console.log('[boot] first run: showing the walkthrough');
+    shellApp.setMode('onboarding');
+    return { ok: true };
+  });
+
+  ipcMain.handle('shell:finish-onboarding', () => {
+    settings = settingsStore.save(paths.userData, { onboarded: true });
+    gate.unlockedUntil = 0;
+    console.log('[boot] walkthrough finished');
+    shellApp.goHome();
+    return { ok: true };
+  });
+
+  ipcMain.handle('shell:keep-unlocked', () => {
+    // The walkthrough can run longer than the unlock window; this extends it
+    // while the parent is demonstrably still working through it.
+    if (shellApp.mode !== 'onboarding') return { ok: false };
+    gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+    return { ok: true };
+  });
 
   ipcMain.handle('shell:open-gate', (_e, intent) => {
     gate.wrongAttempts = 0;
