@@ -37,10 +37,43 @@ test('screenshot dimensions are inside the AppStream range', () => {
 test('every image the README points at is actually there', () => {
   // Moving a screenshot used to leave a broken image in the README, which only
   // shows up once it is rendered on GitHub.
-  const refs = [...readme.matchAll(/(?:src="|\]\()(docs\/[^")\s]+\.png)/g)].map((m) => m[1]);
-  assert.ok(refs.length, 'the README references no screenshots at all');
+  const refs = [
+    ...readme.matchAll(/(?:src="|srcset="|\]\()(docs\/[^")\s]+\.(?:png|svg|md))/g)
+  ].map((m) => m[1]);
+  assert.ok(refs.length, 'the README references nothing under docs/');
   for (const ref of new Set(refs)) {
     assert.ok(fs.existsSync(path.join(ROOT, ref)), `README points at missing ${ref}`);
+  }
+});
+
+test('the macOS download button is ours, not Apple\'s', () => {
+  // Sukhi Play is not distributed through the Mac App Store. Apple's "Download
+  // on the Mac App Store" badge would say it is, and using their marks would
+  // imply an endorsement that does not exist, so the button is a local SVG.
+  for (const variant of ['light', 'dark']) {
+    const file = path.join(ROOT, 'docs', `badge-macos-${variant}.svg`);
+    assert.ok(fs.existsSync(file), `docs/badge-macos-${variant}.svg is missing`);
+    const svg = fs.readFileSync(file, 'utf8');
+    assert.match(svg, /not (?:from )?the App Store/i,
+      'the button has to say it is not an App Store download');
+    assert.ok(!/app ?store\.com|apple\.com|<image|xlink:href/i.test(svg),
+      'the button must not pull in Apple artwork');
+  }
+  assert.ok(!/(?:mac_?app_?store|Download_on_the)/i.test(readme),
+    'the README must not use Apple official badge artwork');
+});
+
+test('the macOS page offers both architectures by their permanent names', () => {
+  // The release job aliases the two disk images to version-free names so these
+  // links keep working. If the names drift apart the page 404s silently.
+  const page = fs.readFileSync(path.join(ROOT, 'docs', 'macos.md'), 'utf8');
+  const workflow = fs.readFileSync(
+    path.join(ROOT, '.github', 'workflows', 'release.yml'), 'utf8');
+  for (const name of ['Sukhi-Play-macOS-AppleSilicon.dmg', 'Sukhi-Play-macOS-Intel.dmg']) {
+    assert.ok(page.includes(`releases/latest/download/${name}`),
+      `docs/macos.md does not link ${name}`);
+    assert.ok(workflow.includes(name),
+      `the release job does not produce ${name}, so the link would 404`);
   }
 });
 

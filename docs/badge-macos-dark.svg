@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="296" height="56" viewBox="0 0 296 56"
+     role="img" aria-label="Download for macOS, Apple Silicon or Intel, not from the Mac App Store">
+  <!-- Deliberately not Apple's "Download on the Mac App Store" badge. Sukhi
+       Play is not distributed through the Mac App Store and this button must
+       not imply that it is, or that Apple endorses it. No Apple wordmark or
+       logo is used, and the button says so on its face.
+
+       No textLength here. Constraining it to fit made the renderer squeeze the
+       inter-character spacing until the glyphs overlapped, which was worse
+       than the overflow it was meant to fix. The box is sized for the text
+       instead, with room to spare for a renderer whose fonts are wider. -->
+  <rect x="0.5" y="0.5" width="295" height="55" rx="12" fill="#f4f2ff"/>
+  <text x="20" y="25" fill="#17153a"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="15.5" font-weight="700">Download for macOS</text>
+  <text x="20" y="42" fill="#5b5780"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="10" font-weight="600">Apple Silicon or Intel &#183; not the App Store</text>
+</svg>
