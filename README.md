@@ -422,7 +422,7 @@ the tests fail.
 ## Licence
 
 Code is [MIT](LICENSE). **The Sukhi character artwork is not.** It belongs to
-the project owner. If you fork this and ship your own builds, replace it first;
+Mandeep Singh. If you fork this and ship your own builds, replace it first;
 `python3 branding/generate-mascot.py` swaps in an MIT placeholder. See
 [branding/README.md](branding/README.md).
 

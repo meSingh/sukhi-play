@@ -64,7 +64,7 @@ nsis:
 linux:
   # Debian requires a maintainer. Note that it is embedded in the package and
   # readable by anyone who installs it.
-  maintainer: meSingh <mesingh90@gmail.com>
+  maintainer: Mandeep Singh <mesingh90@gmail.com>
   syncDesktopName: true
   synopsis: A locked-down browser that lets a small child open only what you choose
   target:

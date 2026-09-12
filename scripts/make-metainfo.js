@@ -37,7 +37,7 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
   <project_license>MIT</project_license>
 
   <developer id="com.msingh">
-    <name>meSingh</name>
+    <name>Mandeep Singh</name>
   </developer>
 
   <launchable type="desktop-id">sukhi-play.desktop</launchable>

@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Sukhi Play contributors
+Copyright (c) 2026 Mandeep Singh
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ NOTE ON ARTWORK
 This licence covers the source code of Sukhi Play.
 
 It does NOT cover the Sukhi character artwork, which is the personal property of
-the project owner. That includes:
+Mandeep Singh. That includes:
 
     branding/cutout-*.png
     branding/sukhi-icon.png
@@ -35,7 +35,7 @@ the project owner. That includes:
     build/icons/*.png
     src/renderer/assets/mascot.png
 
-Those files are (c) 2026 the project owner, all rights reserved. If you fork
+Those files are (c) 2026 Mandeep Singh, all rights reserved. If you fork
 this project and distribute your own builds, replace them first. Running
 `python3 branding/generate-mascot.py` overwrites them with MIT-licensed
 placeholder artwork. See branding/README.md.

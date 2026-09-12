@@ -6,10 +6,10 @@ The **code** in this repository is MIT licensed. The **artwork is not.**
 
 | Asset | Licence |
 | --- | --- |
-| `branding/cutout-*.png`, `branding/sukhi-icon.png`, `build/icon.png`, `build/icons/*.png`, `src/renderer/assets/mascot.png` | © the project owner. **All rights reserved.** Not covered by the MIT licence. |
+| `branding/cutout-*.png`, `branding/sukhi-icon.png`, `build/icon.png`, `build/icons/*.png`, `src/renderer/assets/mascot.png` | © Mandeep Singh. **All rights reserved.** Not covered by the MIT licence. |
 | `branding/generate-mascot.py` and the placeholder it draws | MIT, like the rest of the code |
 
-The Sukhi character is a personal character belonging to the project owner. It
+The Sukhi character is a personal character belonging to Mandeep Singh. It
 is included here because this is his application. **If you fork this project and
 distribute your own builds, replace the character artwork first.** See below.
 You are welcome to the code; the character is not part of the offer.
