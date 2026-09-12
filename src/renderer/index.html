@@ -84,14 +84,14 @@
         <h1 class="ob-title">Welcome to Sukhi Play</h1>
         <p class="ob-text">
           This turns the computer into a safe place for a small child to play.
-          They get a few big buttons, and nothing else — no other websites, no
-          popups, no way out without you.
+          They get a few big buttons and nothing else. No other websites, no
+          popups, and no way out without you.
         </p>
         <p class="ob-question">Who is using the computer right now?</p>
         <div class="ob-choices">
           <button id="ob-parent" class="ob-choice ob-choice--primary" type="button">
             <span class="ob-choice-title">I'm a grown-up</span>
-            <span class="ob-choice-sub">Set it up — about a minute</span>
+            <span class="ob-choice-sub">Set it up. Takes about a minute.</span>
           </button>
           <button id="ob-child" class="ob-choice" type="button">
             <span class="ob-choice-title">Just let me look</span>
@@ -123,7 +123,7 @@
         <p class="ob-text">
           While your child is playing there is a small <strong>✕</strong> in the
           corner. Pressing it asks you to <strong>hold a button for three
-          seconds</strong> — long enough that a toddler will not manage it.
+          seconds</strong>, which is longer than a toddler will manage.
         </p>
         <p class="ob-text">
           You can also press <strong id="ob-chord">Ctrl+Shift+X</strong> at any
@@ -197,7 +197,9 @@
           <img class="gate-mark" src="assets/mascot.png" alt="" width="512" height="512">
           <h2 id="gate-title">Grown-ups only</h2>
         </header>
-        <p class="gate-hint">Press and hold for <strong id="hold-secs">3</strong> seconds.</p>
+        <p class="gate-hint" id="gate-lead">
+          Press and hold for <strong id="hold-secs">3</strong> seconds.
+        </p>
         <button id="hold-btn" class="hold-btn" type="button">
           <span class="hold-fill" id="hold-fill"></span>
           <span class="hold-label">Hold</span>
@@ -249,8 +251,8 @@
             <h3 class="sec-head"><span>Where is it?</span></h3>
             <p class="sec-note">
               Type the address. Sukhi Play opens it once and works out which
-              hosts it needs, then suggests everything else — you can change all
-              of it before saving.
+              hosts it needs, then fills in the rest for you. Change whatever you
+              like before saving.
             </p>
             <div class="lib-row">
               <input id="form-url" class="lib-input" type="text" inputmode="url"
@@ -297,7 +299,7 @@
             </div>
 
             <details class="adv" id="form-adv">
-              <summary class="adv-head">Advanced — what it may load</summary>
+              <summary class="adv-head">Advanced: what it may load</summary>
 
               <div class="field">
                 <label class="field-label" for="form-allow">Allowed hosts</label>
@@ -358,12 +360,18 @@
               <p class="panel-sub">Choose what your child can open.</p>
             </div>
           </div>
-          <button id="lib-done" class="panel-close" type="button" aria-label="Done">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor"
-                    stroke-width="2.6" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <div class="panel-actions">
+            <button id="add-new" class="add-new" type="button">
+              <span class="add-new-plus" aria-hidden="true">+</span>
+              <span>Add an app</span>
+            </button>
+            <button id="lib-done" class="panel-close" type="button" aria-label="Done">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor"
+                      stroke-width="2.6" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
         </header>
 
         <div class="panel-body">
@@ -373,26 +381,23 @@
               <span id="mine-count" class="sec-count"></span>
             </h3>
             <div id="lib-mine" class="apps"></div>
-            <button id="add-new" class="add-new" type="button">
-              <span class="add-new-plus" aria-hidden="true">+</span>
-              <span>Add a new app</span>
-            </button>
           </section>
 
           <section class="sec" id="sec-suggest">
-            <h3 class="sec-head"><span>Ready to add</span></h3>
+            <h3 class="sec-head"><span>Suggestions</span></h3>
             <p class="sec-note">
-              Set up by other parents. Nothing here is installed or endorsed by
-              Sukhi Play, and none of these sites is connected to it — you are
-              responsible for checking each one's terms. Choosing one opens the
-              same settings as any other app, so you can change anything first.
+              Sites other parents set up. Pick one to fill in the settings, then
+              change whatever you like before saving.
+              <span class="sec-fine">
+                Sukhi Play is not connected to any of these sites and does not
+                endorse them. Please check each one's terms yourself.
+              </span>
             </p>
             <div id="lib-suggest-list" class="cards"></div>
           </section>
         </div>
 
         <footer class="panel-foot">
-          <p class="foot-note">Changes take effect straight away.</p>
           <button id="choice-quit" class="btn-danger" type="button">Quit Sukhi Play</button>
         </footer>
       </div>

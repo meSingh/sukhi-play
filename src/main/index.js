@@ -69,10 +69,21 @@ const gate = {
   unlockedUntil: 0
 };
 
-const UNLOCK_WINDOW_MS = 90_000;
+// Overridable so the sliding behaviour can be exercised without a 90s test.
+const UNLOCK_WINDOW_MS = Number(process.env.SUKHI_UNLOCK_MS || 90_000);
 
+/**
+ * A sliding window, not a stopwatch.
+ *
+ * It used to expire ninety seconds after unlocking no matter what, so a parent
+ * who spent two minutes reading the list found that every switch and every
+ * delete answered "not unlocked". Each successful action now pushes the expiry
+ * out, so the window closes on idleness rather than on elapsed time.
+ */
 function isUnlocked () {
-  return Date.now() < gate.unlockedUntil;
+  if (Date.now() >= gate.unlockedUntil) return false;
+  gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+  return true;
 }
 
 /**
@@ -220,10 +231,10 @@ function registerIpc () {
   });
 
   ipcMain.handle('shell:keep-unlocked', () => {
-    // The walkthrough can run longer than the unlock window; this extends it
-    // while the parent is demonstrably still working through it.
-    if (shellApp.mode !== 'onboarding') return { ok: false };
-    gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+    // Held open while the parent is demonstrably still on a parent screen.
+    // Reading a long list is not idleness.
+    if (shellApp.mode !== 'onboarding' && shellApp.mode !== 'gate') return { ok: false };
+    if (!isUnlocked()) return { ok: false };
     return { ok: true };
   });
 

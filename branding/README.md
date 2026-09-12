@@ -1,6 +1,6 @@
 # Branding
 
-## Licensing — read this before forking
+## Licensing: read this before forking
 
 The **code** in this repository is MIT licensed. The **artwork is not.**
 
@@ -11,7 +11,7 @@ The **code** in this repository is MIT licensed. The **artwork is not.**
 
 The Sukhi character is a personal character belonging to the project owner. It
 is included here because this is his application. **If you fork this project and
-distribute your own builds, replace the character artwork first** — see below.
+distribute your own builds, replace the character artwork first.** See below.
 You are welcome to the code; the character is not part of the offer.
 
 This is the usual arrangement for open-source projects: the code is free, the
@@ -44,7 +44,7 @@ python3 branding/build-icon.py biggrin    # the alternative expression
 ```
 
 Step 3 alone is enough while a `cutout-*.png` already exists, which is the
-normal case — the cut-outs are committed.
+normal case, because the cut-outs are committed.
 
 To use a different expression, add its coordinates to `PANELS` in the script.
 They are fractions of the sheet's width and height: `(left, top, right, bottom)`.
@@ -74,7 +74,7 @@ You need one square PNG, ideally **1024 × 1024**. Put it in three places:
 | `src/renderer/assets/mascot.png` | 512 × 512 | The loading screen and the tile-picker header |
 
 `build/icon.png` should have a filled background with its own rounded corners
-and transparency outside them — a fully transparent or fully square icon looks
+and transparency outside them. A fully transparent or fully square icon looks
 wrong in a dock or taskbar.
 
 electron-builder converts `build/icon.png` into `.icns` (macOS), `.ico`
@@ -102,9 +102,9 @@ room.
 | --- | --- | --- |
 | `--sky-top` / `--sky-mid` / `--sky-low` | `#7FD4FF` → `#BFEBFF` → `#FFF6E9` | The sky gradient behind everything |
 | `--hill` | `#7BD9A6` | The soft green horizon |
-| `--ink` | `#16354F` | Lettering — a deep blue, never pure black |
+| `--ink` | `#16354F` | Lettering, a deep blue rather than pure black |
 
-**The play palette** — tile colours, assigned automatically so no two tiles next
+**The play palette.** Tile colours, assigned automatically so no two tiles next
 to each other match.
 
 | Token | Value |
@@ -118,7 +118,7 @@ to each other match.
 
 Tile lettering is **not** fixed to white. `inkFor()` in
 `src/renderer/app.js` measures each tile colour's luminance and picks black or
-white, whichever is readable — a yellow tile with white text looks fine in a
+white, whichever is readable. A yellow tile with white text looks fine in a
 palette and is unreadable on screen. Any colour a parent chooses is handled.
 
 **Depth.** Everything the child touches has a chunky offset shadow (`--drop`)

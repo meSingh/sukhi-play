@@ -14,7 +14,7 @@ npm test
 ```
 
 Use `npm run dev`, not `npm start`, while working. `npm start` covers the whole
-screen, sits above everything, and takes 64 keyboard shortcuts off the OS —
+screen, sits above everything, and takes 64 keyboard shortcuts off the OS,
 which is correct for a child and miserable for a developer.
 
 ## The rules this project lives by
@@ -65,5 +65,5 @@ For anything security-related, see [SECURITY.md](SECURITY.md) instead.
 ## Licence
 
 Contributions are accepted under the [MIT Licence](LICENSE). Note that the
-character artwork is **not** MIT — see [branding/README.md](branding/README.md)
+character artwork is **not** MIT, so see [branding/README.md](branding/README.md)
 before touching anything in `branding/` or `build/`.

@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         If this is a way to escape the kiosk or get past the exit gate, please
-        do not post details here — see [SECURITY.md](../blob/main/SECURITY.md).
+        do not post details here , see [SECURITY.md](../blob/main/SECURITY.md).
 
   - type: textarea
     id: what
@@ -42,7 +42,7 @@ body:
     id: version
     attributes:
       label: Sukhi Play version
-      placeholder: "1.0.0 — shown at the bottom of the tile screen"
+      placeholder: "1.0.0 , shown at the bottom of the tile screen"
     validations: { required: true }
 
   - type: dropdown

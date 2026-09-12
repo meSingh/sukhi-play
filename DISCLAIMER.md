@@ -27,8 +27,8 @@ any website, game, or company** whose site a user chooses to open with it.
 
 All trademarks, service marks, product names, and company names are the
 property of their respective owners. Where such a name appears in this project's
-documentation, it is used only to describe or identify that site factually —
-nominative use — and implies no relationship of any kind.
+documentation, it is used only to describe or identify that site factually,
+which is nominative use, and implies no relationship of any kind.
 
 The project is not named after, branded after, or designed around any third
 party's service. No third party's logo, artwork, or trademark appears in the
@@ -45,7 +45,7 @@ fails if the shipped catalog enables anything.
 The app includes a list of **suggested site profiles** a parent can add with one
 tap. To be precise about what that is and is not:
 
-- A profile is **compatibility data** — the hostnames a site needs in order to
+- A profile is **compatibility data**: the hostnames a site needs in order to
   function, measured by visiting it once and recording what it loaded. It is a
   factual description of how a site is put together, in the same way a browser
   compatibility table is.
@@ -95,7 +95,7 @@ so its advertising loads. The choice is yours and the responsibility is yours.
 ## Please support the sites you value
 
 Free games and educational sites are usually paid for by advertising. If your
-child enjoys a site regularly, please consider supporting it — a subscription,
+child enjoys a site regularly, please consider supporting it with a subscription,
 a purchase, an ad-supported session on your own device, or a direct
 contribution. Blocking ads on a site you rely on has a real cost to the people
 who make it.
@@ -112,7 +112,7 @@ application-data folder, in a browser profile kept separate from your own.
 For completeness, the app does make network requests in exactly three
 situations, all of them initiated by you:
 
-1. **Opening a site** your child selected — the whole point of the program.
+1. **Opening a site** your child selected, which is the whole point of the program.
 2. **Checking a site** when you use *Add a site*. It loads that address once,
    records the hostnames it requests, and discards the page.
 3. **Fetching a site's icon** when you add it, so the tile shows the site's own

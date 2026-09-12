@@ -4,7 +4,7 @@
 
 # Sukhi Play
 
-**A locked-down browser that lets a small child open only the sites you choose — and nothing else.**
+**A locked-down browser that lets a small child open only the sites you choose, and nothing else.**
 
 [![CI](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml/badge.svg)](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/meSingh/sukhi-play?sort=semver)](https://github.com/meSingh/sukhi-play/releases/latest)
@@ -20,8 +20,8 @@ screen, which means ads, popups, new tabs, and eventually my work. This is the
 thing I built so I could hand him the laptop and stop watching over his
 shoulder.
 
-He gets a few big colourful buttons. Everything else — other websites, popups,
-new windows, downloads, keyboard shortcuts, the desktop — is switched off.
+He gets a few big colourful buttons. Everything else is switched off: other websites, popups,
+new windows, downloads, keyboard shortcuts, the desktop.
 Closing it needs an adult.
 
 ## Install
@@ -35,7 +35,7 @@ Grab the file for your machine from the
 | macOS (Intel) | `.dmg` with `x64` in the name |
 | Windows 10 / 11 | `.exe` installer, or the portable `.exe` |
 | Ubuntu / Debian | `.deb` |
-| Other Linux | `.AppImage` — `chmod +x`, then run |
+| Other Linux | `.AppImage`, `chmod +x` then run |
 
 > **These builds are not signed.** macOS will refuse the first launch:
 > right-click the app, choose *Open*, confirm. Windows SmartScreen will warn:
@@ -55,12 +55,12 @@ npm start
 ## First run: a one-minute walkthrough
 
 The first time you open Sukhi Play it asks **who is using the computer right
-now** — a grown-up setting it up, or someone just looking. Choose *I'm a
+now**: a grown-up setting it up, or someone just looking. Choose *I'm a
 grown-up* and it walks you through four short steps:
 
-1. **What this is** — what your child will and will not be able to reach.
-2. **Choose what they can open** — pick one or two sites from the suggestions.
-3. **How you get back out** — it explains the ✕ and the three-second hold, and
+1. **What this is.** What your child will and will not be able to reach.
+2. **Choose what they can open.** Pick one or two sites from the suggestions.
+3. **How you get back out.** It explains the ✕ and the three-second hold, and
    lets you practise the hold once so you know the feel of it.
 4. **Hand it over.**
 
@@ -68,17 +68,17 @@ That is the whole setup. Afterwards the walkthrough never appears again, and the
 tile screen is what opens.
 
 If the tile screen is ever empty it says so plainly and offers an **Add games**
-button that takes you to the grown-up screen — no hunting through files.
+button that takes you to the grown-up screen, with no hunting through files.
 
 ## Adding and removing sites
 
 **Sukhi Play ships with an empty launcher.** It does not pick sites for you. But
-it does make picking easy — you never need to work out hostnames yourself.
+it does make picking easy, and you never need to work out hostnames yourself.
 
 Open the grown-up screen (**For grown-ups**, hold 3 seconds) → **Add or remove
 games**. Three tabs:
 
-### Suggestions — one tap
+### Suggestions, in one tap
 
 A bundled list of sites other parents use, grouped by category, each labelled
 **no ads** or **has ads**. Tap *Add* and it appears on the tile screen.
@@ -97,9 +97,9 @@ these sites is connected to it. Read [DISCLAIMER.md](DISCLAIMER.md).
 | Games | PBS Kids | US public broadcasting, made for pre-schoolers |
 | Games | Toy Theater | Simple educational games |
 | Games | Poki | Large free game portal, ad-supported |
-| Video | YouTube Kids | Ad filtering **off** by design — see below |
+| Video | YouTube Kids | Ad filtering **off** by design, see below |
 
-### Add a site — type a domain, it works the rest out
+### Add an app: type an address and it works out the rest
 
 Type `pbskids.org`. The app opens it once, watches every request it makes, and
 tells you:
@@ -113,7 +113,7 @@ Give the tile a name, press **Add**. It fetches the site's favicon for the tile
 and writes the allowlist for you. This is the same machinery as `npm run check`,
 driven from the interface.
 
-### My games — turn things on and off
+### Your apps: turn things on and off
 
 Toggle each tile on or off, or remove it.
 
@@ -121,7 +121,7 @@ Toggle each tile on or off, or remove it.
 
 That profile ships with **ad filtering switched off** on purpose. Some sites are
 explicit in their terms about not interfering with their advertising, and
-YouTube is the clearest example. You do not need ad blocking there anyway — what
+YouTube is the clearest example. You do not need ad blocking there anyway. What
 you need is *containment*, and that still applies in full: your child cannot
 leave the site, open a popup, or reach anything else.
 
@@ -134,8 +134,7 @@ age profile up inside YouTube Kids first.
 
 ## Editing by hand
 
-Everything above writes to `catalog.json`, which you can edit directly — the
-grown-up screen has a button that opens the folder.
+Everything above writes to `catalog.json`, which you can edit directly if you prefer.
 
 | Field | Meaning |
 | --- | --- |
@@ -145,7 +144,7 @@ grown-up screen has a button that opens the folder.
 | `shape` | `star` `rocket` `ball` `blocks` `note` `leaf` `drop` `bolt` |
 | `color` | Tile colour, `#rrggbb` |
 | `allowHosts` | **Only** these hosts may load. `example.com` also covers `a.example.com`, never `evil-example.com` |
-| `denyHosts` | Overrides `allowHosts` — for ad subdomains of an allowed domain |
+| `denyHosts` | Overrides `allowHosts`, for ad subdomains of an allowed domain |
 | `blockAds` | `false` leaves the site's advertising alone |
 | `enabled` | `true` to show the tile |
 
@@ -159,7 +158,7 @@ npm run check -- --check=my-games              # does my profile actually work?
 ## What your child sees
 
 1. **A loading screen.**
-2. **The picker** — big square tiles, one per site, each a bold colour and a
+2. **The picker.** Big square tiles, one per site, each a bold colour and a
    simple shape. No reading needed.
 3. **The site**, with a thin bar on top: a large blue **Back** button and a small
    grey **✕** in the corner.
@@ -175,13 +174,12 @@ nothing a child can press to shrink it.
 Six independent layers, so no single mistake opens a hole.
 
 **1. An allowlist per site.** Each entry lists the only hosts allowed to load
-*anything at all*. Every other request — image, script, frame, websocket — is
-cancelled. This layer does most of the work: it blocks ad networks nobody has
+*anything at all*. Every other request is cancelled: image, script, frame, websocket. This layer does most of the work: it blocks ad networks nobody has
 heard of yet, because they are not on the list.
 
 **2. An ad and tracker blocklist.** ~110 known ad, tracker and popunder domains
 plus URL patterns, checked *even on allowed hosts*. This catches ad code served
-from a site's own CDN — the case an allowlist alone cannot see.
+from a site's own CDN, which an allowlist alone cannot see.
 
 **3. No new windows.** Every popup, `target="_blank"` and `window.open` is
 denied. If the link was to an allowed page it opens in place instead, so nothing
@@ -191,7 +189,7 @@ appears broken.
 to a non-allowlisted host is cancelled. Non-web schemes (`mailto:`, `steam:`,
 `file:`) are refused, so no page can launch another program.
 
-**5. No keyboard escapes — but games keep their keys.** A page-level filter
+**5. No keyboard escapes, but games keep their keys.** A page-level filter
 swallows modifier combinations, function keys, devtools and reload. A second
 OS-level layer takes 64 shortcuts away from the window manager itself, including
 `Cmd/Alt+Tab`, Mission Control and Spotlight.
@@ -218,7 +216,7 @@ Instead the window is frameless, fixed, sized to the whole display, and kept at
 joins every Space, so swiping brings the window along rather than revealing
 what is behind it.
 
-A site that asks for fullscreen with its own button still gets it — the bar
+A site that asks for fullscreen with its own button still gets it. The bar
 slides away and **Esc** brings it back.
 
 ## The grown-up gate
@@ -230,7 +228,7 @@ Press ✕, or **Ctrl+Shift+X** (**Cmd+Shift+X** on a Mac).
 
 Finishing the hold only *unlocks*. It does not decide anything by itself, so it
 can never dump you back on the launcher when you meant to close the app. The
-hold is **timed in the main process**, not the page — the animation is only for
+hold is **timed in the main process**, not the page. The animation is only for
 you to look at.
 
 Want more? Set a PIN in `settings.json` and you will be asked for it after the
@@ -264,7 +262,7 @@ window loses focus.
 
 **Not blocked, on purpose:**
 
-- **Force Quit** — `Cmd+Alt+Esc` on macOS, `Ctrl+Alt+Del` on Windows. Left alone
+- **Force Quit.** `Cmd+Alt+Esc` on macOS, `Ctrl+Alt+Del` on Windows. Left alone
   so the machine can always be recovered. Do not add these.
 - **The bare Windows / Command key.** The OS refuses to hand it over.
 
@@ -295,7 +293,7 @@ not also be holding `Cmd+Q`.
 
 If you still need to get out:
 
-- **Force Quit** — `Cmd+Alt+Esc` on macOS, `Ctrl+Alt+Del` on Windows. Never
+- **Force Quit.** `Cmd+Alt+Esc` on macOS, `Ctrl+Alt+Del` on Windows. Never
   captured, on purpose.
 - **From a terminal**, if you can reach one: `pkill -f "Sukhi Play"`
 
@@ -361,11 +359,11 @@ the tests fail.
 
 ## Licence
 
-Code is [MIT](LICENSE). **The Sukhi character artwork is not** — it belongs to
+Code is [MIT](LICENSE). **The Sukhi character artwork is not.** It belongs to
 the project owner. If you fork this and ship your own builds, replace it first;
 `python3 branding/generate-mascot.py` swaps in an MIT placeholder. See
 [branding/README.md](branding/README.md).
 
-- [DISCLAIMER.md](DISCLAIMER.md) — what this is, and what you are responsible for
-- [SECURITY.md](SECURITY.md) — reporting a kiosk escape
-- [CONTRIBUTING.md](CONTRIBUTING.md) — the rules this project lives by
+- [DISCLAIMER.md](DISCLAIMER.md): what this is, and what you are responsible for
+- [SECURITY.md](SECURITY.md): reporting a kiosk escape
+- [CONTRIBUTING.md](CONTRIBUTING.md): the rules this project lives by

@@ -135,6 +135,7 @@ function applyState (state) {
   if (!state) return;
   app.dataset.mode = state.mode;
   if (state.gateIntent) gateIntent = state.gateIntent;
+  if (state.mode === 'gate') describeGate();
 
   // "Back" and "Stop this game" are only distinguishable if we know whether a
   // game is actually open. When none is, "stop" is meaningless and is hidden
@@ -159,6 +160,27 @@ function applyState (state) {
 
 /* ---------------- the grown-up gate ---------------- */
 
+/**
+ * Says what the gate is guarding.
+ *
+ * Pressing Close and being asked "Grown-ups only" tells a parent nothing about
+ * what is about to happen. Quitting now asks to confirm quitting.
+ */
+function describeGate () {
+  const quitting = gateIntent === 'quit';
+  const seconds = config ? config.settings.holdSeconds : 3;
+
+  el('gate-title').textContent = quitting ? 'Close Sukhi Play?' : 'Grown-ups only';
+  el('gate-lead').textContent = quitting
+    ? `Hold the button for ${seconds} seconds to confirm you are a grown-up.`
+    : `Press and hold for ${seconds} seconds.`;
+
+  const hold = el('hold-btn');
+  const label = hold && hold.querySelector('.hold-label');
+  if (label) label.textContent = quitting ? 'Hold to close' : 'Hold';
+  hold.classList.toggle('hold-btn--quit', quitting);
+}
+
 function resetGate () {
   clearInterval(holdTimer);
   holdTimer = null;
@@ -170,6 +192,7 @@ function resetGate () {
   libCard().classList.remove('is-wide');
   el('gate-input').value = '';
   el('gate-error').textContent = '';
+  describeGate();
 }
 
 function startHold () {
@@ -235,7 +258,7 @@ function obShow (step) {
   if (step === 4) {
     el('ob-summary').textContent = obAdded
       ? `${obAdded} game${obAdded === 1 ? '' : 's'} ready. Press the button below and hand the computer over.`
-      : 'You have not added anything yet. You can do that any time from the grown-up screen — press "For grown-ups" on the tile screen.';
+      : 'You have not added anything yet. You can do it any time from the tile screen by pressing Grown-ups.';
   }
 }
 
@@ -434,11 +457,12 @@ function renderMine (mine) {
     host.className = 'app-host';
     try { host.textContent = new URL(entry.url).hostname; } catch { host.textContent = entry.url; }
 
-    const controls = document.createElement('div');
-    controls.className = 'app-controls';
-    controls.append(visibilitySwitch(entry), editButton(entry));
+    // Top corner, where a card's own state control belongs, rather than in a
+    // stack under the name competing with Edit.
+    const toggle = visibilitySwitch(entry);
+    toggle.classList.add('app-toggle');
 
-    box.append(name, host, controls);
+    box.append(toggle, name, host, editButton(entry));
     wrap.appendChild(box);
   }
 }
@@ -458,11 +482,11 @@ function visibilitySwitch (entry) {
 
   const text = document.createElement('span');
   text.className = 'switch-text';
-  text.textContent = entry.enabled ? 'Showing' : 'Hidden';
+  text.textContent = entry.enabled ? 'On' : 'Off';
 
   input.addEventListener('change', async () => {
     input.disabled = true;
-    text.textContent = input.checked ? 'Showing' : 'Hidden';
+    text.textContent = input.checked ? 'On' : 'Off';
     const r = await api.updateSite(entry.id, { enabled: input.checked });
     if (!r || !r.ok) showToast((r && r.message) || 'Could not change that.');
     input.disabled = false;
@@ -864,6 +888,21 @@ async function afterUnlock () {
   libCard().classList.add('is-wide');
   loadLibrary();
   el('lib-done').focus();
+  startPortalHeartbeat();
+}
+
+/** Keeps the unlock alive while a parent is still on a parent screen. */
+let portalBeat = null;
+function startPortalHeartbeat () {
+  clearInterval(portalBeat);
+  portalBeat = setInterval(() => {
+    if (app.dataset.mode !== 'gate') {
+      clearInterval(portalBeat);
+      portalBeat = null;
+      return;
+    }
+    api.keepUnlocked();
+  }, 25_000);
 }
 
 async function submitAnswer () {
@@ -1021,9 +1060,14 @@ async function boot () {
 
   applyState(config.state);
 
-  // Tell the main process the launcher is genuinely on screen. Until this
-  // arrives, a watchdog is holding the lockdown open to be released.
-  requestAnimationFrame(() => requestAnimationFrame(() => api.rendererReady()));
+  // Tell the main process the launcher is up. Until this arrives a watchdog is
+  // waiting to tear the lockdown down.
+  //
+  // Deliberately NOT inside requestAnimationFrame: rAF does not fire while the
+  // window is hidden or occluded, so tying this to a paint meant a backgrounded
+  // start never reported ready and the watchdog released the lockdown on a
+  // perfectly healthy app.
+  api.rendererReady();
 }
 
 boot().catch((err) => {

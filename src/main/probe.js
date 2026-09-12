@@ -131,7 +131,7 @@ function prettyTitle (title, url) {
   const fromHost = base ? base.charAt(0).toUpperCase() + base.slice(1) : 'Site';
   if (!title) return fromHost;
   // Page titles are long and full of taglines; a tile has room for one word.
-  const first = title.split(/[|–—\-:·]/)[0].trim();
+  const first = title.split(/[|–,\-:·]/)[0].trim();
   const pick = first.length >= 3 && first.length <= 14 ? first : fromHost;
   return pick;
 }

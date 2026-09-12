@@ -23,7 +23,7 @@ the exit gate, please report it privately first:
 - open an issue that says only "security report, please make contact" with no
   details, and wait to be contacted.
 
-Please do not post a working escape publicly before it is fixed — the people
+Please do not post a working escape publicly before it is fixed. The people
 running this have small children using it right now.
 
 Include what you did, what happened, your OS, and the app version. A short video

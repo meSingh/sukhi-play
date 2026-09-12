@@ -97,6 +97,16 @@ test('every shape a catalog entry may use has artwork', () => {
   }
 });
 
+test('no em dashes in anything a person reads', () => {
+  // They are the clearest tell that a machine wrote the text, and this is a
+  // product for parents, not a generated artefact.
+  const offenders = [];
+  for (const [name, text] of [['index.html', html], ['app.js', js], ['styles.css', css]]) {
+    if (text.includes('\u2014')) offenders.push(name);
+  }
+  assert.deepEqual(offenders, [], `em dashes found in: ${offenders.join(', ')}`);
+});
+
 test('the dated glass and blur treatments are gone', () => {
   assert.ok(!css.includes('backdrop-filter'), 'frosted glass reads as 2021');
   assert.ok(!/filter:\s*blur\(/.test(css), 'blurred background orbs read as 2021');
