@@ -59,9 +59,12 @@ test('snapcraft is available in the job that builds the snap', () => {
     'the build job installs snapcraft, because electron-builder invokes it to pack');
 });
 
-test('the snap declares the metadata a store listing shows', () => {
-  // A bare listing was the original complaint. These travel inside the snap;
-  // licence, links, icon and screenshots cannot and are set on the store page.
+test('the snap declares the metadata a fresh store listing would use', () => {
+  // A bare listing was the original complaint. These are carried by the snap,
+  // but the store only adopts them until the listing is edited by hand, and
+  // this one has been, so they matter for a fresh listing rather than for the
+  // current one. Licence, links, icon and screenshots are never carried by the
+  // snap and are set on the store page.
   for (const field of ['title', 'summary', 'description', 'category']) {
     assert.ok(builder.snap[field], `snap.${field} is not set, so the listing will be bare`);
   }

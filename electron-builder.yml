@@ -108,10 +108,18 @@ snap:
   confinement: strict
   grade: stable
   autoStart: false
-  # Without these the store listing shows the app name as its own summary and
-  # nothing else: no description, no category. They travel inside the snap, so
-  # they land on upload. Licence, links and screenshots cannot: the snap format
-  # has no field for them and they have to be set on the store listing page.
+  # These travel inside the snap, but do NOT assume they reach the store. The
+  # Snap Store adopts a snap's metadata on upload only until the publisher
+  # makes a manual change to the listing, after which the listing is
+  # authoritative and uploads no longer touch it. This listing has been edited
+  # by hand, so these values apply only to a fresh listing, or if someone runs
+  # `snapcraft upload-metadata --force` to push them deliberately. Do not put
+  # that in CI: it would overwrite the longer description in
+  # docs/store-description.md every release.
+  #
+  # Licence, links, icon and screenshots were never carried by the snap at all.
+  # The format has no screenshots field, and electron-builder only writes an
+  # icon: key when useTemplateApp is false.
   title: Sukhi Play
   summary: Let a small child open only the sites you choose
   category: Education
