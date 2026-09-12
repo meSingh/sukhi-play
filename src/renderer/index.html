@@ -11,15 +11,13 @@
 <div id="app" data-mode="boot">
 
   <!-- Soft background scenery for the child-facing screens. Purely decorative. -->
-  <!-- Background for the child-facing screens: big saturated shapes, heavily
-       blurred into a mesh, with a fine grain over the top. Decorative only. -->
+  <!-- Background for the child-facing screens: flat shapes, layered for depth.
+       No blur and no frosted glass -- both read as 2021. Decorative only. -->
   <div class="sky" aria-hidden="true">
-    <span class="orb orb--1"></span>
-    <span class="orb orb--2"></span>
-    <span class="orb orb--3"></span>
-    <span class="orb orb--4"></span>
-    <span class="orb orb--5"></span>
-    <span class="grain"></span>
+    <span class="ground"></span>
+    <span class="shape shape--sun"></span>
+    <span class="shape shape--arch"></span>
+    <span class="shape shape--pill"></span>
   </div>
 
   <!-- ============ loading screen ============ -->
@@ -182,10 +180,13 @@
   <!-- ============ grown-ups only ============ -->
   <section id="gate" class="screen">
     <div class="gate-card">
-      <h2 id="gate-title">Grown-ups only</h2>
+      <header class="gate-head">
+        <img class="gate-mark" src="assets/mascot.png" alt="" width="512" height="512">
+        <h2 id="gate-title">Grown-ups only</h2>
+      </header>
 
       <div id="gate-step-hold">
-        <p class="gate-hint">Press and hold the button for <strong id="hold-secs">3</strong> seconds.</p>
+        <p class="gate-hint">Press and hold for <strong id="hold-secs">3</strong> seconds.</p>
         <button id="hold-btn" class="hold-btn" type="button">
           <span class="hold-fill" id="hold-fill"></span>
           <span class="hold-label">Hold</span>
@@ -197,20 +198,36 @@
         <input id="gate-input" class="gate-input" type="text" inputmode="numeric"
                autocomplete="off" spellcheck="false" aria-label="Answer">
         <div class="keypad" id="keypad"></div>
-        <p class="gate-error" id="gate-error" role="status"></p>
       </div>
 
+      <!-- One list, ordered by how often a parent needs each thing, with the
+           irreversible one last and visually separated. -->
       <div id="gate-step-choice" hidden>
-        <p class="gate-hint">Unlocked. What would you like to do?</p>
-        <div class="choice-stack">
-          <button id="choice-quit" class="choice-btn choice-btn--quit" type="button">
-            Close Sukhi Play
+        <div class="menu">
+          <button id="choice-library" class="menu-item" type="button">
+            <span class="menu-icon" data-icon="grid" aria-hidden="true"></span>
+            <span class="menu-text">
+              <span class="menu-title">Manage games</span>
+              <span class="menu-sub">Add, remove, or turn them on and off</span>
+            </span>
           </button>
-          <button id="choice-library" class="choice-btn" type="button">
-            Add or remove games
+
+          <button id="choice-home" class="menu-item" type="button" hidden>
+            <span class="menu-icon" data-icon="stop" aria-hidden="true"></span>
+            <span class="menu-text">
+              <span class="menu-title">Stop this game</span>
+              <span class="menu-sub">Go back to the picture buttons</span>
+            </span>
           </button>
-          <button id="choice-home" class="choice-btn" type="button">
-            Back to the game list
+        </div>
+
+        <div class="menu menu--last">
+          <button id="choice-quit" class="menu-item menu-item--danger" type="button">
+            <span class="menu-icon" data-icon="power" aria-hidden="true"></span>
+            <span class="menu-text">
+              <span class="menu-title">Close Sukhi Play</span>
+              <span class="menu-sub">Quit the app completely</span>
+            </span>
           </button>
         </div>
       </div>
@@ -247,22 +264,19 @@
           <div id="lib-suggest-list"></div>
         </div>
 
-        <div class="gate-actions">
+        <footer class="lib-foot">
           <button id="lib-done" class="ghost-btn" type="button">Done</button>
-        </div>
+          <button id="open-config" class="ghost-btn" type="button">Open settings folder</button>
+          <span class="lib-path" id="config-path"></span>
+        </footer>
       </div>
 
-      <div class="gate-actions">
-        <button id="gate-cancel" class="ghost-btn" type="button">Go back to playing</button>
-      </div>
-
-      <details id="parent-info" class="parent-info">
-        <summary>Settings &amp; game list</summary>
-        <p>Edit <code>catalog.json</code> to add or remove games, and
-           <code>settings.json</code> to change this exit check.</p>
-        <p class="path" id="config-path"></p>
-        <button id="open-config" class="ghost-btn" type="button">Open that folder</button>
-      </details>
+      <!-- The single way back. Its label says where "back" goes, so it can
+           never be confused with "stop this game". -->
+      <footer class="gate-foot">
+        <p class="gate-error" id="gate-error" role="status"></p>
+        <button id="gate-cancel" class="ghost-btn" type="button">Back</button>
+      </footer>
     </div>
   </section>
 

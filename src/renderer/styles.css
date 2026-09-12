@@ -17,12 +17,11 @@
 
 :root {
   /* --- the child's world: bold, saturated, modern --- */
-  --base:       #F6F3FF;
-  --orb-violet: #7C5CFF;
-  --orb-cyan:   #1FD1E8;
-  --orb-amber:  #FFB020;
-  --orb-pink:   #FF5FA2;
-  --orb-lime:   #9BE015;
+  --base:        #FFF7EC;
+  --wash-amber:  #FFE9B8;
+  --wash-violet: #E7DEFF;
+  --wash-cyan:   #CFF1F7;
+  --wash-mint:   #DCF3DC;
 
   /* --- ink --- */
   --ink:        #17153A;
@@ -43,9 +42,9 @@
   --radius: 28px;
 
   /* The chunky offset that makes everything feel like a physical button. */
-  --drop: 0 10px 0 rgba(23, 21, 58, .16), 0 20px 40px rgba(23, 21, 58, .18);
-  --drop-lift: 0 16px 0 rgba(23, 21, 58, .16), 0 30px 54px rgba(23, 21, 58, .22);
-  --drop-press: 0 3px 0 rgba(23, 21, 58, .16), 0 8px 18px rgba(23, 21, 58, .16);
+  --drop: 0 8px 0 rgba(23, 21, 58, .14), 0 14px 28px rgba(23, 21, 58, .12);
+  --drop-lift: 0 14px 0 rgba(23, 21, 58, .14), 0 24px 44px rgba(23, 21, 58, .16);
+  --drop-press: 0 2px 0 rgba(23, 21, 58, .14), 0 6px 14px rgba(23, 21, 58, .1);
 
   --font: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Nunito",
           "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -96,66 +95,40 @@ img, svg { -webkit-user-drag: none; }
   background: var(--base);
 }
 
-/* Only the bar shows in play mode; a background behind it would be noise. */
 [data-mode="playing"] .sky { display: none; }
 
-/* Large saturated shapes, blurred hard enough to read as one mesh rather than
-   five circles. This is what replaces the pastel-sky-and-clouds look. */
-.orb {
-  position: absolute;
+/* Flat shapes, layered. Depth comes from overlap and scale rather than blur:
+   crisp edges read better to a small child than a soft gradient, and the
+   blurred-mesh look dates the whole screen. */
+.shape { position: absolute; }
+
+.shape--sun {
+  width: 34vw; height: 34vw; min-width: 300px; min-height: 300px;
+  top: -12vw; right: -8vw;
   border-radius: 50%;
-  filter: blur(90px);
-  will-change: transform;
+  background: var(--wash-amber);
 }
 
-.orb--1 {
-  width: 46vw; height: 46vw; min-width: 420px; min-height: 420px;
-  top: -14%; left: -10%;
-  background: var(--orb-violet); opacity: .55;
-  animation: wander 34s ease-in-out infinite;
-}
-.orb--2 {
-  width: 40vw; height: 40vw; min-width: 360px; min-height: 360px;
-  top: -8%; right: -8%;
-  background: var(--orb-cyan); opacity: .5;
-  animation: wander 42s ease-in-out infinite reverse;
-}
-.orb--3 {
-  width: 38vw; height: 38vw; min-width: 340px; min-height: 340px;
-  bottom: -16%; left: 14%;
-  background: var(--orb-pink); opacity: .45;
-  animation: wander 50s ease-in-out infinite;
-  animation-delay: -12s;
-}
-.orb--4 {
-  width: 32vw; height: 32vw; min-width: 280px; min-height: 280px;
-  bottom: -10%; right: -6%;
-  background: var(--orb-amber); opacity: .5;
-  animation: wander 38s ease-in-out infinite reverse;
-  animation-delay: -20s;
-}
-.orb--5 {
-  width: 26vw; height: 26vw; min-width: 220px; min-height: 220px;
-  top: 38%; left: 42%;
-  background: var(--orb-lime); opacity: .3;
-  animation: wander 56s ease-in-out infinite;
-  animation-delay: -34s;
+.shape--arch {
+  width: 26vw; height: 40vw; min-width: 230px; min-height: 340px;
+  bottom: -8vw; left: -6vw;
+  border-radius: 50% 50% 0 0 / 62% 62% 0 0;
+  background: var(--wash-violet);
 }
 
-@keyframes wander {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33%      { transform: translate(6vw, 4vh) scale(1.08); }
-  66%      { transform: translate(-4vw, -3vh) scale(.95); }
+.shape--pill {
+  width: 15vw; height: 15vw; min-width: 130px; min-height: 130px;
+  top: 44%; left: 6vw;
+  border-radius: 50%;
+  background: var(--wash-cyan);
 }
 
-/* A fine grain stops the gradients looking like flat plastic. */
-.grain {
+/* A band along the bottom gives the tiles something to sit on. */
+.ground {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: .3;
-  mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  left: 0; right: 0; bottom: 0;
+  height: 26vh; min-height: 160px;
+  background: var(--wash-mint);
 }
 
 /* ---------------- loading ---------------- */
@@ -240,9 +213,8 @@ img, svg { -webkit-user-drag: none; }
   justify-content: space-between;
   gap: 14px;
   padding: 14px 20px;
-  background: rgba(255, 255, 255, .72);
-  backdrop-filter: blur(18px) saturate(140%);
-  border-bottom: 1px solid rgba(23, 21, 58, .07);
+  background: var(--paper);
+  box-shadow: 0 2px 0 rgba(23, 21, 58, .05), 0 6px 20px rgba(23, 21, 58, .07);
 }
 
 .top-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
@@ -305,8 +277,10 @@ img, svg { -webkit-user-drag: none; }
 
 .tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(212px, 250px));
-  gap: 28px;
+  /* Bigger and fewer. A three-year-old's aim is poor and a larger target is
+     worth more than fitting another tile on screen. */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 310px));
+  gap: 30px;
   justify-content: center;
   width: 100%;
   max-width: 1120px;
@@ -327,9 +301,9 @@ img, svg { -webkit-user-drag: none; }
   background: var(--tile, var(--blue));
   color: var(--tile-ink, #fff);
   font: inherit;
-  font-size: 24px;
-  font-weight: 900;
-  letter-spacing: -.3px;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -.2px;
   cursor: pointer;
   box-shadow: var(--drop);
   transition: transform .18s cubic-bezier(.34, 1.56, .64, 1), box-shadow .18s ease;
@@ -363,16 +337,17 @@ img, svg { -webkit-user-drag: none; }
 .tile-badge {
   position: relative;
   z-index: 1;
-  width: 116px; height: 116px;
+  /* The picture is what the child navigates by, so it takes the space. */
+  width: 148px; height: 148px;
   display: grid; place-items: center;
   border-radius: 50%;
   background: var(--paper);
-  box-shadow: 0 6px 0 rgba(23, 21, 58, .14);
+  box-shadow: 0 6px 0 rgba(23, 21, 58, .12);
   overflow: hidden;
 }
 
-.tile-badge svg { width: 64px; height: 64px; fill: var(--tile, var(--blue)); }
-.tile-badge img { width: 80px; height: 80px; object-fit: contain; }
+.tile-badge svg { width: 86px; height: 86px; fill: var(--tile, var(--blue)); }
+.tile-badge img { width: 104px; height: 104px; object-fit: contain; }
 
 .tile-name {
   position: relative;
@@ -511,8 +486,7 @@ img, svg { -webkit-user-drag: none; }
   align-items: center;
   justify-content: center;
   padding: 32px;
-  background: rgba(23, 21, 58, .55);
-  backdrop-filter: blur(6px);
+  background: rgba(23, 21, 58, .58);
 }
 
 .gate-card {
@@ -592,32 +566,99 @@ img, svg { -webkit-user-drag: none; }
 }
 .ghost-btn:hover { border-color: var(--blue); color: var(--blue); }
 
-.choice-stack { display: flex; flex-direction: column; gap: 13px; margin-top: 6px; }
+/* --- the grown-up menu --- */
 
-.choice-btn {
-  padding: 20px 24px;
-  border: none; border-radius: 20px;
-  background: #F0EEFB; color: var(--ink);
-  font: inherit; font-size: 19px; font-weight: 900;
-  cursor: pointer;
-  transition: transform .12s ease, background .14s ease;
+.gate-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 22px;
 }
-.choice-btn:hover  { background: #E2DFF5; }
-.choice-btn:active { transform: scale(.975); }
-.choice-btn--quit  { background: var(--danger); color: #fff; }
-.choice-btn--quit:hover { background: #E22A4C; }
 
-.parent-info {
-  margin-top: 24px; padding-top: 20px;
+.gate-mark { width: 52px; height: 52px; flex: none; }
+
+.menu { display: flex; flex-direction: column; gap: 10px; }
+
+/* A visible gap before the one action that cannot be undone. */
+.menu--last {
+  margin-top: 14px;
+  padding-top: 14px;
   border-top: 1px solid #EDEBF8;
-  text-align: left; font-size: 14px; color: var(--ink-soft); line-height: 1.6;
 }
-.parent-info summary { cursor: pointer; font-weight: 800; color: var(--ink); margin-bottom: 12px; }
-.parent-info code {
-  padding: 2px 7px; border-radius: 6px;
-  background: #F0EEFB; color: var(--blue); font-weight: 700;
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  padding: 17px 20px;
+  border: 2px solid #EDEBF8;
+  border-radius: 20px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .14s ease, background .14s ease, transform .12s ease;
 }
-.path { word-break: break-all; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.menu-item:hover  { border-color: var(--blue); background: #F9F8FE; }
+.menu-item:active { transform: scale(.985); }
+.menu-item:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
+
+.menu-icon {
+  width: 42px; height: 42px;
+  display: grid; place-items: center;
+  border-radius: 13px;
+  background: #F0EEFB;
+  color: var(--blue);
+  flex: none;
+}
+.menu-icon svg { width: 22px; height: 22px; }
+
+.menu-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.menu-title { font-size: 17.5px; font-weight: 800; }
+.menu-sub   { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+
+.menu-item--danger { border-color: #FFE0E6; }
+.menu-item--danger .menu-icon { background: #FFE6EC; color: var(--danger); }
+.menu-item--danger:hover {
+  border-color: var(--danger);
+  background: #FFF5F7;
+}
+.menu-item--danger:hover .menu-title { color: var(--danger); }
+
+.gate-foot {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #EDEBF8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.lib-foot {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #EDEBF8;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.lib-path {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--ink-faint);
+  word-break: break-all;
+}
+
+
+
+
+
 
 /* ---------------- grown-up library ---------------- */
 
@@ -813,6 +854,18 @@ img, svg { -webkit-user-drag: none; }
 }
 
 [data-mode="playing"] .toast { display: none; }
+
+.boot-failure {
+  position: fixed;
+  inset: auto 20px 20px 20px;
+  z-index: 100;
+  padding: 16px 20px;
+  border-radius: 18px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 15px; font-weight: 800; line-height: 1.5;
+  box-shadow: 0 12px 32px rgba(23, 21, 58, .35);
+}
 
 /* ---------------- motion ---------------- */
 

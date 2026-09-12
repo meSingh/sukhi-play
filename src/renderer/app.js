@@ -5,11 +5,29 @@
 const api = window.sukhi;
 
 const el = (id) => document.getElementById(id);
+
+/**
+ * Binds a listener, and says so loudly if the element is not there.
+ *
+ * A single `on('missing', ...)` used to throw out of wire(),
+ * which boot()'s catch answered by replacing the whole document with an error
+ * message -- so one stale id blanked the entire interface. Now the rest of the
+ * app still works and the console names the culprit.
+ */
+function on (id, event, handler) {
+  const node = el(id);
+  if (!node) {
+    console.error(`[shell] no element #${id} to bind ${event} to`);
+    return;
+  }
+  node.addEventListener(event, handler);
+}
 const app = el('app');
 
 const MIN_SPLASH_MS = 1400; // long enough to read as "it is starting", not a flash
 
 let config = null;
+let gameOpen = false;
 let holdTimer = null;
 let holdStart = 0;
 let toastTimer = null;
@@ -117,6 +135,12 @@ function applyState (state) {
   if (!state) return;
   app.dataset.mode = state.mode;
 
+  // "Back" and "Stop this game" are only distinguishable if we know whether a
+  // game is actually open. When none is, "stop" is meaningless and is hidden
+  // rather than sitting there duplicating "back".
+  if (state.mode !== 'gate') gameOpen = Boolean(state.activeAppId);
+  applyGateLabels();
+
   if (state.mode === 'launcher') {
     for (const t of document.querySelectorAll('.tile')) t.classList.remove('is-busy');
   }
@@ -136,6 +160,39 @@ function applyState (state) {
 
 /* ---------------- the grown-up gate ---------------- */
 
+/**
+ * Names the exits after where they lead.
+ *
+ * There used to be "Back to the game list" and "Go back to playing" on screen
+ * together, which are different actions with near-identical labels. Now there
+ * is one Back, named for its destination, and Stop only appears when there is
+ * something to stop.
+ */
+function applyGateLabels () {
+  const back = el('gate-cancel');
+  const stop = el('choice-home');
+  if (!back || !stop) return;
+  back.textContent = gameOpen ? 'Back to the game' : 'Back to the buttons';
+  stop.hidden = !gameOpen;
+}
+
+const MENU_ICONS = {
+  grid: '<rect x="3" y="3" width="7.5" height="7.5" rx="2.4"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2.4"/>' +
+        '<rect x="3" y="13.5" width="7.5" height="7.5" rx="2.4"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2.4"/>',
+  stop: '<rect x="4.5" y="4.5" width="15" height="15" rx="4"/>',
+  power: '<path d="M12 3.2v7.6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>' +
+         '<path d="M7 6.6a7 7 0 1 0 10 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>'
+};
+
+function fillMenuIcons () {
+  for (const holder of document.querySelectorAll('.menu-icon[data-icon]')) {
+    const body = MENU_ICONS[holder.dataset.icon];
+    if (!body) continue;
+    holder.innerHTML =
+      `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${body}</svg>`;
+  }
+}
+
 function resetGate () {
   clearInterval(holdTimer);
   holdTimer = null;
@@ -147,6 +204,7 @@ function resetGate () {
   libCard().classList.remove('is-wide');
   el('gate-input').value = '';
   el('gate-error').textContent = '';
+  applyGateLabels();
 }
 
 function startHold () {
@@ -537,7 +595,8 @@ function showChoices () {
   el('gate-step-hold').hidden = true;
   el('gate-step-answer').hidden = true;
   el('gate-step-choice').hidden = false;
-  el('choice-quit').focus();
+  applyGateLabels();
+  el('choice-library').focus();
 }
 
 async function submitAnswer () {
@@ -599,29 +658,29 @@ function showToast (message) {
 /* ---------------- wiring ---------------- */
 
 function wire () {
-  el('home-btn').addEventListener('click', () => api.goHome());
-  el('exit-btn').addEventListener('click', () => api.openGate('quit'));
-  el('parent-btn').addEventListener('click', () => api.openGate('quit'));
-  el('close-btn').addEventListener('click', () => api.openGate('quit'));
-  el('empty-add').addEventListener('click', () => api.openGate('quit'));
+  on('home-btn', 'click', () => api.goHome());
+  on('exit-btn', 'click', () => api.openGate('quit'));
+  on('parent-btn', 'click', () => api.openGate('quit'));
+  on('close-btn', 'click', () => api.openGate('quit'));
+  on('empty-add', 'click', () => api.openGate('quit'));
 
-  el('ob-parent').addEventListener('click', () => obShow(2));
-  el('ob-child').addEventListener('click', finishOnboarding);
-  el('ob-next-2').addEventListener('click', () => obShow(3));
-  el('ob-next-3').addEventListener('click', () => obShow(4));
-  el('ob-back-1').addEventListener('click', () => obShow(1));
-  el('ob-back-2').addEventListener('click', () => obShow(2));
-  el('ob-done').addEventListener('click', finishOnboarding);
+  on('ob-parent', 'click', () => obShow(2));
+  on('ob-child', 'click', finishOnboarding);
+  on('ob-next-2', 'click', () => obShow(3));
+  on('ob-next-3', 'click', () => obShow(4));
+  on('ob-back-1', 'click', () => obShow(1));
+  on('ob-back-2', 'click', () => obShow(2));
+  on('ob-done', 'click', finishOnboarding);
 
   const obHold = el('ob-hold');
   obHold.addEventListener('pointerdown', obPractiseHold);
   obHold.addEventListener('pointerup', obCancelHold);
   obHold.addEventListener('pointerleave', obCancelHold);
   obHold.addEventListener('pointercancel', obCancelHold);
-  el('gate-cancel').addEventListener('click', () => api.closeGate());
-  el('open-config').addEventListener('click', () => api.openConfigFolder());
+  on('gate-cancel', 'click', () => api.closeGate());
+  on('open-config', 'click', () => api.openConfigFolder());
 
-  el('choice-quit').addEventListener('click', async () => {
+  on('choice-quit', 'click', async () => {
     el('choice-quit').textContent = 'Closing...';
     const r = await api.quitApp();
     if (!r || !r.ok) {
@@ -629,11 +688,11 @@ function wire () {
       el('gate-error').textContent = (r && r.message) || 'Could not close.';
     }
   });
-  el('choice-home').addEventListener('click', () => api.goHomeUnlocked());
-  el('choice-library').addEventListener('click', showLibrary);
-  el('lib-done').addEventListener('click', hideLibrary);
-  el('lib-check').addEventListener('click', checkSite);
-  el('lib-url').addEventListener('keydown', (e) => { if (e.key === 'Enter') checkSite(); });
+  on('choice-home', 'click', () => api.goHomeUnlocked());
+  on('choice-library', 'click', showLibrary);
+  on('lib-done', 'click', hideLibrary);
+  on('lib-check', 'click', checkSite);
+  on('lib-url', 'keydown', (e) => { if (e.key === 'Enter') checkSite(); });
   for (const tab of document.querySelectorAll('.lib-tab')) {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   }
@@ -644,11 +703,13 @@ function wire () {
   hold.addEventListener('pointerleave', cancelHold);
   hold.addEventListener('pointercancel', cancelHold);
 
-  el('gate-input').addEventListener('keydown', (e) => {
+  on('gate-input', 'keydown', (e) => {
     if (e.key === 'Enter') submitAnswer();
   });
 
   buildKeypad();
+  fillMenuIcons();
+  applyGateLabels();
 
   api.on('state', applyState);
   api.on('apps', (payload) => renderTiles(payload.apps || []));
@@ -688,5 +749,11 @@ async function boot () {
 
 boot().catch((err) => {
   console.error('[shell] boot failed', err);
-  document.body.textContent = 'Sukhi Play could not start.';
+  // Show the failure over the interface rather than in place of it: wiping the
+  // document also destroys every element, which turns one small fault into a
+  // blank screen and a pile of null references.
+  const note = document.createElement('div');
+  note.className = 'boot-failure';
+  note.textContent = 'Sukhi Play could not start properly. ' + (err && err.message ? err.message : '');
+  document.body.appendChild(note);
 });

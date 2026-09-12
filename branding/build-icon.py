@@ -89,7 +89,14 @@ def build(which, size=1024):
     os.makedirs('src/renderer/assets', exist_ok=True)
     icon.save('build/icon.png')
     icon.save('branding/sukhi-icon.png')
-    icon.resize((512, 512), Image.LANCZOS).save('src/renderer/assets/mascot.png')
+
+    # The in-app mascot is the character ALONE - no tile, no background. Using
+    # the app icon here made every avatar look like a sticker of an icon.
+    bare = cut.crop(cut.getchannel('A').getbbox())
+    side = max(bare.size)
+    square = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+    square.paste(bare, ((side - bare.width) // 2, (side - bare.height) // 2), bare)
+    square.resize((512, 512), Image.LANCZOS).save('src/renderer/assets/mascot.png')
     print(f'built icon from the "{which}" cut-out')
     print('  build/icon.png                  1024x1024')
     print('  branding/sukhi-icon.png         1024x1024')
