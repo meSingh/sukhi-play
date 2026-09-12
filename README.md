@@ -275,6 +275,22 @@ window loses focus.
   so the machine can always be recovered. Do not add these.
 - **The bare Windows / Command key.** The OS refuses to hand it over.
 
+**On Linux, how much of that works depends on your session.** Electron can only
+take global shortcuts on **X11**. Under **Wayland**, the default on current
+Ubuntu, registration reports success and then intercepts nothing, so the
+function keys and the Super key keep working. The app says so in its log rather
+than claiming otherwise:
+
+```
+[shortcuts] registered 64 shortcuts, but this is a wayland session and they
+will NOT be intercepted.
+```
+
+For the full lockdown on Linux, choose **Xorg** at the login screen (the gear on
+the password field), or restrict the shortcuts inside the account your child
+uses. The Super key is a GNOME binding and no application can take it on either
+session.
+
 **Cannot be blocked by any application:**
 
 - **Hardware media keys.** On a Mac, F-keys report as brightness, volume or
