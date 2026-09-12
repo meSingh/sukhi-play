@@ -1092,6 +1092,10 @@ function wire () {
 
   buildKeypad();
 
+  // Reachable so the screenshot tooling can populate the portal before
+  // capturing it. Nothing in the app itself uses this.
+  window.__loadLibrary = loadLibrary;
+
   api.on('state', applyState);
   api.on('apps', (payload) => renderTiles(payload.apps || []));
   api.on('toast', (payload) => showToast(payload.message));

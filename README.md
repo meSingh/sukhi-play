@@ -1,15 +1,17 @@
 <div align="center">
 
-<img src="branding/sukhi-icon.png" width="128" alt="Sukhi Play">
+<img src="branding/sukhi-icon.png" width="120" alt="Sukhi Play">
 
 # Sukhi Play
 
-**A locked-down browser that lets a small child open only the sites you choose, and nothing else.**
+**A locked-down browser that lets a small child open only what you choose, and nothing else.**
 
 [![CI](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml/badge.svg)](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/meSingh/sukhi-play?sort=semver)](https://github.com/meSingh/sukhi-play/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/meSingh/sukhi-play/releases/latest)
+
+<img src="docs/screenshot-launcher.png" width="820" alt="The tile screen: six large colourful buttons, one per site, with a Grown-ups and Close button in the bar above">
 
 </div>
 
@@ -115,7 +117,14 @@ driven from the interface.
 
 ### Your apps: turn things on and off
 
-Toggle each tile on or off, or remove it.
+Each app is a card shaped like the tile your child sees. The switch in its
+corner decides whether it appears on their screen, and tapping the card opens
+everything else: name, picture, colour, address, allowed hosts and ad filtering,
+with Delete at the bottom.
+
+<div align="center">
+<img src="docs/screenshot-parent-portal.png" width="760" alt="The parent portal: cards for each app with on/off switches, an Add an app button, and Quit Sukhi Play">
+</div>
 
 ### About YouTube Kids
 

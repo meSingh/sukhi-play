@@ -603,6 +603,45 @@ app.whenReady().then(() => {
     }, exitAfter * 1000);
   }
 
+  // Screenshot tooling for the README. Kept because the images go stale every
+  // time the interface changes, and a screenshot taken from the real app beats
+  // one taken from a mock. See CONTRIBUTING.md.
+  if (process.env.SUKHI_SHOT) {
+    ipcMain.once('shell:renderer-ready', () => {
+      setTimeout(async () => {
+        try {
+          if (process.env.SUKHI_SHOT_VIEW === 'portal') {
+            gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+            shellApp.openGate('portal');
+            await shellApp.shellView.webContents.executeJavaScript(`(async () => {
+              document.getElementById('gate-step-hold').hidden = true;
+              document.getElementById('gate-step-library').hidden = false;
+              document.querySelector('.gate-card').classList.add('is-wide');
+              const fn = window.__loadLibrary; if (fn) await fn();
+              return 1;
+            })()`);
+            await new Promise((r) => setTimeout(r, 1200));
+          }
+
+          const w = Number(process.env.SUKHI_SHOT_W || 1280);
+          const h = Number(process.env.SUKHI_SHOT_H || 820);
+          shellApp.win.setBounds({ x: 40, y: 40, width: w, height: h });
+          shellApp.layout();
+          await new Promise((r) => setTimeout(r, 900));
+          const view = shellApp.shellView;
+          const image = await view.webContents.capturePage();
+          require('node:fs').writeFileSync(process.env.SUKHI_SHOT, image.toPNG());
+          console.log('[SHOT] wrote', process.env.SUKHI_SHOT, image.getSize());
+        } catch (e) {
+          console.log('[SHOT] failed:', e.message);
+        }
+        try { shortcuts.releaseAll(); } catch {}
+        shellApp.allowQuit = true;
+        app.exit(0);
+      }, Number(process.env.SUKHI_SHOT_DELAY || 3500));
+    });
+  }
+
   // The launcher must prove it is on screen. If it does not, everything is
   // unlocked: a kiosk whose interface never appeared has no exit gate either,
   // and with Cmd+Q and Cmd+Tab held at the OS level the only way out would be a

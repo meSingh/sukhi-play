@@ -404,14 +404,22 @@ img, svg { -webkit-user-drag: none; }
 
 /* ---------------- the bar over a site ---------------- */
 
+/* The bar sits directly against whatever the site renders, and plenty of sites
+   are white. A faint edge disappeared into them entirely, so this is a solid
+   line plus a real drop shadow: visible against white, and against anything
+   else. */
 #bar {
+  position: relative;
+  z-index: 2;
   height: var(--bar-h);
   align-items: center;
   gap: 14px;
   padding: 0 16px;
   background: var(--paper);
-  border-bottom: 4px solid rgba(23, 21, 58, .08);
-  box-shadow: 0 4px 16px rgba(23, 21, 58, .12);
+  border-bottom: 3px solid rgba(23, 21, 58, .16);
+  box-shadow:
+    0 2px 0 rgba(23, 21, 58, .06),
+    0 10px 24px rgba(23, 21, 58, .16);
 }
 
 .bar-btn {

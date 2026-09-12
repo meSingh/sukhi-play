@@ -48,6 +48,24 @@ npm run check   # drives a real site and reports what loaded and what was cut
 is not part of CI. Run it locally if you touched request filtering, navigation,
 or the window.
 
+## Regenerating the screenshots
+
+The images in `docs/` are captured from the real application, not mocked up, so
+they go stale whenever the interface changes:
+
+```bash
+# a tile screen with apps on it
+SUKHI_SHOT=docs/screenshot-launcher.png SUKHI_SHOT_W=1400 SUKHI_SHOT_H=960 \
+  npx electron . --user-data-dir=/tmp/sukhi-shot
+
+# the parent portal
+SUKHI_SHOT=docs/screenshot-parent-portal.png SUKHI_SHOT_VIEW=portal \
+  SUKHI_SHOT_W=1400 SUKHI_SHOT_H=960 npx electron . --user-data-dir=/tmp/sukhi-shot
+```
+
+Seed `/tmp/sukhi-shot/catalog.json` with a few enabled apps first, or the shot
+will be of an empty screen.
+
 ## Adding a site to the docs
 
 Don't add enabled entries to `config/catalog.json`. If you want to document a
