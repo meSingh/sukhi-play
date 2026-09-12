@@ -373,6 +373,10 @@ the project owner. If you fork this and ship your own builds, replace it first;
 `python3 branding/generate-mascot.py` swaps in an MIT placeholder. See
 [branding/README.md](branding/README.md).
 
+If it saved you an afternoon, you can
+[buy me a coffee](https://www.buymeacoffee.com/msingh). Entirely optional, and
+the app is free either way.
+
 - [DISCLAIMER.md](DISCLAIMER.md): what this is, and what you are responsible for
 - [SECURITY.md](SECURITY.md): reporting a kiosk escape
 - [CONTRIBUTING.md](CONTRIBUTING.md): the rules this project lives by
