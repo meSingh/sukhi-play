@@ -154,4 +154,45 @@ for (const target of targets) {
   console.log(`wrote ${path.relative(process.cwd(), target.file)} for version ${pkg.version}`);
 }
 
+// Debian policy requires every package to ship a copyright file, and the .deb
+// had only a changelog. Machine-readable DEP-5 format, so the licence is
+// legible to tooling as well as to a person.
+const year = new Date().getFullYear();
+const copyright = `Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Sukhi Play
+Upstream-Contact: Mandeep Singh <mesingh90@gmail.com>
+Source: https://github.com/meSingh/sukhi-play
+
+Files: *
+Copyright: ${year} Mandeep Singh
+License: MIT
+
+License: MIT
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+
+Comment: The Sukhi character artwork bundled with this package is the personal
+ property of the copyright holder and is not covered by the MIT licence above.
+ See the LICENCE file in the upstream repository for the list of files and the
+ terms that apply to them.
+`;
+const copyrightFile = path.join(out, 'copyright');
+fs.writeFileSync(copyrightFile, copyright, 'utf8');
+console.log(`wrote ${path.relative(process.cwd(), copyrightFile)}`);
+
 function recursiveOpt () { return { recursive: true }; }

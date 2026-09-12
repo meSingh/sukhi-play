@@ -64,6 +64,8 @@ deb:
   # fpm places it where the centres look.
   fpm:
     - "build/linux/com.msingh.sukhi.play.metainfo.xml=/usr/share/metainfo/com.msingh.sukhi.play.metainfo.xml"
+    # Debian policy requires this; the package shipped only a changelog.
+    - "build/linux/copyright=/usr/share/doc/sukhi-play/copyright"
 
 nsis:
   artifactName: ${productName}-${version}-win-${arch}-setup.${ext}
@@ -106,6 +108,28 @@ snap:
   confinement: strict
   grade: stable
   autoStart: false
+  # Without these the store listing shows the app name as its own summary and
+  # nothing else: no description, no category. They travel inside the snap, so
+  # they land on upload. Licence, links and screenshots cannot: the snap format
+  # has no field for them and they have to be set on the store listing page.
+  title: Sukhi Play
+  summary: Let a small child open only the sites you choose
+  category: Education
+  description: |
+    Sukhi Play turns a computer into a safe place for a small child to play.
+
+    A grown-up chooses which sites are allowed. The child gets a full screen of
+    large, brightly coloured buttons and nothing else: no address bar, no tabs,
+    no other websites, no popups, and no way out without an adult.
+
+    Everything outside the approved list is blocked, along with ads and
+    trackers. Keyboard shortcuts are neutralised so a child mashing keys cannot
+    escape or break anything, while the arrow keys and letters games need keep
+    working. Closing the app takes a sustained press a toddler will not manage.
+
+    Sukhi Play is not affiliated with any of the sites it can open and does not
+    endorse them. You choose where it may go and are responsible for complying
+    with each site's terms.
   # No `plugs` override. electron-builder's `default` already expands to
   # desktop, desktop-legacy, home, x11, wayland, unity7, browser-support,
   # network, gsettings, audio-playback, pulseaudio and opengl. Listing
