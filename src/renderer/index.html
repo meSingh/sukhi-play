@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-src 'none'">
+<title>Sukhi Play</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app" data-mode="boot">
+
+  <!-- ============ loading screen ============ -->
+  <section id="boot" class="screen">
+    <img class="boot-mark" src="assets/mascot.png" alt="" width="512" height="512">
+    <h1 class="boot-title">Sukhi Play</h1>
+    <div class="boot-dots" aria-label="Loading"><i></i><i></i><i></i></div>
+  </section>
+
+  <!-- ============ pick something ============ -->
+  <section id="launcher" class="screen">
+    <h1 class="launcher-title">
+      <img class="launcher-mark" src="assets/mascot.png" alt="" width="512" height="512">
+      What do you want to play?
+    </h1>
+    <div id="tiles" class="tiles" role="list"></div>
+    <footer class="launcher-foot">
+      <button id="parent-btn" class="ghost-btn" type="button">For grown-ups</button>
+      <span id="version" class="version"></span>
+    </footer>
+  </section>
+
+  <!-- ============ the bar shown over a game ============ -->
+  <header id="bar">
+    <button id="home-btn" class="bar-btn bar-btn--home" type="button">
+      <svg class="bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 11.5 12 4l9 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5.5 10.5V20h13v-9.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Back</span>
+    </button>
+
+    <div class="bar-mid">
+      <span id="bar-title"></span>
+      <span id="bar-blocked" class="badge" hidden></span>
+    </div>
+
+    <button id="exit-btn" class="bar-btn bar-btn--exit" type="button" title="Close the app (grown-ups)">
+      <svg class="bar-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- ============ grown-ups only ============ -->
+  <section id="gate" class="screen">
+    <div class="gate-card">
+      <h2 id="gate-title">Grown-ups only</h2>
+
+      <div id="gate-step-hold">
+        <p class="gate-hint">Press and hold the button for <strong id="hold-secs">3</strong> seconds.</p>
+        <button id="hold-btn" class="hold-btn" type="button">
+          <span class="hold-fill" id="hold-fill"></span>
+          <span class="hold-label">Hold</span>
+        </button>
+      </div>
+
+      <div id="gate-step-answer" hidden>
+        <p class="gate-hint" id="gate-prompt">Enter the parent PIN</p>
+        <input id="gate-input" class="gate-input" type="text" inputmode="numeric"
+               autocomplete="off" spellcheck="false" aria-label="Answer">
+        <div class="keypad" id="keypad"></div>
+        <p class="gate-error" id="gate-error" role="status"></p>
+      </div>
+
+      <div id="gate-step-choice" hidden>
+        <p class="gate-hint">Unlocked. What would you like to do?</p>
+        <div class="choice-stack">
+          <button id="choice-quit" class="choice-btn choice-btn--quit" type="button">
+            Close Sukhi Play
+          </button>
+          <button id="choice-home" class="choice-btn" type="button">
+            Back to the game list
+          </button>
+        </div>
+      </div>
+
+      <div class="gate-actions">
+        <button id="gate-cancel" class="ghost-btn" type="button">Go back to playing</button>
+      </div>
+
+      <details id="parent-info" class="parent-info">
+        <summary>Settings &amp; game list</summary>
+        <p>Edit <code>catalog.json</code> to add or remove games, and
+           <code>settings.json</code> to change this exit check.</p>
+        <p class="path" id="config-path"></p>
+        <button id="open-config" class="ghost-btn" type="button">Open that folder</button>
+      </details>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" hidden></div>
+</div>
+
+<!-- Original tile artwork: plain geometric primitives drawn for this app. -->
+<svg class="sprite" aria-hidden="true">
+  <symbol id="shape-star" viewBox="0 0 100 100">
+    <path d="M50 8 62 38 94 41 70 62 77 93 50 76 23 93 30 62 6 41 38 38Z"/>
+  </symbol>
+  <symbol id="shape-rocket" viewBox="0 0 100 100">
+    <path d="M50 6c14 14 20 30 20 46v12H30V52c0-16 6-32 20-46Z"/>
+    <path d="M30 56 14 74l14-2 4 12Z"/>
+    <path d="M70 56l16 18-14-2-4 12Z"/>
+    <circle cx="50" cy="44" r="9" fill="rgba(0,0,0,.3)"/>
+  </symbol>
+  <symbol id="shape-ball" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40"/>
+    <path d="M22 34c18 10 38 10 56 0M22 66c18-10 38-10 56 0M50 10v80"
+          fill="none" stroke="rgba(0,0,0,.32)" stroke-width="5"/>
+  </symbol>
+  <symbol id="shape-blocks" viewBox="0 0 100 100">
+    <rect x="12" y="52" width="34" height="34" rx="6"/>
+    <rect x="54" y="52" width="34" height="34" rx="6"/>
+    <rect x="33" y="14" width="34" height="34" rx="6"/>
+  </symbol>
+  <symbol id="shape-note" viewBox="0 0 100 100">
+    <circle cx="34" cy="72" r="16"/>
+    <rect x="44" y="14" width="8" height="58" rx="4"/>
+    <path d="M52 14c14 4 24 10 26 22-6-8-14-12-26-14Z"/>
+  </symbol>
+  <symbol id="shape-leaf" viewBox="0 0 100 100">
+    <path d="M84 16C46 16 20 34 20 62c0 10 5 18 12 22C42 54 60 38 82 32 62 44 48 60 40 88c26 4 46-18 46-48 0-10-1-18-2-24Z"/>
+  </symbol>
+  <symbol id="shape-drop" viewBox="0 0 100 100">
+    <path d="M50 8c16 22 28 36 28 50a28 28 0 1 1-56 0c0-14 12-28 28-50Z"/>
+  </symbol>
+  <symbol id="shape-bolt" viewBox="0 0 100 100">
+    <path d="M58 6 26 56h20l-6 38 34-52H54Z"/>
+  </symbol>
+</svg>
+
+<script src="app.js"></script>
+</body>
+</html>

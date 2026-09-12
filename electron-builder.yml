@@ -1,0 +1,67 @@
+appId: com.sukhi.play
+productName: Sukhi Play
+copyright: Copyright © 2026
+
+directories:
+  output: dist
+  buildResources: build
+
+# Predictable, self-describing filenames so a parent can tell at a glance which
+# download is theirs.
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+
+files:
+  - src/**/*
+  - config/**/*
+  - package.json
+  - "!**/*.map"
+
+# Nothing in this app talks to an update server; a kiosk app that can rewrite
+# itself is a bigger risk than an out-of-date one.
+publish: null
+
+mac:
+  category: public.app-category.education
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+    - target: zip
+      arch: [arm64, x64]
+  # No hardened runtime or notarisation: these builds are unsigned on purpose.
+  identity: null
+  icon: build/icon.png
+  darkModeSupport: true
+  # No entitlements needed: no camera, mic, or file access is ever requested.
+  extendInfo:
+    LSApplicationCategoryType: public.app-category.education
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  icon: build/icon.png
+
+nsis:
+  artifactName: ${productName}-${version}-win-${arch}-setup.${ext}
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Sukhi Play
+
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+  icon: build/icon.png
+  category: Education
+  synopsis: A locked-down, ad-free game launcher for small kids
+  desktop:
+    entry:
+      Name: Sukhi Play
+      Categories: Education;Game;

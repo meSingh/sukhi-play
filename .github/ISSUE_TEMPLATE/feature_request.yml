@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest an improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you running into?
+      description: Describe the situation, not the solution you have in mind.
+      placeholder: My child works out how to... and then...
+    validations: { required: true }
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to happen?
+    validations: { required: true }
+
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Please confirm
+      options:
+        - label: This does not require games to lose the arrow keys or WASD
+          required: true
+        - label: This does not require any site to be enabled by default
+          required: true

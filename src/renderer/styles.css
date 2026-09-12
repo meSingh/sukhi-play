@@ -1,0 +1,378 @@
+/* ===========================================================
+   Sukhi Play - launcher shell
+   The same document renders four things depending on
+   #app[data-mode]: boot, launcher, playing (bar only), gate.
+   In "playing" the whole view is only 72px tall, so everything
+   except the bar must be out of the way.
+   =========================================================== */
+
+:root {
+  --bg: #0f172a;
+  --bg-soft: #1e293b;
+  --ink: #f8fafc;
+  --ink-dim: #94a3b8;
+  --accent: #38bdf8;
+  --danger: #f87171;
+  --bar-h: 72px;
+  --radius: 24px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
+  cursor: default;
+}
+
+/* No text selection or drag anywhere - both are ways to get stuck. */
+img, svg { -webkit-user-drag: none; }
+
+#app { height: 100%; }
+
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.screen { display: none; height: 100%; }
+#bar { display: none; }
+
+[data-mode="boot"]     #boot     { display: flex; }
+[data-mode="launcher"] #launcher { display: flex; }
+[data-mode="gate"]     #gate     { display: flex; }
+[data-mode="playing"]  #bar      { display: flex; }
+
+/* ---------------- loading screen ---------------- */
+
+#boot {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: radial-gradient(circle at 50% 38%, #1e3a8a 0%, var(--bg) 62%);
+}
+
+.boot-mark {
+  width: 172px;
+  height: 172px;
+  animation: bob 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .45));
+}
+
+.launcher-mark {
+  width: 64px;
+  height: 64px;
+  vertical-align: -14px;
+  margin-right: 10px;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-16px) rotate(3deg); }
+}
+
+.boot-title {
+  margin: 0;
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.boot-dots { display: flex; gap: 12px; }
+.boot-dots i {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.boot-dots i:nth-child(2) { animation-delay: .18s; }
+.boot-dots i:nth-child(3) { animation-delay: .36s; }
+
+@keyframes pulse {
+  0%, 100% { opacity: .25; transform: scale(.8); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+/* ---------------- tile picker ---------------- */
+
+#launcher {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px;
+}
+
+.launcher-title {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+  gap: 32px;
+  justify-content: center;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  aspect-ratio: 1 / 1;
+  padding: 24px;
+  border: none;
+  border-radius: 40px;
+  background: var(--tile, #3b82f6);
+  color: #fff;
+  font: inherit;
+  font-size: 30px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 14px 0 rgba(0, 0, 0, .28);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.tile svg {
+  width: 110px;
+  height: 110px;
+  fill: #fff;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .25));
+}
+
+/* A big, obvious press. Nothing subtle - a 3-year-old needs to see it react. */
+.tile:hover  { transform: translateY(-6px); box-shadow: 0 20px 0 rgba(0, 0, 0, .28); }
+.tile:active { transform: translateY(10px); box-shadow: 0 4px 0 rgba(0, 0, 0, .28); }
+.tile:focus-visible { outline: 6px solid #fff; outline-offset: 6px; }
+
+.tile.is-busy { opacity: .55; pointer-events: none; }
+
+.launcher-foot {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  opacity: .6;
+}
+
+.version { font-size: 13px; color: var(--ink-dim); }
+
+.empty-note {
+  max-width: 520px;
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
+
+/* ---------------- bar over a game ---------------- */
+
+#bar {
+  height: var(--bar-h);
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  background: var(--bg-soft);
+  border-bottom: 3px solid rgba(255, 255, 255, .08);
+}
+
+.bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 999px;
+  background: #334155;
+  color: var(--ink);
+  font: inherit;
+  font-size: 19px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .12s ease, transform .12s ease;
+}
+
+.bar-btn:hover  { background: #475569; }
+.bar-btn:active { transform: scale(.95); }
+.bar-btn:focus-visible { outline: 4px solid var(--accent); outline-offset: 3px; }
+
+/* Back is the one button the kid is meant to use, so it is the loud one. */
+.bar-btn--home { background: var(--accent); color: #082f49; padding: 0 28px; font-size: 21px; }
+.bar-btn--home:hover { background: #7dd3fc; }
+
+/* Exit is deliberately small, grey and off in the corner. */
+.bar-btn--exit { width: 52px; padding: 0; justify-content: center; background: #1e293b; color: var(--ink-dim); }
+.bar-btn--exit:hover { background: var(--danger); color: #fff; }
+
+.bar-icon { width: 26px; height: 26px; }
+
+.bar-mid {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.badge {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, .15);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ---------------- grown-up gate ---------------- */
+
+#gate {
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(15, 23, 42, .97);
+}
+
+.gate-card {
+  width: min(520px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 36px;
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+  text-align: center;
+}
+
+#gate-title { margin: 0 0 10px; font-size: 28px; }
+
+.gate-hint { margin: 0 0 22px; font-size: 17px; color: var(--ink-dim); line-height: 1.5; }
+#gate-prompt { font-size: 34px; font-weight: 800; color: var(--ink); }
+
+.hold-btn {
+  position: relative;
+  width: 200px; height: 200px;
+  border: none; border-radius: 50%;
+  background: #334155;
+  color: var(--ink);
+  font: inherit; font-size: 24px; font-weight: 800;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.hold-btn:focus-visible { outline: 5px solid var(--accent); outline-offset: 5px; }
+
+/* Fills from the bottom as the button is held. */
+.hold-fill {
+  position: absolute; inset: auto 0 0 0;
+  height: 0;
+  background: var(--accent);
+  transition: height 80ms linear;
+}
+
+.hold-label { position: relative; z-index: 1; }
+
+.gate-input {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 3px solid #334155;
+  border-radius: 16px;
+  background: #0f172a;
+  color: var(--ink);
+  font: inherit; font-size: 30px; font-weight: 800;
+  text-align: center;
+  letter-spacing: 4px;
+}
+
+.gate-input:focus { outline: none; border-color: var(--accent); }
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.key {
+  padding: 16px 0;
+  border: none; border-radius: 14px;
+  background: #334155; color: var(--ink);
+  font: inherit; font-size: 24px; font-weight: 700;
+  cursor: pointer;
+}
+.key:hover  { background: #475569; }
+.key:active { transform: scale(.95); }
+.key--wide  { grid-column: span 1; font-size: 18px; }
+.key--ok    { background: var(--accent); color: #082f49; }
+
+.gate-error { min-height: 24px; margin: 14px 0 0; color: var(--danger); font-size: 16px; font-weight: 700; }
+
+.choice-stack { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+
+.choice-btn {
+  padding: 20px 24px;
+  border: none; border-radius: 18px;
+  background: #334155; color: var(--ink);
+  font: inherit; font-size: 20px; font-weight: 800;
+  cursor: pointer;
+  transition: transform .1s ease, background .12s ease;
+}
+.choice-btn:hover  { background: #475569; }
+.choice-btn:active { transform: scale(.97); }
+.choice-btn--quit  { background: var(--danger); color: #450a0a; }
+.choice-btn--quit:hover { background: #fca5a5; }
+
+.gate-actions { margin-top: 26px; }
+
+.ghost-btn {
+  padding: 12px 22px;
+  border: 2px solid #475569; border-radius: 999px;
+  background: transparent; color: var(--ink-dim);
+  font: inherit; font-size: 15px; font-weight: 600;
+  cursor: pointer;
+}
+.ghost-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.parent-info {
+  margin-top: 26px; padding-top: 20px;
+  border-top: 1px solid #334155;
+  text-align: left; font-size: 14px; color: var(--ink-dim); line-height: 1.6;
+}
+.parent-info summary { cursor: pointer; font-weight: 700; color: var(--ink); margin-bottom: 12px; }
+.parent-info code { padding: 2px 6px; border-radius: 5px; background: #0f172a; color: var(--accent); }
+.path { word-break: break-all; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+
+/* ---------------- toast ---------------- */
+
+.toast {
+  position: fixed;
+  left: 50%; bottom: 34px;
+  transform: translateX(-50%);
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: #1e293b;
+  color: var(--ink);
+  font-size: 17px; font-weight: 700;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, .5);
+  z-index: 50;
+}
+
+/* In "playing" the view is 72px tall; a toast would be clipped anyway. */
+[data-mode="playing"] .toast { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

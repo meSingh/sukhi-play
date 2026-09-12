@@ -1,0 +1,433 @@
+'use strict';
+
+const path = require('node:path');
+const crypto = require('node:crypto');
+const { app, session, ipcMain, Menu, shell: electronShell } = require('electron');
+
+const settingsStore = require('./settings');
+const catalogStore = require('./catalog');
+const security = require('./security');
+const shortcuts = require('./shortcuts');
+const { Shell } = require('./windowing');
+
+const IS_DEV = process.argv.includes('--dev');
+const SESSION_PARTITION = 'persist:sukhi-kidzone';
+
+// `--check[=appId]` opens an app, watches it for a few seconds, then prints
+// which hosts it actually needed and what was cut, and exits. Run it after
+// adding a site to catalog.json to see whether the allowlist is right.
+const CHECK_ARG = process.argv.find((a) => a === '--check' || a.startsWith('--check='));
+const CHECK_MODE = Boolean(CHECK_ARG);
+const CHECK_APP_ID = CHECK_ARG && CHECK_ARG.includes('=') ? CHECK_ARG.split('=')[1] : null;
+const CHECK_SECONDS = Number(process.env.CHECK_SECONDS || 14);
+
+// --- one instance only ------------------------------------------------------
+// Two copies of a kiosk app fighting over always-on-top is a bad time.
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+  process.exit(0);
+}
+
+// No application menu means no Cmd+Q / Ctrl+W accelerators wired up by Electron,
+// and no menu bar for a small person to discover.
+Menu.setApplicationMenu(null);
+
+// Chromium-level hardening, applied before anything loads.
+app.commandLine.appendSwitch('disable-features', 'Translate,MediaRouter,AutofillServerCommunication');
+app.enableSandbox();
+
+let shellApp = null;
+let policy = null;
+let settings = null;
+let catalog = null;
+let paths = {};
+
+// --- the grown-up gate ------------------------------------------------------
+
+/**
+ * Gate state lives only in the main process. The page animates the hold button,
+ * but it is this clock that decides whether the hold actually happened, and any
+ * PIN is compared here -- so there is nothing in the page to read or fake.
+ */
+const gate = {
+  openedAt: 0,
+  wrongAttempts: 0,
+  lockedUntil: 0,
+  // Set once the grown-up has answered correctly. Quitting is only honoured
+  // while this is true, and it expires so a solved gate left open on the couch
+  // does not stay solved.
+  unlockedUntil: 0
+};
+
+const UNLOCK_WINDOW_MS = 90_000;
+
+function isUnlocked () {
+  return Date.now() < gate.unlockedUntil;
+}
+
+/**
+ * In 'hold' mode the press-and-hold IS the check, so the elapsed time is
+ * measured here rather than taken on trust from the page. The renderer animates
+ * the button; the main process decides whether the hold really happened.
+ */
+function holdSatisfied () {
+  if (!gate.openedAt) return false;
+  const required = settings.holdSeconds * 1000;
+  // A small tolerance for the renderer's animation frame timing.
+  return (Date.now() - gate.openedAt) >= (required - 250);
+}
+
+function checkPin (given) {
+  const now = Date.now();
+  if (now < gate.lockedUntil) {
+    const seconds = Math.ceil((gate.lockedUntil - now) / 1000);
+    return { ok: false, message: `Wait ${seconds}s and try again.` };
+  }
+  if (!settings.pin) return { ok: false, message: 'No PIN is set.' };
+
+  const expected = Buffer.from(settings.pin, 'utf8');
+  const actual = Buffer.from(String(given).trim(), 'utf8');
+  const match = expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+
+  if (match) {
+    gate.wrongAttempts = 0;
+    gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+    return { ok: true };
+  }
+
+  gate.wrongAttempts += 1;
+  if (gate.wrongAttempts >= 3) {
+    gate.wrongAttempts = 0;
+    gate.lockedUntil = Date.now() + 10_000;
+    return { ok: false, message: 'Too many tries. Wait 10 seconds.', locked: true };
+  }
+  return { ok: false, message: 'Not quite. Try again.' };
+}
+
+function quitForReal () {
+  console.log('[quit] grown-up confirmed, closing down');
+  shortcuts.releaseAll();
+  if (!shellApp) return app.exit(0);
+  shellApp.allowQuit = true;
+  shellApp.destroyGameView();
+  // app.quit() runs the close handlers; if anything refuses, exit anyway so a
+  // confirmed quit can never turn into "it just went back to the games".
+  app.quit();
+  setTimeout(() => app.exit(0), 1500);
+}
+
+// --- focus guard ------------------------------------------------------------
+
+/**
+ * Pulls the window back to the front if the kid clicks away. Self-disables if it
+ * ever starts fighting with another window, so a focus loop can never make the
+ * machine unusable -- the parent can still reach the exit gate either way.
+ */
+function installFocusGuard (win) {
+  let recentRefocuses = [];
+  let disabled = false;
+
+  win.on('blur', () => {
+    if (disabled || IS_DEV) return;
+    if (!settings.refocusOnBlur) return;
+    if (!shellApp || shellApp.mode === 'gate') return;
+
+    const now = Date.now();
+    recentRefocuses = recentRefocuses.filter((t) => now - t < 10_000);
+    if (recentRefocuses.length >= 15) {
+      disabled = true;
+      console.warn('[focus] refocus guard disabled: too many refocuses in 10s');
+      return;
+    }
+    recentRefocuses.push(now);
+
+    setTimeout(() => {
+      if (!win.isDestroyed() && !win.isFocused()) {
+        win.show();
+        win.focus();
+      }
+    }, 120);
+  });
+}
+
+// --- ipc --------------------------------------------------------------------
+
+function findApp (appId) {
+  return catalog.apps.find((a) => a.id === appId && a.enabled) || null;
+}
+
+function registerIpc () {
+  ipcMain.handle('shell:ready', () => ({
+    apps: catalog.apps.filter((a) => a.enabled).map(({ id, title, shape, color }) => ({ id, title, shape, color })),
+    state: shellApp.state(),
+    settings: {
+      holdSeconds: settings.holdSeconds,
+      gateMode: settings.gateMode,
+      showBlockCounter: settings.showBlockCounter
+    },
+    version: app.getVersion(),
+    paths,
+    catalogSource: catalog.source,
+    isDev: IS_DEV,
+    checkMode: CHECK_MODE
+  }));
+
+  ipcMain.handle('shell:launch', (_e, appId) => {
+    const entry = findApp(appId);
+    if (!entry) return { ok: false, message: 'That is not on the list.' };
+    console.log(`[launch] ${entry.id} -> ${entry.url}`);
+    return shellApp.launch(entry);
+  });
+
+  ipcMain.handle('shell:go-home', () => shellApp.goHome());
+
+  ipcMain.handle('shell:open-gate', (_e, intent) => {
+    gate.wrongAttempts = 0;
+    gate.openedAt = Date.now();
+    return shellApp.openGate(intent);
+  });
+
+  ipcMain.handle('shell:close-gate', () => {
+    gate.openedAt = 0;
+    gate.unlockedUntil = 0;
+    return shellApp.closeGate();
+  });
+
+  ipcMain.handle('shell:complete-hold', () => {
+    if (shellApp.mode !== 'gate') return { ok: false, message: 'not at the gate' };
+    if (!holdSatisfied()) {
+      return { ok: false, message: 'Hold the button a little longer.' };
+    }
+    if (settings.gateMode === 'pin') {
+      return { ok: true, needsPin: true, prompt: 'Enter the parent PIN' };
+    }
+    // Holding is the whole check. Unlock, but decide nothing: the grown-up
+    // picks "close" or "back to the games" next.
+    gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+    return { ok: true, unlocked: true };
+  });
+
+  ipcMain.handle('shell:answer-gate', (_e, answer) => {
+    if (shellApp.mode !== 'gate') return { ok: false, message: 'not at the gate' };
+    if (settings.gateMode !== 'pin') return { ok: false, message: 'no PIN required' };
+    if (!holdSatisfied()) return { ok: false, message: 'Hold the button first.' };
+    const result = checkPin(answer);
+    if (result.ok) return { ok: true, action: 'unlocked' };
+    return result;
+  });
+
+  ipcMain.handle('shell:quit', () => {
+    if (!isUnlocked()) return { ok: false, message: 'not unlocked' };
+    gate.unlockedUntil = 0;
+    setTimeout(quitForReal, 80);
+    return { ok: true };
+  });
+
+  ipcMain.handle('shell:go-home-unlocked', () => {
+    if (!isUnlocked()) return { ok: false, message: 'not unlocked' };
+    gate.unlockedUntil = 0;
+    shellApp.closeGateAndGoHome();
+    return { ok: true };
+  });
+
+  ipcMain.handle('shell:open-config-folder', () => {
+    if (!isUnlocked()) return { ok: false, message: 'not unlocked' };
+    // The one place a real OS action is wanted, and it only ever opens the
+    // app's own settings folder -- never a URL from a page.
+    electronShell.openPath(paths.userData);
+    return { ok: true };
+  });
+}
+
+// --- allowlist check ---------------------------------------------------------
+
+function reportOne (entry) {
+  const { allowed, blocked } = policy.seenHosts;
+  const counts = policy.counts;
+  const pad = (n) => String(n).padStart(5);
+
+  console.log(`\n  == ${entry.id} ==\n`);
+  console.log(`  LOADED (${allowed.length} hosts)`);
+  if (!allowed.length) console.log('    (nothing loaded - is the allowlist too tight, or is the machine offline?)');
+  for (const [host, n] of allowed) console.log(`  ${pad(n)}  ${host}`);
+
+  console.log(`\n  BLOCKED (${blocked.length} hosts)`);
+  for (const [host, n, sample] of blocked.slice(0, 40)) {
+    console.log(`  ${pad(n)}  ${host}`);
+    if (sample) console.log(`         ${sample.slice(0, 110)}`);
+  }
+  if (blocked.length > 40) console.log(`         ...and ${blocked.length - 40} more`);
+
+  console.log(`\n  ads:${counts.ads}  off-list:${counts.offlist}  popups:${counts.popups}` +
+              `  navigations:${counts.navigations}  downloads:${counts.downloads}`);
+}
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function runCheck () {
+  const enabled = catalog.apps.filter((a) => a.enabled);
+  let entries;
+
+  if (CHECK_APP_ID === 'all') {
+    entries = enabled;
+  } else if (CHECK_APP_ID) {
+    const found = catalog.apps.find((a) => a.id === CHECK_APP_ID);
+    entries = found ? [found] : [];
+  } else {
+    entries = enabled.slice(0, 1);
+  }
+
+  if (!entries.length) {
+    console.error(`\n  No app to check${CHECK_APP_ID ? ` with id "${CHECK_APP_ID}"` : ''}.`);
+    console.error(`  Available: ${catalog.apps.map((a) => a.id).join(', ')}\n`);
+    shellApp.allowQuit = true;
+    return app.exit(1);
+  }
+
+  // Switching between games is exactly the path that used to fall over, so
+  // checking several in a row is also the regression test for it.
+  const problems = [];
+
+  for (const entry of entries) {
+    console.log(`\n  Checking "${entry.title}" (${entry.url})`);
+    console.log(`  Watching for ${CHECK_SECONDS} seconds...`);
+    shellApp.launch(entry);
+
+    await wait(CHECK_SECONDS * 1000);
+
+    // If the app bounced back to the tiles on its own, that is the bug the
+    // child experiences as a crash.
+    if (shellApp.mode !== 'playing') {
+      problems.push(`${entry.id}: dropped out of the game by itself (mode=${shellApp.mode})`);
+    }
+    if (shellApp.activeAppId !== entry.id) {
+      problems.push(`${entry.id}: active app changed to ${shellApp.activeAppId}`);
+    }
+    // Games are keyboard-driven: if our bar holds focus instead of the game,
+    // arrow keys and WASD go nowhere and the game looks frozen.
+    const gc = shellApp.gameContents;
+    const keyboardOnGame = Boolean(gc && gc.isFocused());
+    if (!keyboardOnGame) {
+      problems.push(`${entry.id}: keyboard focus is NOT on the game (arrow keys/WASD would not work)`);
+    }
+    reportOne(entry);
+    console.log(`\n  keyboard focus on game: ${keyboardOnGame ? 'yes' : 'NO'}`);
+  }
+
+  if (entries.length > 1) {
+    console.log(`\n  == switching ==\n`);
+    if (problems.length) {
+      for (const p of problems) console.log(`  PROBLEM  ${p}`);
+    } else {
+      console.log(`  ok  played ${entries.length} games back to back, stayed in the game each time`);
+    }
+  }
+
+  console.log('\n  If the app looked broken, add the host it needed to allowHosts in catalog.json.\n');
+
+  shortcuts.releaseAll();
+  shellApp.allowQuit = true;
+  app.exit(problems.length ? 1 : 0);
+}
+
+// --- boot -------------------------------------------------------------------
+
+app.whenReady().then(() => {
+  paths = {
+    userData: app.getPath('userData'),
+    catalog: null,
+    settings: null
+  };
+
+  const loadedSettings = settingsStore.load(paths.userData);
+  settings = loadedSettings.settings;
+  paths.settings = loadedSettings.file;
+
+  catalog = catalogStore.load({
+    userDataDir: paths.userData,
+    bundledPath: path.join(__dirname, '..', '..', 'config', 'catalog.json')
+  });
+  paths.catalog = catalog.file;
+
+  console.log(`[boot] ${catalog.apps.length} apps from ${catalog.source} catalog`);
+  console.log(`[boot] config folder: ${paths.userData}`);
+
+  policy = security.createPolicy();
+  security.installGlobalHardening(app, () => policy);
+
+  const kidSession = session.fromPartition(SESSION_PARTITION);
+  security.configureSession(kidSession, policy, {
+    onBlocked: () => {
+      if (shellApp) shellApp.pushState();
+    }
+  });
+
+  shellApp = new Shell({
+    policy,
+    settings,
+    session: kidSession,
+    isDev: IS_DEV,
+    checkMode: CHECK_MODE
+  });
+
+  const win = shellApp.create();
+  installFocusGuard(win);
+  registerIpc();
+
+  // Swallow F-keys, Mission Control, Cmd+Q/W/M and the rest at the OS level,
+  // but only while this window is in front. Disabled in dev so the machine
+  // stays usable while working on the app.
+  shortcuts.install(win, {
+    enabled: !IS_DEV && !CHECK_MODE,
+    onParentEscape: () => shellApp.openGate('exit')
+  });
+
+  if (CHECK_MODE) {
+    // Wait for the renderer to finish booting before launching anything:
+    // otherwise its splash timer calls goHome() and tears down the very view
+    // we are trying to measure.
+      ipcMain.once('shell:renderer-idle', () => setTimeout(() => { runCheck(); }, 200));
+    return;
+  }
+
+  // Closing the window is a quit request, and quit requests go to the gate.
+  win.on('close', (event) => {
+    if (shellApp.allowQuit) return;
+    event.preventDefault();
+    shellApp.openGate('quit');
+  });
+
+  shellApp.setMode('boot');
+});
+
+app.on('before-quit', (event) => {
+  if (CHECK_MODE) return;
+  if (shellApp && !shellApp.allowQuit) {
+    event.preventDefault();
+    shellApp.openGate('quit');
+  }
+});
+
+app.on('second-instance', () => {
+  if (shellApp && shellApp.win && !shellApp.win.isDestroyed()) {
+    shellApp.win.show();
+    shellApp.win.focus();
+  }
+});
+
+app.on('will-quit', () => {
+  // Never leave the machine with keys held hostage after we exit.
+  shortcuts.releaseAll();
+});
+
+app.on('window-all-closed', () => {
+  app.quit();
+});
+
+// Never let a page talk the app into opening something in the real browser.
+app.on('web-contents-created', (_e, contents) => {
+  contents.on('will-navigate', (event, url) => {
+    if (url.startsWith('file://') || url.startsWith('http')) return;
+    event.preventDefault();
+  });
+});

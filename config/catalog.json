@@ -1,0 +1,60 @@
+{
+  "$comment": [
+    "THE LIST OF THINGS YOUR CHILD MAY OPEN.",
+    "",
+    "Every entry below ships with \"enabled\": false on purpose. Sukhi Play does",
+    "not choose destinations for you and does not endorse any site. You decide",
+    "where it may go, and you are responsible for complying with each site's",
+    "terms of service. Please read DISCLAIMER.md.",
+    "",
+    "TO TURN SOMETHING ON: set \"enabled\": true, then restart the app.",
+    "TO CHECK IT WORKS:   npm run check -- --check=<id>",
+    "",
+    "The entries below are examples. Their allowHosts lists are a starting point,",
+    "not a guarantee - run the check above and add whatever host it reports.",
+    "",
+    "FIELDS",
+    "  id           unique short name, no spaces",
+    "  title        caption under the tile",
+    "  url          the page that opens",
+    "  shape        star | rocket | ball | blocks | note | leaf | drop | bolt",
+    "  color        tile colour, #rrggbb",
+    "  allowHosts   ONLY these hosts may load anything. Everything else is cut.",
+    "               'example.com' also covers 'a.example.com', never 'evil-example.com'.",
+    "  denyHosts    overrides allowHosts, for ad subdomains of an allowed domain",
+    "  enabled      true to show the tile"
+  ],
+
+  "apps": [
+    {
+      "id": "example-games",
+      "title": "Games",
+      "url": "https://example.com/",
+      "shape": "rocket",
+      "color": "#3b82f6",
+      "enabled": false,
+      "allowHosts": ["example.com"],
+      "denyHosts": []
+    },
+    {
+      "id": "example-learning",
+      "title": "Learning",
+      "url": "https://example.org/",
+      "shape": "blocks",
+      "color": "#10b981",
+      "enabled": false,
+      "allowHosts": ["example.org"],
+      "denyHosts": []
+    },
+    {
+      "id": "example-music",
+      "title": "Music",
+      "url": "https://example.net/",
+      "shape": "note",
+      "color": "#ec4899",
+      "enabled": false,
+      "allowHosts": ["example.net"],
+      "denyHosts": []
+    }
+  ]
+}
