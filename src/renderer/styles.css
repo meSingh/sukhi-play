@@ -566,87 +566,74 @@ img, svg { -webkit-user-drag: none; }
 }
 .ghost-btn:hover { border-color: var(--blue); color: var(--blue); }
 
-/* --- the grown-up menu --- */
+/* --- the grown-up panel --- */
 
 .gate-head {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
 .gate-mark { width: 52px; height: 52px; flex: none; }
 
-.menu { display: flex; flex-direction: column; gap: 10px; }
-
-/* A visible gap before the one action that cannot be undone. */
-.menu--last {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid #EDEBF8;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-  padding: 17px 20px;
-  border: 2px solid #EDEBF8;
-  border-radius: 20px;
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color .14s ease, background .14s ease, transform .12s ease;
-}
-.menu-item:hover  { border-color: var(--blue); background: #F9F8FE; }
-.menu-item:active { transform: scale(.985); }
-.menu-item:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; }
-
-.menu-icon {
-  width: 42px; height: 42px;
-  display: grid; place-items: center;
-  border-radius: 13px;
-  background: #F0EEFB;
-  color: var(--blue);
-  flex: none;
-}
-.menu-icon svg { width: 22px; height: 22px; }
-
-.menu-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.menu-title { font-size: 17.5px; font-weight: 800; }
-.menu-sub   { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
-
-.menu-item--danger { border-color: #FFE0E6; }
-.menu-item--danger .menu-icon { background: #FFE6EC; color: var(--danger); }
-.menu-item--danger:hover {
-  border-color: var(--danger);
-  background: #FFF5F7;
-}
-.menu-item--danger:hover .menu-title { color: var(--danger); }
-
 .gate-foot {
-  margin-top: 24px;
+  margin-top: 22px;
   padding-top: 18px;
   border-top: 1px solid #EDEBF8;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  justify-content: center;
 }
 
-.lib-foot {
-  margin-top: 18px;
-  padding-top: 16px;
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.panel-titles { min-width: 0; }
+.panel-title { margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -.3px; }
+.panel-sub   { margin: 4px 0 0; font-size: 14.5px; font-weight: 600; color: var(--ink-soft); }
+
+.panel-close {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 2px solid #EDEBF8; border-radius: 50%;
+  background: var(--paper); color: var(--ink-soft);
+  cursor: pointer; flex: none;
+  transition: border-color .14s ease, color .14s ease, transform .12s ease;
+}
+.panel-close svg { width: 18px; height: 18px; }
+.panel-close:hover  { border-color: var(--ink); color: var(--ink); }
+.panel-close:active { transform: scale(.92); }
+
+.panel-foot {
+  margin-top: 20px;
+  padding-top: 18px;
   border-top: 1px solid #EDEBF8;
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 16px;
   flex-wrap: wrap;
+  text-align: left;
 }
+
+.panel-meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+.link-btn {
+  padding: 0;
+  border: none; background: none;
+  color: var(--blue);
+  font: inherit; font-size: 13.5px; font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+.link-btn:hover { text-decoration: underline; }
 
 .lib-path {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -655,10 +642,65 @@ img, svg { -webkit-user-drag: none; }
   word-break: break-all;
 }
 
+/* Quitting is separated from everything else and is the only red thing here. */
+.btn-danger {
+  padding: 12px 22px;
+  border: 2px solid #FFE0E6; border-radius: 999px;
+  background: var(--paper); color: var(--danger);
+  font: inherit; font-size: 14.5px; font-weight: 800;
+  cursor: pointer; flex: none;
+  transition: background .14s ease, color .14s ease, border-color .14s ease;
+}
+.btn-danger:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn-danger:disabled { opacity: .6; cursor: default; }
 
+/* --- a real switch, so state and action are both visible --- */
 
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  flex: none;
+}
 
+.switch input {
+  position: absolute;
+  width: 1px; height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
 
+.switch-track {
+  position: relative;
+  width: 46px; height: 27px;
+  border-radius: 999px;
+  background: #D9D5EC;
+  transition: background .16s ease;
+  flex: none;
+}
+
+.switch-knob {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 21px; height: 21px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(23, 21, 58, .3);
+  transition: transform .16s cubic-bezier(.34, 1.4, .64, 1);
+}
+
+.switch input:checked + .switch-track { background: var(--mint); }
+.switch input:checked + .switch-track .switch-knob { transform: translateX(19px); }
+.switch input:focus-visible + .switch-track { outline: 3px solid var(--blue); outline-offset: 3px; }
+.switch input:disabled + .switch-track { opacity: .6; }
+
+.switch-text {
+  font-size: 13px; font-weight: 800;
+  color: var(--ink-soft);
+  min-width: 74px;
+}
+.switch input:checked ~ .switch-text { color: #0B7A5C; }
 
 /* ---------------- grown-up library ---------------- */
 
@@ -729,6 +771,15 @@ img, svg { -webkit-user-drag: none; }
 .lib-btn:hover { border-color: var(--blue); color: var(--blue); }
 .lib-btn--on { background: var(--mint); border-color: var(--mint); color: #06371f; }
 .lib-btn--danger:hover { border-color: var(--danger); color: var(--danger); }
+.lib-btn.is-armed {
+  background: var(--danger); border-color: var(--danger); color: #fff;
+  animation: nudge .3s ease;
+}
+@keyframes nudge {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-3px); }
+  75%      { transform: translateX(3px); }
+}
 .lib-btn--add { background: var(--blue); border-color: var(--blue); color: #fff; }
 .lib-btn--add:hover { color: #fff; }
 .lib-btn:disabled { opacity: .5; cursor: default; }

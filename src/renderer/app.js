@@ -27,7 +27,6 @@ const app = el('app');
 const MIN_SPLASH_MS = 1400; // long enough to read as "it is starting", not a flash
 
 let config = null;
-let gameOpen = false;
 let holdTimer = null;
 let holdStart = 0;
 let toastTimer = null;
@@ -138,8 +137,6 @@ function applyState (state) {
   // "Back" and "Stop this game" are only distinguishable if we know whether a
   // game is actually open. When none is, "stop" is meaningless and is hidden
   // rather than sitting there duplicating "back".
-  if (state.mode !== 'gate') gameOpen = Boolean(state.activeAppId);
-  applyGateLabels();
 
   if (state.mode === 'launcher') {
     for (const t of document.querySelectorAll('.tile')) t.classList.remove('is-busy');
@@ -160,51 +157,16 @@ function applyState (state) {
 
 /* ---------------- the grown-up gate ---------------- */
 
-/**
- * Names the exits after where they lead.
- *
- * There used to be "Back to the game list" and "Go back to playing" on screen
- * together, which are different actions with near-identical labels. Now there
- * is one Back, named for its destination, and Stop only appears when there is
- * something to stop.
- */
-function applyGateLabels () {
-  const back = el('gate-cancel');
-  const stop = el('choice-home');
-  if (!back || !stop) return;
-  back.textContent = gameOpen ? 'Back to the game' : 'Back to the buttons';
-  stop.hidden = !gameOpen;
-}
-
-const MENU_ICONS = {
-  grid: '<rect x="3" y="3" width="7.5" height="7.5" rx="2.4"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2.4"/>' +
-        '<rect x="3" y="13.5" width="7.5" height="7.5" rx="2.4"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2.4"/>',
-  stop: '<rect x="4.5" y="4.5" width="15" height="15" rx="4"/>',
-  power: '<path d="M12 3.2v7.6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>' +
-         '<path d="M7 6.6a7 7 0 1 0 10 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>'
-};
-
-function fillMenuIcons () {
-  for (const holder of document.querySelectorAll('.menu-icon[data-icon]')) {
-    const body = MENU_ICONS[holder.dataset.icon];
-    if (!body) continue;
-    holder.innerHTML =
-      `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${body}</svg>`;
-  }
-}
-
 function resetGate () {
   clearInterval(holdTimer);
   holdTimer = null;
   el('hold-fill').style.height = '0%';
   el('gate-step-hold').hidden = false;
   el('gate-step-answer').hidden = true;
-  el('gate-step-choice').hidden = true;
   el('gate-step-library').hidden = true;
   libCard().classList.remove('is-wide');
   el('gate-input').value = '';
   el('gate-error').textContent = '';
-  applyGateLabels();
 }
 
 function startHold () {
@@ -249,7 +211,7 @@ async function revealChallenge () {
   }
 
   // Holding was the whole check.
-  showChoices();
+  showPanel();
 }
 
 /* ---------------- first-run walkthrough ---------------- */
@@ -351,20 +313,6 @@ let probeResult = null;
 
 function libCard () { return document.querySelector('.gate-card'); }
 
-function showLibrary () {
-  el('gate-step-choice').hidden = true;
-  el('gate-step-library').hidden = false;
-  libCard().classList.add('is-wide');
-  switchTab('mine');
-  loadLibrary();
-}
-
-function hideLibrary () {
-  el('gate-step-library').hidden = true;
-  libCard().classList.remove('is-wide');
-  showChoices();
-}
-
 function switchTab (name) {
   for (const tab of document.querySelectorAll('.lib-tab')) {
     tab.classList.toggle('is-on', tab.dataset.tab === name);
@@ -435,6 +383,84 @@ function tag (text, cls) {
   return t;
 }
 
+/**
+ * A real switch for visibility, and a delete that asks first.
+ *
+ * A button reading "On" told a parent the current state but not what pressing
+ * it would do, and "Remove" is the label every site on the internet uses for
+ * everything. A switch shows state and affordance at once, and delete is
+ * irreversible so it takes two taps.
+ */
+function visibilitySwitch (app) {
+  const label = document.createElement('label');
+  label.className = 'switch';
+
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.checked = app.enabled;
+  input.setAttribute('aria-label', `Show ${app.title} to your child`);
+
+  const track = document.createElement('span');
+  track.className = 'switch-track';
+  track.appendChild(document.createElement('span')).className = 'switch-knob';
+
+  const text = document.createElement('span');
+  text.className = 'switch-text';
+  text.textContent = app.enabled ? 'On the tiles' : 'Hidden';
+
+  input.addEventListener('change', async () => {
+    input.disabled = true;
+    text.textContent = input.checked ? 'On the tiles' : 'Hidden';
+    const r = await api.updateSite(app.id, { enabled: input.checked });
+    if (!r || !r.ok) {
+      input.checked = !input.checked;
+      text.textContent = input.checked ? 'On the tiles' : 'Hidden';
+      showToast((r && r.message) || 'Could not change that.');
+    }
+    input.disabled = false;
+    loadLibrary();
+  });
+
+  label.append(input, track, text);
+  return label;
+}
+
+function deleteButton (app) {
+  let armed = false;
+  let timer = null;
+
+  const btn = button('Delete', 'lib-btn--danger', async () => {
+    if (!armed) {
+      // Nothing here is recoverable, so ask before doing it.
+      armed = true;
+      btn.textContent = 'Tap to confirm';
+      btn.classList.add('is-armed');
+      timer = setTimeout(() => {
+        armed = false;
+        btn.textContent = 'Delete';
+        btn.classList.remove('is-armed');
+      }, 4000);
+      return;
+    }
+
+    clearTimeout(timer);
+    btn.disabled = true;
+    const r = await api.removeSite(app.id);
+    if (!r || !r.ok) {
+      btn.disabled = false;
+      armed = false;
+      btn.textContent = 'Delete';
+      btn.classList.remove('is-armed');
+      showToast((r && r.message) || 'Could not delete that.');
+      return;
+    }
+    loadLibrary();
+  });
+
+  btn.title = `Delete ${app.title}`;
+  return btn;
+}
+
 function renderMine (mine) {
   const wrap = el('lib-mine');
   wrap.textContent = '';
@@ -442,7 +468,7 @@ function renderMine (mine) {
   if (!mine.length) {
     const p = document.createElement('p');
     p.className = 'lib-empty';
-    p.textContent = 'No games yet. Use "Add a site" or pick one from Suggestions.';
+    p.textContent = 'Nothing added yet. Pick something from Suggestions, or add a site by address.';
     wrap.appendChild(p);
     return;
   }
@@ -456,16 +482,7 @@ function renderMine (mine) {
       color: app.color,
       name,
       sub: `${app.url}  ·  ${app.hostCount} host${app.hostCount === 1 ? '' : 's'} allowed`,
-      actions: [
-        button(app.enabled ? 'On' : 'Off', app.enabled ? 'lib-btn--on' : '', async () => {
-          await api.updateSite(app.id, { enabled: !app.enabled });
-          loadLibrary();
-        }),
-        button('Remove', 'lib-btn--danger', async () => {
-          await api.removeSite(app.id);
-          loadLibrary();
-        })
-      ]
+      actions: [visibilitySwitch(app), deleteButton(app)]
     }));
   }
 }
@@ -590,13 +607,22 @@ async function checkSite () {
   out.appendChild(nameRow);
 }
 
-function showChoices () {
+/**
+ * Unlocking opens the panel directly.
+ *
+ * Managing games is the only reason a parent comes here often, so a menu whose
+ * two options were "manage games" and "quit" was a screen that existed to be
+ * clicked through. Quit now lives at the bottom of the panel, separated.
+ */
+function showPanel () {
   el('gate-error').textContent = '';
   el('gate-step-hold').hidden = true;
   el('gate-step-answer').hidden = true;
-  el('gate-step-choice').hidden = false;
-  applyGateLabels();
-  el('choice-library').focus();
+  el('gate-step-library').hidden = false;
+  libCard().classList.add('is-wide');
+  switchTab('mine');
+  loadLibrary();
+  el('lib-done').focus();
 }
 
 async function submitAnswer () {
@@ -605,7 +631,7 @@ async function submitAnswer () {
   const result = await api.answerGate(value);
   if (result && result.ok) {
     // Unlocking decides nothing by itself. The grown-up picks what happens next.
-    showChoices();
+    showPanel();
     return;
   }
   el('gate-input').value = '';
@@ -681,16 +707,18 @@ function wire () {
   on('open-config', 'click', () => api.openConfigFolder());
 
   on('choice-quit', 'click', async () => {
-    el('choice-quit').textContent = 'Closing...';
+    const btn = el('choice-quit');
+    btn.disabled = true;
+    btn.textContent = 'Quitting…';
     const r = await api.quitApp();
     if (!r || !r.ok) {
-      el('choice-quit').textContent = 'Close Sukhi Play';
-      el('gate-error').textContent = (r && r.message) || 'Could not close.';
+      btn.disabled = false;
+      btn.textContent = 'Quit Sukhi Play';
+      showToast((r && r.message) || 'Could not quit.');
     }
   });
-  on('choice-home', 'click', () => api.goHomeUnlocked());
-  on('choice-library', 'click', showLibrary);
-  on('lib-done', 'click', hideLibrary);
+  on('lib-done', 'click', () => api.closeGate());
+  on('gate-cancel-pin', 'click', () => api.closeGate());
   on('lib-check', 'click', checkSite);
   on('lib-url', 'keydown', (e) => { if (e.key === 'Enter') checkSite(); });
   for (const tab of document.querySelectorAll('.lib-tab')) {
@@ -708,8 +736,6 @@ function wire () {
   });
 
   buildKeypad();
-  fillMenuIcons();
-  applyGateLabels();
 
   api.on('state', applyState);
   api.on('apps', (payload) => renderTiles(payload.apps || []));

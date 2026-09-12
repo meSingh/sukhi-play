@@ -483,16 +483,6 @@ class Shell {
     return { ok: true };
   }
 
-  /** Leave the gate and return to the tile screen, closing any open game. */
-  closeGateAndGoHome () {
-    if (this.gameView && !this.gameView.webContents.isDestroyed()) {
-      this.gameView.webContents.setAudioMuted(false);
-    }
-    this.previousMode = 'launcher';
-    this.goHome();
-    return { ok: true };
-  }
-
   toast (message) {
     if (!this.shellView || this.shellView.webContents.isDestroyed()) return;
     this.shellView.webContents.send('shell:toast', { message });

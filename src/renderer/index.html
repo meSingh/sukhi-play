@@ -180,61 +180,56 @@
   <!-- ============ grown-ups only ============ -->
   <section id="gate" class="screen">
     <div class="gate-card">
-      <header class="gate-head">
-        <img class="gate-mark" src="assets/mascot.png" alt="" width="512" height="512">
-        <h2 id="gate-title">Grown-ups only</h2>
-      </header>
 
+      <!-- Locked. One way in, one way out. -->
       <div id="gate-step-hold">
+        <header class="gate-head">
+          <img class="gate-mark" src="assets/mascot.png" alt="" width="512" height="512">
+          <h2 id="gate-title">Grown-ups only</h2>
+        </header>
         <p class="gate-hint">Press and hold for <strong id="hold-secs">3</strong> seconds.</p>
         <button id="hold-btn" class="hold-btn" type="button">
           <span class="hold-fill" id="hold-fill"></span>
           <span class="hold-label">Hold</span>
         </button>
+        <p class="gate-error" id="gate-error" role="status"></p>
+        <footer class="gate-foot">
+          <button id="gate-cancel" class="ghost-btn" type="button">Cancel</button>
+        </footer>
       </div>
 
+      <!-- Optional PIN, when one is set. -->
       <div id="gate-step-answer" hidden>
+        <header class="gate-head">
+          <h2>Enter your PIN</h2>
+        </header>
         <p class="gate-hint" id="gate-prompt">Enter the parent PIN</p>
         <input id="gate-input" class="gate-input" type="text" inputmode="numeric"
-               autocomplete="off" spellcheck="false" aria-label="Answer">
+               autocomplete="off" spellcheck="false" aria-label="PIN">
         <div class="keypad" id="keypad"></div>
+        <footer class="gate-foot">
+          <button id="gate-cancel-pin" class="ghost-btn" type="button">Cancel</button>
+        </footer>
       </div>
 
-      <!-- One list, ordered by how often a parent needs each thing, with the
-           irreversible one last and visually separated. -->
-      <div id="gate-step-choice" hidden>
-        <div class="menu">
-          <button id="choice-library" class="menu-item" type="button">
-            <span class="menu-icon" data-icon="grid" aria-hidden="true"></span>
-            <span class="menu-text">
-              <span class="menu-title">Manage games</span>
-              <span class="menu-sub">Add, remove, or turn them on and off</span>
-            </span>
-          </button>
-
-          <button id="choice-home" class="menu-item" type="button" hidden>
-            <span class="menu-icon" data-icon="stop" aria-hidden="true"></span>
-            <span class="menu-text">
-              <span class="menu-title">Stop this game</span>
-              <span class="menu-sub">Go back to the picture buttons</span>
-            </span>
-          </button>
-        </div>
-
-        <div class="menu menu--last">
-          <button id="choice-quit" class="menu-item menu-item--danger" type="button">
-            <span class="menu-icon" data-icon="power" aria-hidden="true"></span>
-            <span class="menu-text">
-              <span class="menu-title">Close Sukhi Play</span>
-              <span class="menu-sub">Quit the app completely</span>
-            </span>
-          </button>
-        </div>
-      </div>
-
+      <!-- Unlocked. Straight into the panel: managing games is what a parent
+           came here to do, so it is not hidden behind a menu of two items. -->
       <div id="gate-step-library" hidden>
+        <header class="panel-head">
+          <div class="panel-titles">
+            <h2 class="panel-title">Parent settings</h2>
+            <p class="panel-sub">Choose what <span id="panel-kid">your child</span> can open.</p>
+          </div>
+          <button id="lib-done" class="panel-close" type="button" aria-label="Done">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor"
+                    stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </header>
+
         <div class="lib-tabs" role="tablist">
-          <button class="lib-tab is-on" data-tab="mine" type="button">My games</button>
+          <button class="lib-tab is-on" data-tab="mine" type="button">Games</button>
           <button class="lib-tab" data-tab="add" type="button">Add a site</button>
           <button class="lib-tab" data-tab="suggest" type="button">Suggestions</button>
         </div>
@@ -243,9 +238,9 @@
 
         <div id="lib-add" class="lib-pane" hidden>
           <p class="lib-help">
-            Type a web address. Sukhi Play will open it once, watch what it
-            loads, and work out which hosts it needs. Nothing is saved until you
-            press Add.
+            Type a web address. Sukhi Play opens it once, watches what it loads,
+            and works out which hosts it needs. Nothing is saved until you press
+            Add.
           </p>
           <div class="lib-row">
             <input id="lib-url" class="lib-input" type="text" inputmode="url"
@@ -264,19 +259,15 @@
           <div id="lib-suggest-list"></div>
         </div>
 
-        <footer class="lib-foot">
-          <button id="lib-done" class="ghost-btn" type="button">Done</button>
-          <button id="open-config" class="ghost-btn" type="button">Open settings folder</button>
-          <span class="lib-path" id="config-path"></span>
+        <footer class="panel-foot">
+          <div class="panel-meta">
+            <button id="open-config" class="link-btn" type="button">Settings folder</button>
+            <span class="lib-path" id="config-path"></span>
+          </div>
+          <button id="choice-quit" class="btn-danger" type="button">Quit Sukhi Play</button>
         </footer>
       </div>
 
-      <!-- The single way back. Its label says where "back" goes, so it can
-           never be confused with "stop this game". -->
-      <footer class="gate-foot">
-        <p class="gate-error" id="gate-error" role="status"></p>
-        <button id="gate-cancel" class="ghost-btn" type="button">Back</button>
-      </footer>
     </div>
   </section>
 

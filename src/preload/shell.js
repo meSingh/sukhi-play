@@ -37,9 +37,6 @@ contextBridge.exposeInMainWorld('sukhi', {
   /** Close the whole app. Only works after the gate has been answered. */
   quitApp: () => ipcRenderer.invoke('shell:quit'),
 
-  /** Leave the gate for the tile screen. Only works after the gate is answered. */
-  goHomeUnlocked: () => ipcRenderer.invoke('shell:go-home-unlocked'),
-
   /** Enter the first-run walkthrough. */
   beginOnboarding: () => ipcRenderer.invoke('shell:begin-onboarding'),
 

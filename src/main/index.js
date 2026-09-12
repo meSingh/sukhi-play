@@ -269,13 +269,6 @@ function registerIpc () {
     return { ok: true };
   });
 
-  ipcMain.handle('shell:go-home-unlocked', () => {
-    if (!isUnlocked()) return { ok: false, message: 'not unlocked' };
-    gate.unlockedUntil = 0;
-    shellApp.closeGateAndGoHome();
-    return { ok: true };
-  });
-
   // ---- the grown-up library. Every handler needs an unlocked gate. ----
 
   const locked = () => ({ ok: false, message: 'Not unlocked.' });
