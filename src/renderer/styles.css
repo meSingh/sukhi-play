@@ -47,7 +47,8 @@
   --drop-press: 0 2px 0 rgba(23, 21, 58, .14), 0 6px 14px rgba(23, 21, 58, .1);
 
   --font: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", "Nunito",
-          "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+          "Segoe UI Variable", "Segoe UI", "Ubuntu", "Cantarell", "Noto Sans",
+          "DejaVu Sans", system-ui, -apple-system, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -679,6 +680,10 @@ img, svg { -webkit-user-drag: none; }
 }
 
 .card {
+  /* A button sizes itself to its content, so outside a grid these collapsed
+     and the "Add" label spilled past the border. */
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -710,7 +715,11 @@ img, svg { -webkit-user-drag: none; }
   font-size: 15.5px; font-weight: 800;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.card-meta { font-size: 11.5px; font-weight: 700; color: var(--ink-faint); }
+.card-meta {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 700; color: var(--ink-faint);
+}
+.card-meta .lib-tag { margin-left: 0; }
 
 .card-state {
   font-size: 12.5px; font-weight: 900;
@@ -954,7 +963,17 @@ img, svg { -webkit-user-drag: none; }
 .ob-choice-title { font-size: 19px; font-weight: 900; }
 .ob-choice-sub   { font-size: 14px; opacity: .82; }
 
-.ob-list { max-height: 40vh; overflow-y: auto; text-align: left; margin-bottom: 8px; }
+.ob-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 40vh;
+  overflow-y: auto;
+  text-align: left;
+  margin-bottom: 8px;
+  /* Room for the scrollbar so it cannot sit on top of the Add labels. */
+  padding-right: 6px;
+}
 
 .ob-actions {
   display: flex; align-items: center; justify-content: space-between;

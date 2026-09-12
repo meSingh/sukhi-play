@@ -1,7 +1,7 @@
 {
   "name": "sukhi-play",
   "productName": "Sukhi Play",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A locked-down, ad-free kiosk browser that lets a small child open only the sites you choose.",
   "main": "src/main/index.js",
   "private": true,

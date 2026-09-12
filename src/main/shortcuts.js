@@ -3,6 +3,21 @@
 const { globalShortcut } = require('electron');
 
 /**
+ * Whether the OS will actually hand over keys.
+ *
+ * Electron's globalShortcut is an X11 facility. Under Wayland, which is the
+ * default on current Ubuntu and Fedora, registration reports success and then
+ * nothing is intercepted, which is worse than failing outright because the log
+ * claims the keyboard is held when it is not. Said plainly here instead.
+ */
+function sessionCanHoldKeys () {
+  if (process.platform !== 'linux') return { ok: true, session: process.platform };
+  const type = (process.env.XDG_SESSION_TYPE || '').toLowerCase();
+  const wayland = type === 'wayland' || Boolean(process.env.WAYLAND_DISPLAY);
+  return { ok: !wayland, session: wayland ? 'wayland' : (type || 'x11') };
+}
+
+/**
  * OS-level shortcut blocking.
  *
  * `before-input-event` only sees keys that actually reach the web page. On macOS
@@ -95,7 +110,17 @@ function acquire ({ onParentEscape } = {}) {
     }
   }
 
-  console.log(`[shortcuts] holding ${registered.length} OS shortcuts while focused`);
+  const env = sessionCanHoldKeys();
+  if (env.ok) {
+    console.log(`[shortcuts] holding ${registered.length} OS shortcuts while focused`);
+  } else {
+    console.warn(
+      `[shortcuts] registered ${registered.length} shortcuts, but this is a ` +
+      `${env.session} session and they will NOT be intercepted. ` +
+      'Electron can only take global shortcuts on X11. ' +
+      'Log in to an Xorg session, or restrict the keys in the account settings. ' +
+      'See "What this cannot do" in the README.');
+  }
 }
 
 function release () {
@@ -139,6 +164,6 @@ function install (win, { onParentEscape, enabled = true } = {}) {
 }
 
 module.exports = {
-  install, acquire, release, releaseAll, disable, isDisabled,
+  install, acquire, release, releaseAll, disable, isDisabled, sessionCanHoldKeys,
   FUNCTION_KEYS, APP_SHORTCUTS, SWITCHERS, MISSION_CONTROL
 };

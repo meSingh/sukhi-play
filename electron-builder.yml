@@ -63,7 +63,9 @@ linux:
       arch: [x64]
     - target: deb
       arch: [x64]
-  icon: build/icon.png
+  # A directory of NxN.png files, not a single image: a lone 1024x1024 entry is
+  # not matched by the icon theme and Ubuntu falls back to a generic icon.
+  icon: build/icons
   category: Education
   desktop:
     entry:

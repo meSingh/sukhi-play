@@ -1,10 +1,21 @@
 'use strict';
 
 const path = require('node:path');
-const { BaseWindow, WebContentsView, screen } = require('electron');
+const { BaseWindow, WebContentsView, screen, nativeImage } = require('electron');
 const security = require('./security');
 
 const BAR_HEIGHT = 72;
+
+/** The window icon, used by Linux window managers for the taskbar entry. */
+function appIcon () {
+  try {
+    const img = nativeImage.createFromPath(
+      path.join(__dirname, '..', '..', 'build', 'icon.png'));
+    return img.isEmpty() ? undefined : img;
+  } catch {
+    return undefined;
+  }
+}
 
 function escapeHtml (text) {
   return String(text).replace(/[&<>"']/g, (c) => (
@@ -83,7 +94,14 @@ class Shell {
       maximizable: !cover,
       closable: true,
       autoHideMenuBar: true,
-      fullscreenable: false,
+      // macOS uses "simple" fullscreen, which does not need this and must not
+      // have it. Every other platform covers the screen by actually going
+      // fullscreen, which this was preventing outright.
+      fullscreenable: process.platform !== 'darwin',
+      // The window manager on Linux takes the taskbar icon from the window
+      // itself, not from the desktop entry, so it has to be set here or the
+      // running app shows a generic placeholder.
+      icon: appIcon(),
       minWidth: 640,
       minHeight: 480,
       alwaysOnTop: this.lockdownEnabled && settings.alwaysOnTop
@@ -167,8 +185,14 @@ class Shell {
 
     try {
       if (process.platform === 'darwin') {
+        // Covers the menu bar and Dock without creating its own Space, which a
+        // three-finger swipe would otherwise slide straight past.
         win.setSimpleFullScreen(true);
       } else {
+        // Linux and Windows have no Spaces to worry about, so ordinary
+        // fullscreen is both correct and the only thing that reliably covers
+        // the panel and the taskbar.
+        win.setFullScreen(true);
         win.setBounds(this.screenBounds());
       }
     } catch (err) {
@@ -214,6 +238,7 @@ class Shell {
    * and this is the fix for it.
    */
   releaseLockdown (reason) {
+    try { if (process.platform !== 'darwin') this.win.setFullScreen(false); } catch {}
     console.error(`[window] RELEASING LOCKDOWN: ${reason}`);
     this.lockdownReleased = true;
     this.allowQuit = true;
