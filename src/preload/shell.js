@@ -34,6 +34,15 @@ contextBridge.exposeInMainWorld('sukhi', {
   /** Submit a PIN, only used when gateMode is "pin". Resolves { ok, message }. */
   answerGate: (answer) => ipcRenderer.invoke('shell:answer-gate', String(answer)),
 
+  /** Wipe everything back to a first run. Relaunches the app. */
+  resetEverything: () => ipcRenderer.invoke('shell:reset-everything'),
+
+  /** Ask GitHub whether a newer release exists. Reports only. */
+  checkUpdate: () => ipcRenderer.invoke('shell:check-update'),
+
+  /** Open the releases page in the normal browser. */
+  openReleases: () => ipcRenderer.invoke('shell:open-releases'),
+
   /** Close the whole app. Only works after the gate has been answered. */
   quitApp: () => ipcRenderer.invoke('shell:quit'),
 

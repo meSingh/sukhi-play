@@ -28,7 +28,14 @@ const DEFAULTS = {
 
   // Set once the grown-up has been walked through setting the app up. Until
   // then the first thing anyone sees is the walkthrough, not an empty screen.
-  onboarded: false
+  onboarded: false,
+
+  // Linux only. Switches off the desktop's own Alt+Tab and Super key for as
+  // long as the app runs, then puts them back. It is the only way to stop them
+  // on Wayland, where an application cannot intercept keys at all. Every
+  // original value is saved to disk first, so a crash cannot leave the desktop
+  // without them.
+  borrowDesktopShortcuts: true
 };
 
 function clampInt (value, min, max, fallback) {
@@ -50,7 +57,7 @@ function coerce (raw) {
   out.holdSeconds = clampInt(raw.holdSeconds, 1, 15, DEFAULTS.holdSeconds);
 
   for (const key of ['kiosk', 'alwaysOnTop', 'fullscreenOnLaunch', 'refocusOnBlur',
-                     'showBlockCounter', 'onboarded']) {
+                     'showBlockCounter', 'onboarded', 'borrowDesktopShortcuts']) {
     if (typeof raw[key] === 'boolean') out[key] = raw[key];
   }
   return out;

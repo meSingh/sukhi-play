@@ -1062,6 +1062,58 @@ function wire () {
     }
   });
   on('lib-done', 'click', () => api.closeGate());
+
+  // Two taps, because this throws away every app the parent has set up.
+  on('reset-all', 'click', async () => {
+    const btn = el('reset-all');
+    if (btn.dataset.armed !== 'yes') {
+      btn.dataset.armed = 'yes';
+      btn.textContent = 'Erase everything?';
+      btn.classList.add('is-armed');
+      el('update-note').textContent =
+        'This removes every app and setting and starts the walkthrough again. It cannot be undone.';
+      setTimeout(() => {
+        btn.dataset.armed = 'no';
+        btn.textContent = 'Start over';
+        btn.classList.remove('is-armed');
+        el('update-note').textContent = '';
+      }, 6000);
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Starting over…';
+    const r = await api.resetEverything();
+    if (!r || !r.ok) {
+      btn.disabled = false;
+      btn.dataset.armed = 'no';
+      btn.textContent = 'Start over';
+      btn.classList.remove('is-armed');
+      showToast((r && r.message) || 'Could not reset.');
+    }
+  });
+
+  on('check-update', 'click', async () => {
+    const note = el('update-note');
+    note.className = 'update-note';
+    note.textContent = 'Checking…';
+    const r = await api.checkUpdate();
+    if (!r || !r.ok) {
+      note.textContent = (r && r.message) || 'Could not check.';
+      return;
+    }
+    if (!r.newer) {
+      note.textContent = `You have the latest version (${r.current}).`;
+      return;
+    }
+    note.className = 'update-note is-new';
+    note.textContent = `Version ${r.latest} is out. You have ${r.current}. `;
+    const link = document.createElement('button');
+    link.type = 'button';
+    link.className = 'link-btn';
+    link.textContent = 'Open the download page';
+    link.addEventListener('click', () => api.openReleases());
+    note.appendChild(link);
+  });
   on('gate-cancel-pin', 'click', () => api.closeGate());
   on('add-new', 'click', () => openForm('address'));
 

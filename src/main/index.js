@@ -2,15 +2,20 @@
 
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { app, session, ipcMain, Menu, nativeImage } = require('electron');
+const fs = require('node:fs');
+const { execFile } = require('node:child_process');
+const { app, session, ipcMain, Menu, nativeImage, net } = require('electron');
 
 const settingsStore = require('./settings');
 const catalogStore = require('./catalog');
 const security = require('./security');
 const shortcuts = require('./shortcuts');
+const gnome = require('./gnome');
 const probe = require('./probe');
 const library = require('./library');
 const { Shell } = require('./windowing');
+
+const RELEASES_URL = 'https://github.com/meSingh/sukhi-play/releases/latest';
 
 const IS_DEV = process.argv.includes('--dev');
 const SESSION_PARTITION = 'persist:sukhi-kidzone';
@@ -173,6 +178,17 @@ function installFocusGuard (win) {
 
 // --- ipc --------------------------------------------------------------------
 
+/** Plain numeric semver comparison. Returns true when a is newer than b. */
+function isNewer (a, b) {
+  const parse = (v) => String(v).split('.').map((n) => parseInt(n, 10) || 0);
+  const [x, y] = [parse(a), parse(b)];
+  for (let i = 0; i < Math.max(x.length, y.length); i += 1) {
+    if ((x[i] || 0) > (y[i] || 0)) return true;
+    if ((x[i] || 0) < (y[i] || 0)) return false;
+  }
+  return false;
+}
+
 function pushApps () {
   if (!shellApp || !shellApp.shellView) return;
   const wc = shellApp.shellView.webContents;
@@ -271,6 +287,25 @@ function registerIpc () {
     const result = checkPin(answer);
     if (result.ok) return { ok: true, action: 'unlocked' };
     return result;
+  });
+
+  /**
+   * Opens the releases page, and nothing else.
+   *
+   * shell.openExternal is stubbed out app-wide on purpose so no page can ever
+   * hand a URL to the operating system. This uses the platform opener directly
+   * with a URL that is a constant in this file, never anything from a page.
+   */
+  ipcMain.handle('shell:open-releases', () => {
+    if (!isUnlocked()) return locked();
+    const opener = process.platform === 'darwin' ? 'open'
+      : process.platform === 'win32' ? 'explorer' : 'xdg-open';
+    try {
+      execFile(opener, [RELEASES_URL], () => {});
+      return { ok: true };
+    } catch {
+      return { ok: false, message: 'Could not open the browser.' };
+    }
   });
 
   ipcMain.handle('shell:quit', () => {
@@ -390,6 +425,61 @@ function registerIpc () {
     const result = library.updateSite(paths.catalog, String(id), patch || {});
     if (result.ok) reloadCatalog();
     return result;
+  });
+
+  /**
+   * Wipes everything back to a first run.
+   *
+   * The app is relaunched rather than reloaded: settings and the catalog are
+   * read once at start-up, so carrying on in the same process would leave the
+   * old ones in memory and the next write would put them straight back.
+   */
+  ipcMain.handle('shell:reset-everything', () => {
+    if (!isUnlocked()) return locked();
+    try {
+      fs.rmSync(path.join(paths.userData, 'catalog.json'), { force: true });
+      fs.rmSync(path.join(paths.userData, 'settings.json'), { force: true });
+      fs.rmSync(path.join(paths.userData, 'icons'), { recursive: true, force: true });
+    } catch (err) {
+      console.warn('[reset] could not clear settings:', err.message);
+      return { ok: false, message: 'Could not clear the settings.' };
+    }
+    console.log('[reset] cleared, restarting into the walkthrough');
+    shortcuts.releaseAll();
+    gnome.giveBack(paths.userData);
+    shellApp.allowQuit = true;
+    app.relaunch();
+    app.exit(0);
+    return { ok: true };
+  });
+
+  /**
+   * Asks GitHub whether there is a newer release. Checking only: a kiosk that
+   * can rewrite itself is a worse problem than one that is out of date, so this
+   * reports and links, and never downloads or installs anything.
+   */
+  ipcMain.handle('shell:check-update', async () => {
+    if (!isUnlocked()) return locked();
+    try {
+      const res = await net.fetch(
+        'https://api.github.com/repos/meSingh/sukhi-play/releases/latest',
+        { credentials: 'omit', headers: { Accept: 'application/vnd.github+json' } });
+      if (!res.ok) return { ok: false, message: `GitHub returned ${res.status}.` };
+
+      const body = await res.json();
+      const latest = String(body.tag_name || '').replace(/^v/, '');
+      if (!latest) return { ok: false, message: 'No release found.' };
+
+      return {
+        ok: true,
+        current: app.getVersion(),
+        latest,
+        newer: isNewer(latest, app.getVersion()),
+        url: body.html_url || RELEASES_URL
+      };
+    } catch (err) {
+      return { ok: false, message: 'Could not reach GitHub.' };
+    }
   });
 
   ipcMain.handle('shell:remove-site', (_e, id) => {
@@ -589,6 +679,9 @@ app.whenReady().then(() => {
     checkMode: CHECK_MODE || PROBE_MODE
   });
 
+  // If the lockdown is abandoned, the desktop gets its shortcuts back too.
+  shellApp.onReleaseLockdown = () => gnome.giveBack(paths.userData);
+
   const win = shellApp.create();
 
   // A test run must never be able to take over the machine. SUKHI_EXIT_AFTER
@@ -684,6 +777,15 @@ app.whenReady().then(() => {
     onParentEscape: () => shellApp.openGate('exit')
   });
 
+  // On Linux the desktop owns Alt+Tab and the Super key, and on Wayland it owns
+  // every shortcut. Borrowed for the session and given back on quit.
+  if (!IS_DEV && !CHECK_MODE && !PROBE_MODE && settings.borrowDesktopShortcuts) {
+    gnome.borrow(paths.userData);
+  } else if (gnome.available()) {
+    // A previous run may have died mid-session; never leave them borrowed.
+    gnome.restoreFromDisk(paths.userData);
+  }
+
   if (PROBE_MODE) {
     ipcMain.once('shell:renderer-idle', () => setTimeout(() => { runProbe(); }, 200));
     return;
@@ -725,6 +827,7 @@ app.on('second-instance', () => {
 app.on('will-quit', () => {
   // Never leave the machine with keys held hostage after we exit.
   shortcuts.releaseAll();
+  if (paths.userData) gnome.giveBack(paths.userData);
 });
 
 app.on('window-all-closed', () => {

@@ -7,12 +7,28 @@ const path = require('node:path');
 const RENDERER = path.join(__dirname, '..', 'src', 'renderer');
 const js = fs.readFileSync(path.join(RENDERER, 'app.js'), 'utf8');
 
-/** Comments talk about ids that do not exist; only real code counts. */
+/** Comments mention ids that do not exist; only real code counts. */
 const code = js
   .replace(/\/\*[\s\S]*?\*\//g, '')
   .split('\n')
   .filter((line) => !line.trim().startsWith('//'))
   .join('\n');
+
+/**
+ * The same source with string PROSE removed, for scanning call sites.
+ *
+ * Quoted text can read like a call: "the latest version (1.0.1)" looked like a
+ * call to version(). The id scan needs those quotes intact, so this is a second
+ * view rather than a change to the first.
+ */
+const callSites = code
+  .replace(/`(?:\\.|[^`\\])*`/g, (lit) => {
+    const parts = [...lit.matchAll(/\$\{([^{}]*)\}/g)].map((m) => m[1]);
+    return parts.length ? '(' + parts.join(',') + ')' : '0';
+  })
+  .replace(/'(?:\\.|[^'\\])*'/g, '0')
+  .replace(/"(?:\\.|[^"\\])*"/g, '0');
+
 const html = fs.readFileSync(path.join(RENDERER, 'index.html'), 'utf8');
 const css = fs.readFileSync(path.join(RENDERER, 'styles.css'), 'utf8');
 
@@ -51,10 +67,10 @@ test('every function the renderer calls is actually defined', () => {
   ]);
 
   const defined = new Set();
-  for (const m of code.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)/g)) defined.add(m[1]);
-  for (const m of code.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/g)) defined.add(m[1]);
+  for (const m of callSites.matchAll(/\bfunction\s+([A-Za-z_$][\w$]*)/g)) defined.add(m[1]);
+  for (const m of callSites.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/g)) defined.add(m[1]);
   // destructured and parameter names, kept loose on purpose
-  for (const m of code.matchAll(/\(([^)]*)\)\s*=>/g)) {
+  for (const m of callSites.matchAll(/\(([^)]*)\)\s*=>/g)) {
     for (const part of m[1].split(',')) {
       const name = part.trim().replace(/[=:].*$/, '').replace(/[{}\[\].]/g, '').trim();
       if (/^[A-Za-z_$][\w$]*$/.test(name)) defined.add(name);
@@ -62,7 +78,7 @@ test('every function the renderer calls is actually defined', () => {
   }
 
   const called = new Set();
-  for (const m of code.matchAll(/(^|[^.\w$'"`])([A-Za-z_$][\w$]*)\s*\(/gm)) called.add(m[2]);
+  for (const m of callSites.matchAll(/(^|[^.\w$'"`])([A-Za-z_$][\w$]*)\s*\(/gm)) called.add(m[2]);
 
   const undefinedCalls = [...called].filter((name) =>
     !defined.has(name) && !KEYWORDS.has(name) && !GLOBALS.has(name));

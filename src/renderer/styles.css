@@ -212,7 +212,12 @@ img, svg { -webkit-user-drag: none; }
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 14px 20px;
+  /* An explicit floor, because the controls inside are 44px and a taller
+     fallback font on another platform was letting them push past the bar and
+     get clipped by the top of the screen. */
+  min-height: 76px;
+  box-sizing: border-box;
+  padding: 16px 20px;
   background: var(--paper);
   box-shadow: 0 2px 0 rgba(23, 21, 58, .05), 0 6px 20px rgba(23, 21, 58, .07);
 }
@@ -732,13 +737,32 @@ img, svg { -webkit-user-drag: none; }
 .card.is-added .card-state { color: var(--ink-faint); }
 .card.is-added:hover { border-color: #EDEBF8; }
 
+.foot-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+.update-note { font-size: 12px; color: var(--ink-faint); }
+.update-note.is-new { color: var(--blue); font-weight: 800; }
+
+.btn-quiet {
+  padding: 12px 20px;
+  border: 2px solid #E2DFF5; border-radius: 999px;
+  background: var(--paper); color: var(--ink-soft);
+  font: inherit; font-size: 14.5px; font-weight: 800;
+  cursor: pointer; flex: none; white-space: nowrap;
+  transition: border-color .14s ease, color .14s ease, background .14s ease;
+}
+.btn-quiet:hover { border-color: var(--ink-soft); color: var(--ink); }
+.btn-quiet.is-armed {
+  background: var(--danger); border-color: var(--danger); color: #fff;
+  animation: nudge .3s ease;
+}
+
 .panel-foot {
   margin-top: 4px;
   padding-top: 18px;
   border-top: 1px solid #EDEBF8;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
   text-align: left;

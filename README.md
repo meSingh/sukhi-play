@@ -232,13 +232,24 @@ slides away and **Esc** brings it back.
 
 Press ✕, or **Ctrl+Shift+X** (**Cmd+Shift+X** on a Mac).
 
-1. Press and hold the button for 3 seconds.
-2. Choose: **Close Sukhi Play**, or **Back to the game list**.
+**Grown-ups** opens the portal. **Close** quits. Either way you hold a button
+for 3 seconds first, and the gate says which one you asked for.
 
-Finishing the hold only *unlocks*. It does not decide anything by itself, so it
-can never dump you back on the launcher when you meant to close the app. The
-hold is **timed in the main process**, not the page. The animation is only for
-you to look at.
+The hold is **timed in the main process**, not the page. The animation is only
+for you to look at, and letting go early gets you nothing.
+
+Inside the portal, besides adding and editing apps:
+
+- **Check for updates** asks GitHub whether a newer release exists and links to
+  it. It reports only. Nothing is downloaded or installed, because a kiosk that
+  can rewrite itself is a worse problem than one that is out of date.
+- **Start over** wipes every app and setting and restarts into the walkthrough.
+  It asks twice and cannot be undone.
+
+> A `.deb` or `.dmg` you installed by hand is not tracked by your system's app
+> store, so it will never offer you an update. That is how manual packages
+> work rather than a fault in this app. Use **Check for updates** and download
+> the new one.
 
 Want more? Set a PIN in `settings.json` and you will be asked for it after the
 hold:
@@ -258,6 +269,7 @@ hold:
 | `refocusOnBlur` | `true` | Pull the window back if the child clicks away |
 | `showBlockCounter` | `true` | Show "N ads blocked" in the bar |
 | `onboarded` | `false` | Set to `false` to see the first-run walkthrough again |
+| `borrowDesktopShortcuts` | `true` | Linux/GNOME only. Switch the desktop's Alt+Tab and Super key off while the app runs, then restore them |
 
 `refocusOnBlur` switches itself off if it ever starts fighting another window,
 so it can never make the machine unusable.
@@ -275,21 +287,30 @@ window loses focus.
   so the machine can always be recovered. Do not add these.
 - **The bare Windows / Command key.** The OS refuses to hand it over.
 
-**On Linux, how much of that works depends on your session.** Electron can only
-take global shortcuts on **X11**. Under **Wayland**, the default on current
-Ubuntu, registration reports success and then intercepts nothing, so the
-function keys and the Super key keep working. The app says so in its log rather
-than claiming otherwise:
+**On Linux the desktop's own shortcuts are borrowed, not blocked.** Alt+Tab and
+the Super key belong to GNOME rather than to any application, and under
+**Wayland**, the default on current Ubuntu, an application cannot intercept keys
+at all: Electron's global shortcuts are an X11 facility, and on Wayland they
+report success and catch nothing.
+
+So on a GNOME session Sukhi Play switches those bindings off in GNOME's own
+settings while it runs, and puts them back exactly as they were when it quits.
+25 of them, including Alt+Tab, the Super key, workspace switching and the
+screenshot keys.
+
+Every original value is written to disk before anything changes, so a crash
+cannot leave you without Alt+Tab: the next start finds the backup and restores
+from it. Set `borrowDesktopShortcuts` to `false` in `settings.json` if you would
+rather it left your desktop alone.
+
+On a desktop other than GNOME, choose **Xorg** at the login screen (the gear on
+the password field) for the in-app layer to work at all. The app says which
+session it found:
 
 ```
-[shortcuts] registered 64 shortcuts, but this is a wayland session and they
-will NOT be intercepted.
+[gnome] borrowed 25 desktop shortcuts, including Alt+Tab and the Super key
+[gnome] originals saved to ..., restored when this app quits
 ```
-
-For the full lockdown on Linux, choose **Xorg** at the login screen (the gear on
-the password field), or restrict the shortcuts inside the account your child
-uses. The Super key is a GNOME binding and no application can take it on either
-session.
 
 **Cannot be blocked by any application:**
 

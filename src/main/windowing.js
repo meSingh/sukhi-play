@@ -192,11 +192,15 @@ class Shell {
         // Linux and Windows have no Spaces to worry about, so ordinary
         // fullscreen is both correct and the only thing that reliably covers
         // the panel and the taskbar.
+        //
+        // Nothing else after this: setting bounds as well made the window
+        // manager and this call fight over the geometry, and the window ended
+        // up offset upwards with the top bar sliding under the screen edge.
         win.setFullScreen(true);
-        win.setBounds(this.screenBounds());
       }
     } catch (err) {
       console.warn('[window] could not cover the screen:', err.message);
+      // Only now is placing it by hand worth trying.
       try { win.setBounds(this.screenBounds()); } catch { /* nothing more to try */ }
     }
 
@@ -239,6 +243,10 @@ class Shell {
    */
   releaseLockdown (reason) {
     try { if (process.platform !== 'darwin') this.win.setFullScreen(false); } catch {}
+    // Failing open includes handing the desktop's own shortcuts back.
+    try {
+      if (typeof this.onReleaseLockdown === 'function') this.onReleaseLockdown();
+    } catch { /* nothing more to do */ }
     console.error(`[window] RELEASING LOCKDOWN: ${reason}`);
     this.lockdownReleased = true;
     this.allowQuit = true;
