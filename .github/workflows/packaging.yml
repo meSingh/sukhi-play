@@ -1,0 +1,98 @@
+name: Packaging smoke test
+
+# Builds the Linux packages without publishing anything.
+#
+# The release workflow is the only other thing that builds a snap, and running
+# it publishes: it updates the GitHub release and pushes a revision to the Snap
+# Store. That makes it useless for checking a packaging change. This does the
+# build, inspects what came out, and throws it away.
+#
+# Run it from the Actions tab before changing anything under snapcraft: or
+# electron-builder.yml, since a snap cannot be built on macOS at all.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'electron-builder.yml'
+      - 'package.json'
+      - '.github/workflows/packaging.yml'
+
+jobs:
+  linux:
+    name: Build Linux packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fakeroot dpkg rpm
+          sudo snap install snapcraft --classic
+
+      - name: Install
+        run: npm ci
+
+      - name: Build AppImage, deb and snap
+        run: npm run dist:linux:all
+
+      - name: What came out
+        run: ls -lh dist/
+
+      - name: The snap must exist and carry its metadata
+        # electron-builder can report success while producing a snap whose
+        # metadata never made it in, which is invisible until the store listing
+        # comes back bare.
+        run: |
+          set -e
+          snap=$(find dist -name '*.snap' -print -quit)
+          if [ -z "$snap" ]; then
+            echo "::error::no .snap was produced"
+            exit 1
+          fi
+          echo "built $snap"
+
+          sudo unsquashfs -q -d /tmp/snapx "$snap" meta
+          echo "--- meta/snap.yaml ---"
+          cat /tmp/snapx/meta/snap.yaml
+
+          for field in "^name:" "^version:" "^summary:" "^confinement: strict" "^base:"; do
+            if ! grep -qE "$field" /tmp/snapx/meta/snap.yaml; then
+              echo "::error::meta/snap.yaml is missing $field"
+              exit 1
+            fi
+          done
+
+          # The duplicate that got an upload rejected by the store.
+          plugs=$(grep -oP '(?<=- )\w[\w-]*' /tmp/snapx/meta/snap.yaml | sort)
+          if [ "$(echo "$plugs" | wc -l)" != "$(echo "$plugs" | uniq | wc -l)" ]; then
+            echo "::error::duplicate entries in snap.yaml; the store rejects these"
+            echo "$plugs" | uniq -d
+            exit 1
+          fi
+          echo "snap metadata looks sane"
+
+      - name: The deb must carry its metainfo and copyright
+        run: |
+          set -e
+          deb=$(find dist -name '*.deb' -print -quit)
+          dpkg-deb -c "$deb" | grep -E 'metainfo|doc/sukhi-play/copyright' || {
+            echo "::error::deb is missing metainfo or copyright"
+            exit 1
+          }
+          echo "--- deb control ---"
+          dpkg-deb -f "$deb" Package Version Maintainer Homepage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: |
+            dist/*.snap
+            dist/*.deb
+            dist/*.AppImage
+          retention-days: 3
