@@ -596,14 +596,20 @@ async function runCheck () {
 // Each entry puts the interface into one state and names the file. `run` gets
 // the renderer's executeJavaScript so a step can click real controls rather
 // than reaching past them into private state.
+// Pauses every running animation at its first frame.
+//
+// Must not inject a <style> element: the renderer's CSP is `style-src 'self'`,
+// which blocks one, silently as far as the injecting side can tell. An earlier
+// version did exactly that, so nothing was ever frozen -- the only visible
+// sign was a CSP violation in the renderer log. The Web Animations API touches
+// no stylesheet and is not restricted.
 const FREEZE_MOTION = `(() => {
-  if (document.getElementById('sukhi-freeze')) return 1;
-  const st = document.createElement('style');
-  st.id = 'sukhi-freeze';
-  st.textContent = '*, *::before, *::after { animation: none !important;' +
-    ' transition: none !important; }';
-  document.head.appendChild(st);
-  return 1;
+  const running = document.getAnimations();
+  for (const animation of running) {
+    animation.currentTime = 0;
+    animation.pause();
+  }
+  return running.length;
 })()`;
 
 function shotScript () {
@@ -797,7 +803,8 @@ async function runDiagnose () {
   try {
     // The tiles float on a staggered delay, so measuring them mid-animation
     // reports a spread that is motion, not misalignment.
-    await wc.executeJavaScript(FREEZE_MOTION);
+    const paused = await wc.executeJavaScript(FREEZE_MOTION);
+    say('animations', `${paused} paused for measurement`);
     await new Promise((r) => setTimeout(r, 250));
     const dom = await wc.executeJavaScript(`(() => {
       const pick = (sel) => {

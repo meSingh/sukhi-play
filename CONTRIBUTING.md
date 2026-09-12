@@ -69,9 +69,16 @@ only has anything on it after. The seeded profile is built from
 `config/suggestions.json`, so the screenshots always show real titles, colours
 and hosts.
 
-Motion is frozen before each capture. The tiles carry a float animation on a
-staggered delay and a small per-tile rotation, so an unfrozen capture catches
-each tile at its own phase.
+Motion is frozen before each capture, via `document.getAnimations()` and the
+Web Animations API. The tiles carry a float animation on a staggered delay, so
+an unfrozen capture catches each at its own phase.
+
+Do not freeze it by injecting a `<style>` element. The renderer's CSP is
+`style-src 'self'`, which blocks one, and the injecting side cannot tell: the
+only sign is a violation in the renderer log. An earlier version did that, so
+nothing was frozen for several releases while the code looked correct. A few
+pixels of label variation survives the freeze and is meant to: each tile also
+carries a small CSS rotation, which changes its bounding box.
 
 To add a state, add an entry to `shotScript()` in `src/main/index.js` with a
 name and a caption. `docs/screenshots/captions.json` is the manifest, and

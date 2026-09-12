@@ -3,42 +3,42 @@
     "name": "00-first-run",
     "caption": "First run: nothing is allowed until a grown-up chooses",
     "width": 1400,
-    "height": 928
+    "height": 896
   },
   {
     "name": "00b-first-run-pick",
     "caption": "Setup offers a curated list, or any address you type",
     "width": 1400,
-    "height": 928
+    "height": 896
   },
   {
     "name": "01-launcher",
     "caption": "What your child sees: only the apps you approved",
     "width": 1400,
-    "height": 928
+    "height": 896
   },
   {
     "name": "02-parent-portal",
     "caption": "The grown-up portal: every app, with a switch to hide it",
     "width": 1400,
-    "height": 928
+    "height": 896
   },
   {
     "name": "03-add-an-app",
     "caption": "Adding an app: type an address, it works out the rest",
     "width": 1400,
-    "height": 928
+    "height": 896
   },
   {
     "name": "04-suggestions",
     "caption": "Suggestions: a curated list, each one already checked",
     "width": 1400,
-    "height": 928
+    "height": 896
   },
   {
     "name": "05-closing-needs-a-grownup",
     "caption": "Closing takes a steady press a small child will not manage",
     "width": 1400,
-    "height": 928
+    "height": 896
   }
 ]

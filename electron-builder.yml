@@ -27,8 +27,21 @@ mac:
       arch: [arm64, x64]
     - target: zip
       arch: [arm64, x64]
-  # No hardened runtime or notarisation: these builds are unsigned on purpose.
-  identity: null
+  # Ad-hoc signed, not Developer ID signed, so no hardened runtime and no
+  # notarisation. "-" is the ad-hoc identity: electron-builder signs through
+  # @electron/osx-sign, which knows the order Electron's frameworks and helper
+  # apps have to be signed in.
+  #
+  # `identity: null` skipped signing altogether, which left Electron's own
+  # linker signature in place over a bundle electron-builder had already
+  # renamed and rewritten. macOS reports that invalid signature as
+  # "Sukhi Play.app is damaged and can't be opened".
+  identity: "-"
+  # Off deliberately. Hardened runtime exists to satisfy notarisation, and
+  # these builds are not notarised. Combined with an ad-hoc signature it turns
+  # on library validation, which can stop the app loading Electron's own
+  # dylibs -- electron-builder warns about exactly this.
+  hardenedRuntime: false
   icon: build/icon.png
   darkModeSupport: true
   # No entitlements needed: no camera, mic, or file access is ever requested.
@@ -93,6 +106,13 @@ snap:
   confinement: strict
   grade: stable
   autoStart: false
-  plugs:
-    - default
-    - audio-playback
+  # No `plugs` override. electron-builder's `default` already expands to
+  # desktop, desktop-legacy, home, x11, wayland, unity7, browser-support,
+  # network, gsettings, audio-playback, pulseaudio and opengl. Listing
+  # audio-playback on top of `default` produced a duplicate, and the store
+  # rejects the upload: "$.apps.sukhi-play.plugs ... has non-unique elements".
+  #
+  # Snap artifacts are named without spaces, unlike the other targets: the
+  # store tooling and the documented upload command both expect the
+  # name_version_arch form.
+  artifactName: ${name}_${version}_${arch}.snap
