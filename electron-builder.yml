@@ -114,9 +114,15 @@ linux:
 # This block builds from a prebuilt template with no container at all, works
 # the same locally and in CI, and has shipped every revision so far.
 #
-# Revisit when electron-builder actually threatens to remove it. Run
-# `gh workflow run packaging.yml` to test any change before tagging: a snap
-# cannot be built on macOS.
+# The real pressure is not the deprecation warning. This template pins
+# base: core20, which is Ubuntu 20.04, and the Snap Store will not accept it
+# forever. When core20 is retired, or electron-builder actually removes this
+# block, the migration has to happen and the LXD networking problem has to be
+# solved: `sudo iptables -P FORWARD ACCEPT` on the runner is the documented
+# fix for it and was not tried.
+#
+# Run `gh workflow run packaging.yml` to test any change before tagging: a snap
+# cannot be built on macOS at all.
 snap:
   confinement: strict
   grade: stable
