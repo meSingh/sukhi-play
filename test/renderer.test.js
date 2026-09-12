@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const RENDERER = path.join(__dirname, '..', 'src', 'renderer');
+const MAIN = path.join(__dirname, '..', 'src', 'main');
 const js = fs.readFileSync(path.join(RENDERER, 'app.js'), 'utf8');
 
 /** Comments mention ids that do not exist; only real code counts. */
@@ -183,11 +184,19 @@ test('BAR_HEIGHT matches the stylesheet --bar-h', () => {
   // mode the shell view was given 72px for a 76px bar. The bottom 4px was
   // clipped and the game view was drawn over it. The running app reads the
   // property, but the constant is the fallback and must not be wrong.
-  const { BAR_HEIGHT } = require('../src/main/windowing');
+  //
+  // Read from the source rather than required. windowing.js pulls in electron
+  // at module load, so requiring it here made this test depend on electron
+  // being installed and unpacked, and it failed on a runner where the
+  // postinstall had flaked. Nothing else in this file needs a runtime.
+  const src = fs.readFileSync(path.join(MAIN, 'windowing.js'), 'utf8');
+  const constant = src.match(/^const BAR_HEIGHT = (\d+);/m);
+  assert.ok(constant, 'windowing.js no longer declares BAR_HEIGHT');
+
   const declared = css.match(/--bar-h:\s*(\d+(?:\.\d+)?)px/);
   assert.ok(declared, 'styles.css no longer declares --bar-h');
-  assert.strictEqual(BAR_HEIGHT, Math.ceil(Number(declared[1])),
-    `BAR_HEIGHT is ${BAR_HEIGHT} but --bar-h is ${declared[1]}px`);
+  assert.strictEqual(Number(constant[1]), Math.ceil(Number(declared[1])),
+    `BAR_HEIGHT is ${constant[1]} but --bar-h is ${declared[1]}px`);
 });
 
 test('the in-game bar and the launcher bar are not confused for each other', () => {
