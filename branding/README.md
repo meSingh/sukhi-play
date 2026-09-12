@@ -6,7 +6,7 @@ The **code** in this repository is MIT licensed. The **artwork is not.**
 
 | Asset | Licence |
 | --- | --- |
-| `branding/character-sheet.png`, `branding/cutout-*.png`, `branding/sukhi-icon.png`, `build/icon.png`, `src/renderer/assets/mascot.png` | © the project owner. **All rights reserved.** Not covered by the MIT licence. |
+| `branding/cutout-*.png`, `branding/sukhi-icon.png`, `build/icon.png`, `build/icons/*.png`, `src/renderer/assets/mascot.png` | © the project owner. **All rights reserved.** Not covered by the MIT licence. |
 | `branding/generate-mascot.py` and the placeholder it draws | MIT, like the rest of the code |
 
 The Sukhi character is a personal character belonging to the project owner. It
@@ -23,13 +23,14 @@ The icon is not drawn or generated. It is lifted straight out of the character
 model sheet, so the artwork stays exactly as it was drawn:
 
 ```bash
-python3 branding/build-icon.py biggrin   # the default
+python3 branding/build-icon.py           # rebuilds from the kept cut-out
 python3 branding/build-icon.py proud     # the calmer expression
 ```
 
-The cut-out is done by **Adobe's background removal**, not by the script.
-Hand-rolled colour keying leaves ragged edges around hair and shoulders; a
-proper subject matte does not. The full cycle is:
+Only the finished cut-out lives here, not the model sheet it came from. The
+cut-out itself was made with a proper subject matte rather than colour keying,
+which leaves ragged edges around hair and shoulders. The full cycle, if you are
+starting from a sheet of your own:
 
 ```bash
 # 1. crop the expression panel out of the sheet
@@ -40,7 +41,7 @@ python3 branding/build-icon.py --crop proud
 
 # 3. composite the cut-out onto the navy tile
 python3 branding/build-icon.py proud      # the shipped icon
-python3 branding/build-icon.py biggrin    # the alternative expression
+python3 branding/build-icon.py proud      # the shipped icon
 ```
 
 Step 3 alone is enough while a `cutout-*.png` already exists, which is the

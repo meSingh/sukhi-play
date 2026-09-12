@@ -29,10 +29,10 @@ This licence covers the source code of Sukhi Play.
 It does NOT cover the Sukhi character artwork, which is the personal property of
 the project owner. That includes:
 
-    branding/character-sheet.png
     branding/cutout-*.png
     branding/sukhi-icon.png
     build/icon.png
+    build/icons/*.png
     src/renderer/assets/mascot.png
 
 Those files are (c) 2026 the project owner, all rights reserved. If you fork

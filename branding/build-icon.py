@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-Builds the Sukhi Play app icon from the character model sheet.
+Builds the Sukhi Play app icon from the character cut-out.
 
-The character is never redrawn or regenerated - one expression panel is lifted
-straight out of the sheet and composited onto the app's navy tile, so the
-artwork stays exactly as it was drawn.
+The character is never redrawn or regenerated. The cut-out is composited onto
+the app's tile, so the artwork stays exactly as it was drawn.
 
-The cut-out itself is done by Adobe's background removal, not here. Hand-rolled
-keying leaves ragged edges around hair and shoulders; a proper subject matte
-does not.
+    python3 branding/build-icon.py
 
-    # 1. crop the panel you want
+Only the finished cut-out is kept in this repository, not the original model
+sheet it came from. The --crop step below therefore needs a sheet you supply
+yourself; it is left in because it documents how the cut-out was produced.
+
+    # 1. crop one expression panel out of a model sheet
     python3 branding/build-icon.py --crop proud
 
-    # 2. run branding/panel-<name>.png through Adobe image_remove_background
-    #    and save the result as branding/cutout-<name>.png
+    # 2. run branding/panel-<name>.png through a background remover and save
+    #    the result as branding/cutout-<name>.png
 
     # 3. composite it onto the tile
-    python3 branding/build-icon.py proud      # the shipped icon
-    python3 branding/build-icon.py biggrin    # the alternative
+    python3 branding/build-icon.py proud
 
 Requires Pillow:  pip install Pillow
 """
@@ -38,7 +38,12 @@ GLOW = (37, 78, 190, 255)
 
 
 def crop_panel(which):
-    """Step 1: pull one panel out of the sheet, ready for background removal."""
+    """Step 1: pull one panel out of a model sheet, ready for background removal."""
+    if not os.path.exists(SHEET):
+        raise SystemExit(
+            f'{SHEET} is not in this repository: only the finished cut-out is kept.\n'
+            'Put your own model sheet there to use --crop, or skip straight to '
+            'compositing an existing branding/cutout-*.png.')
     l, t, r, b = PANELS[which]
     sheet = Image.open(SHEET).convert('RGB')
     W, H = sheet.size
