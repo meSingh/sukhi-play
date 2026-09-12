@@ -48,5 +48,6 @@
   },
   "engines": {
     "node": ">=20"
-  }
+  },
+  "desktopName": "sukhi-play.desktop"
 }
