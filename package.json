@@ -22,7 +22,8 @@
     "diagnose": "electron . --diagnose",
     "shots": "node scripts/shots.js",
     "flathub:lint": "node scripts/flathub-lint.js",
-    "dist:snap": "npm run metainfo && electron-builder --linux snap"
+    "dist:snap": "npm run metainfo && electron-builder --linux snap",
+    "dist:linux:all": "npm run metainfo && electron-builder --linux AppImage deb snap"
   },
   "devDependencies": {
     "electron": "^44.3.0",

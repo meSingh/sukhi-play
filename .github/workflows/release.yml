@@ -69,10 +69,11 @@ jobs:
               dist/*.exe
           - os: ubuntu-latest
             name: Linux
-            script: dist:linux
+            script: dist:linux:all
             artifacts: |
               dist/*.AppImage
               dist/*.deb
+              dist/*.snap
 
     steps:
       - uses: actions/checkout@v4
@@ -84,7 +85,13 @@ jobs:
 
       - name: Linux packaging tools
         if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fakeroot dpkg rpm
+        # snapcraft is needed at build time, not just at upload time:
+        # `electron-builder --linux snap` shells out to it, and without it the
+        # whole Linux build fails with `spawn snapcraft ENOENT`.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fakeroot dpkg rpm
+          sudo snap install snapcraft --classic
 
       - name: Install
         run: npm ci
@@ -111,6 +118,10 @@ jobs:
     name: Publish release
     needs: [verify, build]
     runs-on: ubuntu-latest
+    # Job level, not step level: a step's own `env` block is not visible to
+    # that step's `if`, so the guard below would never see the credential.
+    env:
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
     steps:
       - uses: actions/checkout@v4
 
@@ -129,6 +140,25 @@ jobs:
           sha256sum * > SHA256SUMS.txt
           echo "--- checksums ---"
           cat SHA256SUMS.txt
+
+      - name: Publish the snap to the Snap Store
+        # Reuses the snap the build job already produced, rather than a second
+        # build definition in the repository. Snapcraft's GitHub integration
+        # wants a snapcraft.yaml at the repo root and builds from source on
+        # Launchpad, which would mean maintaining a parallel recipe that could
+        # drift from the electron-builder one that is known to work.
+        #
+        # Skipped rather than failed when the credential is absent, so a fork
+        # or a run without the secret still publishes a GitHub release.
+        if: env.SNAPCRAFT_STORE_CREDENTIALS != ''
+        run: |
+          snap=$(find artifacts -name '*.snap' -print -quit)
+          if [ -z "$snap" ]; then
+            echo "::error::no .snap in the build artifacts"
+            exit 1
+          fi
+          sudo snap install snapcraft --classic || true
+          snapcraft upload --release=stable "$snap"
 
       - name: Create the GitHub release
         uses: softprops/action-gh-release@v2

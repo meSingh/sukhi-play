@@ -10,6 +10,14 @@
 [![Release](https://img.shields.io/github/v/release/meSingh/sukhi-play?sort=semver)](https://github.com/meSingh/sukhi-play/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/meSingh/sukhi-play/releases/latest)
+[![Snap Store](https://snapcraft.io/sukhi-play/badge.svg)](https://snapcraft.io/sukhi-play)
+
+<a href="https://snapcraft.io/sukhi-play">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://snapcraft.io/en/dark/install.svg">
+    <img src="https://snapcraft.io/en/light/install.svg" alt="Get it from the Snap Store" height="56">
+  </picture>
+</a>
 
 <img src="docs/screenshots/01-launcher.png" width="820" alt="The tile screen: six large colourful buttons, one per site, with a Grown-ups and Close button in the bar above">
 
@@ -28,7 +36,20 @@ Closing it needs an adult.
 
 ## Install
 
-Grab the file for your machine from the
+On Ubuntu and any other distribution with snap, this is the easiest way and it
+updates itself:
+
+```bash
+sudo snap install sukhi-play
+```
+
+One thing to know about the snap: it runs under strict confinement, which is
+what keeps its permissions restricted, and a confined snap is not allowed to
+change desktop settings. So it does not borrow Alt+Tab and the Super key the
+way the `.deb` and `.AppImage` do. Everything else is identical. If that layer
+matters to you, use one of those instead.
+
+Otherwise grab the file for your machine from the
 **[latest release](https://github.com/meSingh/sukhi-play/releases/latest)**:
 
 | Platform | File |
@@ -39,11 +60,12 @@ Grab the file for your machine from the
 | Ubuntu / Debian | `.deb` |
 | Other Linux | `.AppImage`, `chmod +x` then run |
 
-> **These builds are not signed.** macOS will refuse the first launch:
-> right-click the app, choose *Open*, confirm. Windows SmartScreen will warn:
-> *More info* → *Run anyway*. Certificates cost money every year and this is a
-> free project. `SHA256SUMS.txt` is attached to every release if you want to
-> check what you downloaded.
+> **These builds are signed, but not notarised.** macOS will refuse the first
+> launch: right-click the app, choose *Open*, then confirm. Windows SmartScreen
+> will warn: *More info*, then *Run anyway*. A Developer ID and an EV
+> certificate cost money every year and this is a free project.
+> `SHA256SUMS.txt` is attached to every release if you want to check what you
+> downloaded.
 
 Or run it from source:
 
