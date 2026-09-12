@@ -62,9 +62,9 @@ nsis:
   shortcutName: Sukhi Play
 
 linux:
-  # Debian needs a maintainer, and it is embedded in the package for anyone to
-  # read, so it is the GitHub noreply address rather than a personal one.
-  maintainer: meSingh <2369397+meSingh@users.noreply.github.com>
+  # Debian requires a maintainer. Note that it is embedded in the package and
+  # readable by anyone who installs it.
+  maintainer: meSingh <mesingh90@gmail.com>
   syncDesktopName: true
   synopsis: A locked-down browser that lets a small child open only what you choose
   target:
