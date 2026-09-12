@@ -34,23 +34,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends fakeroot dpkg rpm
           sudo snap install snapcraft --classic
+          # core24 builds inside a container. Destructive mode looked like the
+          # way round that on CI, but the gnome extension Electron needs cannot
+          # be used with it, so LXD is the only path left.
+          sudo snap install lxd
+          sudo lxd init --auto
+          sudo usermod -aG lxd "$USER"
 
       - name: Install
         run: npm ci
 
+      # Run under `sg lxd` so the whole process tree has the group added
+      # above. usermod does not affect the running shell, and electron-builder
+      # spawns snapcraft itself, so there is nowhere else to inject it.
       - name: Build AppImage, deb and snap
-        run: npm run dist:linux:all
-        # core24 builds in an LXD container by default, and a GitHub runner
-        # has no usable one: snapcraft aborts with "user must be manually added
-        # to 'lxd' group". Building on the host instead is the usual answer for
-        # CI. Snapcraft warns that destructive mode can pull host libraries
-        # into the snap, which is a fair objection on a developer's machine but
-        # bounded here: the runner is a pinned, ephemeral image.
-        #
-        # Set here rather than as useDestructiveMode in electron-builder.yml so
-        # that a local `npm run dist:snap` still builds in a container.
-        env:
-          SNAPCRAFT_BUILD_ENVIRONMENT: host
+        run: sg lxd -c "npm run dist:linux:all"
 
       - name: What came out
         run: ls -lh dist/
