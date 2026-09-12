@@ -53,6 +53,11 @@ nsis:
   shortcutName: Sukhi Play
 
 linux:
+  # Debian needs a maintainer, and it is embedded in the package for anyone to
+  # read, so it is the GitHub noreply address rather than a personal one.
+  maintainer: meSingh <2369397+meSingh@users.noreply.github.com>
+  desktopName: sukhi-play.desktop
+  synopsis: A locked-down browser that lets a small child open only what you choose
   target:
     - target: AppImage
       arch: [x64]
@@ -60,7 +65,6 @@ linux:
       arch: [x64]
   icon: build/icon.png
   category: Education
-  synopsis: A locked-down, ad-free game launcher for small kids
   desktop:
     entry:
       Name: Sukhi Play

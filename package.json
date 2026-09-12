@@ -41,7 +41,11 @@
   "bugs": {
     "url": "https://github.com/meSingh/sukhi-play/issues"
   },
-  "author": "Sukhi Play contributors",
+  "author": {
+    "name": "meSingh",
+    "email": "2369397+meSingh@users.noreply.github.com",
+    "url": "https://github.com/meSingh"
+  },
   "engines": {
     "node": ">=20"
   }
