@@ -60,12 +60,27 @@ Otherwise grab the file for your machine from the
 | Ubuntu / Debian | `.deb` |
 | Other Linux | `.AppImage`, `chmod +x` then run |
 
-> **These builds are signed, but not notarised.** macOS will refuse the first
-> launch: right-click the app, choose *Open*, then confirm. Windows SmartScreen
-> will warn: *More info*, then *Run anyway*. A Developer ID and an EV
-> certificate cost money every year and this is a free project.
-> `SHA256SUMS.txt` is attached to every release if you want to check what you
-> downloaded.
+> **These builds are signed, but not notarised.** Notarising needs a paid
+> Apple Developer account and an EV certificate is needed for Windows, both
+> annual, and this is a free project. `SHA256SUMS.txt` is attached to every
+> release if you want to check what you downloaded.
+>
+> **macOS** blocks the first launch with *"Apple could not verify Sukhi Play is
+> free of malware"*. Control-clicking the app and choosing *Open* used to get
+> past this, but macOS 15 removed that. Instead:
+>
+> 1. Try to open the app once and click **Done** on the warning.
+> 2. Open **System Settings**, then **Privacy & Security**.
+> 3. Scroll to the bottom, to **Security**. There is a line saying Sukhi Play
+>    was blocked. Click **Open Anyway** and authenticate.
+>
+> Once only. Or skip all of it by clearing the download flag:
+>
+> ```bash
+> xattr -dr com.apple.quarantine "/Applications/Sukhi Play.app"
+> ```
+>
+> **Windows** SmartScreen will warn: *More info*, then *Run anyway*.
 
 Or run it from source:
 
