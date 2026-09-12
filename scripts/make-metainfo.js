@@ -86,14 +86,7 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
   <url type="vcs-browser">${REPO}</url>
 
   <screenshots>
-    <screenshot type="default">
-      <caption>The tile screen a child sees</caption>
-      <image>${RAW}/docs/screenshot-launcher.png</image>
-    </screenshot>
-    <screenshot>
-      <caption>The parent portal, where sites are chosen</caption>
-      <image>${RAW}/docs/screenshot-parent-portal.png</image>
-    </screenshot>
+${screenshots()}
   </screenshots>
 
   <content_rating type="oars-1.1"/>
@@ -108,6 +101,36 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
 
 const out = path.join(__dirname, '..', 'build', 'linux');
 fs.mkdirSync(out, recursiveOpt());
+function screenshots () {
+  const dir = path.join(__dirname, '..', 'docs', 'screenshots');
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(path.join(dir, 'captions.json'), 'utf8'));
+  } catch (err) {
+    throw new Error(
+      'docs/screenshots/captions.json is missing or unreadable. ' +
+      'Run `npm run shots` to regenerate the screenshot set. (' + err.message + ')'
+    );
+  }
+
+  const usable = manifest.filter((s) => !s.error && fs.existsSync(path.join(dir, s.name + '.png')));
+  if (!usable.length) throw new Error('no usable screenshots in docs/screenshots');
+
+  // AppStream wants the primary view first. The launcher is what the app is,
+  // so it leads regardless of filename order.
+  usable.sort((a, b) => (a.name.includes('launcher') ? -1 : b.name.includes('launcher') ? 1 : 0));
+
+  return usable.map((s, i) => {
+    const tag = i === 0 ? '<screenshot type="default">' : '<screenshot>';
+    return [
+      '    ' + tag,
+      '      <caption>' + escape(s.caption) + '</caption>',
+      '      <image>' + RAW + '/docs/screenshots/' + s.name + '.png</image>',
+      '    </screenshot>'
+    ].join('\n');
+  }).join('\n');
+}
+
 const file = path.join(out, 'com.msingh.sukhi.play.metainfo.xml');
 fs.writeFileSync(file, xml, 'utf8');
 console.log(`wrote ${path.relative(process.cwd(), file)} for version ${pkg.version}`);

@@ -50,21 +50,29 @@ or the window.
 
 ## Regenerating the screenshots
 
-The images in `docs/` are captured from the real application, not mocked up, so
-they go stale whenever the interface changes:
+The images in `docs/screenshots/` are captured from the real application, not
+mocked up, so they go stale whenever the interface changes. One command
+regenerates all of them:
 
 ```bash
-# a tile screen with apps on it
-SUKHI_SHOT=docs/screenshot-launcher.png SUKHI_SHOT_W=1400 SUKHI_SHOT_H=960 \
-  npx electron . --user-data-dir=/tmp/sukhi-shot
-
-# the parent portal
-SUKHI_SHOT=docs/screenshot-parent-portal.png SUKHI_SHOT_VIEW=portal \
-  SUKHI_SHOT_W=1400 SUKHI_SHOT_H=960 npx electron . --user-data-dir=/tmp/sukhi-shot
+npm run shots
+npm run metainfo   # refresh the AppStream list that software centres read
 ```
 
-Seed `/tmp/sukhi-shot/catalog.json` with a few enabled apps first, or the shot
-will be of an empty screen.
+It runs the app twice against throwaway profiles, because the interesting
+states do not coexist: onboarding only exists before setup, and the tile screen
+only has anything on it after. The seeded profile is built from
+`config/suggestions.json`, so the screenshots always show real titles, colours
+and hosts.
+
+Motion is frozen before each capture. The tiles carry a float animation on a
+staggered delay and a small per-tile rotation, so an unfrozen capture catches
+each tile at its own phase.
+
+To add a state, add an entry to `shotScript()` in `src/main/index.js` with a
+name and a caption. `docs/screenshots/captions.json` is the manifest, and
+`scripts/make-metainfo.js` generates the software-centre screenshot list from
+it, so a new capture reaches Linux stores without a second edit.
 
 ## Adding a site to the docs
 

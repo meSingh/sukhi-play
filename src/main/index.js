@@ -35,6 +35,12 @@ const CHECK_SECONDS = Number(process.env.CHECK_SECONDS || 14);
 // geometry is the one thing that cannot be reasoned about from another machine.
 const DIAGNOSE = process.argv.includes('--diagnose');
 
+// `--shots=DIR` walks the interface through each state worth showing and writes
+// a PNG per state. Store listings and the README both need these, and a
+// screenshot taken from the real app beats one taken from a mock.
+const SHOTS_ARG = process.argv.find((a) => a.startsWith('--shots='));
+const SHOTS_DIR = SHOTS_ARG ? SHOTS_ARG.slice('--shots='.length) : null;
+
 const PROBE_ARG = process.argv.find((a) => a.startsWith('--probe='));
 const PROBE_URL = PROBE_ARG ? PROBE_ARG.split('=').slice(1).join('=') : null;
 const PROBE_MODE = Boolean(PROBE_URL);
@@ -587,6 +593,171 @@ async function runCheck () {
   app.exit(problems.length ? 1 : 0);
 }
 
+// Each entry puts the interface into one state and names the file. `run` gets
+// the renderer's executeJavaScript so a step can click real controls rather
+// than reaching past them into private state.
+const FREEZE_MOTION = `(() => {
+  if (document.getElementById('sukhi-freeze')) return 1;
+  const st = document.createElement('style');
+  st.id = 'sukhi-freeze';
+  st.textContent = '*, *::before, *::after { animation: none !important;' +
+    ' transition: none !important; }';
+  document.head.appendChild(st);
+  return 1;
+})()`;
+
+function shotScript () {
+  const js = (code) => shellApp.shellView.webContents.executeJavaScript(code);
+  const settle = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // Every state starts from the launcher. openGate returns early when the gate
+  // is already open, so without this a step inherits whatever the previous one
+  // left on screen -- which produced a capture showing the add form and the
+  // portal stacked on top of each other.
+  const reset = async () => {
+    shellApp.closeGate();
+    shellApp.goHome();
+    await js(FREEZE_MOTION);
+    await settle(500);
+  };
+
+  const openPortal = async () => {
+    await reset();
+    gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+    shellApp.openGate('portal');
+    await js(`(async () => {
+      for (const id of ['gate-step-hold', 'gate-step-answer', 'gate-step-form']) {
+        document.getElementById(id).hidden = true;
+      }
+      document.getElementById('gate-step-library').hidden = false;
+      document.querySelector('.gate-card').classList.add('is-wide');
+      const fn = window.__loadLibrary; if (fn) await fn();
+      return 1;
+    })()`);
+    await settle(1400);
+  };
+
+  if (!settings.onboarded) {
+    const step = async (clickId) => {
+      await js(FREEZE_MOTION);
+      if (clickId) {
+        await js(`(() => { const b = document.getElementById('${clickId}');
+          if (b) b.click(); return 1; })()`);
+      }
+      await settle(800);
+    };
+    return [
+      {
+        name: '00-first-run',
+        caption: 'First run: nothing is allowed until a grown-up chooses',
+        run: () => step(null)
+      },
+      {
+        name: '00b-first-run-pick',
+        caption: 'Setup offers a curated list, or any address you type',
+        run: () => step('ob-parent')
+      }
+    ];
+  }
+
+  return [
+    {
+      name: '01-launcher',
+      caption: 'What your child sees: only the apps you approved',
+      run: async () => { await reset(); await settle(600); }
+    },
+    {
+      name: '02-parent-portal',
+      caption: 'The grown-up portal: every app, with a switch to hide it',
+      run: openPortal
+    },
+    {
+      name: '03-add-an-app',
+      caption: 'Adding an app: type an address, it works out the rest',
+      run: async () => {
+        await openPortal();
+        await js(`document.getElementById('add-new').click(); 1`);
+        await settle(900);
+        await js(`(() => {
+          const u = document.getElementById('form-url');
+          if (u) { u.value = 'poki.com'; u.dispatchEvent(new Event('input')); }
+          return 1;
+        })()`);
+        await settle(500);
+      }
+    },
+    {
+      name: '04-suggestions',
+      caption: 'Suggestions: a curated list, each one already checked',
+      run: async () => {
+        await openPortal();
+        await js(`(() => {
+          const s = document.getElementById('sec-suggest');
+          if (s) s.scrollIntoView({ block: 'center', behavior: 'instant' });
+          return 1;
+        })()`);
+        await settle(700);
+      }
+    },
+    {
+      name: '05-closing-needs-a-grownup',
+      caption: 'Closing takes a steady press a small child will not manage',
+      run: async () => {
+        await reset();
+        shellApp.openGate('quit');
+        await settle(900);
+      }
+    }
+  ];
+}
+
+async function runShots () {
+  const fs = require('node:fs');
+  fs.mkdirSync(SHOTS_DIR, { recursive: true });
+
+  const w = Number(process.env.SUKHI_SHOT_W || 1400);
+  const h = Number(process.env.SUKHI_SHOT_H || 928);
+  shellApp.win.setBounds({ x: 40, y: 40, width: w, height: h });
+  shellApp.layout();
+  await new Promise((r) => setTimeout(r, 1200));
+
+  const index = [];
+  for (const shot of shotScript()) {
+    try {
+      await shot.run();
+      shellApp.layout();
+      await new Promise((r) => setTimeout(r, 350));
+      const image = await shellApp.shellView.webContents.capturePage();
+      const file = require('node:path').join(SHOTS_DIR, `${shot.name}.png`);
+      fs.writeFileSync(file, image.toPNG());
+      const size = image.getSize();
+      index.push({ name: shot.name, caption: shot.caption, ...size });
+      console.log(`[SHOT] ${shot.name}  ${size.width}x${size.height}`);
+    } catch (err) {
+      console.log(`[SHOT] ${shot.name} FAILED: ${err.message}`);
+      index.push({ name: shot.name, caption: shot.caption, error: err.message });
+    }
+  }
+
+  // Onboarding and post-setup states come from separate runs writing into the
+  // same directory, so merge rather than clobber.
+  const capFile = require('node:path').join(SHOTS_DIR, 'captions.json');
+  let merged = [];
+  try { merged = JSON.parse(fs.readFileSync(capFile, 'utf8')); } catch { merged = []; }
+  for (const entry of index) {
+    const at = merged.findIndex((m) => m.name === entry.name);
+    if (at >= 0) merged[at] = entry; else merged.push(entry);
+  }
+  merged.sort((a, b) => a.name.localeCompare(b.name));
+  fs.writeFileSync(capFile, JSON.stringify(merged, null, 2) + '\n');
+  console.log(`[SHOT] wrote ${index.filter((s) => !s.error).length}/${index.length} to ${SHOTS_DIR}`);
+
+  try { shortcuts.releaseAll(); } catch { /* nothing held */ }
+  gnome.giveBack(paths.userData);
+  shellApp.allowQuit = true;
+  app.exit(index.some((s) => s.error) ? 1 : 0);
+}
+
 async function runDiagnose () {
   const { screen } = require('electron');
   const win = shellApp.win;
@@ -619,6 +790,10 @@ async function runDiagnose () {
   say('alwaysOnTop', settings.alwaysOnTop);
 
   try {
+    // The tiles float on a staggered delay, so measuring them mid-animation
+    // reports a spread that is motion, not misalignment.
+    await wc.executeJavaScript(FREEZE_MOTION);
+    await new Promise((r) => setTimeout(r, 250));
     const dom = await wc.executeJavaScript(`(() => {
       const pick = (sel) => {
         const el = document.querySelector(sel);
@@ -638,7 +813,18 @@ async function runDiagnose () {
         topBarStyle: bar ? getComputedStyle(bar).minHeight + ' / ' + getComputedStyle(bar).paddingTop : 'n/a',
         firstButton: pick('.top-actions .top-btn'),
         brandMark: pick('.top-mark'),
-        scrollTop: document.getElementById('launcher') ? document.getElementById('launcher').scrollTop : 'n/a'
+        scrollTop: document.getElementById('launcher') ? document.getElementById('launcher').scrollTop : 'n/a',
+        // Reported raw. A few pixels of variation within a row is expected:
+        // each tile carries a small CSS rotation and a float animation on a
+        // staggered delay, so labels genuinely sit at slightly different
+        // heights. Only a large spread points at a layout problem.
+        tileLabelTops: (function () {
+          var tops = Array.prototype.map.call(
+            document.querySelectorAll('#tiles .tile-name'),
+            function (el) { return Math.round(el.getBoundingClientRect().top); }
+          );
+          return tops.length ? tops.join(', ') : 'no tiles';
+        })()
       });
     })()`);
     const d = JSON.parse(dom);
@@ -863,6 +1049,11 @@ app.whenReady().then(() => {
     gnome.restoreFromDisk(paths.userData);
   }
 
+  if (SHOTS_DIR) {
+    ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runShots(); }, 2200));
+    return;
+  }
+
   if (DIAGNOSE) {
     ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runDiagnose(); }, 1800));
     return;
@@ -892,7 +1083,7 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', (event) => {
-  if (CHECK_MODE || PROBE_MODE || DIAGNOSE) return;
+  if (CHECK_MODE || PROBE_MODE || DIAGNOSE || SHOTS_DIR) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');

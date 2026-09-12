@@ -11,7 +11,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/meSingh/sukhi-play/releases/latest)
 
-<img src="docs/screenshot-launcher.png" width="820" alt="The tile screen: six large colourful buttons, one per site, with a Grown-ups and Close button in the bar above">
+<img src="docs/screenshots/01-launcher.png" width="820" alt="The tile screen: six large colourful buttons, one per site, with a Grown-ups and Close button in the bar above">
 
 </div>
 
@@ -123,7 +123,7 @@ everything else: name, picture, colour, address, allowed hosts and ad filtering,
 with Delete at the bottom.
 
 <div align="center">
-<img src="docs/screenshot-parent-portal.png" width="760" alt="The parent portal: cards for each app with on/off switches, an Add an app button, and Quit Sukhi Play">
+<img src="docs/screenshots/02-parent-portal.png" width="760" alt="The parent portal: cards for each app with on/off switches, an Add an app button, and Quit Sukhi Play">
 </div>
 
 ### About YouTube Kids
@@ -418,6 +418,24 @@ git push --follow-tags
 
 The workflow refuses to publish if the tag and `package.json` disagree, or if
 the tests fail.
+
+## Screenshots
+
+Captured from the real application with `npm run shots`, never mocked up. The
+full set with captions lives in
+[docs/screenshots](docs/screenshots), and the same images are what Linux
+software centres show.
+
+| | |
+|---|---|
+| <img src="docs/screenshots/00-first-run.png" alt="The first-run screen asking whether a grown-up or a child is using the computer"> | <img src="docs/screenshots/00b-first-run-pick.png" alt="Setup offering a list of sites to add, each labelled with a category and whether it has ads"> |
+| **First run.** Nothing is allowed until a grown-up chooses. | **Choosing.** A curated list, or any address you type. |
+| <img src="docs/screenshots/01-launcher.png" alt="The tile screen with six large colourful app buttons"> | <img src="docs/screenshots/02-parent-portal.png" alt="The parent portal listing every app with an on/off switch"> |
+| **The tile screen.** All your child ever sees. | **The grown-up portal.** Every app, with a switch. |
+| <img src="docs/screenshots/03-add-an-app.png" alt="The add-an-app form with an address field and a Check button"> | <img src="docs/screenshots/04-suggestions.png" alt="The suggestions list showing sites with ad labels and Set up links"> |
+| **Adding an app.** Type an address; it works out the rest. | **Suggestions.** Each one already checked. |
+| <img src="docs/screenshots/05-closing-needs-a-grownup.png" alt="The close confirmation with a hold-to-close button"> | |
+| **Closing.** A steady press a small child will not manage. | |
 
 ## Licence
 
