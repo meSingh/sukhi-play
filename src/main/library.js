@@ -163,11 +163,40 @@ async function refreshFrom (url, fetchImpl) {
 function toTilePayload (apps) {
   return (apps || [])
     .filter((a) => a.enabled)
-    .map(({ id, title, shape, color, icon }) => ({ id, title, shape, color, icon: icon || null }));
+    .map(({ id, title, shape, color, icon }) => ({
+      id, title, shape, color, icon: encodeIcon(icon)
+    }));
+}
+
+const ICON_TYPES = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg',
+                     webp: 'image/webp', svg: 'image/svg+xml', ico: 'image/x-icon' };
+
+/**
+ * Turns a downloaded favicon into a data: URI.
+ *
+ * The launcher runs under a strict content-security-policy that permits `self`
+ * and `data:` only, and a favicon saved next to the catalog is neither. Inlining
+ * it is what makes the site's own icon usable on a tile instead of a plain
+ * coloured shape.
+ */
+function encodeIcon (file) {
+  if (!file) return null;
+  try {
+    const ext = path.extname(file).slice(1).toLowerCase();
+    const type = ICON_TYPES[ext];
+    if (!type) return null;
+    const buf = fs.readFileSync(file);
+    // Tiles are small; anything larger than this is not a favicon.
+    if (!buf.length || buf.length > 512 * 1024) return null;
+    return `data:${type};base64,${buf.toString('base64')}`;
+  } catch {
+    return null;   // a missing icon just means the tile keeps its shape
+  }
 }
 
 module.exports = {
   toTilePayload,
+  encodeIcon,
   loadSuggestions, addSite, updateSite, removeSite, refreshFrom,
   readCatalogFile, writeCatalogFile, uniqueId, pickLook, SHAPES, COLORS
 };

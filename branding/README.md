@@ -91,10 +91,36 @@ Then `npm start` to look at it, and `npm run dist` to build installers with it.
 
 The palette lives in `src/renderer/styles.css` under `:root`.
 
+The child's screens and the grown-up's screens are deliberately different: warm
+daylight and saturated colour for the child, quiet white cards for the parent.
+A parent should be able to tell whose screen they are looking at from across the
+room.
+
+**The child's world**
+
 | Token | Value | Used for |
 | --- | --- | --- |
-| `--bg` | `#0f172a` | Page background |
-| `--bg-soft` | `#1e293b` | The top bar and cards |
-| `--ink` | `#f8fafc` | Text |
-| `--accent` | `#38bdf8` | The Back button, focus rings |
-| `--danger` | `#f87171` | The close-app button |
+| `--sky-top` / `--sky-mid` / `--sky-low` | `#7FD4FF` → `#BFEBFF` → `#FFF6E9` | The sky gradient behind everything |
+| `--hill` | `#7BD9A6` | The soft green horizon |
+| `--ink` | `#16354F` | Lettering — a deep blue, never pure black |
+
+**The play palette** — tile colours, assigned automatically so no two tiles next
+to each other match.
+
+| Token | Value |
+| --- | --- |
+| `--blue` | `#2E8FE8` |
+| `--yellow` | `#FFC43D` |
+| `--coral` | `#FF7A6B` |
+| `--mint` | `#2FCF9B` |
+| `--grape` | `#9B7DF5` |
+| `--pink` | `#FF8FC7` |
+
+Tile lettering is **not** fixed to white. `inkFor()` in
+`src/renderer/app.js` measures each tile colour's luminance and picks black or
+white, whichever is readable — a yellow tile with white text looks fine in a
+palette and is unreadable on screen. Any colour a parent chooses is handled.
+
+**Depth.** Everything the child touches has a chunky offset shadow (`--drop`)
+that shrinks when pressed, so buttons feel like physical objects rather than
+flat rectangles.

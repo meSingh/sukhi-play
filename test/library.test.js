@@ -70,13 +70,33 @@ test('a catalog written by the app survives being read back', () => {
 
 test('the tile payload carries only enabled apps, with what a tile needs', () => {
   const payload = library.toTilePayload([
-    { id: 'a', title: 'A', shape: 'star', color: '#111111', enabled: true, icon: '/tmp/a.png' },
+    { id: 'a', title: 'A', shape: 'star', color: '#111111', enabled: true, icon: '/nope/a.png' },
     { id: 'b', title: 'B', shape: 'ball', color: '#222222', enabled: false },
     { id: 'c', title: 'C', shape: 'note', color: '#333333', enabled: true }
   ]);
   assert.deepEqual(payload.map((a) => a.id), ['a', 'c']);
-  assert.deepEqual(payload[0], { id: 'a', title: 'A', shape: 'star', color: '#111111', icon: '/tmp/a.png' });
+  assert.equal(payload[0].title, 'A');
+  assert.equal(payload[0].shape, 'star');
+  assert.equal(payload[0].color, '#111111');
+  // An icon that is not on disk must not break the tile, only lose its picture.
+  assert.equal(payload[0].icon, null);
   assert.equal(payload[1].icon, null);
+});
+
+test('a real icon file is inlined so it survives the content-security-policy', () => {
+  // The launcher may only load `self` and `data:`, and a favicon saved beside
+  // the catalog is neither -- so it has to travel as a data URI.
+  const real = path.join(__dirname, '..', 'src', 'renderer', 'assets', 'mascot.png');
+  const [tile] = library.toTilePayload([
+    { id: 'a', title: 'A', shape: 'star', color: '#111111', enabled: true, icon: real }
+  ]);
+  assert.ok(tile.icon.startsWith('data:image/png;base64,'), 'should be an inline png');
+});
+
+test('only real image types are inlined', () => {
+  assert.equal(library.encodeIcon('/tmp/thing.exe'), null);
+  assert.equal(library.encodeIcon('/tmp/thing.html'), null);
+  assert.equal(library.encodeIcon(null), null);
 });
 
 test('a newly added site appears in the tile payload straight away', () => {

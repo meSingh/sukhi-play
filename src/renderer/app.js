@@ -37,20 +37,68 @@ function renderTiles (apps) {
     tile.className = 'tile';
     tile.setAttribute('role', 'listitem');
     tile.style.setProperty('--tile', entry.color);
+    tile.style.setProperty('--tile-ink', inkFor(entry.color));
     tile.dataset.appId = entry.id;
 
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-    use.setAttribute('href', `#shape-${entry.shape}`);
-    svg.appendChild(use);
+    // The icon sits on a white coin: a site's own favicon and our flat shapes
+    // both read cleanly against it, whatever colour the tile is.
+    const badge = document.createElement('span');
+    badge.className = 'tile-badge';
+
+    if (entry.icon) {
+      const img = document.createElement('img');
+      img.src = entry.icon;
+      img.alt = '';
+      // If the favicon will not decode, fall back to the shape rather than
+      // leaving an empty coin.
+      img.addEventListener('error', () => {
+        badge.textContent = '';
+        badge.appendChild(shapeIcon(entry.shape));
+      }, { once: true });
+      badge.appendChild(img);
+    } else {
+      badge.appendChild(shapeIcon(entry.shape));
+    }
 
     const label = document.createElement('span');
+    label.className = 'tile-name';
     label.textContent = entry.title;
 
-    tile.append(svg, label);
+    tile.append(badge, label);
     tile.addEventListener('click', () => launch(tile, entry.id));
     wrap.appendChild(tile);
   }
+}
+
+/**
+ * Picks black or white lettering for a tile, whichever is actually readable on
+ * it. A yellow tile with white text looks fine in a palette and is unreadable
+ * on screen, and every colour here is parent-chosen, so this cannot be left to
+ * taste.
+ *
+ * Relative luminance per WCAG; the 0.55 threshold favours dark text, which
+ * reads better at the weights used here.
+ */
+function inkFor (hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ''));
+  if (!m) return '#ffffff';
+  const n = parseInt(m[1], 16);
+  const channel = (c) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  };
+  const lum = 0.2126 * channel((n >> 16) & 255) +
+              0.7152 * channel((n >> 8) & 255) +
+              0.0722 * channel(n & 255);
+  return lum > 0.55 ? '#16354F' : '#ffffff';
+}
+
+function shapeIcon (shape) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', `#shape-${shape || 'star'}`);
+  svg.appendChild(use);
+  return svg;
 }
 
 async function launch (tile, appId) {

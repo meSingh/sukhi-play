@@ -10,9 +10,24 @@
 <body>
 <div id="app" data-mode="boot">
 
+  <!-- Soft background scenery for the child-facing screens. Purely decorative. -->
+  <div class="sky" aria-hidden="true">
+    <span class="cloud cloud--1"></span>
+    <span class="cloud cloud--2"></span>
+    <span class="cloud cloud--3"></span>
+    <span class="blob blob--1"></span>
+    <span class="blob blob--2"></span>
+    <svg class="twinkle twinkle--1" viewBox="0 0 100 100"><use href="#shape-star"></use></svg>
+    <svg class="twinkle twinkle--2" viewBox="0 0 100 100"><use href="#shape-star"></use></svg>
+    <svg class="twinkle twinkle--3" viewBox="0 0 100 100"><use href="#shape-star"></use></svg>
+    <span class="hills"></span>
+  </div>
+
   <!-- ============ loading screen ============ -->
   <section id="boot" class="screen">
-    <img class="boot-mark" src="assets/mascot.png" alt="" width="512" height="512">
+    <div class="boot-badge">
+      <img class="boot-mark" src="assets/mascot.png" alt="" width="512" height="512">
+    </div>
     <h1 class="boot-title">Sukhi Play</h1>
     <div class="boot-dots" aria-label="Loading"><i></i><i></i><i></i></div>
   </section>
