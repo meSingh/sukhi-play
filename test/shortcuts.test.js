@@ -63,3 +63,30 @@ test('install with enabled:false never takes the keyboard', () => {
   assert.equal(held.size, 0);
   assert.equal(mod.isDisabled(), true);
 });
+
+test('screen capture is held, because it covers the kiosk', () => {
+  // Print Screen on Windows 11 opens the Snipping Tool overlay on top of
+  // everything, which is the behaviour this whole module exists to stop. It
+  // was never registered: no PrintScreen entry existed in any list.
+  const { mod, held } = loadShortcuts();
+  mod.acquire({});
+  for (const accelerator of mod.SCREEN_CAPTURE) {
+    assert.ok(held.has(accelerator), `${accelerator} was not registered`);
+  }
+  assert.ok(mod.SCREEN_CAPTURE.includes('PrintScreen'), 'PrintScreen must be in the list');
+});
+
+test('only the Windows-key combinations Windows actually hands over are claimed', () => {
+  // Measured with `npm run key-probe` on a Windows session: Super+D, Super+E,
+  // Super+R, Super+Tab, Super+Shift+S and the rest are all refused, and a bare
+  // Super accelerator throws. Listing refused ones would be noise that reads
+  // like protection the app does not have.
+  const { mod } = loadShortcuts();
+  const all = [...mod.FUNCTION_KEYS, ...mod.APP_SHORTCUTS, ...mod.SWITCHERS,
+    ...mod.MISSION_CONTROL, ...mod.SCREEN_CAPTURE, ...mod.WINDOWS_KEYS];
+
+  assert.ok(!all.includes('Super'), 'a bare Super accelerator throws, it cannot be registered');
+  for (const refused of ['Super+D', 'Super+E', 'Super+R', 'Super+L', 'Super+Tab', 'Super+Shift+S']) {
+    assert.ok(!all.includes(refused), `${refused} is refused by Windows; listing it is misleading`);
+  }
+});

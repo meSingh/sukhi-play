@@ -60,8 +60,17 @@ not match, delete it and tell us at
 ## What to expect once it is running
 
 Sukhi Play covers the whole screen, including the taskbar, and holds the
-keyboard shortcuts a child might hit, including Alt+Tab and the Windows key.
-That is the point of it, and it is all released the moment the app quits.
+keyboard shortcuts a child might hit: Alt+Tab, the function keys, Alt+F4, the
+browser shortcuts, and Print Screen. All of it is released the moment the app
+quits.
+
+**The Windows key is the exception.** Windows does not let an application take
+it, on its own or in almost any combination, so pressing it opens the Start
+menu over the kiosk. The app notices and pulls itself back in front within
+about a tenth of a second, so the menu does not stay, but you will see it
+flash. Taking that key properly would mean a permanent change to the machine,
+which this app does not make. `npm run key-probe` reports exactly which keys
+Windows hands over on your system.
 
 To quit, press **Close** and hold the button for three seconds.
 

@@ -68,6 +68,26 @@ const SWITCHERS = [
   'Alt+Escape', 'CommandOrControl+Escape'
 ].concat(process.platform === 'darwin' ? ['Command+`', 'Command+Alt+D'] : []);
 
+// Screen capture. Print Screen on Windows 11 opens the Snipping Tool overlay,
+// which covers the kiosk and is exactly the "takes over" behaviour this module
+// exists to stop. Measured as holdable on Windows with `npm run key-probe`.
+// The macOS entries take the capture UI, which behaves the same way.
+const SCREEN_CAPTURE = [
+  'PrintScreen', 'Alt+PrintScreen', 'Control+PrintScreen'
+].concat(process.platform === 'darwin'
+  ? ['Command+Shift+3', 'Command+Shift+4', 'Command+Shift+5', 'Command+Shift+6']
+  : []);
+
+// The only Windows-key combinations Windows will actually hand over. Every
+// other one is refused outright, including Super+D, Super+E, Super+R,
+// Super+Tab and Super+Shift+S, and a bare Super accelerator throws. Run
+// `npm run key-probe` to re-measure. These three are worth having: clipboard
+// history, and the magnifier, which a child will otherwise leave the screen
+// zoomed into.
+const WINDOWS_KEYS = process.platform === 'win32'
+  ? ['Super+V', 'Super+Plus', 'Super+-']
+  : [];
+
 // macOS Mission Control / Spaces / App Exposé. These are the shortcuts that
 // expose the rest of the desktop, so they matter more than the rest combined.
 const MISSION_CONTROL = process.platform === 'darwin'
@@ -98,7 +118,10 @@ function acquire ({ onParentEscape } = {}) {
     })) registered.push(escapeChord);
   } catch { /* accelerator unsupported on this platform */ }
 
-  for (const accelerator of [...FUNCTION_KEYS, ...APP_SHORTCUTS, ...SWITCHERS, ...MISSION_CONTROL]) {
+  for (const accelerator of [
+    ...FUNCTION_KEYS, ...APP_SHORTCUTS, ...SWITCHERS, ...MISSION_CONTROL,
+    ...SCREEN_CAPTURE, ...WINDOWS_KEYS
+  ]) {
     try {
       // An empty handler means "consume this key and do nothing".
       if (globalShortcut.register(accelerator, () => {})) {
@@ -165,5 +188,6 @@ function install (win, { onParentEscape, enabled = true } = {}) {
 
 module.exports = {
   install, acquire, release, releaseAll, disable, isDisabled, sessionCanHoldKeys,
-  FUNCTION_KEYS, APP_SHORTCUTS, SWITCHERS, MISSION_CONTROL
+  FUNCTION_KEYS, APP_SHORTCUTS, SWITCHERS, MISSION_CONTROL,
+  SCREEN_CAPTURE, WINDOWS_KEYS
 };

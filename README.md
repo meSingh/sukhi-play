@@ -325,15 +325,31 @@ so it can never make the machine unusable.
 ## What this cannot do
 
 **Blocked at the OS level while the app is in front:** `Cmd/Alt+Tab`, `F1`–`F20`,
-Mission Control and Spaces, Spotlight, the Start menu, `Cmd/Ctrl+Q W M H N T R P
-S O F J L D U`, devtools shortcuts, zoom, `Alt+F4`. Released the moment the
-window loses focus.
+Mission Control and Spaces, Spotlight, `Cmd/Ctrl+Q W M H N T R P S O F J L D U`,
+devtools shortcuts, zoom, `Alt+F4`, and screen capture (`Print Screen` and its
+variants, `Cmd+Shift+3/4/5/6`). Released the moment the window loses focus.
 
 **Not blocked, on purpose:**
 
-- **Force Quit.** `Cmd+Alt+Esc` on macOS, `Ctrl+Alt+Del` on Windows. Left alone
-  so the machine can always be recovered. Do not add these.
-- **The bare Windows / Command key.** The OS refuses to hand it over.
+- **Force Quit.** `Cmd+Alt+Esc` on macOS, `Ctrl+Alt+Del` on Windows, and
+  `Ctrl+Shift+Esc`. Left alone so the machine can always be recovered. Do not
+  add these.
+
+**Not blocked, because Windows will not allow it:**
+
+- **The Windows key**, on its own and in almost every combination. A bare
+  `Super` accelerator is rejected by Electron outright, and Windows refuses
+  `Super+D`, `Super+E`, `Super+R`, `Super+L`, `Super+Tab`, `Super+Shift+S` and
+  the rest when asked for them. Only `Super+V`, `Super+Plus` and `Super+-` are
+  handed over, and those are taken.
+
+  So pressing the Windows key opens the Start menu over the kiosk. The app
+  notices it lost focus and pulls itself back in front after 120ms, which
+  dismisses it, but there is a visible flash. Blocking it properly needs a
+  low-level keyboard hook or a registry scancode map, and both are permanent
+  changes to the machine that this project will not make.
+
+  Run `npm run key-probe` to re-measure any of this.
 
 **On Linux the desktop's own shortcuts are borrowed, not blocked.** Alt+Tab and
 the Super key belong to GNOME rather than to any application, and under
