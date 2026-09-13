@@ -210,3 +210,20 @@ test('the in-game bar and the launcher bar are not confused for each other', () 
   assert.ok(top && !/height:\s*var\(--bar-h\)/.test(top[1]),
     '.top must not be sized by --bar-h; it is not the in-game bar');
 });
+
+test('Windows covers the screen by bounds, not by fullscreen', () => {
+  // Measured on a real Windows session: setFullScreen sizes a frameless window
+  // to the work area, 1038x727 on a 1024x768 display with a 48px taskbar, so
+  // it never reaches over the taskbar. setKiosk measures identically, and
+  // correcting the bounds afterwards leaves the window larger than the screen.
+  // Only placing it by hand gives geometry that matches. Undoing this brings
+  // the visible taskbar back, on a platform most contributors cannot test.
+  const src = fs.readFileSync(path.join(MAIN, 'windowing.js'), 'utf8');
+  const cover = src.slice(src.indexOf('applyCover ()'));
+  const branch = cover.slice(cover.indexOf("'win32'"), cover.indexOf('} else {'));
+
+  assert.ok(branch.includes('setBounds(this.screenBounds())'),
+    'the win32 branch must place the window at the display bounds');
+  assert.ok(!/win\.setFullScreen\(true\)|win\.setKiosk\(true\)/.test(branch),
+    'setFullScreen and setKiosk both leave the taskbar showing on Windows');
+});

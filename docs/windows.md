@@ -69,6 +69,17 @@ If the interface ever fails to appear, the lockdown releases itself after twelve
 seconds and you get an ordinary closable window. A kiosk that breaks has to
 break open, not locked.
 
+If the taskbar is still visible over the app, that is a bug and not a setting.
+Run the probe and include its output in a report:
+
+```bash
+npm run cover-probe
+```
+
+It measures every way of covering the screen and prints what the window manager
+did with each, which is the only reliable way to tell a window that is the
+wrong size from one that is being drawn under the taskbar.
+
 > **Windows is the least tested of the three platforms.** It builds in CI and
 > the test suite runs there, but far fewer people have actually used it than
 > macOS or Linux. Please report anything that looks wrong.

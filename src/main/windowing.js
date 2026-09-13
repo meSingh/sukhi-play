@@ -209,10 +209,31 @@ class Shell {
         // Covers the menu bar and Dock without creating its own Space, which a
         // three-finger swipe would otherwise slide straight past.
         win.setSimpleFullScreen(true);
+      } else if (process.platform === 'win32') {
+        // Windows sizes a fullscreen frameless window to the WORK AREA rather
+        // than the display, so it stops above the taskbar and leaves it on
+        // show. Measured on a real session, a 1024x768 display with a 48px
+        // taskbar:
+        //
+        //   setFullScreen(true)            1038x727   does not cover
+        //   setKiosk(true)                 1038x727   does not cover
+        //   setFullScreen then setBounds   1038x775   covers, wrong size
+        //   setBounds(display.bounds)      1024x768   covers, exact
+        //
+        // So the taskbar was never being drawn over the kiosk; nothing was
+        // covering it. setKiosk is not the fix either, it measures identically.
+        //
+        // Correcting the bounds after setFullScreen does not work: the two
+        // fight and the window ends up 14x7 larger than the display, which
+        // pushes content off every edge. Placing it by hand is the only way to
+        // get geometry that matches the screen. Always-on-top below is what
+        // then keeps it above the taskbar.
+        //
+        // `npm run cover-probe` re-measures all of this.
+        win.setBounds(this.screenBounds());
       } else {
-        // Linux and Windows have no Spaces to worry about, so ordinary
-        // fullscreen is both correct and the only thing that reliably covers
-        // the panel and the taskbar.
+        // Linux has no Spaces to worry about, so ordinary fullscreen is both
+        // correct and the only thing that reliably covers the panel.
         //
         // Nothing else after this: setting bounds as well made the window
         // manager and this call fight over the geometry, and the window ended
