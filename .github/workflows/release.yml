@@ -58,10 +58,11 @@ jobs:
         include:
           - os: macos-latest
             name: macOS
-            script: dist:mac
+            script: dist:mac:all
             artifacts: |
               dist/*.dmg
               dist/*.zip
+              dist-catalina/*.dmg
           - os: windows-latest
             name: Windows
             script: dist:win
@@ -136,6 +137,13 @@ jobs:
           mkdir -p release
           find artifacts -type f \( -name '*.dmg' -o -name '*.zip' -o -name '*.exe' \
             -o -name '*.AppImage' -o -name '*.deb' \) -exec cp {} release/ \;
+
+          # The Catalina build already has a version-free name, so it is a
+          # permanent link without needing an alias.
+          if [ ! -f "release/Sukhi-Play-macOS-Intel-Catalina.dmg" ]; then
+            echo "::error::the macOS 10.15 build is missing"
+            exit 1
+          fi
           # Version-free copies of the two macOS disk images, so
           # /releases/latest/download/<name> is a permanent link that docs and
           # buttons can point at. Every other asset keeps its versioned name.
@@ -207,6 +215,7 @@ jobs:
             | --- | --- |
             | **macOS** (Apple Silicon) | `Sukhi-Play-macOS-AppleSilicon.dmg` |
             | **macOS** (Intel) | `Sukhi-Play-macOS-Intel.dmg` |
+            | **macOS 10.15 Catalina** | `Sukhi-Play-macOS-Intel-Catalina.dmg`, see below |
             | **Windows 10/11** | `Sukhi-Play-Windows-Setup.exe`, or `-Portable.exe` |
             | **Ubuntu / Debian** | `.deb`, or `sudo snap install sukhi-play` |
             | **Other Linux** | `.AppImage` (`chmod +x`, then run) |
@@ -228,6 +237,20 @@ jobs:
 
             Once per install. Full walkthrough:
             [docs/macos.md](https://github.com/${{ github.repository }}/blob/main/docs/macos.md).
+
+            ### The macOS 10.15 build is not security-patched
+
+            macOS 10.15 cannot run the normal download: Electron 44 requires
+            macOS 13. The Catalina build pins Electron 32, the newest version
+            that still runs on 10.15 and still has the APIs this app is built
+            on.
+
+            Electron only patches its latest three major versions, so that
+            Chromium carries publicly known unfixed vulnerabilities. Apple
+            stopped patching macOS 10.15 in 2022, so the machine is already in
+            that position, and this app only opens sites you approved with ads
+            and trackers filtered. **On macOS 11 or later, take the normal
+            download instead.**
 
             ### Windows blocks the first run too
 

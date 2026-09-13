@@ -7,7 +7,8 @@ Both links always give you the newest release.
 | Your Mac | Download |
 | --- | --- |
 | **Apple Silicon** (M1, M2, M3, M4 and later) | [Sukhi-Play-macOS-AppleSilicon.dmg](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-AppleSilicon.dmg) |
-| **Intel** | [Sukhi-Play-macOS-Intel.dmg](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-Intel.dmg) |
+| **Intel**, macOS 13 or later | [Sukhi-Play-macOS-Intel.dmg](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-Intel.dmg) |
+| **macOS 10.15 to 12** | [Sukhi-Play-macOS-Intel-Catalina.dmg](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-Intel-Catalina.dmg), read the warning below |
 
 Not sure which you have? Apple menu, then **About This Mac**. If the **Chip**
 line says *Apple* anything, take Apple Silicon. If it says **Processor** and
@@ -18,6 +19,32 @@ section before you try to open it, because the first launch will be refused.
 
 Sukhi Play is not in the Mac App Store and is not distributed or endorsed by
 Apple. It is a free project you download directly.
+
+## The macOS 10.15 build, and why it carries a warning
+
+The normal download will not open on macOS 10.15, 11 or 12. It reports *"You
+can't use this version of the application with this version of macOS"*, because
+Electron 44 requires macOS 13 and Electron, not this project, sets that floor.
+
+There is a separate build for older Macs. It pins Electron 32, which was
+measured to be the newest version that both runs on 10.15 and still has the
+APIs this app is built on:
+
+| Electron | Minimum macOS |
+| --- | --- |
+| 30, 31, 32 | 10.15 |
+| 33 to 37 | 11.0 |
+| 44, the normal build | 13.0 |
+
+**That build is not security-patched.** Electron maintains only its latest
+three major versions, so Electron 32's Chromium carries publicly known,
+unfixed vulnerabilities. Apple stopped issuing security updates for macOS 10.15
+in 2022, so a Catalina machine is already in that position, and Sukhi Play only
+ever opens sites you approved, with ads and trackers filtered, which is a far
+smaller surface than ordinary browsing. That is the reasoning for offering it.
+
+**If your Mac runs macOS 13 or later, take the normal download.** The older
+build has no advantage and less protection.
 
 ## The first launch is blocked, and that is expected
 

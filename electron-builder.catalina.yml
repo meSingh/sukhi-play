@@ -1,0 +1,55 @@
+# A build for macOS 10.15 Catalina, which the normal one cannot run on.
+#
+# Electron sets the minimum macOS version, not this project. Measured by
+# building each and reading LSMinimumSystemVersion out of the bundle:
+#
+#   electron 30.5.1    10.15
+#   electron 31.7.7    10.15
+#   electron 32.3.3    10.15   <- newest that still runs on Catalina
+#   electron 33.4.11   11.0
+#   electron 37.10.3   11.0
+#   electron 44.3.0    13.0    <- what everything else ships with
+#
+# BaseWindow and WebContentsView, which this app is built on, arrived in
+# Electron 30, so 30 to 32 is the only window where both are true. 32.3.3 is
+# the newest point in it.
+#
+# THIS BUILD IS NOT SECURITY-PATCHED. Electron maintains the latest three
+# major versions; 32 left support in 2025, so its Chromium carries publicly
+# known unfixed vulnerabilities. macOS 10.15 has had no security updates from
+# Apple since 2022, so the machine is already in that position, and this app
+# only ever loads sites a parent approved, with ads and trackers filtered. That
+# is the reasoning for offering it at all. Anyone on macOS 11 or later should
+# take the normal download instead.
+# Deliberately standalone rather than `extends: electron-builder.yml`. Extending
+# merged the base target list instead of replacing it, so one build produced a
+# zip and a dmg for both architectures, all four writing to the same filename
+# and overwriting each other.
+electronVersion: 32.3.3
+
+appId: com.msingh.sukhi.play
+productName: Sukhi Play
+copyright: Copyright (c) 2026 Mandeep Singh
+
+directories:
+  output: dist-catalina
+  buildResources: build
+
+files:
+  - "src/**/*"
+  - "config/**/*"
+  - "package.json"
+  - "!**/*.map"
+
+mac:
+  category: public.app-category.education
+  target:
+    - target: dmg
+      arch: [x64]
+  artifactName: Sukhi-Play-macOS-Intel-Catalina.dmg
+  identity: "-"
+  hardenedRuntime: false
+  icon: build/icon.png
+  darkModeSupport: true
+  extendInfo:
+    LSApplicationCategoryType: public.app-category.education

@@ -1,7 +1,7 @@
 {
   "name": "sukhi-play",
   "productName": "Sukhi Play",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "A locked-down, ad-free kiosk browser that lets a small child open only the sites you choose.",
   "main": "src/main/index.js",
   "private": true,
@@ -25,7 +25,9 @@
     "dist:snap": "npm run metainfo && electron-builder --linux snap --publish never",
     "dist:linux:all": "npm run metainfo && electron-builder --linux AppImage deb snap --publish never",
     "cover-probe": "electron . --cover-probe",
-    "key-probe": "electron . --key-probe"
+    "key-probe": "electron . --key-probe",
+    "dist:mac:catalina": "electron-builder --config electron-builder.catalina.yml --mac --publish never",
+    "dist:mac:all": "npm run dist:mac && npm run dist:mac:catalina"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

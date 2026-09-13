@@ -98,3 +98,34 @@ test('the snap declares the metadata a fresh store listing would use', () => {
   assert.equal(snap.confinement, 'strict',
     'strict confinement is what makes the store report restricted permissions');
 });
+
+test('the Catalina build pins an Electron that can actually run on 10.15', () => {
+  // Electron sets the minimum macOS version, not this project. Measured by
+  // building each and reading LSMinimumSystemVersion out of the bundle:
+  // 30, 31 and 32 give 10.15; 33 and 37 give 11.0; 44 gives 13.0. BaseWindow
+  // and WebContentsView, which this app is built on, arrived in Electron 30.
+  // So 30 to 32 is the only window, and pinning outside it silently ships a
+  // build that Catalina refuses to open, which is the bug this exists to fix.
+  const legacy = yaml.load(fs.readFileSync(
+    path.join(ROOT, 'electron-builder.catalina.yml'), 'utf8'));
+
+  const pinned = String(legacy.electronVersion || '');
+  assert.match(pinned, /^\d+\.\d+\.\d+$/, 'electronVersion must be pinned exactly');
+
+  const major = Number(pinned.split('.')[0]);
+  assert.ok(major >= 30, `Electron ${major} predates BaseWindow, added in 30`);
+  assert.ok(major <= 32, `Electron ${major} requires macOS 11 or later, so not Catalina`);
+
+  assert.ok(!legacy.extends,
+    'extending the main config merged its target list instead of replacing it');
+  assert.equal(legacy.mac.artifactName, 'Sukhi-Play-macOS-Intel-Catalina.dmg');
+  assert.deepEqual(legacy.mac.target[0].arch, ['x64'], 'Catalina Macs are Intel');
+});
+
+test('the release collects the Catalina build', () => {
+  const mac = release.jobs.build.strategy.matrix.include.find((m) => m.name === 'macOS');
+  assert.match(pkg.scripts[mac.script], /dist:mac:catalina/,
+    'the macOS leg has to build the Catalina dmg, not just the normal one');
+  assert.match(mac.artifacts, /dist-catalina/,
+    'the Catalina dmg has to be uploaded as an artifact or it never reaches the release');
+});
