@@ -176,7 +176,21 @@ jobs:
             exit 1
           fi
           sudo snap install snapcraft --classic || true
-          snapcraft upload --release=stable "$snap"
+
+          # Tolerate a snap that is already in the store. Re-running this job
+          # after a failure later in it -- a GitHub API outage during release
+          # creation, which has happened -- otherwise dies here on
+          # "binary_sha3_384: Error checking upload uniqueness", and the job can
+          # never be re-run to completion.
+          if snapcraft upload --release=stable "$snap" 2>&1 | tee /tmp/snap-upload.log; then
+            echo "uploaded"
+          elif grep -q "upload uniqueness" /tmp/snap-upload.log; then
+            echo "::notice::this snap is already in the store; continuing"
+          else
+            echo "::error::snap upload failed"
+            cat /tmp/snap-upload.log
+            exit 1
+          fi
 
       - name: Create the GitHub release
         uses: softprops/action-gh-release@v2
