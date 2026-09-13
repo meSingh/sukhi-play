@@ -809,6 +809,14 @@ async function runCoverProbe () {
     ['kiosk + alwaysOnTop', () => {
       win.setKiosk(true);
       win.setAlwaysOnTop(true, 'screen-saver');
+    }],
+    ['setFullScreen then setBounds', () => {
+      win.setFullScreen(true);
+      win.setBounds(display.bounds);
+    }],
+    ['setBounds then alwaysOnTop', () => {
+      win.setBounds(display.bounds);
+      win.setAlwaysOnTop(true, 'screen-saver');
     }]
   ]) {
     await reset();
