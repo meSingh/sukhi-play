@@ -38,6 +38,12 @@ const DIAGNOSE = process.argv.includes('--diagnose');
 // `--shots=DIR` walks the interface through each state worth showing and writes
 // a PNG per state. Store listings and the README both need these, and a
 // screenshot taken from the real app beats one taken from a mock.
+// `--cover-probe` measures each way of covering the screen and reports what
+// the window manager actually did with it. Windows left the taskbar visible and
+// there is no way to tell from another platform whether that is the window
+// being the wrong size or the taskbar being drawn over a correctly sized one.
+const COVER_PROBE = process.argv.includes('--cover-probe');
+
 const SHOTS_ARG = process.argv.find((a) => a.startsWith('--shots='));
 const SHOTS_DIR = SHOTS_ARG ? SHOTS_ARG.slice('--shots='.length) : null;
 
@@ -764,6 +770,77 @@ async function runShots () {
   app.exit(index.some((s) => s.error) ? 1 : 0);
 }
 
+async function runCoverProbe () {
+  const { screen } = require('electron');
+  const win = shellApp.win;
+  const display = screen.getPrimaryDisplay();
+  const settle = () => new Promise((r) => setTimeout(r, 1200));
+
+  const reset = async () => {
+    try { win.setKiosk(false); } catch { /* not supported */ }
+    try { win.setFullScreen(false); } catch { /* not supported */ }
+    await settle();
+  };
+
+  const snapshot = (label) => {
+    const b = win.getBounds();
+    const c = win.getContentBounds();
+    const s = display.bounds;
+    const covers = b.x <= s.x && b.y <= s.y &&
+                   b.width >= s.width && b.height >= s.height;
+    return {
+      strategy: label,
+      bounds: `${b.x},${b.y} ${b.width}x${b.height}`,
+      content: `${c.x},${c.y} ${c.width}x${c.height}`,
+      fullScreen: (() => { try { return win.isFullScreen(); } catch { return '?'; } })(),
+      kiosk: (() => { try { return win.isKiosk(); } catch { return '?'; } })(),
+      // The gap the taskbar would sit in, if the window is merely work-area
+      // sized rather than screen sized.
+      shortBy: `${s.width - b.width}x${s.height - b.height}`,
+      coversScreen: covers
+    };
+  };
+
+  const rows = [];
+  for (const [label, apply] of [
+    ['setFullScreen(true)', () => win.setFullScreen(true)],
+    ['setKiosk(true)', () => win.setKiosk(true)],
+    ['setBounds(display.bounds)', () => win.setBounds(display.bounds)],
+    ['kiosk + alwaysOnTop', () => {
+      win.setKiosk(true);
+      win.setAlwaysOnTop(true, 'screen-saver');
+    }]
+  ]) {
+    await reset();
+    try { apply(); } catch (err) { rows.push({ strategy: label, bounds: 'threw: ' + err.message }); continue; }
+    await settle();
+    rows.push(snapshot(label));
+  }
+
+  console.log('\n  ===== how each strategy covers the screen =====\n');
+  console.log(`  platform      ${process.platform}`);
+  console.log(`  display       ${display.bounds.width}x${display.bounds.height} at ${display.bounds.x},${display.bounds.y}`);
+  console.log(`  workArea      ${display.workArea.width}x${display.workArea.height} at ${display.workArea.x},${display.workArea.y}`);
+  console.log(`  scaleFactor   ${display.scaleFactor}`);
+  console.log('');
+  for (const r of rows) {
+    console.log(`  ${r.strategy}`);
+    if (r.bounds && r.bounds.startsWith('threw')) { console.log(`      ${r.bounds}`); continue; }
+    console.log(`      bounds ${r.bounds}   content ${r.content}`);
+    console.log(`      isFullScreen=${r.fullScreen}  isKiosk=${r.kiosk}  short by ${r.shortBy}`);
+    console.log(`      covers the whole display: ${r.coversScreen ? 'yes' : 'NO'}`);
+  }
+  console.log('');
+  console.log('  A window the size of workArea rather than the display is being');
+  console.log('  kept off the taskbar. One that matches the display but still');
+  console.log('  shows the taskbar is a z-order problem, not a sizing one.\n');
+
+  try { shortcuts.releaseAll(); } catch { /* nothing held */ }
+  gnome.giveBack(paths.userData);
+  shellApp.allowQuit = true;
+  app.exit(0);
+}
+
 async function runDiagnose () {
   const { screen } = require('electron');
   const win = shellApp.win;
@@ -1076,6 +1153,11 @@ app.whenReady().then(() => {
     return;
   }
 
+  if (COVER_PROBE) {
+    ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runCoverProbe(); }, 2000));
+    return;
+  }
+
   if (DIAGNOSE) {
     ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runDiagnose(); }, 1800));
     return;
@@ -1105,7 +1187,7 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', (event) => {
-  if (CHECK_MODE || PROBE_MODE || DIAGNOSE || SHOTS_DIR) return;
+  if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || SHOTS_DIR) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');

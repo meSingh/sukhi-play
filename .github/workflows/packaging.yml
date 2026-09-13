@@ -18,6 +18,28 @@ on:
       - '.github/workflows/packaging.yml'
 
 jobs:
+  # Windows left the taskbar visible over the kiosk, and there is no way to
+  # tell from macOS whether the window is the wrong size or the taskbar is
+  # simply drawn over a correct one. A runner has a desktop session, so the
+  # probe can answer that with real numbers.
+  windows-cover:
+    name: How Windows covers the screen
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Probe every covering strategy
+        run: npm run cover-probe
+        timeout-minutes: 5
+
   linux:
     name: Build Linux packages
     runs-on: ubuntu-latest
