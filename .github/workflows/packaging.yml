@@ -23,7 +23,7 @@ jobs:
   # simply drawn over a correct one. A runner has a desktop session, so the
   # probe can answer that with real numbers.
   windows-cover:
-    name: How Windows covers the screen
+    name: What Windows lets the app hold
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +38,10 @@ jobs:
 
       - name: Probe every covering strategy
         run: npm run cover-probe
+        timeout-minutes: 5
+
+      - name: Probe which accelerators Windows hands over
+        run: npm run key-probe
         timeout-minutes: 5
 
   linux:

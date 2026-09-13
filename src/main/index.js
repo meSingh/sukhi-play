@@ -44,6 +44,12 @@ const DIAGNOSE = process.argv.includes('--diagnose');
 // being the wrong size or the taskbar being drawn over a correctly sized one.
 const COVER_PROBE = process.argv.includes('--cover-probe');
 
+// `--key-probe` asks the OS which accelerators it will actually hand over.
+// globalShortcut.register returns false when the system keeps a key for
+// itself, so this reports what is genuinely holdable on this platform instead
+// of assuming. The Windows key and Print Screen were never registered at all.
+const KEY_PROBE = process.argv.includes('--key-probe');
+
 const SHOTS_ARG = process.argv.find((a) => a.startsWith('--shots='));
 const SHOTS_DIR = SHOTS_ARG ? SHOTS_ARG.slice('--shots='.length) : null;
 
@@ -770,6 +776,68 @@ async function runShots () {
   app.exit(index.some((s) => s.error) ? 1 : 0);
 }
 
+async function runKeyProbe () {
+  const { globalShortcut } = require('electron');
+
+  const groups = {
+    'bare modifiers and keys': [
+      'Super', 'Meta', 'PrintScreen', 'Alt+PrintScreen', 'Super+PrintScreen',
+      'Control+PrintScreen'
+    ],
+    'Windows key combinations': [
+      'Super+D', 'Super+E', 'Super+R', 'Super+L', 'Super+S', 'Super+A',
+      'Super+I', 'Super+X', 'Super+Tab', 'Super+M', 'Super+Up', 'Super+Down',
+      'Super+Left', 'Super+Right', 'Super+Home', 'Super+P', 'Super+G',
+      'Super+Shift+S', 'Super+Control+D', 'Super+Control+Left',
+      'Super+Control+Right', 'Super+Control+F4', 'Super+Space', 'Super+;',
+      'Super+.', 'Super+V', 'Super+K', 'Super+H', 'Super+W', 'Super+N',
+      'Super+Plus', 'Super+-'
+    ],
+    'already held, as a control': [
+      'Alt+Tab', 'F11', 'CommandOrControl+W'
+    ],
+    'deliberately left alone': [
+      'Control+Shift+Escape', 'Control+Alt+Delete'
+    ]
+  };
+
+  console.log('\n  ===== which accelerators will this OS hand over? =====\n');
+  console.log(`  platform ${process.platform}\n`);
+
+  const holdable = [];
+  for (const [group, list] of Object.entries(groups)) {
+    console.log(`  ${group}`);
+    for (const accelerator of list) {
+      let result;
+      try {
+        result = globalShortcut.register(accelerator, () => {}) ? 'held' : 'REFUSED';
+      } catch (err) {
+        result = 'threw: ' + err.message.split('\n')[0];
+      }
+      if (result === 'held') {
+        holdable.push(accelerator);
+        try { globalShortcut.unregister(accelerator); } catch { /* fine */ }
+      }
+      console.log(`      ${accelerator.padEnd(24)} ${result}`);
+    }
+    console.log('');
+  }
+
+  console.log('  Holdable list, ready to paste into shortcuts.js:');
+  console.log('  ' + JSON.stringify(holdable));
+  console.log('');
+  console.log('  REFUSED means the OS keeps the key for itself and no amount of');
+  console.log('  Electron will take it. That needs a native keyboard hook or a');
+  console.log('  policy change, both out of scope for an app that promises to');
+  console.log('  put everything back when it quits.\n');
+
+  try { globalShortcut.unregisterAll(); } catch { /* nothing held */ }
+  try { shortcuts.releaseAll(); } catch { /* nothing held */ }
+  gnome.giveBack(paths.userData);
+  shellApp.allowQuit = true;
+  app.exit(0);
+}
+
 async function runCoverProbe () {
   const { screen } = require('electron');
   const win = shellApp.win;
@@ -1045,7 +1113,10 @@ app.whenReady().then(() => {
     // Deliberately not folded into checkMode. That flag means "the main
     // process drives the UI", which parks the renderer on the splash, and with
     // it set every measurement the diagnostic takes comes back zero.
-    noLockdown: DIAGNOSE || Boolean(SHOTS_DIR)
+    // COVER_PROBE deliberately absent: without the lockdown the window gets a
+    // frame, and a framed window measures differently from the frameless one
+    // the probe exists to measure.
+    noLockdown: DIAGNOSE || KEY_PROBE || Boolean(SHOTS_DIR)
   });
 
   // If the lockdown is abandoned, the desktop gets its shortcuts back too.
@@ -1161,6 +1232,11 @@ app.whenReady().then(() => {
     return;
   }
 
+  if (KEY_PROBE) {
+    ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runKeyProbe(); }, 1500));
+    return;
+  }
+
   if (COVER_PROBE) {
     ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runCoverProbe(); }, 2000));
     return;
@@ -1195,7 +1271,7 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', (event) => {
-  if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || SHOTS_DIR) return;
+  if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || KEY_PROBE || SHOTS_DIR) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');

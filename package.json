@@ -24,7 +24,8 @@
     "flathub:lint": "node scripts/flathub-lint.js",
     "dist:snap": "npm run metainfo && electron-builder --linux snap --publish never",
     "dist:linux:all": "npm run metainfo && electron-builder --linux AppImage deb snap --publish never",
-    "cover-probe": "electron . --cover-probe"
+    "cover-probe": "electron . --cover-probe",
+    "key-probe": "electron . --key-probe"
   },
   "devDependencies": {
     "ajv": "^8.20.0",
