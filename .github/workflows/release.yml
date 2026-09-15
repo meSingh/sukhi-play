@@ -144,14 +144,35 @@ jobs:
             echo "::error::the macOS 10.15 build is missing"
             exit 1
           fi
-          # Version-free copies of the two macOS disk images, so
-          # /releases/latest/download/<name> is a permanent link that docs and
-          # buttons can point at. Every other asset keeps its versioned name.
+          # "x64" reads as "64-bit", which every modern Mac is, so someone on
+          # an M1 installed the Intel build and macOS warned them Rosetta was
+          # going away. Rename the versioned macOS artifacts to say which chip
+          # they are for. electron-builder has no friendly-architecture token,
+          # so it happens here.
           cd release
-          for pair in "mac-arm64.dmg:Sukhi-Play-macOS-AppleSilicon.dmg" \
-                      "mac-x64.dmg:Sukhi-Play-macOS-Intel.dmg" \
+          for f in *mac-x64.*; do
+            [ -e "$f" ] || continue
+            mv "$f" "${f/mac-x64./mac-Intel.}"
+            echo "renamed $f -> ${f/mac-x64./mac-Intel.}"
+          done
+          for f in *mac-arm64.*; do
+            [ -e "$f" ] || continue
+            mv "$f" "${f/mac-arm64./mac-AppleSilicon.}"
+            echo "renamed $f -> ${f/mac-arm64./mac-AppleSilicon.}"
+          done
+          cd ..
+
+          # Version-free copies of the installers, so
+          # /releases/latest/download/<name> is a permanent link that docs and
+          # the website's buttons can point at. Every other asset keeps its
+          # versioned name.
+          cd release
+          for pair in "mac-AppleSilicon.dmg:Sukhi-Play-macOS-AppleSilicon.dmg" \
+                      "mac-Intel.dmg:Sukhi-Play-macOS-Intel.dmg" \
                       "win-x64-setup.exe:Sukhi-Play-Windows-Setup.exe" \
-                      "win-x64.exe:Sukhi-Play-Windows-Portable.exe"; do
+                      "win-x64.exe:Sukhi-Play-Windows-Portable.exe" \
+                      "linux-amd64.deb:Sukhi-Play-Linux.deb" \
+                      "linux-x86_64.AppImage:Sukhi-Play-Linux.AppImage"; do
             match=${pair%%:*}; alias=${pair##*:}
             src=$(find . -maxdepth 1 -name "*${match}" -print -quit)
             if [ -z "$src" ]; then

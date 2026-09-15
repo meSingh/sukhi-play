@@ -129,3 +129,34 @@ test('the release collects the Catalina build', () => {
   assert.match(mac.artifacts, /dist-catalina/,
     'the Catalina dmg has to be uploaded as an artifact or it never reaches the release');
 });
+
+test('macOS artifacts are named by chip, not by architecture string', () => {
+  // Someone on an M1 installed the Intel build, because the asset was called
+  // "mac-x64" and x64 reads as "64-bit", which every modern Mac is. macOS then
+  // warned them Rosetta support was ending. The versioned artifacts say which
+  // chip they are for.
+  const collect = release.jobs.release.steps.find((s) => /Collect/.test(s.name || '')).run;
+  assert.match(collect, /mac-x64\.\}?.*mac-Intel/s,
+    'the collect step must rename mac-x64 artifacts to say Intel');
+  assert.match(collect, /mac-arm64\.\}?.*mac-AppleSilicon/s,
+    'the collect step must rename mac-arm64 artifacts to say Apple Silicon');
+
+  // The alias loop runs on the renamed files, so it has to look for the new
+  // names. Matching the old ones silently produced no aliases at all.
+  const aliasLine = collect.slice(collect.indexOf('for pair in'));
+  assert.ok(aliasLine.includes('mac-AppleSilicon.dmg:') && aliasLine.includes('mac-Intel.dmg:'),
+    'the alias loop must match the renamed artifacts');
+  assert.ok(!aliasLine.includes('mac-arm64.dmg:') && !aliasLine.includes('mac-x64.dmg:'),
+    'the alias loop still matches pre-rename names, so it would find nothing');
+});
+
+test('Linux installers get permanent download names too', () => {
+  // The website's Linux buttons point at /releases/latest/download/<name>,
+  // which only works for a name that does not change between versions.
+  const collect = release.jobs.release.steps.find((s) => /Collect/.test(s.name || '')).run;
+  const aliasLine = collect.slice(collect.indexOf('for pair in'));
+  for (const [match, alias] of [['linux-amd64.deb', 'Sukhi-Play-Linux.deb'],
+                                ['linux-x86_64.AppImage', 'Sukhi-Play-Linux.AppImage']]) {
+    assert.ok(aliasLine.includes(`${match}:${alias}`), `no permanent alias ${alias}`);
+  }
+});
