@@ -83,6 +83,8 @@ main.wrap { padding-bottom: 72px; }
 .top nav a:hover,
 .top nav a[aria-current="page"] { background: var(--paper); color: var(--ink); }
 
+.menu-btn, .nav-head, .nav-cta, .nav-scrim { display: none; }
+
 /* ---------------- type ---------------- */
 
 h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.08; letter-spacing: -1.4px; margin: 16px 0 12px; }
@@ -172,7 +174,7 @@ th { font-weight: 800; color: var(--ink-soft); font-size: 13.5px; text-transform
 .os a svg { width: 48px; height: 48px; transition: transform .35s var(--spring); }
 .os a:hover svg { transform: rotate(-8deg) scale(1.1); }
 .os a b { font-size: 17px; font-weight: 900; letter-spacing: -.3px; }
-.os a span { font-size: 12.5px; color: var(--ink-faint); font-weight: 700; }
+.os a span { font-size: 12.5px; color: var(--ink-faint); font-weight: 700; text-align: center; line-height: 1.35; }
 .os a .yours {
   position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
   background: var(--mint); color: var(--ink); white-space: nowrap;
@@ -674,7 +676,7 @@ footer.foot { padding: 24px 0 40px; color: var(--ink-faint); font-size: 14.5px; 
 footer.foot .wrap { display: flex; gap: 8px 18px; flex-wrap: wrap; align-items: center; }
 footer.foot a { color: var(--ink-soft); text-decoration: none; font-weight: 700; }
 footer.foot a:hover { color: var(--ink); text-decoration: underline; }
-footer.foot .spacer { margin-left: auto; }
+footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-wrap: wrap; }
 
 /* ================= motion ================= */
 
@@ -704,8 +706,73 @@ footer.foot .spacer { margin-left: auto; }
 
 @media (max-width: 620px) {
   section { padding-block: 52px; }
-  .top { gap: 10px; }
-  .top nav { margin-left: 0; width: 100%; }
+  .top { flex-wrap: nowrap; padding: 14px 18px; }
+  .menu-btn {
+    display: grid; align-content: center; gap: 5px;
+    margin-left: auto; width: 46px; height: 46px; padding: 0 12px;
+    border: 0; border-radius: 14px; background: var(--paper); box-shadow: var(--drop); cursor: pointer;
+  }
+  .menu-btn span { display: block; height: 3px; border-radius: 3px; background: var(--ink); }
+  .menu-btn span:nth-child(2) { width: 70%; }
+
+  .top nav {
+    position: fixed; z-index: 50; top: 0; right: 0; bottom: 0;
+    width: min(320px, 86vw); margin: 0; padding: 18px 18px 24px;
+    display: flex; flex-direction: column; flex-wrap: nowrap; gap: 6px;
+    background: var(--base); box-shadow: -20px 0 60px rgba(23, 21, 58, .2);
+    border-radius: 28px 0 0 28px; overflow-y: auto;
+    transform: translateX(105%); visibility: hidden;
+    transition: transform .4s cubic-bezier(.16, 1, .3, 1), visibility 0s linear .4s;
+  }
+  .top nav:focus { outline: none; }
+  .nav-open .top nav { transform: none; visibility: visible; transition: transform .45s cubic-bezier(.16, 1, .3, 1); }
+  .top nav a {
+    padding: 14px 16px; border-radius: 16px; font-size: 19px; font-weight: 800; color: var(--ink);
+  }
+  .top nav a[aria-current="page"] { background: var(--paper); box-shadow: var(--drop); }
+  .nav-open .top nav a { animation: navin .45s cubic-bezier(.16, 1, .3, 1) both; }
+  .nav-open .top nav a:nth-of-type(2) { animation-delay: .04s; }
+  .nav-open .top nav a:nth-of-type(3) { animation-delay: .08s; }
+  .nav-open .top nav a:nth-of-type(4) { animation-delay: .12s; }
+  .nav-open .top nav a:nth-of-type(5) { animation-delay: .16s; }
+  .nav-open .top nav a:nth-of-type(6) { animation-delay: .20s; }
+  @keyframes navin { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+  .nav-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 4px 4px 14px;
+    border-bottom: 1px solid var(--line); font-weight: 900; font-size: 18px;
+  }
+  .nav-head img { width: 34px; height: 34px; }
+  .menu-close {
+    margin-left: auto; width: 40px; height: 40px; border-radius: 12px; border: 0;
+    background: var(--paper); color: var(--ink); font-size: 26px; line-height: 1; cursor: pointer;
+  }
+  .top nav a.nav-cta {
+    display: block; margin-top: auto; text-align: center;
+    background: var(--ink); color: #fff; box-shadow: var(--drop);
+  }
+  .nav-scrim {
+    display: block; position: fixed; inset: 0; z-index: 40;
+    background: rgba(23, 21, 58, .35); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    animation: fadein .3s ease both;
+  }
+  .nav-scrim[hidden] { display: none; }
+  @keyframes fadein { from { opacity: 0; } }
+  .nav-open body { overflow: hidden; }
+
+  /* Without the script there is no button to open it, so the nav stays inline. */
+  .no-js .menu-btn { display: none; }
+  .no-js .top { flex-wrap: wrap; }
+  .no-js .top nav { position: static; transform: none; visibility: visible; width: 100%; flex-direction: row; flex-wrap: wrap; background: none; box-shadow: none; padding: 0; }
+  .no-js .top nav .nav-head, .no-js .top nav .nav-cta { display: none; }
+
+  footer.foot { padding: 28px 0 36px; }
+  footer.foot .wrap { flex-direction: column; align-items: stretch; gap: 16px; text-align: center; }
+  footer.foot .foot-links { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; order: -1; }
+  footer.foot .foot-links a {
+    display: block; padding: 12px 8px; border-radius: 14px;
+    background: var(--paper); border: 1px solid var(--line); font-size: 15px;
+  }
+  footer.foot .copy { font-size: 13.5px; line-height: 1.5; }
   .os a { width: calc(50% - 7px); }
   .tour-steps { gap: 6px; }
   .tour-steps button { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 12px 6px 16px; row-gap: 6px; }

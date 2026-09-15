@@ -12,13 +12,20 @@
 <body>
 <header class="top">
   <a class="brand" href="index.html"><img src="assets/sukhi-icon.png" alt="">Sukhi Play</a>
-  <nav>
+  <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+    <span></span><span></span><span></span>
+  </button>
+  <nav id="site-nav" tabindex="-1">
+    <div class="nav-head"><img src="assets/sukhi-icon.png" alt="">Sukhi Play
+      <button class="menu-close" type="button" aria-label="Close menu">&times;</button></div>
     <a href="index.html">Overview</a>
     <a href="download.html">Download</a>
     <a href="macos.html">macOS</a>
     <a href="windows.html" aria-current="page">Windows</a>
     <a href="linux.html">Linux</a>
+    <a class="nav-cta" href="download.html">Download, free</a>
   </nav>
+  <div class="nav-scrim" hidden></div>
 </header>
 
 <main class="wrap wrap--narrow">
@@ -141,12 +148,13 @@
 
 <footer class="foot">
   <div class="wrap">
-    <span>&copy; 2026 Mandeep Singh &middot; MIT licence, Sukhi artwork excluded</span>
-    <span class="spacer"></span>
-    <a href="https://github.com/meSingh/sukhi-play">GitHub</a>
-    <a href="https://snapcraft.io/sukhi-play">Snap Store</a>
-    <a href="debug.html">Troubleshooting</a>
-    <a href="https://github.com/meSingh/sukhi-play/issues">Report a problem</a>
+    <span class="copy">&copy; 2026 Mandeep Singh &middot; MIT licence, Sukhi artwork excluded</span>
+    <nav class="foot-links" aria-label="More">
+      <a href="https://github.com/meSingh/sukhi-play">GitHub</a>
+      <a href="https://snapcraft.io/sukhi-play">Snap Store</a>
+      <a href="debug.html">Troubleshooting</a>
+      <a href="https://github.com/meSingh/sukhi-play/issues">Report a problem</a>
+    </nav>
   </div>
 </footer>
 <script>
@@ -162,6 +170,23 @@
     : /Win/i.test(plat + ua) ? 'win'
     : /Linux|X11|CrOS/i.test(plat + ua) ? 'linux' : null;
   window.SUKHI_OS = os;
+
+  // Phone menu: the nav slides in from the side instead of wrapping.
+  var menuBtn = document.querySelector('.menu-btn');
+  var scrim = document.querySelector('.nav-scrim');
+  var setMenu = function (open) {
+    root.classList.toggle('nav-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    scrim.hidden = !open;
+    if (open) document.getElementById('site-nav').focus({ preventScroll: true });
+  };
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function () { setMenu(true); });
+    document.querySelector('.menu-close').addEventListener('click', function () { setMenu(false); menuBtn.focus(); });
+    scrim.addEventListener('click', function () { setMenu(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('nav-open')) { setMenu(false); menuBtn.focus(); } });
+    window.matchMedia('(min-width: 621px)').addEventListener('change', function (m) { if (m.matches) setMenu(false); });
+  }
   if (os) {
     document.querySelectorAll('[data-os="' + os + '"]').forEach(function (el) {
       el.classList.add('yours');
