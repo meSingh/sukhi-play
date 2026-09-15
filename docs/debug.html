@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Troubleshooting Sukhi Play</title>
+<meta name="description" content="Run Sukhi Play’s diagnostics from source and report a problem with real numbers.">
+<link rel="icon" href="assets/sukhi-icon.png">
+<link rel="stylesheet" href="site.css">
+<script>document.documentElement.classList.remove('no-js')</script>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="index.html"><img src="assets/sukhi-icon.png" alt="">Sukhi Play</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="download.html">Download</a>
+    <a href="macos.html">macOS</a>
+    <a href="windows.html">Windows</a>
+    <a href="linux.html">Linux</a>
+  </nav>
+</header>
+
+<main class="wrap wrap--narrow">
+  <div class="hero hero--page">
+    <span class="bob" style="display:inline-block"><svg class="glyph" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="#fff"/><path d="M30.5 11.5a8 8 0 0 0-9.8 10.3L11.8 30.7a3.2 3.2 0 1 0 4.5 4.5l8.9-8.9a8 8 0 0 0 10.3-9.8l-4.6 4.6-4.3-1.2-1.2-4.3z" fill="#8B5CF6"/></svg></span>
+    <h1>Troubleshooting</h1>
+    <p class="lede">Something looks wrong on your computer? A short check prints exactly what happened, so it can be fixed.</p>
+  </div>
+
+  <div class="card ok reveal">
+    <h3>Locked out right now?</h3>
+    <p>Force Quit always works: <b>Cmd+Option+Esc</b> on a Mac, <b>Ctrl+Alt+Delete</b> on Windows.
+      And if the screen ever fails to appear, Sukhi Play unlocks itself after twelve seconds.</p>
+  </div>
+
+  <div class="block">
+    <h2 class="reveal">Why this needs the source code</h2>
+    <p class="reveal">The checks are developer tools that print to a terminal, so they run from the project&rsquo;s code. About five minutes the first time.</p>
+  </div>
+
+  <div class="block">
+    <h2 class="reveal">1. Install Node.js</h2>
+    <p class="reveal">Download the <b>LTS</b> version from <a href="https://nodejs.org">nodejs.org</a> and install it like any app.</p>
+  </div>
+
+  <div class="block">
+    <h2 class="reveal">2. Get the code</h2>
+    <p class="reveal">Open Terminal (Mac, Linux) or PowerShell (Windows) and run:</p>
+    <pre class="reveal"><code>git clone https://github.com/meSingh/sukhi-play.git
+cd sukhi-play
+npm ci</code></pre>
+    <p class="note-small" style="text-align:left">No git? <a href="https://github.com/meSingh/sukhi-play/archive/refs/heads/main.zip">Download the code as a zip</a>, unzip it, open a terminal in that folder and run <code>npm ci</code>.</p>
+  </div>
+
+  <div class="block">
+    <h2 class="reveal">3. Run the check for your problem</h2>
+    <div class="probe-list">
+      <div class="card reveal">
+        <header><b>The layout or size looks wrong</b><span>All systems</span></header>
+        <pre><code>npm run diagnose</code></pre>
+        <p>Prints the screen and window sizes, then closes. It never locks your screen.</p>
+        <p style="font-size:14px">On Linux, if it complains about the sandbox: <code>./node_modules/.bin/electron . --diagnose --no-sandbox</code></p>
+      </div>
+      <div class="card reveal">
+        <header><b>The taskbar still shows</b><span>Windows</span></header>
+        <pre><code>npm run cover-probe</code></pre>
+        <p>Tries every way of covering the screen and reports which worked. Your screen is covered for a few seconds.</p>
+      </div>
+      <div class="card reveal">
+        <header><b>A key isn&rsquo;t being held</b><span>Windows</span></header>
+        <pre><code>npm run key-probe</code></pre>
+        <p>Lists exactly which keys Windows lets the app hold on your computer.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2 class="reveal">4. Send the output</h2>
+    <p class="reveal">Copy everything it printed into a new issue, with what you expected to see.</p>
+    <div class="page-os reveal" style="justify-content:flex-start">
+      <a class="get" href="https://github.com/meSingh/sukhi-play/issues/new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg><span><b>Open an issue</b><small>On GitHub, free account needed</small></span></a>
+      <a class="get get--soft" href="https://github.com/meSingh/sukhi-play/issues"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg><span><b>See known problems</b><small>Someone may have hit it already</small></span></a>
+    </div>
+  </div>
+</main>
+
+<section class="madeby">
+  <img class="bob" src="assets/cutout-proud.png" alt="" width="92" height="92" loading="lazy">
+  <p class="love">Made with <span class="heart" aria-label="love">&#9829;</span> by
+    <a href="https://www.msingh.com">Mandeep Singh</a>,<br>for his cheeky little Sukhraj.</p>
+  <p class="story">It began with a three-year-old who pressed every key and clicked
+    every button. So Mandeep built a screen where pressing all of them is perfectly safe.</p>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>&copy; 2026 Mandeep Singh &middot; MIT licence, Sukhi artwork excluded</span>
+    <span class="spacer"></span>
+    <a href="https://github.com/meSingh/sukhi-play">GitHub</a>
+    <a href="https://snapcraft.io/sukhi-play">Snap Store</a>
+    <a href="debug.html">Troubleshooting</a>
+    <a href="https://github.com/meSingh/sukhi-play/issues">Report a problem</a>
+  </div>
+</footer>
+<script>
+/* Reveal on scroll, and mark the visitor's own platform. Both are decoration:
+   without this script every section is visible and every link works. */
+(function () {
+  var root = document.documentElement;
+  var ua = navigator.userAgent;
+  var plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+  var touch = navigator.maxTouchPoints > 1;
+  var os = /Android|iPhone|iPad/i.test(ua) ? null
+    : /Mac/i.test(plat + ua) && !touch ? 'mac'
+    : /Win/i.test(plat + ua) ? 'win'
+    : /Linux|X11|CrOS/i.test(plat + ua) ? 'linux' : null;
+  window.SUKHI_OS = os;
+  if (os) {
+    document.querySelectorAll('[data-os="' + os + '"]').forEach(function (el) {
+      el.classList.add('yours');
+      var tag = el.querySelector('.yours[hidden]');
+      if (tag) tag.hidden = false;
+    });
+  }
+
+  var els = document.querySelectorAll('.reveal, .vault');
+  if (!('IntersectionObserver' in window) ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // Only now hide them, so nothing can leave the page blank.
+  root.classList.add('js');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+</body>
+</html>

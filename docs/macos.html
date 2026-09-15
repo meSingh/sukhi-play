@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sukhi Play on macOS</title>
+<meta name="description" content="Install Sukhi Play on macOS. Apple Silicon and Intel, plus a build for macOS 10.15 Catalina.">
+<link rel="icon" href="assets/sukhi-icon.png">
+<link rel="stylesheet" href="site.css">
+<script>document.documentElement.classList.remove('no-js')</script>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="index.html"><img src="assets/sukhi-icon.png" alt="">Sukhi Play</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="download.html">Download</a>
+    <a href="macos.html" aria-current="page">macOS</a>
+    <a href="windows.html">Windows</a>
+    <a href="linux.html">Linux</a>
+  </nav>
+</header>
+
+<main class="wrap wrap--narrow">
+  <div class="hero hero--page">
+    <span class="bob" style="display:inline-block"><svg class="glyph" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="6" y="9" width="36" height="35" rx="10" fill="#17153A"/>
+  <rect x="6" y="4.5" width="36" height="35" rx="10" fill="#fff" stroke="#17153A" stroke-width="3"/>
+  <path transform="translate(12 10) " d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" stroke="#3B6BFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></span>
+    <h1>Sukhi Play on macOS</h1>
+  </div>
+
+  <div class="getting" hidden>
+    <div class="gt-top">
+      <div class="gt-ring" aria-hidden="true"><svg viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="27"/><circle class="prog" cx="32" cy="32" r="27"/></svg><b class="gt-count">5</b><span class="gt-done">&check;</span></div>
+      <div class="gt-text" aria-live="polite"><b class="gt-title">Your download starts in a moment</b><span class="gt-file"></span></div>
+      <div class="gt-actions"><a class="gt-now" href="#">Download now</a><button class="gt-cancel" type="button">Cancel</button></div>
+    </div>
+    <div class="gt-note" data-for="*"><b>macOS will block it the first time. That is expected.</b><ol><li><span>Open it once and click <b>Done</b></span></li><li><span><b>System Settings</b> &rarr; <b>Privacy &amp; Security</b></span></li><li><span>Click <b>Open Anyway</b></span></li></ol><a href="#first-launch">Full steps &darr;</a></div>
+  </div>
+  <script>
+  (function () {
+    var GETS = {"apple-silicon": {"url": "https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-AppleSilicon.dmg", "name": "Apple Silicon .dmg"}, "intel": {"url": "https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-Intel.dmg", "name": "Intel .dmg"}};
+    var key = new URLSearchParams(location.search).get('get');
+    var pick = GETS[key];
+    var box = document.querySelector('.getting');
+    if (!pick || !box) return;
+
+    var note = box.querySelector('.gt-note[data-for="' + key + '"]') || box.querySelector('.gt-note[data-for="*"]');
+    [].forEach.call(box.querySelectorAll('.gt-note'), function (n) { n.hidden = n !== note; });
+    var title = box.querySelector('.gt-title'), count = box.querySelector('.gt-count');
+    var now = box.querySelector('.gt-now');
+    box.querySelector('.gt-file').textContent = pick.name;
+    now.href = pick.url;
+    box.hidden = false;
+
+    // The address keeps no trace of the download, so a reload does not start it again.
+    history.replaceState(null, '', location.pathname + location.hash);
+
+    var left = 5, timer;
+    var start = function () {
+      clearInterval(timer);
+      box.classList.add('started');
+      title.textContent = 'Downloading';
+      now.textContent = 'Didn’t start? Try again';
+      window.location.href = pick.url;
+    };
+    title.textContent = 'Your download starts in ' + left + ' seconds';
+    requestAnimationFrame(function () { box.classList.add('counting'); });
+    timer = setInterval(function () {
+      left -= 1;
+      count.textContent = left;
+      if (left <= 0) return start();
+      title.textContent = 'Your download starts in ' + left + ' second' + (left === 1 ? '' : 's');
+    }, 1000);
+    now.addEventListener('click', function (e) { e.preventDefault(); start(); });
+    box.querySelector('.gt-cancel').addEventListener('click', function () {
+      clearInterval(timer);
+      box.hidden = true;
+    });
+  })();
+  </script>
+
+  <div class="page-os reveal">
+    <a class="get" href="https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-AppleSilicon.dmg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>Apple Silicon</b><small>M1, M2, M3, M4 and later</small></span></a>
+    <a class="get get--soft" href="https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-Intel.dmg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>Intel</b><small>macOS 13 or later</small></span></a>
+  </div>
+  <p class="note-small">Apple menu &rarr; <b>About This Mac</b>. Chip says Apple? Take Apple Silicon.
+    <a href="download.html">More help choosing</a></p>
+
+  <div class="block" id="first-launch">
+    <h2 class="reveal">The first launch is blocked</h2>
+    <div class="card warn reveal">
+      <p><b>&ldquo;Sukhi Play.app&rdquo; Not Opened.</b> Apple could not verify it is free of malware.</p>
+    </div>
+    <p class="reveal">Expected. Apple charges to vouch for an app, and this one is free, so macOS says the strongest thing it can.</p>
+    <ol class="steps reveal d1">
+      <li>Click <b>Done</b>. You have to try once for the next step to appear.</li>
+      <li>Open <b>System Settings</b>, then <b>Privacy &amp; Security</b>.</li>
+      <li>Scroll to <b>Security</b> at the bottom.</li>
+      <li>Click <b>Open Anyway</b> and enter your password.</li>
+    </ol>
+    <p class="reveal">Once per install. Comfortable in Terminal? This skips the dialog:</p>
+    <pre class="reveal"><code>xattr -dr com.apple.quarantine "/Applications/Sukhi Play.app"</code></pre>
+  </div>
+
+  <div class="block" id="catalina">
+    <h2 class="reveal">Older Macs</h2>
+    <p class="reveal">macOS 10.15, 11 and 12 can&rsquo;t run the normal build. Electron, which the app is built on, needs macOS 13.</p>
+    <div class="table-scroll reveal d1">
+      <table>
+        <tr><th>Electron</th><th>Runs on</th></tr>
+        <tr><td>30, 31, 32</td><td>macOS 10.15 and later</td></tr>
+        <tr><td>33 to 37</td><td>macOS 11 and later</td></tr>
+        <tr><td>44, the normal build</td><td>macOS 13 and later</td></tr>
+      </table>
+    </div>
+    <div class="card stop reveal">
+      <p><b>The older build is not security patched.</b> It uses Electron 32, which has known, unfixed vulnerabilities.</p>
+      <p>Apple stopped patching macOS 10.15 in 2022, so such a Mac is already there, and Sukhi Play only opens sites you approved.
+        <b>On macOS 13 or later, take the normal download.</b></p>
+    </div>
+    <div class="page-os reveal">
+      <a class="get get--soft" href="https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-Intel-Catalina.dmg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>macOS 10.15 to 12</b><small>Intel Macs, not patched</small></span></a>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2 class="reveal">Once it is running</h2>
+    <ul class="checks reveal d1">
+      <li><span class="tick yes">&check;</span> Covers the menu bar and the Dock</li>
+      <li><span class="tick yes">&check;</span> Cmd+Tab, Spotlight and screenshots are held</li>
+      <li><span class="tick yes">&check;</span> A swipe cannot slide the desktop back</li>
+      <li><span class="tick yes">&check;</span> Quit by holding Close for three seconds</li>
+    </ul>
+    <p class="note-small">If the screen ever fails to appear, it unlocks itself after twelve seconds.</p>
+  </div>
+
+  <div class="help reveal">
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="#fff"/><path d="M30.5 11.5a8 8 0 0 0-9.8 10.3L11.8 30.7a3.2 3.2 0 1 0 4.5 4.5l8.9-8.9a8 8 0 0 0 10.3-9.8l-4.6 4.6-4.3-1.2-1.2-4.3z" fill="#8B5CF6"/></svg>
+    <div><b>Still stuck?</b><span>Run a two-minute check and send us the numbers.</span></div>
+    <a class="go" href="debug.html">Troubleshooting</a>
+  </div>
+</main>
+
+<section class="madeby">
+  <img class="bob" src="assets/cutout-proud.png" alt="" width="92" height="92" loading="lazy">
+  <p class="love">Made with <span class="heart" aria-label="love">&#9829;</span> by
+    <a href="https://www.msingh.com">Mandeep Singh</a>,<br>for his cheeky little Sukhraj.</p>
+  <p class="story">It began with a three-year-old who pressed every key and clicked
+    every button. So Mandeep built a screen where pressing all of them is perfectly safe.</p>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>&copy; 2026 Mandeep Singh &middot; MIT licence, Sukhi artwork excluded</span>
+    <span class="spacer"></span>
+    <a href="https://github.com/meSingh/sukhi-play">GitHub</a>
+    <a href="https://snapcraft.io/sukhi-play">Snap Store</a>
+    <a href="debug.html">Troubleshooting</a>
+    <a href="https://github.com/meSingh/sukhi-play/issues">Report a problem</a>
+  </div>
+</footer>
+<script>
+/* Reveal on scroll, and mark the visitor's own platform. Both are decoration:
+   without this script every section is visible and every link works. */
+(function () {
+  var root = document.documentElement;
+  var ua = navigator.userAgent;
+  var plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+  var touch = navigator.maxTouchPoints > 1;
+  var os = /Android|iPhone|iPad/i.test(ua) ? null
+    : /Mac/i.test(plat + ua) && !touch ? 'mac'
+    : /Win/i.test(plat + ua) ? 'win'
+    : /Linux|X11|CrOS/i.test(plat + ua) ? 'linux' : null;
+  window.SUKHI_OS = os;
+  if (os) {
+    document.querySelectorAll('[data-os="' + os + '"]').forEach(function (el) {
+      el.classList.add('yours');
+      var tag = el.querySelector('.yours[hidden]');
+      if (tag) tag.hidden = false;
+    });
+  }
+
+  var els = document.querySelectorAll('.reveal, .vault');
+  if (!('IntersectionObserver' in window) ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // Only now hide them, so nothing can leave the page blank.
+  root.classList.add('js');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+</body>
+</html>
