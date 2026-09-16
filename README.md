@@ -541,3 +541,9 @@ the app is free either way.
 - [DISCLAIMER.md](DISCLAIMER.md): what this is, and what you are responsible for
 - [SECURITY.md](SECURITY.md): reporting a kiosk escape
 - [CONTRIBUTING.md](CONTRIBUTING.md): the rules this project lives by
+
+<p align="center">
+  <a href="https://www.msingh.com">
+    <img src="docs/made-with-love.png" width="720" alt="Made with love by Mandeep Singh, for his cheeky little Sukhraj. It began with a three-year-old who pressed every key and clicked every button. So Mandeep built a screen where pressing all of them is perfectly safe.">
+  </a>
+</p>

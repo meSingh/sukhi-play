@@ -83,6 +83,9 @@ main.wrap { padding-bottom: 72px; }
 .top nav a:hover,
 .top nav a[aria-current="page"] { background: var(--paper); color: var(--ink); }
 
+.top nav a.nav-gh { display: inline-flex; align-items: center; gap: 7px; }
+.nav-gh svg { width: 17px; height: 17px; fill: currentColor; flex: none; }
+
 .menu-btn, .nav-head, .nav-cta, .nav-scrim { display: none; }
 
 /* ---------------- type ---------------- */
@@ -736,6 +739,9 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
   .nav-open .top nav a:nth-of-type(4) { animation-delay: .12s; }
   .nav-open .top nav a:nth-of-type(5) { animation-delay: .16s; }
   .nav-open .top nav a:nth-of-type(6) { animation-delay: .20s; }
+  .nav-open .top nav a:nth-of-type(7) { animation-delay: .24s; }
+  .top nav a.nav-gh { display: flex; gap: 12px; margin-top: 8px; border-top: 1px solid var(--line); border-radius: 0; padding-top: 18px; }
+  .nav-gh svg { width: 22px; height: 22px; }
   @keyframes navin { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
   .nav-head {
     display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 4px 4px 14px;
