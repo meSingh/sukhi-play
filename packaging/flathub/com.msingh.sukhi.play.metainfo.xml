@@ -92,8 +92,8 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
-    <release version="1.0.12" date="2026-09-13">
-      <url type="details">https://github.com/meSingh/sukhi-play/releases/tag/v1.0.12</url>
+    <release version="1.0.13" date="2026-09-16">
+      <url type="details">https://github.com/meSingh/sukhi-play/releases/tag/v1.0.13</url>
     </release>
   </releases>
 </component>
