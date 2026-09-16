@@ -44,6 +44,41 @@ jobs:
         run: npm run key-probe
         timeout-minutes: 5
 
+      # Presses the Windows key over the running kiosk and checks the Start
+      # menu is closed and the kiosk is back in front each time.
+      - name: Does the Start menu get closed
+        run: npm run start-probe
+        timeout-minutes: 5
+        env:
+          SUKHI_EXIT_AFTER: '90'
+
+  # A build to try on a real Windows 11 machine, where the Start menu behaves
+  # like it does at home. Download it from this run's artifacts.
+  windows-test-build:
+    name: Windows test build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build the installer and portable exe
+        run: npm run dist:win
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-build
+          path: |
+            dist/*-setup.exe
+            dist/*-win-x64.exe
+          retention-days: 7
+
   # The Microsoft Store package can only be built on Windows. Building it here
   # proves the manifest and tile assets are valid before anything is uploaded
   # to Partner Center, which reports problems far more slowly.

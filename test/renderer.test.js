@@ -232,7 +232,7 @@ test('every diagnostic run saves its report to a file before quitting', () => {
   // Installed Windows builds print nothing to the terminal they were started
   // from, so the file on the Desktop is the only output a parent can send.
   const main = fs.readFileSync(path.join(MAIN, 'index.js'), 'utf8');
-  for (const fn of ['runDiagnose', 'runCoverProbe', 'runKeyProbe']) {
+  for (const fn of ['runDiagnose', 'runCoverProbe', 'runKeyProbe', 'runStartProbe']) {
     const start = main.indexOf(`async function ${fn} (`);
     assert.ok(start >= 0, `${fn} not found`);
     const body = main.slice(start, main.indexOf('\n}\n', start));
