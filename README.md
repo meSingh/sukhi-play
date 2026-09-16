@@ -6,6 +6,8 @@
 
 **A locked-down browser that lets a small child open only what you choose, and nothing else.**
 
+**[mesingh.github.io/sukhi-play](https://mesingh.github.io/sukhi-play/)**
+
 [![CI](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml/badge.svg)](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/meSingh/sukhi-play?sort=semver)](https://github.com/meSingh/sukhi-play/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -344,8 +346,9 @@ variants, `Cmd+Shift+3/4/5/6`). Released the moment the window loses focus.
   handed over, and those are taken.
 
   So pressing the Windows key opens the Start menu over the kiosk. The app
-  notices it lost focus and pulls itself back in front after 120ms, which
-  dismisses it, but there is a visible flash. Blocking it properly needs a
+  asks for focus back after 120ms, but Windows 11 refuses a focus request
+  from a background app and draws the Start menu above every application
+  window, so the menu stays until Esc or a click on the app. Blocking it properly needs a
   low-level keyboard hook or a registry scancode map, and both are permanent
   changes to the machine that this project will not make.
 
@@ -394,8 +397,11 @@ reach; it does not childproof a computer.
 
 ### Reporting a layout or window bug
 
-Window geometry cannot be reasoned about from another machine, so paste real
-numbers rather than a description:
+Window geometry cannot be reasoned about from another machine, so send real
+numbers rather than a description. Close the app, then run the installed copy
+with `--diagnose` (the exact line for each system is on the
+[troubleshooting page](https://mesingh.github.io/sukhi-play/debug.html)), or
+from a clone:
 
 ```bash
 npm run diagnose
@@ -407,6 +413,11 @@ the measured position of the top bar, then quits. **Content size must equal
 display bounds.** A top bar reporting `top: 0` with a positive height is
 correctly placed; a negative top, or a window whose `y` is above the display's,
 means the window manager and the app disagree.
+
+Every run also saves what it printed as `sukhi-play-diagnose.txt` on the
+Desktop (`--cover-probe` and `--key-probe` do the same under their own names),
+because an installed Windows app does not print to the terminal it was started
+from.
 
 The diagnostic deliberately runs with the lockdown off, so it opens an ordinary
 window and does not borrow any desktop shortcuts.

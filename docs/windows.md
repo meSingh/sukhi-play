@@ -66,11 +66,12 @@ quits.
 
 **The Windows key is the exception.** Windows does not let an application take
 it, on its own or in almost any combination, so pressing it opens the Start
-menu over the kiosk. The app notices and pulls itself back in front within
-about a tenth of a second, so the menu does not stay, but you will see it
-flash. Taking that key properly would mean a permanent change to the machine,
-which this app does not make. `npm run key-probe` reports exactly which keys
-Windows hands over on your system.
+menu over the kiosk, and on Windows 11 it stays there until someone presses Esc
+or clicks back on the app. The app does ask for focus back, but Windows refuses
+that request from an app in the background, and the Start menu is drawn above
+every application window regardless. Taking that key properly would mean a permanent change to the machine,
+which this app does not make. Running the app with `--key-probe` reports
+exactly which keys Windows hands over on your system.
 
 To quit, press **Close** and hold the button for three seconds.
 
@@ -79,15 +80,18 @@ seconds and you get an ordinary closable window. A kiosk that breaks has to
 break open, not locked.
 
 If the taskbar is still visible over the app, that is a bug and not a setting.
-Run the probe and include its output in a report:
+Close Sukhi Play, then run this in PowerShell:
 
-```bash
-npm run cover-probe
+```powershell
+& (gci "$env:LOCALAPPDATA\Programs" -Recurse -Filter "Sukhi Play.exe")[0].FullName --cover-probe
 ```
 
-It measures every way of covering the screen and prints what the window manager
-did with each, which is the only reliable way to tell a window that is the
-wrong size from one that is being drawn under the taskbar.
+It measures every way of covering the screen and records what the window
+manager did with each, which is the only reliable way to tell a window that is
+the wrong size from one that is being drawn under the taskbar. The report is
+saved as `sukhi-play-cover-probe.txt` on your Desktop; attach it to a bug
+report. An installed app on Windows usually prints nothing to PowerShell, so the
+file is the part that matters.
 
 > **Windows is the least tested of the three platforms.** It builds in CI and
 > the test suite runs there, but far fewer people have actually used it than
