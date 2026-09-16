@@ -113,15 +113,17 @@ break open, not locked.
 
 ## If something goes wrong
 
-Run the diagnostic and include the output in a bug report:
+Close Sukhi Play, then run the built-in check from Terminal:
 
 ```bash
-npm run diagnose
+"/Applications/Sukhi Play.app/Contents/MacOS/Sukhi Play" --diagnose
 ```
 
-It prints the window and display geometry, the measured bar position and the
-session details, then quits, with the lockdown switched off so it never takes
-over your screen.
+It measures the window and display geometry and the session details, then
+quits, with the lockdown switched off so it never takes over your screen. The
+report is saved as `sukhi-play-diagnose.txt` on your Desktop; attach that file
+to a bug report. The [troubleshooting page](https://mesingh.github.io/sukhi-play/debug.html)
+has the same steps for every system.
 
 Report problems at
 [github.com/meSingh/sukhi-play/issues](https://github.com/meSingh/sukhi-play/issues).

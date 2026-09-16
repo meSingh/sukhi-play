@@ -883,3 +883,4 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
   .gt-note { grid-template-columns: 1fr; }
 }
 .getting.started .gt-cancel { display: none; }
+.probe-list .card.yours { border: 2px solid var(--mint); }

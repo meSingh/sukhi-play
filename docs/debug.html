@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Troubleshooting Sukhi Play</title>
-<meta name="description" content="Run Sukhi Play’s diagnostics from source and report a problem with real numbers.">
+<meta name="description" content="Run Sukhi Play’s built-in check and send a report when something looks wrong.">
 <link rel="icon" href="assets/sukhi-icon.png">
 <link rel="stylesheet" href="site.css">
 <script>document.documentElement.classList.remove('no-js')</script>
@@ -32,7 +32,7 @@
   <div class="hero hero--page">
     <span class="bob" style="display:inline-block"><svg class="glyph" viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="#fff"/><path d="M30.5 11.5a8 8 0 0 0-9.8 10.3L11.8 30.7a3.2 3.2 0 1 0 4.5 4.5l8.9-8.9a8 8 0 0 0 10.3-9.8l-4.6 4.6-4.3-1.2-1.2-4.3z" fill="#8B5CF6"/></svg></span>
     <h1>Troubleshooting</h1>
-    <p class="lede">Something looks wrong on your computer? A short check prints exactly what happened, so it can be fixed.</p>
+    <p class="lede">Something looks wrong? One command makes a small report you can send us. No extra software needed.</p>
   </div>
 
   <div class="card ok reveal">
@@ -42,53 +42,53 @@
   </div>
 
   <div class="block">
-    <h2 class="reveal">Why this needs the source code</h2>
-    <p class="reveal">The checks are developer tools that print to a terminal, so they run from the project&rsquo;s code. About five minutes the first time.</p>
+    <h2 class="reveal">1. Close Sukhi Play</h2>
+    <p class="reveal">Hold <b>Close</b> for three seconds. The check can&rsquo;t start while the app is already open.</p>
   </div>
 
   <div class="block">
-    <h2 class="reveal">1. Install Node.js</h2>
-    <p class="reveal">Download the <b>LTS</b> version from <a href="https://nodejs.org">nodejs.org</a> and install it like any app.</p>
-  </div>
-
-  <div class="block">
-    <h2 class="reveal">2. Get the code</h2>
-    <p class="reveal">Open Terminal (Mac, Linux) or PowerShell (Windows) and run:</p>
-    <pre class="reveal"><code>git clone https://github.com/meSingh/sukhi-play.git
-cd sukhi-play
-npm ci</code></pre>
-    <p class="note-small" style="text-align:left">No git? <a href="https://github.com/meSingh/sukhi-play/archive/refs/heads/main.zip">Download the code as a zip</a>, unzip it, open a terminal in that folder and run <code>npm ci</code>.</p>
-  </div>
-
-  <div class="block">
-    <h2 class="reveal">3. Run the check for your problem</h2>
+    <h2 class="reveal">2. Run the check</h2>
+    <p class="reveal">Copy the line for your computer, paste it, press Enter. A window opens for a few seconds, then closes by itself.</p>
     <div class="probe-list">
-      <div class="card reveal">
-        <header><b>The layout or size looks wrong</b><span>All systems</span></header>
-        <pre><code>npm run diagnose</code></pre>
-        <p>Prints the screen and window sizes, then closes. It never locks your screen.</p>
-        <p style="font-size:14px">On Linux, if it complains about the sandbox: <code>./node_modules/.bin/electron . --diagnose --no-sandbox</code></p>
+      <div class="card reveal" data-os="mac">
+        <header><b>Mac</b><span>Open the Terminal app</span></header>
+        <pre><code>"/Applications/Sukhi Play.app/Contents/MacOS/Sukhi Play" --diagnose</code></pre>
       </div>
-      <div class="card reveal">
-        <header><b>The taskbar still shows</b><span>Windows</span></header>
-        <pre><code>npm run cover-probe</code></pre>
-        <p>Tries every way of covering the screen and reports which worked. Your screen is covered for a few seconds.</p>
+      <div class="card reveal" data-os="win">
+        <header><b>Windows</b><span>Open PowerShell from the Start menu</span></header>
+        <pre><code><span class="c"># installed</span>
+&amp; (gci "$env:LOCALAPPDATA\Programs" -Recurse -Filter "Sukhi Play.exe")[0].FullName --diagnose
+<span class="c"># portable</span>
+&amp; ~\Downloads\Sukhi-Play-Windows-Portable.exe --diagnose</code></pre>
       </div>
-      <div class="card reveal">
-        <header><b>A key isn&rsquo;t being held</b><span>Windows</span></header>
-        <pre><code>npm run key-probe</code></pre>
-        <p>Lists exactly which keys Windows lets the app hold on your computer.</p>
+      <div class="card reveal" data-os="linux">
+        <header><b>Linux</b><span>Open a terminal</span></header>
+        <pre><code><span class="c"># Snap or .deb</span>
+sukhi-play --diagnose
+<span class="c"># AppImage</span>
+~/Downloads/Sukhi-Play-Linux.AppImage --diagnose</code></pre>
       </div>
     </div>
   </div>
 
   <div class="block">
-    <h2 class="reveal">4. Send the output</h2>
-    <p class="reveal">Copy everything it printed into a new issue, with what you expected to see.</p>
+    <h2 class="reveal">Windows: a specific problem?</h2>
+    <p class="reveal">Use the same line, but swap <code>--diagnose</code> for:</p>
+    <ul class="checks reveal d1">
+      <li><code>--cover-probe</code>&nbsp; if the taskbar still shows</li>
+      <li><code>--key-probe</code>&nbsp; if a key isn&rsquo;t being held</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2 class="reveal">3. Send us the report</h2>
+    <p class="reveal">A file called <b>sukhi-play-diagnose.txt</b> is now on your Desktop.
+      Open a new issue, say what you expected to see, and drag the file into the box.</p>
     <div class="page-os reveal" style="justify-content:flex-start">
       <a class="get" href="https://github.com/meSingh/sukhi-play/issues/new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg><span><b>Open an issue</b><small>On GitHub, free account needed</small></span></a>
       <a class="get get--soft" href="https://github.com/meSingh/sukhi-play/issues"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg><span><b>See known problems</b><small>Someone may have hit it already</small></span></a>
     </div>
+    <p class="note-small" style="text-align:left;margin-top:18px">Working from the source code instead? <code>npm run diagnose</code> does the same thing.</p>
   </div>
 </main>
 

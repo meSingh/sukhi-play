@@ -53,6 +53,34 @@ const KEY_PROBE = process.argv.includes('--key-probe');
 const SHOTS_ARG = process.argv.find((a) => a.startsWith('--shots='));
 const SHOTS_DIR = SHOTS_ARG ? SHOTS_ARG.slice('--shots='.length) : null;
 
+// Each diagnostic run also saves what it printed to a text file on the Desktop.
+// Installed builds are how most people run this, and on Windows an installed
+// app is a windowed program: its output usually never reaches the terminal it
+// was started from. A file can be attached to a bug report by anyone.
+const REPORT_NAME = DIAGNOSE ? 'diagnose' : COVER_PROBE ? 'cover-probe' : KEY_PROBE ? 'key-probe' : null;
+const reportLines = [];
+if (REPORT_NAME) {
+  const log = console.log.bind(console);
+  console.log = (...args) => {
+    reportLines.push(args.map(String).join(' '));
+    log(...args);
+  };
+}
+
+function saveReport () {
+  if (!REPORT_NAME) return;
+  const name = `sukhi-play-${REPORT_NAME}.txt`;
+  const text = reportLines.join('\n') + '\n';
+  for (const dir of [app.getPath('desktop'), app.getPath('userData')]) {
+    try {
+      const file = path.join(dir, name);
+      fs.writeFileSync(file, text);
+      process.stdout.write(`\n  Report saved to ${file}\n\n`);
+      return;
+    } catch { /* not writable here, try the next place */ }
+  }
+}
+
 const PROBE_ARG = process.argv.find((a) => a.startsWith('--probe='));
 const PROBE_URL = PROBE_ARG ? PROBE_ARG.split('=').slice(1).join('=') : null;
 const PROBE_MODE = Boolean(PROBE_URL);
@@ -835,6 +863,7 @@ async function runKeyProbe () {
   try { shortcuts.releaseAll(); } catch { /* nothing held */ }
   gnome.giveBack(paths.userData);
   shellApp.allowQuit = true;
+  saveReport();
   app.exit(0);
 }
 
@@ -914,6 +943,7 @@ async function runCoverProbe () {
   try { shortcuts.releaseAll(); } catch { /* nothing held */ }
   gnome.giveBack(paths.userData);
   shellApp.allowQuit = true;
+  saveReport();
   app.exit(0);
 }
 
@@ -1007,6 +1037,7 @@ async function runDiagnose () {
   try { shortcuts.releaseAll(); } catch { /* nothing held */ }
   gnome.giveBack(paths.userData);
   shellApp.allowQuit = true;
+  saveReport();
   app.exit(0);
 }
 
