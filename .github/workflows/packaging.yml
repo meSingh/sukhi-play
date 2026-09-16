@@ -44,6 +44,44 @@ jobs:
         run: npm run key-probe
         timeout-minutes: 5
 
+  # The Microsoft Store package can only be built on Windows. Building it here
+  # proves the manifest and tile assets are valid before anything is uploaded
+  # to Partner Center, which reports problems far more slowly.
+  windows-store:
+    name: Build the Microsoft Store package
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build the .appx
+        run: npm run dist:win:store
+
+      - name: What came out
+        shell: bash
+        run: |
+          set -e
+          ls -lh dist/
+          pkg=$(find dist -maxdepth 1 -name '*.appx' -print -quit)
+          if [ -z "$pkg" ]; then
+            echo "::error::no .appx was produced"
+            exit 1
+          fi
+          echo "built $pkg"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: store-package
+          path: dist/*.appx
+          retention-days: 7
+
   linux:
     name: Build Linux packages
     runs-on: ubuntu-latest

@@ -1161,6 +1161,7 @@ async function boot () {
   renderTiles(config.apps);
 
   el('version').textContent = `v${config.version}`;
+  el('check-update').hidden = Boolean(config.storeBuild);
   el('hold-secs').textContent = String(config.settings.holdSeconds);
 
   // Hold the splash briefly so it reads as a loading screen rather than a blink.

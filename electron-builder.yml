@@ -67,6 +67,22 @@ deb:
     # Debian policy requires this; the package shipped only a changelog.
     - "build/linux/copyright=/usr/share/doc/sukhi-play/copyright"
 
+# Microsoft Store package. Built only by `npm run dist:win:store`, never by the
+# release workflow: the Store re-signs and hosts it, and the GitHub downloads
+# stay the NSIS installer and portable exe.
+#
+# identityName, publisher and publisherDisplayName must be copied exactly from
+# Partner Center (the app's Product identity page) once the name is reserved.
+# Until then electron-builder's placeholders let the package build, but the
+# Store will reject an upload whose identity does not match.
+appx:
+  applicationId: SukhiPlay
+  displayName: Sukhi Play
+  backgroundColor: transparent
+  showNameOnTiles: true
+  languages: [en-GB, en-US]
+  artifactName: ${productName}-${version}-store-${arch}.${ext}
+
 nsis:
   artifactName: ${productName}-${version}-win-${arch}-setup.${ext}
   oneClick: false

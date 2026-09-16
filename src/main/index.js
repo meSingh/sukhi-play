@@ -81,6 +81,9 @@ function saveReport () {
   }
 }
 
+// True only when running from a Microsoft Store (MSIX) package.
+const STORE_BUILD = Boolean(process.windowsStore);
+
 const PROBE_ARG = process.argv.find((a) => a.startsWith('--probe='));
 const PROBE_URL = PROBE_ARG ? PROBE_ARG.split('=').slice(1).join('=') : null;
 const PROBE_MODE = Boolean(PROBE_URL);
@@ -267,7 +270,10 @@ function registerIpc () {
     checkMode: CHECK_MODE || PROBE_MODE,
     // The walkthrough runs when nobody has set the app up yet. Without it a
     // parent's first sight of the app is an empty screen with no clue what to do.
-    needsOnboarding: !settings.onboarded
+    needsOnboarding: !settings.onboarded,
+    // A Microsoft Store install is updated by the Store. Store policy does not
+    // allow pointing people at another download source, so the check is hidden.
+    storeBuild: STORE_BUILD
   }));
 
   ipcMain.handle('shell:launch', (_e, appId) => {
@@ -349,6 +355,7 @@ function registerIpc () {
    */
   ipcMain.handle('shell:open-releases', () => {
     if (!isUnlocked()) return locked();
+    if (STORE_BUILD) return { ok: false, message: 'Updates arrive through the Microsoft Store.' };
     const opener = process.platform === 'darwin' ? 'open'
       : process.platform === 'win32' ? 'explorer' : 'xdg-open';
     try {
@@ -511,6 +518,7 @@ function registerIpc () {
    */
   ipcMain.handle('shell:check-update', async () => {
     if (!isUnlocked()) return locked();
+    if (STORE_BUILD) return { ok: false, message: 'Updates arrive through the Microsoft Store.' };
     try {
       const res = await net.fetch(
         'https://api.github.com/repos/meSingh/sukhi-play/releases/latest',

@@ -160,3 +160,11 @@ test('Linux installers get permanent download names too', () => {
     assert.ok(aliasLine.includes(`${match}:${alias}`), `no permanent alias ${alias}`);
   }
 });
+
+test('the Microsoft Store package is never part of a GitHub release', () => {
+  // The Store re-signs and hosts its own package. An .appx attached to a
+  // GitHub release would be an unsigned package nobody can install.
+  const winTargets = builder.win.target.map((t) => (typeof t === 'string' ? t : t.target));
+  assert.ok(!winTargets.includes('appx'), 'appx must not be a default Windows target');
+  assert.match(pkg.scripts['dist:win:store'], /--win appx --publish never/);
+});

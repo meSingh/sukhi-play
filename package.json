@@ -13,6 +13,7 @@
     "dist": "npm run metainfo && electron-builder",
     "dist:mac": "electron-builder --mac --publish never",
     "dist:win": "electron-builder --win --publish never",
+    "dist:win:store": "electron-builder --win appx --publish never",
     "dist:linux": "npm run metainfo && electron-builder --linux --publish never",
     "check": "electron . --check",
     "test": "node --test",
