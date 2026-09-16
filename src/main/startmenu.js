@@ -88,6 +88,7 @@ public static class SukhiStart {
 // "<id> <result>", so a slow reply can never be matched to the wrong request.
 const SCRIPT = `
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
 Add-Type -TypeDefinition @'
 ${CSHARP}
 '@
@@ -151,7 +152,14 @@ function start () {
     waiting.delete(id);
     resolve(line.slice(space + 1));
   });
-  child.stderr.on('data', (d) => console.warn(`[start menu] ${String(d).trim()}`));
+  child.stderr.on('data', (d) => {
+    // PowerShell serialises its progress stream to stderr as CLIXML when it is
+    // not attached to a console. That is noise, not an error.
+    const text = String(d).trim();
+    if (text && !text.startsWith('#< CLIXML') && !text.startsWith('<Objs')) {
+      console.warn(`[start menu] ${text}`);
+    }
+  });
 
   const gone = () => { child = null; ready = false; settleAll(); };
   child.on('exit', gone);
