@@ -1147,105 +1147,6 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
   .nav-dl-menu small { font-size: 12.5px; }
 }
 
-/* ---------------- the features page ---------------- */
-
-/* A band per feature: the real screenshot on one side, what it is on the
-   other, alternating. The previous version drew little abstractions of the
-   app in CSS, which looked like a diagram of a product rather than a product. */
-.features { background: var(--paper); padding: 8px 0 12px; margin: 8px 0 56px; }
-
-.feature {
-  display: grid; grid-template-columns: 1.15fr 1fr; align-items: center; gap: 48px;
-  padding: 52px 0;
-  border-bottom: 1px solid var(--line);
-}
-.feature:last-child { border-bottom: 0; }
-.feature--flip .feature-shot { order: 2; }
-
-/* The picture is a button: clicking it opens the full-resolution original,
-   because a 560px screenshot of a screen is not readable. */
-.feature-shot {
-  position: relative; display: block; width: 100%; padding: 0;
-  border: 0; background: none; cursor: zoom-in;
-  border-radius: 18px;
-}
-.shot-zoom {
-  position: absolute; right: 12px; bottom: 12px;
-  display: grid; place-items: center; width: 40px; height: 40px;
-  border-radius: 12px; background: rgba(23, 21, 58, .72); color: #fff;
-  opacity: 0; transform: translateY(4px); transition: opacity .16s ease, transform .16s ease;
-}
-.shot-zoom svg { width: 20px; height: 20px; }
-.feature-shot:hover .shot-zoom,
-.feature-shot:focus-visible .shot-zoom { opacity: 1; transform: none; }
-.feature-shot:hover img { box-shadow: 0 26px 60px rgba(23, 21, 58, .24); }
-
-.shot-box {
-  width: min(1400px, 94vw); max-width: none; max-height: 92vh;
-  padding: 0; border: 0; border-radius: 18px; background: none;
-  overflow: visible;
-}
-.shot-box::backdrop { background: rgba(23, 21, 58, .78); backdrop-filter: blur(4px); }
-.shot-box img {
-  display: block; width: 100%; height: auto; max-height: 92vh; object-fit: contain;
-  border-radius: 18px; box-shadow: 0 30px 80px rgba(0, 0, 0, .5);
-}
-.shot-close {
-  position: absolute; top: -14px; right: -14px; z-index: 2;
-  width: 44px; height: 44px; border: 0; border-radius: 50%;
-  background: var(--base); color: var(--ink);
-  font-size: 28px; line-height: 1; cursor: pointer; box-shadow: var(--drop);
-}
-
-.feature-shot img {
-  display: block; width: 100%; height: auto;
-  border-radius: 18px; border: 1px solid var(--line);
-  box-shadow: 0 22px 50px rgba(23, 21, 58, .16);
-}
-
-.feature-say h2 { font-size: 30px; line-height: 1.15; margin: 0 0 14px; }
-.feature-say p { font-size: 17px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 12px; }
-.feature-note {
-  margin-top: 16px !important; padding-top: 14px;
-  border-top: 1px solid var(--line);
-  font-size: 14.5px !important; opacity: .85;
-}
-
-.sec-title { font-size: 30px; margin: 0 0 18px; }
-.feat-list {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 44px;
-  margin-bottom: 64px;
-}
-.feat-row { padding: 20px 0; border-bottom: 1px solid var(--line); }
-.feat-row h3 { font-size: 18px; margin: 0 0 6px; }
-.feat-row p { font-size: 15.5px; line-height: 1.55; color: var(--ink-soft); margin: 0; }
-
-/* The end of the page, in ink. A white panel here read as an empty box
-   rather than an ending, and nothing else on this site is white. */
-.closer {
-  background: var(--ink); color: #fff;
-  text-align: center; padding: 74px 24px 80px; margin-top: 64px;
-}
-.closer h2 { font-size: 36px; margin: 0 0 10px; color: #fff; }
-.closer > .wrap > p { color: rgba(255, 255, 255, .74); margin: 0 0 28px; font-size: 17px; }
-.closer-note {
-  margin: 22px 0 0 !important; font-size: 14px;
-  color: rgba(255, 255, 255, .55) !important;
-}
-.big-dl {
-  display: inline-block; padding: 18px 40px; border-radius: 18px;
-  background: #fff; color: var(--ink); font-size: 19px; font-weight: 800;
-  text-decoration: none; box-shadow: 0 10px 28px rgba(0, 0, 0, .28);
-  transition: transform .14s ease, box-shadow .14s ease;
-}
-.big-dl:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(0, 0, 0, .34); }
-
-@media (max-width: 900px) {
-  .feature { grid-template-columns: 1fr; gap: 26px; padding: 40px 0; }
-  .feature--flip .feature-shot { order: 0; }
-  .feat-list { grid-template-columns: 1fr; }
-}
-
 /* ---------------- the catalogue: what is already inside ---------------- */
 
 /* The bundled apps, kept apart from the sites. They need no address and no
@@ -1313,4 +1214,158 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
 
 @media (max-width: 620px) {
   .cat-head--badged { flex-direction: column; gap: 14px; }
+}
+
+/* ---------------- the features page ---------------- */
+
+/* Two acts, and inside each a grid of tiles that are deliberately not all the
+   same size or the same kind. The previous version was six identical bands:
+   a list with pictures in it, everything weighted the same, so nothing stood
+   out and there was no reason to stop anywhere. */
+
+.hero--page h1 em { font-style: normal; color: var(--blue); }
+
+.act { padding: 64px 0 72px; }
+.act--dark {
+  background: var(--ink); color: #fff;
+  margin: 72px 0 0; padding: 72px 0 80px;
+}
+
+.act-head { max-width: 58ch; margin: 0 0 32px; }
+.act-num {
+  display: inline-block; margin-bottom: 12px;
+  font-size: 13px; font-weight: 900; letter-spacing: 2px;
+  color: var(--blue);
+}
+.act--dark .act-num { color: var(--yellow); }
+.act-head h2 { font-size: 38px; line-height: 1.1; margin: 0 0 10px; }
+.act--dark .act-head h2 { color: #fff; }
+.act-head p { font-size: 17.5px; color: var(--ink-soft); margin: 0; }
+.act--dark .act-head p { color: rgba(255, 255, 255, .7); }
+
+.bento { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+.bt {
+  grid-column: span 1;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 24px; border-radius: 24px;
+  background: var(--paper);
+  overflow: hidden;
+}
+.bt--2 { grid-column: span 2; }
+.bt--4 { grid-column: span 4; }
+.bt--tall { grid-row: span 2; }
+
+.tone-amber  { background: var(--wash-amber); }
+.tone-violet { background: var(--wash-violet); }
+.tone-cyan   { background: var(--wash-cyan); }
+.tone-mint   { background: var(--wash-mint); }
+.tone-paper  { background: var(--paper); }
+.tone-ink {
+  background: rgba(255, 255, 255, .06); color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .13);
+}
+.tone-ink h3 { color: #fff; }
+.tone-ink p { color: rgba(255, 255, 255, .72); }
+
+.bt-say { display: flex; flex-direction: column; gap: 8px; }
+.bt h3 { font-size: 20px; line-height: 1.2; margin: 0; }
+.bt p { font-size: 15.5px; line-height: 1.55; color: var(--ink-soft); margin: 0; }
+.bt--tall .bt-say { margin-top: auto; }
+
+/* One loud number instead of a sentence, for the things that are a number. */
+.bt-stat {
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 54px !important; font-weight: 900; line-height: 1 !important;
+  color: var(--ink) !important; letter-spacing: -2px;
+}
+.tone-ink .bt-stat { color: var(--yellow) !important; }
+.bt-stat span {
+  font-size: 12.5px; font-weight: 800; letter-spacing: .4px; line-height: 1.3;
+  color: var(--ink-soft); text-transform: uppercase;
+}
+.tone-ink .bt-stat span { color: rgba(255, 255, 255, .55); }
+
+.bt-shot { position: relative; display: block; padding: 0; border: 0; background: none; cursor: zoom-in; }
+.bt-shot img {
+  display: block; width: 100%; height: auto;
+  border-radius: 14px; border: 1px solid var(--line);
+  box-shadow: 0 14px 34px rgba(23, 21, 58, .14);
+}
+.bt-zoom {
+  position: absolute; right: 10px; bottom: 10px;
+  display: grid; place-items: center; width: 36px; height: 36px;
+  border-radius: 11px; background: rgba(23, 21, 58, .74); color: #fff;
+  opacity: 0; transform: translateY(4px); transition: opacity .16s ease, transform .16s ease;
+}
+.bt-zoom svg { width: 18px; height: 18px; }
+.bt-shot:hover .bt-zoom, .bt-shot:focus-visible .bt-zoom { opacity: 1; transform: none; }
+
+/* The hold, drawn rather than described. */
+.hold-demo { display: flex; justify-content: center; padding: 6px 0 2px; }
+.hold-ring {
+  display: grid; place-items: center; width: 86px; height: 86px;
+  border-radius: 50%; background: var(--blue); color: #fff;
+  font-weight: 900; font-size: 17px;
+  box-shadow: 0 0 0 0 rgba(59, 107, 255, .5);
+  animation: holdpulse 2.6s ease-out infinite;
+}
+@keyframes holdpulse {
+  0%   { box-shadow: 0 0 0 0 rgba(59, 107, 255, .45); }
+  70%  { box-shadow: 0 0 0 20px rgba(59, 107, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 107, 255, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .hold-ring { animation: none; } }
+
+/* The short ones: a quiet run, not a third grid competing with the two above. */
+.rest { padding: 72px 0 8px; }
+.rest h2 { font-size: 27px; margin: 0 0 6px; }
+.rest-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 48px; }
+.rest-list li { display: grid; gap: 4px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.rest-list b { font-size: 17px; }
+.rest-list span { font-size: 15px; line-height: 1.55; color: var(--ink-soft); }
+
+.shot-box {
+  width: min(1400px, 94vw); max-width: none; max-height: 92vh;
+  padding: 0; border: 0; border-radius: 18px; background: none; overflow: visible;
+}
+.shot-box::backdrop { background: rgba(23, 21, 58, .78); backdrop-filter: blur(4px); }
+.shot-box img {
+  display: block; width: 100%; height: auto; max-height: 92vh; object-fit: contain;
+  border-radius: 18px; box-shadow: 0 30px 80px rgba(0, 0, 0, .5);
+}
+.shot-close {
+  position: absolute; top: -14px; right: -14px; z-index: 2;
+  width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: var(--base); color: var(--ink);
+  font-size: 28px; line-height: 1; cursor: pointer; box-shadow: var(--drop);
+}
+
+.closer {
+  background: var(--ink); color: #fff;
+  text-align: center; padding: 74px 24px 80px; margin-top: 64px;
+}
+.closer h2 { font-size: 36px; margin: 0 0 10px; color: #fff; }
+.closer > .wrap > p { color: rgba(255, 255, 255, .74); margin: 0 0 28px; font-size: 17px; }
+.closer-note { margin: 22px 0 0 !important; font-size: 14px; color: rgba(255, 255, 255, .55) !important; }
+.closer-note a, .closer a { color: rgba(255, 255, 255, .8); }
+.big-dl {
+  display: inline-block; padding: 18px 40px; border-radius: 18px;
+  background: #fff; color: var(--ink); font-size: 19px; font-weight: 800;
+  text-decoration: none; box-shadow: 0 10px 28px rgba(0, 0, 0, .28);
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.big-dl:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(0, 0, 0, .34); }
+
+@media (max-width: 900px) {
+  .bento { grid-template-columns: repeat(2, 1fr); }
+  .bt--2, .bt--4 { grid-column: span 2; }
+  .bt--tall { grid-row: span 1; }
+  .act-head h2 { font-size: 30px; }
+  .rest-list { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .bento { grid-template-columns: 1fr; }
+  .bt--2, .bt--4 { grid-column: span 1; }
+  .bt-stat { font-size: 44px !important; }
 }

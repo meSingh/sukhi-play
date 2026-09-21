@@ -1,41 +1,26 @@
 ---
+/**
+ * The features page, in two acts: what a child meets, and what a parent
+ * decides. Within each, a grid of tiles that are deliberately not the same
+ * size or the same kind -- a screenshot, a number, a sentence on a colour --
+ * so the important things are big and the small ones stay small.
+ */
 import Base from '../layouts/Base.astro';
-import Feature from '../components/Feature.astro';
+import Tile from '../components/Tile.astro';
 import { REPO } from '../site';
 
 import launcher from '../images/01-launcher.png';
 import portal from '../images/02-parent-portal.png';
 import addApp from '../images/03-add-an-app.png';
-import suggestions from '../images/04-catalogue.png';
 import closing from '../images/05-closing-needs-a-grownup.png';
-import firstRun from '../images/00-first-run.png';
 
-// The short ones. Everything above is shown; these are the rest, said once.
 const REST = [
-  {
-    h: 'Add any site by its address',
-    p: 'Paste an address and Sukhi Play works out what the site needs, suggests a name and a picture, and lets you change all of it before you save.'
-  },
-  {
-    h: 'No favicons, no logos',
-    p: 'Every tile is a shape and a colour we drew. Nothing is fetched from the sites you add, so nothing on your screen is theirs to change.'
-  },
-  {
-    h: 'More time without changing the rule',
-    p: 'Grant fifteen minutes, an hour, or the rest of the day. It applies to this session only; tomorrow starts from your usual limit again.'
-  },
-  {
-    h: 'Keyboard shortcuts held down',
-    p: 'Alt+Tab, Alt+F4, Command+Q, Print Screen and the rest are caught while the window has focus. The one exception is the Windows key, and we say so plainly.'
-  },
-  {
-    h: 'No downloads, no popups, no new windows',
-    p: 'A site cannot open a window, start a download, or ask for your camera. The one thing that may write a file is a bundled app saving a picture.'
-  },
-  {
-    h: 'Nothing is sent anywhere',
-    p: 'No analytics, no accounts, no telemetry, no crash reporting. The only request Sukhi Play makes on its own is checking for a newer version, and only when you press the button.'
-  }
+  ['No favicons, no logos', 'Every tile is a shape and a colour we drew. Nothing is fetched from the sites you add.'],
+  ['Keyboard shortcuts held', 'Alt+Tab, Alt+F4, Command+Q, Print Screen. The Windows key is the one exception, and we say so.'],
+  ['No downloads', 'A site cannot write a file. The one thing that can is a bundled app saving your child’s picture.'],
+  ['It sets itself up', 'The first run picks a few sites with you and asks how you want to get back in.'],
+  ['Free and open source', 'MIT licensed. Every line is public, including the parts that decide what your child can reach.'],
+  ['Works on your machine', 'macOS, Windows and Linux. No account, no payment, no trial.']
 ];
 ---
 
@@ -47,98 +32,120 @@ const REST = [
   <main>
     <div class="wrap">
       <div class="hero hero--page">
-        <h1>Everything it does</h1>
-        <p class="lede">One screen, locked to the sites you chose, that gives
-          itself back when the time is up. Every picture below is the real app.</p>
+        <h1>Hand it over.<br><em>Keep your work.</em></h1>
+        <p class="lede">Two screens, really: the one your child gets, and the
+          one only you can reach. Here is everything on both.</p>
       </div>
     </div>
 
-    <div class="features">
+    <!-- Act one. -->
+    <section class="act">
       <div class="wrap">
-        <Feature title="The screen is only what you chose" shot={launcher}
-                 alt="The Sukhi Play tile screen: six large coloured tiles, each a site a parent added.">
-          <p>Sukhi Play fills the display. There is no address bar to type into,
-            no new tab, no back button out of it, and no link that leads anywhere
-            you did not allow.</p>
-          <p>A child who taps everything finds only the tiles you put there.</p>
-        </Feature>
+        <header class="act-head">
+          <span class="act-num">01</span>
+          <h2>What your child gets</h2>
+          <p>A screen with no way out of it, and nothing on it you did not put there.</p>
+        </header>
 
-        <Feature title="A grown-up screen behind a real gate" shot={portal} flip
-                 alt="The grown-up screen, with tabs for play time, installed apps, the catalogue and settings."
-                 note="Play time, the apps, the catalogue and every setting live here.">
-          <p>Everything a parent decides is in one place, and a child cannot
-            reach it. Getting in means holding a button for three seconds — or
-            answering a small sum, if your child has worked the hold out.</p>
-        </Feature>
+        <div class="bento">
+          <Tile title="Only what you chose" span={2} tall shot={launcher}
+                alt="The Sukhi Play tile screen: six large coloured tiles, each a site a parent added."
+                tone="paper">
+            <p>Full screen, no address bar, no new tab, no back button out of
+              it. A child who taps everything finds only these tiles.</p>
+          </Tile>
 
-        <Feature title="Play time that ends by itself" shot={closing}
-                 alt="The screen shown when play time is over, offering to ask a grown-up for more."
-                 note="The countdown only appears in the last thirty seconds, so there is nothing to watch or bargain with.">
-          <p>Set how long a session lasts. It starts again every time the app
-            opens, and stops on its own — no argument, because it was never your
-            decision in the moment.</p>
-          <p>When it ends you can grant fifteen minutes, an hour, or the rest of
-            the day. Your usual limit does not move.</p>
-        </Feature>
+          <Tile title="Adverts and trackers, refused" span={2} tone="mint"
+                stat="1,284" statNote="cut in one afternoon">
+            <p>Blocked before they load, on every site you add.</p>
+          </Tile>
 
-        <Feature title="A catalogue to start from" shot={suggestions} flip
-                 alt="The catalogue inside the app: cards for sites that are known to work.">
-          <p>Sites that are known to work, already set up, with the hosts each
-            one needs filled in. Three of them are not sites at all — a colouring
-            book, a keyboard playground and a set of first games ship inside the
-            download and work with no internet.</p>
-          <p><a href="/catalogue/">Have a look at the catalogue</a>. It is a
-            compatibility list, not a recommendation.</p>
-        </Feature>
+          <Tile title="Apps that need no internet" tone="violet" stat="3">
+            <p>A colouring book, a keyboard playground and first games, inside
+              the download.</p>
+          </Tile>
 
-        <Feature title="Adding your own takes a minute" shot={addApp}
-                 alt="The add-an-app form, with a name, a picture, a colour and an address."
-                 note="Advert filtering is on by default, and you can turn it off for a site whose terms ask you to.">
-          <p>Paste an address. Sukhi Play loads the site, works out which hosts
-            it actually needs, and suggests a name and a picture. Change any of
-            it before you save.</p>
-        </Feature>
+          <Tile title="Nothing is sent anywhere" tone="cyan" stat="0"
+                statNote="accounts, trackers, reports">
+            <p>No sign-in, no analytics, nothing phoning home.</p>
+          </Tile>
 
-        <Feature title="It sets itself up the first time" shot={firstRun} flip
-                 alt="The first-run walkthrough, asking whether to start from the catalogue.">
-          <p>The first run walks you through picking a few sites and choosing how
-            you will get back in. After that it opens straight onto the tiles.</p>
-        </Feature>
-      </div>
-    </div>
-
-    <div class="wrap">
-      <h2 class="sec-title">And the rest of it</h2>
-      <div class="feat-list">
-        {REST.map((r) => (
-          <div class="feat-row">
-            <h3>{r.h}</h3>
-            <p>{r.p}</p>
-          </div>
-        ))}
-        <div class="feat-row">
-          <h3>Free, and open source</h3>
-          <p>MIT licensed. Every line is on <a href={REPO}>GitHub</a>, including
-            the bits that decide what your child can reach.</p>
+          <Tile title="Then it stops by itself" span={2} tall shot={closing}
+                alt="The screen shown when play time is over, offering to ask a grown-up for more."
+                tone="paper">
+            <p>No argument, because it was never your decision in the moment.
+              The countdown only appears in the last thirty seconds, so there
+              is nothing to watch or bargain with.</p>
+          </Tile>
         </div>
       </div>
+    </section>
 
-    </div>
-
-    <!-- Ink, not white. Nothing else on this site has a white panel, and one
-         at the bottom of the page read as an empty box rather than an ending. -->
-    <section class="closer">
+    <!-- Act two, on ink, so the two halves are visibly different places. -->
+    <section class="act act--dark">
       <div class="wrap">
-        <h2>Ready when you are</h2>
-        <p>macOS, Windows and Linux. Free, no account, no payment, no trial.</p>
-        <a class="big-dl" href="/download/">Download Sukhi Play</a>
-        <p class="closer-note">Open source, MIT licensed, and it works with no
-          internet once it is installed.</p>
+        <header class="act-head">
+          <span class="act-num">02</span>
+          <h2>What only you can reach</h2>
+          <p>Behind a gate a three-year-old does not get through.</p>
+        </header>
+
+        <div class="bento">
+          <Tile title="The grown-up screen" span={2} tall shot={portal}
+                alt="The grown-up screen, with tabs for play time, installed apps, the catalogue and settings."
+                tone="paper">
+            <p>Play time, the apps, the catalogue and every setting, in one
+              place your child cannot open.</p>
+          </Tile>
+
+          <Tile title="Hold it for three seconds" span={2} tone="ink">
+            <span class="hold-demo" aria-hidden="true">
+              <span class="hold-ring"><b>Hold</b></span>
+            </span>
+            <p>Quick taps do nothing at all. If your child ever works the hold
+              out, swap it for a small sum instead.</p>
+          </Tile>
+
+          <Tile title="Set the session once" span={2} tone="ink"
+                stat="20" statNote="minutes, every time it opens">
+            <p>A standing rule, not a decision you make again each time. When
+              it runs out you can grant fifteen minutes, an hour, or the rest
+              of the day — and your usual limit stays where it is.</p>
+          </Tile>
+
+          <Tile title="Add any site by its address" span={2} tall shot={addApp}
+                alt="The add-an-app form, with a name, a picture, a colour and an address."
+                tone="paper">
+            <p>Paste an address. Sukhi Play loads it, works out which hosts it
+              needs, and suggests a name and a picture — change any of it
+              before you save. Or start from <a href="/catalogue/">the
+              catalogue</a>.</p>
+          </Tile>
+        </div>
       </div>
+    </section>
+
+    <!-- The short ones, as a quiet run rather than a third grid. -->
+    <section class="wrap rest">
+      <h2>And the rest</h2>
+      <ul class="rest-list">
+        {REST.map(([h, p]) => (
+          <li><b>{h}</b><span>{p}</span></li>
+        ))}
+      </ul>
     </section>
   </main>
 
-  <!-- Full-size screenshots, for anyone who wants to read the actual screen. -->
+  <section class="closer">
+    <div class="wrap">
+      <h2>Ready when you are</h2>
+      <p>macOS, Windows and Linux. Free, no account, no payment, no trial.</p>
+      <a class="big-dl" href="/download/">Download Sukhi Play</a>
+      <p class="closer-note">It works with no internet once it is installed.
+        <a href={REPO}>Read the code</a>.</p>
+    </div>
+  </section>
+
   <dialog class="shot-box" id="shot-box">
     <button class="shot-close" type="button" aria-label="Close">&times;</button>
     <img id="shot-box-img" src="" alt="">
@@ -149,10 +156,10 @@ const REST = [
   const box = document.getElementById('shot-box') as HTMLDialogElement | null;
   const img = document.getElementById('shot-box-img') as HTMLImageElement | null;
   if (box && img) {
-    document.querySelectorAll<HTMLButtonElement>('.feature-shot').forEach((b) => {
+    document.querySelectorAll<HTMLButtonElement>('.bt-shot').forEach((b) => {
       b.addEventListener('click', () => {
-        // The full-resolution original, not the 560px one on the page: the
-        // point of enlarging is to read the screen.
+        // The full-resolution original, not the one sized for the tile: the
+        // point of enlarging a picture of a screen is to read the screen.
         img.src = b.dataset.full ?? '';
         img.alt = b.dataset.alt ?? '';
         box.showModal();
@@ -160,7 +167,6 @@ const REST = [
     });
     const shut = () => box.close();
     box.querySelector('.shot-close')?.addEventListener('click', shut);
-    // Clicking the backdrop is the other way everyone expects to close this.
     box.addEventListener('click', (e) => { if (e.target === box) shut(); });
     box.addEventListener('close', () => { img.src = ''; });
   }
