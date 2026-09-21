@@ -1328,6 +1328,14 @@ function wire () {
   on('add-new', 'click', () => openForm('address'));
 
   on('timeup-gate', 'click', () => api.openGate('time'));
+  // Asking to close goes through the ordinary quit gate, so a child pressing
+  // it finds the same hold or sum as anywhere else.
+  on('timeup-quit', 'click', () => api.openGate('quit'));
+
+  on('more-quit', 'click', async () => {
+    const r = await api.quitApp();
+    if (!r || !r.ok) showToast((r && r.message) || 'Could not quit.');
+  });
 
   for (const chip of document.querySelectorAll('#more-chips button')) {
     chip.addEventListener('click', async () => {

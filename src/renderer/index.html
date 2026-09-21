@@ -203,6 +203,12 @@
       <h2>That is all for now</h2>
       <p>Play time is over. See you next time!</p>
       <button id="timeup-gate" class="ghost-btn" type="button">Ask for more time</button>
+      <!-- A grown-up who is not granting more time still has to be able to
+           close the app. Without this the stop screen covers everything and
+           there is no way out of it but the power button. -->
+      <button id="timeup-quit" class="timeup-quit" type="button">
+        Grown-ups: close Sukhi Play
+      </button>
     </div>
   </section>
 
@@ -251,8 +257,18 @@
           </button>
         </div>
         <p class="more-standing" id="more-standing"></p>
-        <footer class="gate-foot">
+        <footer class="gate-foot gate-foot--split">
           <button id="more-cancel" class="ghost-btn" type="button">Not now</button>
+          <!-- The gate is already answered here, so quitting must not ask
+               again. "No more time" and "we are finished" are the same moment. -->
+          <button id="more-quit" class="quit-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 8l-4 4 4 4M6 12h9"
+                    fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Close Sukhi Play
+          </button>
         </footer>
       </div>
 

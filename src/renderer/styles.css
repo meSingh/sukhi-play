@@ -1808,3 +1808,26 @@ img, svg { -webkit-user-drag: none; }
   font-size: 12.5px; font-weight: 700;
   white-space: normal;
 }
+
+/* A way out of the stop screen. The card covers the whole window, so without
+   this the only exit from "that is all for now" was the power button. Quiet,
+   because it is for the grown-up and the child has already been told no. */
+.timeup-quit {
+  margin-top: 14px; padding: 10px 18px;
+  border: 0; border-radius: 999px; background: none;
+  color: var(--ink-soft); font: inherit; font-size: 14.5px; font-weight: 700;
+  cursor: pointer; opacity: .75;
+}
+.timeup-quit:hover { opacity: 1; background: rgba(23, 21, 58, .06); }
+
+/* "Not now" and "we are finished" are the same moment for a parent who has
+   just answered the gate, so quitting is here and does not ask again. */
+.gate-foot--split { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.quit-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 999px;
+  border: 2px solid #FFD9E0; background: none; color: #D6336C;
+  font: inherit; font-size: 14.5px; font-weight: 800; cursor: pointer;
+}
+.quit-btn svg { width: 17px; height: 17px; }
+.quit-btn:hover { background: #FFF5F7; }

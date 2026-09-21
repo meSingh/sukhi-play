@@ -1113,6 +1113,33 @@ async function runPortalShots () {
     console.log(`[PORTAL] ${tab} ${fit}`);
   }
 
+  // The stop screen itself, which covers the whole window. A parent who is
+  // not granting more time has to be able to close the app from here; without
+  // that button there was no way out of it at all.
+  shellApp.closeGate();
+  await sleep(300);
+  settings.sessionMinutes = settings.sessionMinutes || 20;
+  playClock.setLimit(settings.sessionMinutes);
+  playClock.reset();
+  playClock.setActive(true);
+  await js(`(() => { document.getElementById('app').classList.add('is-timeup'); return 1; })()`);
+  await sleep(600);
+  const exits = await js(`(() => {
+    const seen = (id) => {
+      const el = document.getElementById(id);
+      if (!el) return 'missing';
+      const r = el.getBoundingClientRect();
+      const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return r.width > 0 && r.height > 0 && el.contains(top) ? 'clickable' : 'covered';
+    };
+    return JSON.stringify({ more: seen('timeup-gate'), quit: seen('timeup-quit') });
+  })()`);
+  console.log(`[PORTAL] stop screen ${exits}`);
+  const stop = await shellApp.shellView.webContents.capturePage();
+  fs.writeFileSync(path.join(PORTAL_SHOTS, 'timeup.png'), stop.toPNG());
+  await js(`(() => { document.getElementById('app').classList.remove('is-timeup'); return 1; })()`);
+  await sleep(200);
+
   // And the other screen a parent sees: asking for more time, which is a box
   // with three choices and not the grown-up screen.
   shellApp.closeGate();
