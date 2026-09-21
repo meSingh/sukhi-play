@@ -1,6 +1,41 @@
 ---
+/**
+ * The footer.
+ *
+ * Six links in one row had become a queue nobody reads to the end of. They
+ * are in named columns now, which is more room on the page and less work for
+ * a reader: you look at the heading that matches what you want, not at every
+ * link in turn.
+ */
 import { REPO } from '../site';
+
+const COLUMNS = [
+  {
+    name: 'Sukhi Play',
+    links: [
+      { href: '/catalogue/', label: 'Catalogue' },
+      { href: '/download/', label: 'Download' }
+    ]
+  },
+  {
+    name: 'Help',
+    links: [
+      { href: '/docs/', label: 'Documentation' },
+      { href: '/faq/', label: 'Questions' },
+      { href: '/debug/', label: 'Troubleshooting' }
+    ]
+  },
+  {
+    name: 'Project',
+    links: [
+      { href: REPO, label: 'Source on GitHub' },
+      { href: `${REPO}/issues`, label: 'Report a problem' },
+      { href: '/privacy/', label: 'Privacy' }
+    ]
+  }
+];
 ---
+
 <section class="madeby">
   <img class="bob" src="/assets/cutout-proud.png" alt="" width="92" height="92" loading="lazy">
   <p class="love">Made with <span class="heart" aria-label="love">&#9829;</span> by
@@ -11,14 +46,28 @@ import { REPO } from '../site';
 
 <footer class="foot">
   <div class="wrap">
-    <span class="copy">&copy; 2026 Mandeep Singh &middot; MIT licence, Sukhi artwork excluded</span>
-    <nav class="foot-links" aria-label="More">
-      <a href={REPO}>GitHub</a>
-      <a href="/privacy/">Privacy</a>
-      <a href="/faq/">Questions</a>
-      <a href="/docs/">Docs</a>
-      <a href="/debug/">Troubleshooting</a>
-      <a href={`${REPO}/issues`}>Report a problem</a>
-    </nav>
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="foot-mark" href="/">
+          <img src="/assets/sukhi-icon.png" alt="" width="34" height="34">Sukhi Play
+        </a>
+        <p>A locked-down browser that opens only what a grown-up chose.
+          Free, open source, and it asks for nothing.</p>
+      </div>
+
+      {COLUMNS.map((col) => (
+        <nav class="foot-col" aria-label={col.name}>
+          <h2>{col.name}</h2>
+          <ul>
+            {col.links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          </ul>
+        </nav>
+      ))}
+    </div>
+
+    <div class="foot-end">
+      <span>&copy; 2026 Mandeep Singh &middot; MIT licence, Sukhi artwork excluded</span>
+      <a href="#" data-consent-reopen>Cookie choice</a>
+    </div>
   </div>
 </footer>

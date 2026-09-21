@@ -690,11 +690,29 @@ th { font-weight: 800; color: var(--ink-soft); font-size: 13.5px; text-transform
 .heart { display: inline-block; color: var(--coral); animation: beat 1.6s ease-in-out infinite; }
 @keyframes beat { 0%, 60%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1.05); } 45% { transform: scale(1.2); } }
 
-footer.foot { padding: 24px 0 40px; color: var(--ink-faint); font-size: 14.5px; }
-footer.foot .wrap { display: flex; gap: 8px 18px; flex-wrap: wrap; align-items: center; }
+/* Six links in one row was a queue nobody read to the end of. Three named
+   columns beside a sentence about what this is: you read the heading that
+   matches what you came for, not every link in turn. */
+footer.foot { padding: 40px 0 36px; color: var(--ink-faint); font-size: 14.5px; border-top: 1px solid var(--line); }
 footer.foot a { color: var(--ink-soft); text-decoration: none; font-weight: 700; }
-footer.foot a:hover { color: var(--ink); text-decoration: underline; }
-footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-wrap: wrap; }
+footer.foot a:hover { color: var(--ink); }
+
+.foot-grid { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px 40px; align-items: start; }
+
+.foot-brand { max-width: 330px; }
+.foot-mark { display: inline-flex; align-items: center; gap: 9px; font-size: 17px; font-weight: 900; color: var(--ink); }
+.foot-mark img { border-radius: 8px; }
+.foot-brand p { margin: 12px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--ink-faint); font-weight: 500; }
+
+.foot-col h2 { font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-faint); font-weight: 800; margin: 3px 0 12px; }
+.foot-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.foot-col a { font-size: 14.5px; }
+
+.foot-end {
+  display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
+  margin-top: 34px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 13.5px;
+}
+.foot-end a { margin-left: auto; font-weight: 700; }
 
 /* ================= motion ================= */
 
@@ -790,14 +808,15 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
   .no-js .top nav { position: static; transform: none; visibility: visible; width: 100%; flex-direction: row; flex-wrap: wrap; background: none; box-shadow: none; padding: 0; }
   .no-js .top nav .nav-head, .no-js .top nav .nav-cta { display: none; }
 
-  footer.foot { padding: 28px 0 36px; }
-  footer.foot .wrap { flex-direction: column; align-items: stretch; gap: 16px; text-align: center; }
-  footer.foot .foot-links { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; order: -1; }
-  footer.foot .foot-links a {
-    display: block; padding: 12px 8px; border-radius: 14px;
-    background: var(--paper); border: 1px solid var(--line); font-size: 15px;
-  }
-  footer.foot .copy { font-size: 13.5px; line-height: 1.5; }
+  footer.foot { padding: 32px 0 36px; }
+  /* Brand across the top, then the three columns two-up: still scannable by
+     heading, and nothing ends up one word wide. */
+  .foot-grid { grid-template-columns: 1fr 1fr; gap: 26px 20px; }
+  .foot-brand { grid-column: 1 / -1; max-width: none; }
+  .foot-col:last-child { grid-column: 1 / -1; }
+  .foot-col:last-child ul { grid-template-columns: 1fr 1fr; }
+  .foot-end { margin-top: 28px; line-height: 1.5; }
+  .foot-end a { margin-left: 0; }
   .os a { width: calc(50% - 7px); }
   .tour-steps { gap: 6px; }
   .tour-steps button { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 12px 6px 16px; row-gap: 6px; }
@@ -1235,6 +1254,12 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
 .skip:focus { left: 0; top: 0; }
 
 .docs-index { padding-bottom: 72px; }
+
+/* The 72px band above is for a landing page, where a <section> is a whole
+   screenful. In the manual a <section> is a group of links, so it takes its
+   own spacing and none of that. */
+.docs-index section, .docs-nav section { padding-block: 0; }
+
 .docs-group { margin-bottom: 44px; }
 .docs-group h2 { font-size: 15px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 16px; }
 .docs-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
@@ -1260,7 +1285,17 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
 }
 .docs-nav a:hover { background: var(--paper); color: var(--ink); }
 .docs-nav a[aria-current="page"] { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
-.docs-home { display: block; margin-bottom: 20px; font-weight: 800 !important; color: var(--blue) !important; }
+/* A pill, not a full-width row: a link back to the contents should not look
+   like one more page in the list it sits above. Written as .docs-nav
+   a.docs-home so it outranks .docs-nav a without reaching for !important. */
+.docs-nav a.docs-home {
+  display: inline-flex; align-items: center; gap: 7px;
+  width: auto; margin-bottom: 26px; padding: 6px 14px 6px 10px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--paper); color: var(--ink-soft); font-size: 14px;
+}
+.docs-nav a.docs-home::before { content: "\2190"; font-size: 15px; line-height: 1; }
+.docs-nav a.docs-home:hover { border-color: #C7BFF6; color: var(--ink); }
 
 .doc { min-width: 0; max-width: 74ch; }
 .crumbs { font-size: 13.5px; font-weight: 700; color: var(--ink-faint); margin-bottom: 14px; }
