@@ -66,6 +66,24 @@ function main () {
     if (f.endsWith('.png')) fs.copyFileSync(path.join(OUT, f), path.join(IMAGES, f));
   }
 
+  // Two passes write into one file, so a shot that gets renamed leaves its old
+  // entry -- and its old PNG -- behind for ever. The README and the AppStream
+  // list are both built from this, so a stale entry is a screenshot of an
+  // older app that nothing will ever refresh.
+  {
+    const file = path.join(OUT, 'captions.json');
+    const all = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const live = all.filter((s) => fs.existsSync(path.join(OUT, `${s.name}.png`)));
+    const gone = all.filter((s) => !live.includes(s)).map((s) => s.name);
+    if (gone.length) {
+      for (const name of gone) {
+        fs.rmSync(path.join(IMAGES, `${name}.png`), { force: true });
+      }
+      fs.writeFileSync(file, JSON.stringify(live, null, 2) + '\n');
+      console.log(`[shots] dropped ${gone.length} renamed shot(s): ${gone.join(', ')}`);
+    }
+  }
+
   const manifest = JSON.parse(fs.readFileSync(path.join(OUT, 'captions.json'), 'utf8'));
   const bad = manifest.filter((s) => s.error);
   console.log(`\n[shots] ${manifest.length - bad.length}/${manifest.length} captured into web/public/screenshots`);

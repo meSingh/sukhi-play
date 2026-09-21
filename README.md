@@ -33,13 +33,19 @@
   </picture>
 </a>
 
-<img src="docs/assets/demo.gif" width="820" alt="The app running: a countdown in the bar, a one minute warning, the stop screen when play time is over, and a grown-up starting another session">
-
-<img src="docs/screenshots/01-launcher.png" width="820" alt="The tile screen: six large colourful buttons, one per site, with a Grown-ups and Close button in the bar above">
+<img src="docs/assets/demo.gif" width="820" alt="The app running: a child picking a tile and playing, adverts being counted as they are blocked, the one minute warning, the screen that stops play time, a grown-up holding the button for three seconds, and choosing to grant fifteen more minutes">
 
 </div>
 
 ---
+
+> **2.0.0 is out.** Three apps now ship inside the download -- a colouring book,
+> a keyboard playground and first games -- so a fresh install works before the
+> wifi does. Play time can be extended by fifteen minutes, an hour or the rest
+> of the day without moving your usual limit. The grown-up side is a proper
+> screen with tabs, a sum can replace the hold entirely, favicons are gone, and
+> there is a new site at **[sukhiplay.com](https://sukhiplay.com/)**.
+> [Full notes](https://github.com/meSingh/sukhi-play/releases/latest).
 
 My three-year-old wants to play games. He also clicks every button on the
 screen, which means ads, popups, new tabs, and eventually my work. This is the
@@ -177,23 +183,18 @@ everything else: name, picture, colour, address, allowed hosts and ad filtering,
 with Delete at the bottom.
 
 <div align="center">
-<img src="docs/screenshots/02-parent-portal.png" width="760" alt="The parent portal: cards for each app with on/off switches, an Add an app button, and Quit Sukhi Play">
+<img src="docs/screenshots/02-parent-portal.png" width="760" alt="The grown-up screen: tabs for play time, installed apps, the catalogue and settings, with a card and an on/off switch for each app">
 </div>
 
-### About YouTube Kids
+### Leaving a site as its operator intended
 
-That profile ships with **ad filtering switched off** on purpose. Some sites are
-explicit in their terms about not interfering with their advertising, and
-YouTube is the clearest example. You do not need ad blocking there anyway. What
-you need is *containment*, and that still applies in full: your child cannot
-leave the site, open a popup, or reach anything else.
+Some sites say plainly in their terms that you may not interfere with their
+advertising. `blockAds: false` is available on any site you add, for exactly
+that case. Containment still applies in full: your child cannot leave the site,
+open a popup, or reach anything else.
 
-`blockAds: false` is available on any site you add, if you would rather leave it
-as its operator intended.
-
-**youtube.com itself is deliberately not suggested.** Recommendations, comments
-and autoplay make it unsuitable for a small child. Use YouTube Kids, and set the
-age profile up inside YouTube Kids first.
+**youtube.com is deliberately not in the catalogue.** Recommendations, comments
+and autoplay make it unsuitable for a small child.
 
 ## Editing by hand
 
@@ -551,23 +552,17 @@ git push --follow-tags
 The workflow refuses to publish if the tag and `package.json` disagree, or if
 the tests fail.
 
-## Screenshots
+**Sign the tag.** `npm version` makes an annotated tag, and an annotated tag
+carries its own signature rather than inheriting the commit's, so an unsigned
+one shows as *Unverified* on GitHub even when every commit under it is signed.
+Releases here are immutable, which means a tag cannot be replaced once it is
+published -- so this has to be right the first time:
 
-Captured from the real application with `npm run shots`, never mocked up. The
-full set with captions lives in
-[docs/screenshots](docs/screenshots), and the same images are what Linux
-software centres show.
+```bash
+git config tag.gpgsign true   # once per clone
+```
 
-| | |
-|---|---|
-| <img src="docs/screenshots/00-first-run.png" alt="The first-run screen asking whether a grown-up or a child is using the computer"> | <img src="docs/screenshots/00b-first-run-pick.png" alt="Setup offering a list of sites to add, each labelled with a category and whether it has ads"> |
-| **First run.** Nothing is allowed until a grown-up chooses. | **Choosing.** A curated list, or any address you type. |
-| <img src="docs/screenshots/01-launcher.png" alt="The tile screen with six large colourful app buttons"> | <img src="docs/screenshots/02-parent-portal.png" alt="The parent portal listing every app with an on/off switch"> |
-| **The tile screen.** All your child ever sees. | **The grown-up portal.** Every app, with a switch. |
-| <img src="docs/screenshots/03-add-an-app.png" alt="The add-an-app form with an address field and a Check button"> | <img src="docs/screenshots/04-suggestions.png" alt="The suggestions list showing sites with ad labels and Set up links"> |
-| **Adding an app.** Type an address; it works out the rest. | **Suggestions.** Each one already checked. |
-| <img src="docs/screenshots/05-closing-needs-a-grownup.png" alt="The close confirmation with a hold-to-close button"> | |
-| **Closing.** A steady press a small child will not manage. | |
+v2.0.0 went out unsigned before this was noticed. It cannot be re-tagged.
 
 ## Licence
 
