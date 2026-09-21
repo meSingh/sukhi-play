@@ -115,3 +115,28 @@ test('the metainfo generator lists every captured screenshot', () => {
   assert.ok(/<screenshot type="default">[\s\S]{0,200}01-launcher\.png/.test(xml),
     'the launcher must be the default screenshot; it is what the app is');
 });
+
+test('the published catalogue is built from the shipped list', () => {
+  // Two copies of a list drift, and the one that drifts is the one a parent is
+  // reading. The page is generated from config/suggestions.json for that
+  // reason, and this catches anyone hand-editing the page instead.
+  const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'suggestions.json'), 'utf8'));
+  const page = fs.readFileSync(path.join(ROOT, 'docs', 'catalogue.html'), 'utf8');
+  for (const entry of data.suggestions) {
+    assert.ok(page.includes(`>${entry.title}<`), `${entry.title} is missing from the page`);
+  }
+  const cards = (page.match(/class="cat-card"/g) || []).length;
+  assert.equal(cards, data.suggestions.length, 'the page and the list disagree on how many sites');
+});
+
+test('the catalogue page carries no third-party imagery and claims nothing', () => {
+  const page = fs.readFileSync(path.join(ROOT, 'docs', 'catalogue.html'), 'utf8');
+  assert.match(page, /compatibility list, not a recommendation/i);
+  assert.match(page, /not connected to any of these sites/i);
+  // No logos, favicons or anything else loaded from somebody else's server.
+  const external = [...page.matchAll(/(?:src|srcset)="(https?:[^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(external, [], `the page should load no remote images: ${external.join(', ')}`);
+  for (const word of ['recommended', 'child-safe', 'vetted', 'approved by us']) {
+    assert.ok(!new RegExp(word, 'i').test(page), `"${word}" claims more than this project checks`);
+  }
+});

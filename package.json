@@ -21,6 +21,7 @@
     "probe": "electron . --probe=",
     "metainfo": "node scripts/make-metainfo.js",
     "diagnose": "electron . --diagnose",
+    "catalogue": "node scripts/build-catalogue.js",
     "demo": "node scripts/demo.js",
     "shots": "node scripts/shots.js",
     "flathub:lint": "node scripts/flathub-lint.js",

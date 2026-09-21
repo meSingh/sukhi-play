@@ -56,14 +56,23 @@ tap. To be precise about what that is and is not:
   this project does not endorse any listed site. Naming a site is not a
   recommendation of its content; parents should look at what their own child is
   using.
-- Some profiles are shipped with **ad filtering switched off** (`blockAds:
-  false`), so those sites run exactly as their operators intend. Where a site's
-  terms are explicit about not interfering with its advertising, that is the
-  setting we ship.
+- **Ad filtering is on by default**, here and for any site a parent adds. It
+  runs on the parent's own machine, on content they asked for, and it is the
+  reason most people install this.
+- **Where a site's terms explicitly forbid interfering with how it works, the
+  profile ships with filtering switched off** (`blockAds: false`), so the site
+  runs exactly as its operator intends, and the profile's note says so. Today
+  that is the National Geographic Kids profile, which Disney's terms cover.
+- Every profile is a switch in the grown-up screen. A parent who disagrees with
+  either choice can change it for any site, at any time.
 - The list is **bundled with the release**, not fetched at runtime. A children's
   kiosk that downloads a list of destinations at start-up is a
   configuration-injection path; whoever controlled that list would control where
   children are sent.
+
+The same list is published at
+<https://mesingh.github.io/sukhi-play/catalogue.html>, generated from the same
+file, so what is written here describes what is on that page too.
 
 **If you operate a listed site and would like your profile removed, open an
 issue and we will remove it.** No argument required.

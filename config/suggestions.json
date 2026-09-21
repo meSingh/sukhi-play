@@ -32,7 +32,9 @@
       "allowHosts": [
         "mit.edu"
       ],
-      "denyHosts": []
+      "denyHosts": [],
+      "termsUrl": "https://mitscratch.freshdesk.com/en/support/solutions/articles/4000219182-scratch-terms-of-service",
+      "termsChecked": "2026-09-21"
     },
     {
       "id": "blockly",
@@ -47,7 +49,9 @@
       "allowHosts": [
         "blockly.games"
       ],
-      "denyHosts": []
+      "denyHosts": [],
+      "termsUrl": "https://github.com/google/blockly-games/blob/master/LICENSE",
+      "termsChecked": "2026-09-21"
     },
     {
       "id": "pbskids",
@@ -62,7 +66,9 @@
       "allowHosts": [
         "pbskids.org"
       ],
-      "denyHosts": []
+      "denyHosts": [],
+      "termsUrl": "https://pbskids.org/privacy/termsofuse",
+      "termsChecked": "2026-09-21"
     },
     {
       "id": "nasakids",
@@ -91,11 +97,13 @@
       "blockAds": true,
       "adSupported": true,
       "category": "Games",
-      "notes": "Simple educational games. No advertising, no accounts.",
+      "notes": "Simple educational games, no accounts needed. The free site carries advertising.",
       "allowHosts": [
         "toytheater.com"
       ],
-      "denyHosts": []
+      "denyHosts": [],
+      "termsUrl": "https://toytheater.com/terms/",
+      "termsChecked": "2026-09-21"
     },
     {
       "id": "starfall",
@@ -110,7 +118,9 @@
       "allowHosts": [
         "starfall.com"
       ],
-      "denyHosts": []
+      "denyHosts": [],
+      "termsUrl": "https://teach.starfall.com/terms",
+      "termsChecked": "2026-09-21"
     },
     {
       "id": "natgeokids",
@@ -118,10 +128,10 @@
       "url": "https://kids.nationalgeographic.com/",
       "shape": "leaf",
       "color": "#84cc16",
-      "blockAds": true,
+      "blockAds": false,
       "adSupported": true,
       "category": "Learning",
-      "notes": "Animal facts, photos and videos.",
+      "notes": "Animal facts, photos and videos. Ad filtering is OFF for this profile on purpose: Disney's terms, which cover this site, forbid interfering with how it works. The kiosk still stops your child leaving it.",
       "allowHosts": [
         "nationalgeographic.com",
         "natgeofe.com",
@@ -129,30 +139,9 @@
         "disneyaccount.com",
         "go.com"
       ],
-      "denyHosts": []
-    },
-    {
-      "id": "youtubekids",
-      "title": "YouTube Kids",
-      "url": "https://www.youtubekids.com/",
-      "shape": "drop",
-      "color": "#ef4444",
-      "blockAds": false,
-      "adSupported": true,
-      "category": "Video",
-      "notes": "Ad filtering is OFF for this profile on purpose, so the site runs exactly as intended. The kiosk still stops your child leaving it. Set up profiles and age settings in YouTube Kids itself first. This is NOT youtube.com, which is not suitable for small children.",
-      "allowHosts": [
-        "youtubekids.com",
-        "youtube.com",
-        "googlevideo.com",
-        "ytimg.com",
-        "ggpht.com",
-        "googleusercontent.com",
-        "googleapis.com",
-        "google.com",
-        "gstatic.com"
-      ],
-      "denyHosts": []
+      "denyHosts": [],
+      "termsUrl": "https://disneytermsofuse.com/english/",
+      "termsChecked": "2026-09-21"
     },
     {
       "id": "abcya",
@@ -193,7 +182,9 @@
         "ads.poki.com",
         "ad.poki.com",
         "adservice.poki.com"
-      ]
+      ],
+      "termsUrl": "https://poki.com/en/privacy/our-website-rules",
+      "termsChecked": "2026-09-21"
     }
   ]
 }

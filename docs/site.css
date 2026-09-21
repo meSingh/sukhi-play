@@ -930,3 +930,47 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
   .timer { grid-template-columns: 1fr; justify-items: center; gap: 28px; }
   .timer-copy .chips { justify-content: center; }
 }
+
+/* ================= the catalogue ================= */
+
+.cat-grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  margin-top: 26px;
+}
+.cat-card {
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: 22px; padding: 20px 22px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.cat-card header { display: flex; align-items: center; gap: 13px; }
+.cat-card header b { display: block; font-size: 19px; font-weight: 900; letter-spacing: -.2px; }
+.cat-card header small { font-size: 13.5px; color: var(--ink-faint); font-weight: 700; }
+.cat-card p { margin: 0; font-size: 15.5px; color: var(--ink-soft); line-height: 1.5; }
+
+/* The tile a child would see: this project's own shape on the site's colour.
+   No favicons and no logos anywhere on this page; those are other people's
+   marks and there is no licence for them here. */
+.cat-art {
+  width: 52px; height: 52px; flex: none;
+  border-radius: 16px; background: var(--art, var(--blue));
+  display: grid; place-items: center;
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .14);
+}
+.cat-art svg { width: 28px; height: 28px; fill: #fff; }
+
+.cat-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.tagline {
+  font-size: 12.5px; font-weight: 800;
+  padding: 4px 10px; border-radius: 999px;
+  background: #FFF1CC; color: #8A6100;
+}
+.tagline--ok { background: #DFF8EF; color: #0B7F60; }
+.tagline--warn { background: #FFE9E9; color: #B23C3C; }
+.tagline--cat { background: #F0EEFB; color: var(--ink-soft); }
+
+.cat-card details { font-size: 14.5px; }
+.cat-card summary { cursor: pointer; font-weight: 800; color: var(--ink-soft); }
+.cat-hosts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.cat-hosts code { font-size: 12.5px; }
+.cat-links { margin-top: auto; padding-top: 6px; display: flex; gap: 16px; font-size: 14.5px; font-weight: 800; }

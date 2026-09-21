@@ -19,11 +19,22 @@ test('bundled suggestions are all valid and none is enabled', () => {
   }
 });
 
-test('a site whose terms forbid ad blocking is shipped with filtering off', () => {
+test('a site whose terms forbid interference is shipped with filtering off', () => {
+  // DISCLAIMER.md promises exactly this, and a promise the shipped data does
+  // not keep is the first thing a site operator would point at.
   const list = library.loadSuggestions(path.join(__dirname, '..', 'config', 'suggestions.json'));
-  const yt = list.find((s) => s.id === 'youtubekids');
-  assert.ok(yt, 'youtubekids suggestion should exist');
-  assert.equal(yt.blockAds, false, 'YouTube Kids must be left as its operator intends');
+  const natgeo = list.find((s) => s.id === 'natgeokids');
+  assert.ok(natgeo, 'the nationalgeographic profile should exist');
+  assert.equal(natgeo.blockAds, false, "Disney's terms forbid interfering with the site");
+  assert.match(natgeo.notes, /filtering is OFF/i, 'and the note has to say so');
+});
+
+test('every ad-supported profile says so in its note', () => {
+  const list = library.loadSuggestions(path.join(__dirname, '..', 'config', 'suggestions.json'));
+  for (const s of list.filter((x) => x.adSupported)) {
+    assert.match(s.notes, /advertis|ad.supported|ad filtering/i,
+      `${s.id} carries advertising and the note should not pretend otherwise`);
+  }
 });
 
 test('adding a site writes it and refuses an exact duplicate', () => {
