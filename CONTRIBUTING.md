@@ -92,6 +92,27 @@ site that works well, put it in the README's examples table with the
 `allowHosts` you verified with `npm run check`, and leave the decision to the
 person installing it.
 
+## Releasing
+
+```bash
+npm version patch   # or minor / major
+git push --follow-tags
+```
+
+CI builds all three platforms and publishes the installers. It refuses to
+publish if the tag and `package.json` disagree, or if the tests fail.
+
+**The tag must be signed.** `npm version` creates an annotated tag, and an
+annotated tag carries its own signature instead of inheriting the commit's --
+so an unsigned one shows as *Unverified* on GitHub even when every commit under
+it is signed. Releases here are immutable and tag creation is restricted, which
+together mean a tag name cannot be reused once it has been published. This has
+to be right the first time:
+
+```bash
+git config tag.gpgsign true   # once per clone
+```
+
 ## Reporting a problem
 
 Include your OS and version, how you installed it, what you expected, what

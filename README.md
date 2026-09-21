@@ -434,44 +434,6 @@ kiosk). Both are per-account and leave your own login untouched.
 **This is not a substitute for supervision.** It reduces what a small child can
 reach; it does not childproof a computer.
 
-### Reporting a layout or window bug
-
-Window geometry cannot be reasoned about from another machine, so send real
-numbers rather than a description. Close the app, then run the installed copy
-with `--diagnose` (the exact line for each system is on the
-[troubleshooting page](https://sukhiplay.com/debug/)), or
-from a clone:
-
-```bash
-npm run diagnose
-```
-
-It prints the display bounds, the window bounds, whether the window believes it
-is fullscreen, the session type (X11 or Wayland), the in-game bar height, and
-the measured position of the top bar, then quits. **Content size must equal
-display bounds.** A top bar reporting `top: 0` with a positive height is
-correctly placed; a negative top, or a window whose `y` is above the display's,
-means the window manager and the app disagree.
-
-Every run also saves what it printed as `sukhi-play-diagnose.txt` on the
-Desktop (`--cover-probe` and `--key-probe` do the same under their own names),
-because an installed Windows app does not print to the terminal it was started
-from.
-
-The diagnostic deliberately runs with the lockdown off, so it opens an ordinary
-window and does not borrow any desktop shortcuts.
-
-On Linux, running Electron from a fresh clone can fail with `The SUID sandbox
-helper binary was found, but is not configured correctly`, because
-`node_modules/electron/dist/chrome-sandbox` is not installed root-owned. Add
-`--no-sandbox` for local runs; it does not affect window geometry:
-
-```bash
-./node_modules/.bin/electron . --diagnose --no-sandbox
-```
-
-Packaged builds are unaffected: the installers set the helper up correctly.
-
 ## If it ever locks you out
 
 The app is built to **fail open**. If the launcher does not appear within 12
@@ -535,30 +497,6 @@ always topmost, so the site can never paint over it, and showing the gate is
 just a matter of growing our view to fill the window. The renderer runs
 sandboxed under a strict CSP and can only reach the app through a handful of
 named calls.
-
-## Releasing
-
-Tag it. CI builds all three platforms and publishes the installers.
-
-```bash
-npm version patch   # or minor / major
-git push --follow-tags
-```
-
-The workflow refuses to publish if the tag and `package.json` disagree, or if
-the tests fail.
-
-**Sign the tag.** `npm version` makes an annotated tag, and an annotated tag
-carries its own signature rather than inheriting the commit's, so an unsigned
-one shows as *Unverified* on GitHub even when every commit under it is signed.
-Releases here are immutable, which means a tag cannot be replaced once it is
-published -- so this has to be right the first time:
-
-```bash
-git config tag.gpgsign true   # once per clone
-```
-
-v2.0.0 went out unsigned before this was noticed. It cannot be re-tagged.
 
 ## Licence
 
