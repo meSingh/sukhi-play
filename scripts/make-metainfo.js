@@ -88,7 +88,7 @@ const buildXml = (desktopId) => `<?xml version="1.0" encoding="UTF-8"?>
 
   <url type="homepage">${SITE}</url>
   <url type="bugtracker">${REPO}/issues</url>
-  <url type="help">${SITE}/debug.html</url>
+  <url type="help">${SITE}/debug/</url>
   <url type="vcs-browser">${REPO}</url>
 
   <screenshots>

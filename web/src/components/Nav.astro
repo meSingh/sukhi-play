@@ -16,16 +16,16 @@ const { page = '' } = Astro.props;
 
 const LINKS = [
   { href: '/', key: 'index', label: 'Overview' },
-  { href: '/features.html', key: 'features', label: 'Features' },
-  { href: '/catalogue.html', key: 'catalogue', label: 'Catalogue' }
+  { href: '/features/', key: 'features', label: 'Features' },
+  { href: '/catalogue/', key: 'catalogue', label: 'Catalogue' }
 ];
 
 // The platforms hang under the download button rather than sitting in the bar.
 // Four of them up front asked a parent to choose before they had a question.
 const DOWNLOADS = [
-  { href: '/macos.html', key: 'macos', label: 'macOS', note: 'Apple Silicon, Intel, older Macs' },
-  { href: '/windows.html', key: 'windows', label: 'Windows', note: 'Installer or portable' },
-  { href: '/linux.html', key: 'linux', label: 'Linux', note: 'AppImage, deb, Snap' }
+  { href: '/macos/', key: 'macos', label: 'macOS', note: 'Apple Silicon, Intel, older Macs' },
+  { href: '/windows/', key: 'windows', label: 'Windows', note: 'Installer or portable' },
+  { href: '/linux/', key: 'linux', label: 'Linux', note: 'AppImage, deb, Snap' }
 ];
 
 const inDownloads = page === 'download' || DOWNLOADS.some((d) => d.key === page);
@@ -57,7 +57,7 @@ const inDownloads = page === 'download' || DOWNLOADS.some((d) => d.key === page)
          because that is what a button marked Download should do, and a caret
          for people who already know which machine they are on. -->
     <div class:list={['nav-dl', inDownloads && 'is-current']}>
-      <a class="nav-cta" href="/download.html">
+      <a class="nav-cta" href="/download/">
         <span>Download</span>
         <span class="nav-cta-sub">Free, no account</span>
       </a>

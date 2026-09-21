@@ -11,6 +11,24 @@ const SHOTS = path.join(ROOT, 'docs', 'screenshots');
 const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
 const manifest = JSON.parse(fs.readFileSync(path.join(SHOTS, 'captions.json'), 'utf8'));
 
+/**
+ * The site's real pages, as built.
+ *
+ * Clean URLs mean a page is <name>/index.html, and the <name>.html files beside
+ * them are one-line redirects for the addresses the site used to have. Reading
+ * those as pages finds no navigation and no catalogue.
+ */
+function builtPages () {
+  const docs = path.join(__dirname, '..', 'docs');
+  const out = [{ name: 'index.html', file: path.join(docs, 'index.html') }];
+  for (const entry of fs.readdirSync(docs, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const file = path.join(docs, entry.name, 'index.html');
+    if (fs.existsSync(file)) out.push({ name: `${entry.name}/index.html`, file });
+  }
+  return out;
+}
+
 test('every screenshot in the manifest exists and captured cleanly', () => {
   assert.ok(manifest.length, 'captions.json is empty; run npm run shots');
   for (const shot of manifest) {
@@ -121,7 +139,7 @@ test('the published catalogue is built from the shipped list', () => {
   // reading. The page is generated from config/suggestions.json for that
   // reason, and this catches anyone hand-editing the page instead.
   const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'suggestions.json'), 'utf8'));
-  const page = fs.readFileSync(path.join(ROOT, 'docs', 'catalogue.html'), 'utf8');
+  const page = fs.readFileSync(path.join(ROOT, 'docs', 'catalogue', 'index.html'), 'utf8');
   for (const entry of data.suggestions) {
     const shown = entry.siteName || entry.title;
     assert.ok(page.includes(`>${shown}<`), `${shown} is missing from the page`);
@@ -131,7 +149,7 @@ test('the published catalogue is built from the shipped list', () => {
 });
 
 test('the catalogue page carries no third-party imagery and claims nothing', () => {
-  const page = fs.readFileSync(path.join(ROOT, 'docs', 'catalogue.html'), 'utf8');
+  const page = fs.readFileSync(path.join(ROOT, 'docs', 'catalogue', 'index.html'), 'utf8');
   // Wrapped lines are still one sentence to a reader, so match on the text
   // rather than on where the editor happened to break it.
   const text = page.replace(/\s+/g, ' ');
@@ -146,8 +164,7 @@ test('the catalogue page carries no third-party imagery and claims nothing', () 
 });
 
 test('every page carries the same navigation', () => {
-  const docs = path.join(__dirname, '..', 'docs');
-  const pages = fs.readdirSync(docs).filter((f) => f.endsWith('.html'));
+  const pages = builtPages();
   assert.ok(pages.length >= 8, 'the site should have all its pages built');
 
   // One <Nav> component renders into every page, so they must agree. Drift
@@ -164,28 +181,43 @@ test('every page carries the same navigation', () => {
   const strip = (nav) => nav
     .replace(/ aria-current="page"/g, '')
     .replace(/class="nav-dl is-current"/g, 'class="nav-dl"');
-  const first = strip(navOf(fs.readFileSync(path.join(docs, pages[0]), 'utf8')));
+  const first = strip(navOf(fs.readFileSync(pages[0].file, 'utf8')));
 
   for (const page of pages) {
-    const nav = strip(navOf(fs.readFileSync(path.join(docs, page), 'utf8')));
+    const nav = strip(navOf(fs.readFileSync(page.file, 'utf8')));
     assert.equal(nav, first,
-      `${page} has a different navigation; run \`npm run site\``);
+      `${page.name} has a different navigation; run \`npm run site\``);
   }
 });
 
 test('the navigation only points at pages that exist', () => {
   const docs = path.join(__dirname, '..', 'docs');
-  const text = fs.readFileSync(path.join(docs, 'index.html'), 'utf8');
+  const docsDir = path.join(__dirname, '..', 'docs');
+  const text = fs.readFileSync(path.join(docsDir, 'index.html'), 'utf8');
   const nav = text.slice(text.indexOf('<header class="top">'), text.indexOf('</header>'));
 
   for (const href of (nav.match(/href="([^"]+)"/g) || []).map((m) => m.slice(6, -1))) {
     if (href.startsWith('http') || href.startsWith('/assets/')) continue;
-    // Paths are explicit: existing links like sukhiplay.com/debug.html keep
-    // working, and nothing relies on the host resolving an extensionless path.
-    const file = href === '/' ? 'index.html' : href.replace(/^\//, '').split('#')[0];
-    assert.ok(file.endsWith('.html'), `${href} should be an explicit .html path`);
-    assert.ok(fs.existsSync(path.join(docs, file)),
+    // Clean URLs: /debug/ is the directory holding that page's index.html.
+    assert.ok(href === '/' || /^\/[a-z-]+\/(#.*)?$/.test(href),
+      `${href} should be a clean path ending in a slash`);
+    const dir = href === '/' ? '' : href.replace(/^\//, '').split('#')[0];
+    assert.ok(fs.existsSync(path.join(docsDir, dir, 'index.html')),
       `the navigation links to ${href}, which is not there`);
+  }
+});
+
+test('the old .html addresses still lead somewhere', () => {
+  const docs = path.join(__dirname, '..', 'docs');
+  // The site was live at these before the move to clean URLs, and GitHub
+  // Pages forwards the github.io path to the custom domain keeping the path,
+  // so an old link arrives here rather than at a 404.
+  for (const name of ['features', 'catalogue', 'download', 'macos', 'windows', 'linux', 'debug']) {
+    const file = path.join(docs, `${name}.html`);
+    assert.ok(fs.existsSync(file) && fs.statSync(file).isFile(),
+      `docs/${name}.html should be a redirect file`);
+    const text = fs.readFileSync(file, 'utf8');
+    assert.match(text, new RegExp(`url=/${name}/`), `${name}.html should forward to /${name}/`);
   }
 });
 

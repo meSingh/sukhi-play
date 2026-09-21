@@ -442,7 +442,7 @@ reach; it does not childproof a computer.
 Window geometry cannot be reasoned about from another machine, so send real
 numbers rather than a description. Close the app, then run the installed copy
 with `--diagnose` (the exact line for each system is on the
-[troubleshooting page](https://sukhiplay.com/debug.html)), or
+[troubleshooting page](https://sukhiplay.com/debug/)), or
 from a clone:
 
 ```bash

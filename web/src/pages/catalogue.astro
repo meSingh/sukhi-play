@@ -89,20 +89,15 @@ const entries = (data.suggestions as Entry[]).map((e) => {
             <span class="cat-art" aria-hidden="true"><svg viewBox="0 0 100 100" set:html={b.art} /></span>
             <div class="inside-say">
               <h3>{b.name}</h3>
-              <p>{b.blurb}</p>
               <div class="cat-chips">
                 <span class="chip">{b.category || 'Other'}</span>
               </div>
             </div>
-            <a class="inside-credit" href={b.sourceUrl} rel="noopener">
-              {b.credit} &middot; {b.licence}
-            </a>
+            <p class="inside-blurb">{b.blurb}</p>
+            <a class="inside-credit" href={b.sourceUrl} rel="noopener">{b.credit}</a>
           </article>
         ))}
       </div>
-      <p class="inside-note">Open source, included with credit and under their own
-        licences. Nothing here can reach the network, so there is nothing on them
-        to filter.</p>
     </section>
 
     <div class="cat-head cat-head--sites">

@@ -11,8 +11,9 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://sukhiplay.com',
   outDir: '../docs',
-  // ../docs holds CNAME and .nojekyll, which are not ours to delete.
-  build: { format: 'file', assets: 'build' },
+  // 'directory' gives /features/ rather than /features.html, and works on any
+  // static host without relying on it to resolve an extensionless path.
+  build: { format: 'directory', assets: 'build' },
   devToolbar: { enabled: false },
   compressHTML: true
 });

@@ -122,7 +122,7 @@ Close Sukhi Play, then run the built-in check from Terminal:
 It measures the window and display geometry and the session details, then
 quits, with the lockdown switched off so it never takes over your screen. The
 report is saved as `sukhi-play-diagnose.txt` on your Desktop; attach that file
-to a bug report. The [troubleshooting page](https://sukhiplay.com/debug.html)
+to a bug report. The [troubleshooting page](https://sukhiplay.com/debug/)
 has the same steps for every system.
 
 Report problems at

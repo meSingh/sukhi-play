@@ -1147,9 +1147,6 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
   .nav-dl-menu small { font-size: 12.5px; }
 }
 
-
-}
-
 /* ---------------- the features page ---------------- */
 
 /* A band per feature: the real screenshot on one side, what it is on the
@@ -1265,9 +1262,12 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
 .cat-head--sites { margin: 0 0 20px; }
 
 .inside-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+/* Who it is on one row -- picture, name, what kind -- and then what it does
+   across the whole card. The same shape the app's own catalogue uses, so a
+   parent reading the website recognises the cards when they open it. */
 .inside-card {
-  display: grid; grid-template-columns: auto 1fr; grid-template-rows: 1fr auto;
-  gap: 6px 14px;
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr auto;
+  gap: 12px 14px;
   background: var(--base); border: 1px solid var(--line);
   border-radius: 20px; padding: 18px;
 }
@@ -1276,18 +1276,21 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
   display: grid; place-items: center; background: var(--art);
 }
 .inside-card .cat-art svg { width: 27px; height: 27px; fill: #fff; }
-.inside-say h3 { font-size: 18px; margin: 0 0 4px; }
-.inside-say p { font-size: 14.5px; line-height: 1.5; color: var(--ink-soft); margin: 0 0 10px; }
-.chip--inside { background: #EAE6FD; color: #4B39B3; }
+.inside-say {
+  grid-row: 1; display: flex; flex-direction: column; justify-content: center; gap: 6px;
+  min-width: 0;
+}
+.inside-say h3 { font-size: 18px; margin: 0; line-height: 1.2; }
+.inside-blurb {
+  grid-column: 1 / -1; grid-row: 2; margin: 0;
+  font-size: 14.5px; line-height: 1.5; color: var(--ink-soft);
+}
 .inside-credit {
-  grid-column: 1 / -1; margin-top: 4px; padding-top: 12px;
+  grid-column: 1 / -1; grid-row: 3; padding-top: 12px;
   border-top: 1px solid var(--line);
   font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none;
 }
 .inside-credit:hover { color: var(--ink); text-decoration: underline; }
-.inside-note {
-  margin: 20px 0 0; font-size: 14px; color: var(--ink-soft); max-width: 78ch;
-}
 
 @media (max-width: 900px) {
   .inside-grid { grid-template-columns: 1fr; }
