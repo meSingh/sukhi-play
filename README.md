@@ -39,7 +39,7 @@
 
 ---
 
-> **2.0.0 is out.** Three apps now ship inside the download -- a colouring book,
+> **2.0 is out.** Three apps now ship inside the download -- a colouring book,
 > a keyboard playground and first games -- so a fresh install works before the
 > wifi does. Play time can be extended by fifteen minutes, an hour or the rest
 > of the day without moving your usual limit. The grown-up side is a proper
