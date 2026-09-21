@@ -62,6 +62,10 @@ const START_PROBE = process.argv.includes('--start-probe');
 // being able to watch it work rather than trusting that it does.
 const GATE_CHECK = process.argv.includes('--gate-check');
 
+// `--portal-shots=DIR` captures each tab of the grown-up screen.
+const PORTAL_ARG = process.argv.find((a) => a.startsWith('--portal-shots='));
+const PORTAL_SHOTS = PORTAL_ARG ? PORTAL_ARG.slice('--portal-shots='.length) : null;
+
 // `--demo=DIR` records the app for the website: it drives the real screens and
 // writes a PNG per frame. No mock, no reconstruction, and a throwaway profile
 // so the recording never contains anyone's own list of sites.
@@ -1008,6 +1012,42 @@ async function runKeyProbe () {
  * button, the real clock running out. Only the waiting is skipped, by pausing
  * the capture between scenes rather than by faking any state.
  */
+async function runPortalShots () {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const js = (code) => shellApp.shellView.webContents.executeJavaScript(code);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  fs.mkdirSync(PORTAL_SHOTS, { recursive: true });
+  shellApp.win.setBounds({ x: 40, y: 40, width: 1400, height: 940 });
+  shellApp.layout();
+  await sleep(900);
+
+  gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+  shellApp.openGate('portal');
+  await js(`(async () => {
+    for (const id of ['gate-step-hold', 'gate-step-answer', 'gate-step-form']) {
+      document.getElementById(id).hidden = true;
+    }
+    document.getElementById('gate-step-library').hidden = false;
+    document.querySelector('.gate-card').classList.add('is-portal');
+    const fn = window.__loadLibrary; if (fn) await fn();
+    return 1;
+  })()`);
+  await sleep(1200);
+
+  for (const tab of ['time', 'apps', 'catalog', 'settings']) {
+    await js(`(() => { window.__showPortalTab('${tab}'); return 1; })()`);
+    await sleep(600);
+    const image = await shellApp.shellView.webContents.capturePage();
+    fs.writeFileSync(path.join(PORTAL_SHOTS, `${tab}.png`), image.toPNG());
+    console.log(`[PORTAL] ${tab}`);
+  }
+
+  shellApp.allowQuit = true;
+  app.exit(0);
+}
+
 async function runGateCheck () {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const say = (k, v) => console.log(`  ${String(k).padEnd(30)} ${v}`);
@@ -1753,6 +1793,11 @@ app.whenReady().then(() => {
     return;
   }
 
+  if (PORTAL_SHOTS) {
+    ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runPortalShots(); }, 1600));
+    return;
+  }
+
   if (GATE_CHECK) {
     ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runGateCheck(); }, 1500));
     return;
@@ -1803,7 +1848,7 @@ app.whenReady().then(() => {
 
 app.on('before-quit', (event) => {
   if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || KEY_PROBE || START_PROBE ||
-      SHOTS_DIR || DEMO_DIR || GATE_CHECK) return;
+      SHOTS_DIR || DEMO_DIR || GATE_CHECK || PORTAL_SHOTS) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');
