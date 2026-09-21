@@ -70,13 +70,19 @@ function header (page) {
 ${links}
     <a class="nav-gh" href="${REPO}">${GITHUB_ICON}<span>GitHub</span></a>
 
-    <!-- The download button, and the platforms under it. Without JavaScript
-         the panel is simply always open, so every link still works. -->
+    <!-- Two halves, two jobs. The left half is a link to the download page,
+         because someone who presses a button marked Download expects to arrive
+         somewhere. The caret is a separate control for people who already know
+         which machine they are on. Without JavaScript the link still works and
+         the panel is simply always open. -->
     <div class="nav-dl${inDownloads ? ' is-current' : ''}">
-      <button class="nav-cta" type="button" id="nav-dl-btn"
-              aria-expanded="false" aria-controls="nav-dl-menu">
+      <a class="nav-cta" href="download.html">
         <span>Download</span>
         <span class="nav-cta-sub">Free, no account</span>
+      </a>
+      <button class="nav-cta-more" type="button" id="nav-dl-btn"
+              aria-expanded="false" aria-controls="nav-dl-menu"
+              aria-label="Choose your platform">
         <svg class="nav-caret" viewBox="0 0 12 8" aria-hidden="true">
           <path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round"/>
