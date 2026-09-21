@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Everything Sukhi Play does</title>
+<meta name="description" content="A locked screen, a play-time limit that ends by itself, adverts filtered, apps that work with no internet, and a grown-up gate a three-year-old cannot pass. Free and open source.">
+<link rel="icon" href="assets/sukhi-icon.png">
+<link rel="stylesheet" href="site.css">
+<script>document.documentElement.classList.remove('no-js')</script>
+</head>
+<body>
+<!-- nav:start -->
+<header class="top">
+  <a class="brand" href="index.html"><img src="assets/sukhi-icon.png" alt="">Sukhi Play</a>
+  <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+    <span></span><span></span><span></span>
+  </button>
+  <nav id="site-nav" tabindex="-1">
+    <div class="nav-head"><img src="assets/sukhi-icon.png" alt="">Sukhi Play
+      <button class="menu-close" type="button" aria-label="Close menu">&times;</button></div>
+    <a href="index.html">Overview</a>
+    <a href="features.html" aria-current="page">Features</a>
+    <a href="catalogue.html">Catalogue</a>
+    <a class="nav-gh" href="https://github.com/meSingh/sukhi-play"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
+
+    <!-- The download button, and the platforms under it. Without JavaScript
+         the panel is simply always open, so every link still works. -->
+    <div class="nav-dl">
+      <button class="nav-cta" type="button" id="nav-dl-btn"
+              aria-expanded="false" aria-controls="nav-dl-menu">
+        <span>Download</span>
+        <span class="nav-cta-sub">Free, no account</span>
+        <svg class="nav-caret" viewBox="0 0 12 8" aria-hidden="true">
+          <path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="nav-dl-menu" id="nav-dl-menu">
+        <a href="download.html">
+          <b>All downloads</b><small>Every build, with checksums</small>
+        </a>
+        <a href="macos.html">
+          <b>macOS</b><small>Apple Silicon, Intel, older Macs</small>
+        </a>
+        <a href="windows.html">
+          <b>Windows</b><small>Installer or portable</small>
+        </a>
+        <a href="linux.html">
+          <b>Linux</b><small>AppImage, deb, Snap</small>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-scrim" hidden></div>
+</header>
+<script>
+(function () {
+  var root = document.documentElement;
+
+  // The slide-in menu. This used to live in each page's own script, which
+  // meant a new page silently shipped a hamburger button that did nothing.
+  // It belongs with the markup it drives. Opening is idempotent, so the older
+  // pages binding it a second time is harmless.
+  var menuBtn = document.querySelector('.menu-btn');
+  var scrim = document.querySelector('.nav-scrim');
+  var closeBtn = document.querySelector('.menu-close');
+  if (menuBtn && scrim && closeBtn) {
+    var setMenu = function (on) {
+      root.classList.toggle('nav-open', on);
+      menuBtn.setAttribute('aria-expanded', String(on));
+      scrim.hidden = !on;
+      if (on) document.getElementById('site-nav').focus({ preventScroll: true });
+    };
+    menuBtn.addEventListener('click', function () { setMenu(true); });
+    closeBtn.addEventListener('click', function () { setMenu(false); menuBtn.focus(); });
+    scrim.addEventListener('click', function () { setMenu(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && root.classList.contains('nav-open')) { setMenu(false); menuBtn.focus(); }
+    });
+    window.matchMedia('(min-width: 621px)').addEventListener('change', function (m) {
+      if (m.matches) setMenu(false);
+    });
+  }
+
+  // The platform menu. Kept beside the markup it drives rather than in each
+  // page's own script, so there is one copy of both.
+  var wrap = document.querySelector('.nav-dl');
+  var btn = document.getElementById('nav-dl-btn');
+  if (!wrap || !btn) return;
+  root.classList.add('has-nav-dl');
+
+  var open = function (on) {
+    wrap.classList.toggle('is-open', on);
+    btn.setAttribute('aria-expanded', String(on));
+  };
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    open(!wrap.classList.contains('is-open'));
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) open(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && wrap.classList.contains('is-open')) { open(false); btn.focus(); }
+  });
+})();
+</script>
+<!-- nav:end -->
+
+<main>
+  <div class="wrap">
+    <div class="hero hero--page">
+      <h1>Everything it does</h1>
+      <p class="lede">One screen, locked to the sites you chose, that gives itself
+        back when the time is up.</p>
+    </div>
+
+    <!-- The four a parent decides on. Everything further down is detail. -->
+    <div class="feat-grid">
+      <article class="feat feat--wide">
+        <span class="feat-art" aria-hidden="true">
+          <span class="feat-screen">
+            <span class="feat-tile"></span><span class="feat-tile"></span>
+            <span class="feat-tile"></span><span class="feat-tile"></span>
+          </span>
+        </span>
+        <h2>The screen is only what you chose</h2>
+        <p>Sukhi Play fills the display. There is no address bar to type into, no
+          new tab, no back button out of it, and no link that leads anywhere you
+          did not allow. A child who taps everything finds only the tiles you put
+          there.</p>
+      </article>
+
+      <article class="feat">
+        <span class="feat-art feat-art--clock" aria-hidden="true">
+          <span class="feat-dial"><b>0:30</b></span>
+        </span>
+        <h2>Play time that ends by itself</h2>
+        <p>Set how long a session lasts. It starts again every time the app opens,
+          and stops on its own — no argument, because it was never your decision
+          in the moment.</p>
+        <p class="feat-note">The countdown only appears in the last thirty seconds,
+          so there is nothing to watch or bargain with.</p>
+      </article>
+
+      <article class="feat">
+        <span class="feat-art feat-art--shield" aria-hidden="true">
+          <span class="feat-count"><b>1,284</b><small>blocked</small></span>
+        </span>
+        <h2>Adverts filtered</h2>
+        <p>Advert and tracker requests are refused before they load, on every site
+          you add. You can turn it off for a site whose terms ask you to — the
+          child still cannot leave that site either way.</p>
+      </article>
+
+      <article class="feat">
+        <span class="feat-art feat-art--hold" aria-hidden="true">
+          <span class="feat-ring"><b>Hold</b></span>
+        </span>
+        <h2>A gate a three-year-old cannot pass</h2>
+        <p>Getting to the grown-up screen or quitting means holding a button for
+          three seconds, or answering a small sum if your child has worked the
+          hold out. Quick taps do nothing at all.</p>
+      </article>
+
+      <article class="feat feat--wide feat--offline">
+        <span class="feat-art" aria-hidden="true">
+          <span class="feat-apps">
+            <span class="feat-app feat-app--a"></span>
+            <span class="feat-app feat-app--b"></span>
+            <span class="feat-app feat-app--c"></span>
+          </span>
+        </span>
+        <h2>Apps that work with no internet at all</h2>
+        <p>Three open-source apps ship inside the download — a colouring book, a
+          keyboard playground and a set of first games. They are files on your
+          disk, so they work on a train, in a car, and in a house with bad
+          broadband. Nothing about them can reach the network, which also means
+          there is nothing on them to filter.</p>
+        <p class="feat-note">Pictures your child saves land in your Pictures folder.</p>
+      </article>
+    </div>
+
+    <h2 class="sec-title">And the rest of it</h2>
+    <div class="feat-list">
+      <div class="feat-row">
+        <h3>Add any site by its address</h3>
+        <p>Paste an address and Sukhi Play works out what the site needs, suggests a
+          name and a picture, and lets you change all of it before you save.</p>
+      </div>
+      <div class="feat-row">
+        <h3>A catalogue to start from</h3>
+        <p>Sites known to work, already set up. <a href="catalogue.html">Have a
+          look</a> — it is a compatibility list, not a recommendation.</p>
+      </div>
+      <div class="feat-row">
+        <h3>No favicons, no logos</h3>
+        <p>Every tile is a shape and a colour we drew. Nothing is fetched from the
+          sites you add, so nothing on your screen is theirs to change.</p>
+      </div>
+      <div class="feat-row">
+        <h3>More time without changing the rule</h3>
+        <p>Grant fifteen minutes, an hour, or the rest of the day. It applies to
+          this session only; tomorrow starts from your usual limit again.</p>
+      </div>
+      <div class="feat-row">
+        <h3>Keyboard shortcuts held down</h3>
+        <p>Alt+Tab, Alt+F4, Command+Q, Print Screen and the rest are caught while
+          the window has focus. <a href="index.html#limits">The one exception is
+          the Windows key</a>, and we say so plainly.</p>
+      </div>
+      <div class="feat-row">
+        <h3>No downloads, no popups, no new windows</h3>
+        <p>A site cannot open a window, start a download, or ask for your camera.
+          The one thing that may write a file is a bundled app saving a picture.</p>
+      </div>
+      <div class="feat-row">
+        <h3>Nothing is sent anywhere</h3>
+        <p>No analytics, no accounts, no telemetry, no crash reporting. The only
+          request Sukhi Play makes on its own is checking GitHub for a newer
+          version, and only when you press the button.</p>
+      </div>
+      <div class="feat-row">
+        <h3>Free, and open source</h3>
+        <p>MIT licensed. Every line is on
+          <a href="https://github.com/meSingh/sukhi-play">GitHub</a>, including the
+          bits that decide what your child can reach.</p>
+      </div>
+    </div>
+
+    <div class="feat-cta">
+      <h2>Ready when you are</h2>
+      <p>macOS, Windows and Linux. No account, no payment, no trial.</p>
+      <a class="big-dl" href="download.html">Download Sukhi Play</a>
+    </div>
+  </div>
+</main>
+
+<section class="madeby">
+  <img class="bob" src="assets/cutout-proud.png" alt="" width="92" height="92" loading="lazy">
+  <p class="love">Made with <span class="heart" aria-label="love">&#9829;</span> by
+    <a href="https://www.msingh.com">Mandeep Singh</a>,<br>for his cheeky little Sukhraj.</p>
+  <p class="story">It began with a three-year-old who pressed every key and clicked
+    every button. So Mandeep built a screen where pressing all of them is perfectly safe.</p>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="copy">&copy; 2026 Mandeep Singh &middot; MIT licence, Sukhi artwork excluded</span>
+    <nav class="foot-links" aria-label="More">
+      <a href="https://github.com/meSingh/sukhi-play">GitHub</a>
+      <a href="debug.html">Troubleshooting</a>
+      <a href="https://github.com/meSingh/sukhi-play/issues">Report a problem</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>

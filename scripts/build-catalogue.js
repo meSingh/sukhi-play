@@ -21,6 +21,7 @@ const path = require('node:path');
 const ROOT = path.join(__dirname, '..');
 const OUT = path.join(ROOT, 'docs', 'catalogue.html');
 const REPO = 'https://github.com/meSingh/sukhi-play';
+const { header } = require('./build-nav');
 
 const SHAPES = {
   star: '<path d="M50 8 62 38 94 41 70 62 77 93 50 76 23 93 30 62 6 41 38 38Z"/>',
@@ -86,16 +87,9 @@ function main () {
   const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'suggestions.json'), 'utf8'));
   const list = raw.suggestions || [];
   const cards = list.map(card).join('\n');
-  const nav = [
-    ['index.html', 'Overview'],
-    ['catalogue.html', 'Catalogue'],
-    ['download.html', 'Download'],
-    ['macos.html', 'macOS'],
-    ['windows.html', 'Windows'],
-    ['linux.html', 'Linux']
-  ].map(([href, label]) =>
-    `    <a href="${href}"${href === 'catalogue.html' ? ' aria-current="page"' : ''}>${label}</a>`
-  ).join('\n');
+
+  // One navigation for the whole site; see scripts/build-nav.js.
+  const nav = header('catalogue.html');
 
   const html = `<!doctype html>
 <html lang="en" class="no-js">
@@ -109,20 +103,7 @@ function main () {
 <script>document.documentElement.classList.remove('no-js')</script>
 </head>
 <body>
-<header class="top">
-  <a class="brand" href="index.html"><img src="assets/sukhi-icon.png" alt="">Sukhi Play</a>
-  <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
-    <span></span><span></span><span></span>
-  </button>
-  <nav id="site-nav" tabindex="-1">
-    <div class="nav-head"><img src="assets/sukhi-icon.png" alt="">Sukhi Play
-      <button class="menu-close" type="button" aria-label="Close menu">&times;</button></div>
 ${nav}
-    <a class="nav-gh" href="${REPO}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
-    <a class="nav-cta" href="download.html">Download, free</a>
-  </nav>
-  <div class="nav-scrim" hidden></div>
-</header>
 
 <main class="wrap">
   <div class="hero hero--page">

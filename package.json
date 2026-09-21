@@ -31,7 +31,9 @@
     "key-probe": "electron . --key-probe",
     "start-probe": "electron . --start-probe",
     "dist:mac:catalina": "electron-builder --config electron-builder.catalina.yml --mac --publish never",
-    "dist:mac:all": "npm run dist:mac && npm run dist:mac:catalina"
+    "dist:mac:all": "npm run dist:mac && npm run dist:mac:catalina",
+    "nav": "node scripts/build-nav.js",
+    "site": "npm run nav && npm run catalogue"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

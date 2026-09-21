@@ -144,3 +144,32 @@ test('the catalogue page carries no third-party imagery and claims nothing', () 
     assert.ok(!new RegExp(word, 'i').test(page), `"${word}" claims more than this project checks`);
   }
 });
+
+test('every page carries the same navigation', () => {
+  const docs = path.join(__dirname, '..', 'docs');
+  const pages = fs.readdirSync(docs).filter((f) => f.endsWith('.html'));
+  const { header, START, END } = require('../scripts/build-nav');
+
+  for (const page of pages) {
+    const text = fs.readFileSync(path.join(docs, page), 'utf8');
+    const from = text.indexOf(START);
+    const to = text.indexOf(END);
+    assert.ok(from !== -1 && to !== -1, `${page} has no nav markers`);
+
+    // Generated, so drift means somebody hand-edited one copy of eight.
+    assert.equal(text.slice(from, to + END.length), header(page),
+      `${page} has a stale navigation; run \`npm run nav\``);
+  }
+});
+
+test('the navigation only points at pages that exist', () => {
+  const docs = path.join(__dirname, '..', 'docs');
+  const { header } = require('../scripts/build-nav');
+  const nav = header('index.html');
+
+  for (const href of nav.match(/href="([^"]+)"/g).map((m) => m.slice(6, -1))) {
+    if (href.startsWith('http')) continue;
+    assert.ok(fs.existsSync(path.join(docs, href.split('#')[0])),
+      `the navigation links to ${href}, which is not there`);
+  }
+});
