@@ -1,12 +1,7 @@
 {
+  "_comment": "Sukhi Play itself is an Electron desktop app: `npm run dev` opens a window and never listens on a port, so there is nothing for a browser preview to attach to. Run it with `npm run dev` in a terminal. The only thing here a browser can show is the website in docs/.",
   "version": "0.0.1",
   "configurations": [
-    {
-      "name": "dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
-    },
     {
       "name": "site",
       "runtimeExecutable": "python3",
