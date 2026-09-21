@@ -17,7 +17,8 @@ const { sanitizeApp } = require('./catalog');
  * enable a site on its own.
  */
 
-const SHAPES = ['star', 'rocket', 'ball', 'blocks', 'note', 'leaf', 'drop', 'bolt'];
+const SHAPES = ['star', 'rocket', 'ball', 'blocks', 'note', 'leaf', 'drop', 'bolt',
+                'heart', 'cloud', 'moon', 'flower', 'fish', 'book', 'paint', 'car'];
 // Sixteen, to pair with sixteen shapes. Each one is dark enough for white
 // lettering or light enough for dark, which inkFor() in the renderer decides.
 const COLORS = ['#3b82f6', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6',

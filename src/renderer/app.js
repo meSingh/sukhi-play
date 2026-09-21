@@ -28,6 +28,9 @@ const MIN_SPLASH_MS = 1400; // long enough to read as "it is starting", not a fl
 
 let config = null;
 let gateIntent = 'portal';
+// True once a grown-up has answered, so a later message from main does not
+// put the question back up over the screen they just opened.
+let gatePassed = false;
 let holdTimer = null;
 let holdStart = 0;
 let toastTimer = null;
@@ -121,7 +124,7 @@ function applyState (state) {
   if (!state) return;
   app.dataset.mode = state.mode;
   if (state.gateIntent) gateIntent = state.gateIntent;
-  if (state.mode === 'gate') describeGate();
+  if (state.mode === 'gate' && !gatePassed) describeGate();
 
   // "Back" and "Stop this game" are only distinguishable if we know whether a
   // game is actually open. When none is, "stop" is meaningless and is hidden
@@ -290,9 +293,21 @@ async function setSessionMinutes (value) {
  * Pressing Close and being asked "Grown-ups only" tells a parent nothing about
  * what is about to happen. Quitting now asks to confirm quitting.
  */
-function describeGate () {
+async function describeGate () {
   const quitting = gateIntent === 'quit';
   const seconds = config ? config.settings.holdSeconds : 3;
+
+  // When the way in is a sum, the sum is the way in: there is no hold first.
+  if (config && config.settings.gateMode === 'sum') {
+    el('gate-step-hold').hidden = true;
+    el('gate-answer-title').textContent = quitting ? 'Close Sukhi Play?' : 'Grown-ups only';
+    const r = await api.gateQuestion();
+    el('gate-prompt').textContent = (r && r.prompt) || (r && r.message) || 'One moment.';
+    el('gate-step-answer').hidden = false;
+    el('gate-input').value = '';
+    el('gate-input').focus();
+    return;
+  }
 
   el('gate-title').textContent = quitting ? 'Close Sukhi Play?' : 'Grown-ups only';
   el('gate-lead').textContent = quitting
@@ -306,6 +321,7 @@ function describeGate () {
 }
 
 function resetGate () {
+  gatePassed = false;
   clearInterval(holdTimer);
   holdTimer = null;
   el('hold-fill').style.height = '0%';
@@ -355,8 +371,7 @@ async function revealChallenge () {
   el('gate-step-hold').hidden = true;
 
   if (result.needsAnswer || result.needsPin) {
-    el('gate-answer-title').textContent =
-      config && config.settings.gateMode === 'sum' ? 'One more thing' : 'Enter your PIN';
+    el('gate-answer-title').textContent = 'Enter your PIN';
     el('gate-prompt').textContent = result.prompt || 'Enter the parent PIN';
     el('gate-step-answer').hidden = false;
     el('gate-input').focus();
@@ -689,13 +704,25 @@ function renderSuggestions (list) {
     blurb.className = 'card-blurb';
     blurb.textContent = sug.blurb || sug.notes || '';
 
-    body.append(name, meta, blurb);
+    // Where it actually goes. A parent choosing between two similar names
+    // should not have to open the form to find out which site this is.
+    const addr = document.createElement('span');
+    addr.className = 'card-addr';
+    try { addr.textContent = new URL(sug.url).hostname; } catch { addr.textContent = sug.url; }
+
+    body.append(name, meta);
 
     const state = document.createElement('span');
     state.className = 'card-state';
     state.textContent = 'Set up';
 
-    card.append(badge, body, state);
+    // A row of who it is, then the description across the full width beneath.
+    // The description is the part a parent reads, so it gets the space.
+    const head = document.createElement('span');
+    head.className = 'card-head';
+    head.append(badge, body, state);
+
+    card.append(head, blurb, addr);
     // A suggestion is a starting point, not a decision: choosing one opens the
     // same form as anything else so every value can be changed first.
     card.addEventListener('click', () => openForm('add', sug));
@@ -1037,6 +1064,7 @@ async function checkSite () {
  * button was an extra step for no reason.
  */
 async function afterUnlock () {
+  gatePassed = true;
   el('gate-error').textContent = '';
 
   if (gateIntent === 'quit') {
@@ -1304,6 +1332,22 @@ function wire () {
   // capturing it. Nothing in the app itself uses these.
   window.__loadLibrary = loadLibrary;
   window.__showPortalTab = showPortalTab;
+  window.__markGatePassed = () => { gatePassed = true; };
+  // Fills the editor with a finished-looking app, so the capture and scroll
+  // tooling can see the whole form without a network probe.
+  window.__fillDemoForm = () => {
+    if (!form) return;
+    form.title = 'Demo';
+    form.url = 'https://example.com/';
+    form.allowHosts = ['example.com'];
+    el('form-address').hidden = true;
+    el('form-fields').hidden = false;
+    fillFormFields();
+    buildShapePicker();
+    buildColorPicker();
+    updatePreview();
+    validateForm();
+  };
 
   api.on('state', applyState);
   api.on('apps', (payload) => renderTiles(payload.apps || []));

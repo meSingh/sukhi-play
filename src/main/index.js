@@ -204,7 +204,7 @@ function checkSum (given) {
     const seconds = Math.ceil((gate.lockedUntil - now) / 1000);
     return { ok: false, message: `Wait ${seconds}s and try again.` };
   }
-  if (!gate.sum) return { ok: false, message: 'Hold the button first.' };
+  if (!gate.sum) return { ok: false, message: 'Ask for the question first.' };
 
   if (Number(String(given).trim()) === gate.sum.answer) {
     gate.wrongAttempts = 0;
@@ -429,17 +429,36 @@ function registerIpc () {
     return shellApp.closeGate();
   });
 
+  /**
+   * The question, when the way in is a sum.
+   *
+   * Asked as the gate opens rather than after a hold: the sum is the check,
+   * not a second one.
+   */
+  ipcMain.handle('shell:gate-question', () => {
+    if (shellApp.mode !== 'gate') return { ok: false, message: 'not at the gate' };
+    if (settings.gateMode !== 'sum') return { ok: false, message: 'no question here' };
+    const now = Date.now();
+    if (now < gate.lockedUntil) {
+      const seconds = Math.ceil((gate.lockedUntil - now) / 1000);
+      return { ok: false, message: `Wait ${seconds}s and try again.` };
+    }
+    const { a, b } = newSum();
+    return { ok: true, prompt: `What is ${a} + ${b}?` };
+  });
+
   ipcMain.handle('shell:complete-hold', () => {
     if (shellApp.mode !== 'gate') return { ok: false, message: 'not at the gate' };
     if (!holdSatisfied()) {
       return { ok: false, message: 'Hold the button a little longer.' };
     }
+    if (settings.gateMode === 'sum') {
+      // The sum replaced the hold. Holding must not open anything by itself,
+      // which is the whole point of choosing it.
+      return { ok: false, message: 'Answer the sum instead.' };
+    }
     if (settings.gateMode === 'pin') {
       return { ok: true, needsAnswer: true, prompt: 'Enter the parent PIN' };
-    }
-    if (settings.gateMode === 'sum') {
-      const { a, b } = newSum();
-      return { ok: true, needsAnswer: true, prompt: `What is ${a} + ${b}?` };
     }
     // Holding is the whole check. Unlock, but decide nothing: the grown-up
     // picks "close" or "back to the games" next.
@@ -450,7 +469,10 @@ function registerIpc () {
   ipcMain.handle('shell:answer-gate', (_e, answer) => {
     if (shellApp.mode !== 'gate') return { ok: false, message: 'not at the gate' };
     if (settings.gateMode === 'hold') return { ok: false, message: 'no answer required' };
-    if (!holdSatisfied()) return { ok: false, message: 'Hold the button first.' };
+    // A PIN comes after the hold; a sum is instead of it.
+    if (settings.gateMode === 'pin' && !holdSatisfied()) {
+      return { ok: false, message: 'Hold the button first.' };
+    }
     const result = settings.gateMode === 'sum' ? checkSum(answer) : checkPin(answer);
     if (result.ok) return { ok: true, action: 'unlocked' };
     return result;
@@ -1011,23 +1033,59 @@ async function runPortalShots () {
 
   gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
   shellApp.openGate('portal');
+  // The gate asks its question asynchronously. Hiding the steps before that
+  // answer arrives means it puts the question straight back up again.
+  await sleep(700);
   await js(`(async () => {
     for (const id of ['gate-step-hold', 'gate-step-answer', 'gate-step-form']) {
       document.getElementById(id).hidden = true;
     }
     document.getElementById('gate-step-library').hidden = false;
     document.querySelector('.gate-card').classList.add('is-portal');
+    if (window.__markGatePassed) window.__markGatePassed();
     const fn = window.__loadLibrary; if (fn) await fn();
     return 1;
   })()`);
   await sleep(1200);
 
-  for (const tab of ['time', 'apps', 'catalog', 'settings']) {
-    await js(`(() => { window.__showPortalTab('${tab}'); return 1; })()`);
-    await sleep(600);
+  // Does every panel actually reach its own bottom? The Save button sat below
+  // the fold with no way to scroll to it, and a screenshot of the top of the
+  // page would not have shown that.
+  for (const tab of ['time', 'apps', 'catalog', 'settings', 'form']) {
+    if (tab === 'form') {
+      await js(`(() => { document.getElementById('add-new').click(); return 1; })()`);
+      await sleep(500);
+      await js(`(() => {
+        const f = window.__fillDemoForm; if (f) f();
+        return 1;
+      })()`);
+      await sleep(400);
+    } else {
+      await js(`(() => { window.__showPortalTab('${tab}'); return 1; })()`);
+    }
+    await sleep(400);
+    const fit = await js(`(() => {
+      const body = document.querySelector('#gate-step-library .portal-body');
+      body.scrollTop = 1e6;
+      const panel = document.querySelector('.portal-panel:not([hidden])');
+      const last = panel.lastElementChild;
+      const r = last.getBoundingClientRect();
+      return JSON.stringify({
+        scrollable: body.scrollHeight > body.clientHeight,
+        scrolledTo: Math.round(body.scrollTop),
+        lastVisible: r.bottom <= window.innerHeight + 1 && r.top >= 0
+      });
+    })()`);
+    // Back to the top for the picture: a capture of a panel scrolled to its
+    // end is not what a parent sees when they open it.
+    await js(`(() => {
+      document.querySelector('#gate-step-library .portal-body').scrollTop = 0;
+      return 1;
+    })()`);
+    await sleep(300);
     const image = await shellApp.shellView.webContents.capturePage();
     fs.writeFileSync(path.join(PORTAL_SHOTS, `${tab}.png`), image.toPNG());
-    console.log(`[PORTAL] ${tab}`);
+    console.log(`[PORTAL] ${tab} ${fit}`);
   }
 
   shellApp.allowQuit = true;
@@ -1036,22 +1094,29 @@ async function runPortalShots () {
 
 async function runGateCheck () {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  const say = (k, v) => console.log(`  ${String(k).padEnd(30)} ${v}`);
+  const say = (k, v) => console.log(`  ${String(k).padEnd(34)} ${v}`);
   console.log('\n  ===== the grown-up gate =====\n');
+  // The check is about the sum, so it sets the sum itself rather than trusting
+  // whatever profile it happens to run against. A default profile is on hold,
+  // and a check that silently tests the wrong thing is worse than no check.
+  settings.gateMode = 'sum';
   say('way in', settings.gateMode);
 
   shellApp.openGate('portal');
   await sleep(400);
-
-  // No hold yet: the answer must be refused even if someone guesses it.
   gate.openedAt = Date.now();
-  const early = await ipcCall('shell:answer-gate', '7');
-  say('answer before the hold', early.ok ? 'ACCEPTED (bad)' : `refused: ${early.message}`);
 
-  // Hold long enough, and the question arrives.
+  // A guess before the question exists must go nowhere.
+  const early = await ipcCall('shell:answer-gate', '7');
+  say('answering before the question', early.ok ? 'ACCEPTED (bad)' : `refused: ${early.message}`);
+
+  // Holding is not the way in any more, and must open nothing by itself.
   gate.openedAt = Date.now() - (settings.holdSeconds * 1000) - 200;
   const held = await ipcCall('shell:complete-hold');
-  say('after holding', JSON.stringify(held));
+  say('holding the button', held.ok && held.unlocked ? 'UNLOCKED (bad)' : `refused: ${held.message}`);
+
+  const asked = await ipcCall('shell:gate-question');
+  say('the question', asked.prompt || `FAILED: ${asked.message}`);
   if (!gate.sum) {
     say('result', 'FAIL: no sum was asked');
     return finishGateCheck();
@@ -1066,8 +1131,10 @@ async function runGateCheck () {
   const answer = gate.sum ? gate.sum.answer : right;
   const good = await ipcCall('shell:answer-gate', String(answer));
   say(`right answer (${answer})`, good.ok ? 'accepted' : `REFUSED (bad): ${good.message}`);
-  say('result', (!early.ok && !bad.ok && good.ok)
-    ? 'PASS: only the hold plus the right sum opens it'
+
+  const passed = !early.ok && !(held.ok && held.unlocked) && !bad.ok && good.ok;
+  say('result', passed
+    ? 'PASS: only the right sum opens it, and holding does not'
     : 'FAIL: see above');
   finishGateCheck();
 }

@@ -6,8 +6,10 @@ const path = require('node:path');
 const DEFAULTS = {
   // How the grown-up proves they are a grown-up before the app will quit.
   //   'hold' -> press and hold the button, nothing else (the default)
-  //   'sum'  -> hold, then answer a small addition. A three-year-old who has
-  //             learned to hold a button has not learned to add.
+  //   'sum'  -> answer a small addition instead of holding. A three-year-old
+  //             who has learned to hold a button has not learned to add, and
+  //             asking for both is friction for the parent without adding
+  //             anything a child could not already get past.
   //   'pin'  -> hold, then type the pin below
   gateMode: 'hold',
   pin: null,

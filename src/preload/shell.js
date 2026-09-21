@@ -28,6 +28,9 @@ contextBridge.exposeInMainWorld('sukhi', {
   /** Back out of the exit gate. */
   closeGate: () => ipcRenderer.invoke('shell:close-gate'),
 
+  /** Ask for the addition, when the way in is a sum. */
+  gateQuestion: () => ipcRenderer.invoke('shell:gate-question'),
+
   /** Tell main the hold finished. Main times it and decides. */
   completeHold: () => ipcRenderer.invoke('shell:complete-hold'),
 
