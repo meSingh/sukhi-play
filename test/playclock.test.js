@@ -127,3 +127,38 @@ test('a limit set below the time already played ends the session', () => {
   assert.equal(clock.isTimeUp(), true);
   assert.equal(up, 1);
 });
+
+test('more time extends this session and leaves the rule alone', () => {
+  const { clock, advance } = fake(10);
+  clock.setActive(true);
+  advance(600);
+  assert.equal(clock.isTimeUp(), true);
+
+  assert.equal(clock.extend(5), true);
+  assert.equal(clock.isTimeUp(), false);
+  assert.equal(clock.state().leftSeconds, 300);
+  // The standing rule is still ten minutes: tomorrow does not inherit this.
+  assert.equal(clock.state().limitSeconds, 600);
+  assert.equal(clock.state().bonusSeconds, 300);
+
+  advance(300);
+  assert.equal(clock.isTimeUp(), true, 'the granted time runs out too');
+});
+
+test('more time warns again in the stretch it granted', () => {
+  const warns = [];
+  const { clock, advance } = fake(10, { onWarn: (l) => warns.push(l) });
+  clock.setActive(true);
+  advance(600);
+  warns.length = 0;
+  clock.extend(10);
+  advance(300);           // five minutes into the granted ten
+  assert.equal(warns.length, 1, 'the five minute warning comes round again');
+});
+
+test('there is nothing to extend without a limit', () => {
+  const { clock } = fake(0);
+  clock.setActive(true);
+  assert.equal(clock.extend(10), false);
+  assert.equal(clock.state().leftSeconds, null);
+});

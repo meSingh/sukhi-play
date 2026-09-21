@@ -364,14 +364,21 @@ function registerIpc () {
 
   ipcMain.handle('shell:go-home', () => shellApp.goHome());
 
-  /** Another session. Only a parent past the gate can grant one. */
-  ipcMain.handle('shell:more-time', () => {
+  /**
+   * More time, granted by a grown-up who has just answered the gate.
+   *
+   * It extends this session only. The limit in settings is the standing rule
+   * and is left alone, so ten minutes now is not ten minutes every day.
+   */
+  ipcMain.handle('shell:more-time', (_e, minutes) => {
     if (!isUnlocked()) return locked();
-    playClock.reset();
+    const added = playClock.extend(minutes);
+    if (!added) return { ok: false, message: 'There is no limit running.' };
     playClock.setActive(shellApp.mode === 'launcher' || shellApp.mode === 'playing');
+    shellApp.goHome();
     shellApp.pushState();
-    console.log('[clock] a grown-up started a new session');
-    return { ok: true, clock: playClock.state() };
+    console.log(`[clock] a grown-up added ${Math.round(Number(minutes))} minutes`);
+    return { ok: true, minutes: Math.round(Number(minutes)), clock: playClock.state() };
   });
 
   /** How long a session lasts. 0 switches the limit off. */
@@ -395,15 +402,7 @@ function registerIpc () {
   });
 
   ipcMain.handle('shell:finish-onboarding', () => {
-    // A family finishing the walkthrough starts on the suggested settings,
-    // rather than on whatever happens to be the bare default. Anyone who has
-    // already changed something keeps their own choice.
-    const recommend = settings.sessionMinutes === settingsStore.DEFAULTS.sessionMinutes &&
-      settings.gateMode === settingsStore.DEFAULTS.gateMode
-      ? settingsStore.RECOMMENDED
-      : {};
-    settings = settingsStore.save(paths.userData, { onboarded: true, ...recommend });
-    if (playClock) playClock.setLimit(settings.sessionMinutes);
+    settings = settingsStore.save(paths.userData, { onboarded: true });
     gate.unlockedUntil = 0;
     console.log('[boot] walkthrough finished');
     shellApp.goHome();
@@ -468,20 +467,6 @@ function registerIpc () {
     return { ok: true, gateMode: settings.gateMode };
   });
 
-  /** Puts the suggested settings back, in one press. */
-  ipcMain.handle('shell:use-recommended', () => {
-    if (!isUnlocked()) return locked();
-    settings = settingsStore.save(paths.userData, settingsStore.RECOMMENDED);
-    playClock.setLimit(settings.sessionMinutes);
-    shellApp.pushState();
-    console.log('[settings] recommended settings applied');
-    return {
-      ok: true,
-      sessionMinutes: settings.sessionMinutes,
-      gateMode: settings.gateMode,
-      clock: playClock.state()
-    };
-  });
 
   /**
    * Opens the releases page, and nothing else.
@@ -535,7 +520,7 @@ function registerIpc () {
       // able to change any of this without opening a text file.
       mine: catalog.apps.map((a) => ({
         id: a.id, title: a.title, url: a.url, shape: a.shape, color: a.color,
-        enabled: a.enabled, blockAds: a.blockAds, icon: a.icon,
+        enabled: a.enabled, blockAds: a.blockAds,
         allowHosts: a.allowHosts, denyHosts: a.denyHosts, notes: a.notes
       })),
       // Ones already set up are dropped rather than greyed out -- a suggestion
@@ -543,7 +528,8 @@ function registerIpc () {
       suggestions: suggestions
         .filter((s) => !catalog.apps.some((a) => a.url === s.url))
         .map((s) => ({
-          id: s.id, title: s.title, url: s.url, shape: s.shape, color: s.color,
+          id: s.id, title: s.title, siteName: s.siteName, blurb: s.blurb,
+          url: s.url, shape: s.shape, color: s.color,
           category: s.category, adSupported: s.adSupported, blockAds: s.blockAds,
           notes: s.notes, allowHosts: s.allowHosts, denyHosts: s.denyHosts
         })),

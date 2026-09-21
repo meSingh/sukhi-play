@@ -974,3 +974,66 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
 .cat-hosts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .cat-hosts code { font-size: 12.5px; }
 .cat-links { margin-top: auto; padding-top: 6px; display: flex; gap: 16px; font-size: 14.5px; font-weight: 800; }
+
+/* ---------------- catalogue, second pass ---------------- */
+
+.cat-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.cat-card {
+  align-items: flex-start; gap: 12px;
+  padding: 24px 24px 20px;
+  border: 2px solid var(--line);
+  transition: transform .25s var(--spring), border-color .2s, box-shadow .2s;
+}
+.cat-card:hover { transform: translateY(-4px); border-color: var(--art); box-shadow: var(--drop); }
+.cat-card h3 { margin: 0; font-size: 21px; font-weight: 900; letter-spacing: -.3px; }
+.cat-card p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+
+.cat-card .cat-art {
+  width: 74px; height: 74px; border-radius: 22px;
+  background: var(--art, var(--blue));
+  display: grid; place-items: center;
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, .14), 0 8px 0 rgba(23, 21, 58, .08);
+}
+.cat-card .cat-art svg { width: 40px; height: 40px; fill: #fff; }
+
+.cat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 12.5px; font-weight: 800;
+  padding: 5px 11px; border-radius: 999px;
+  background: #F0EEFB; color: var(--ink-soft);
+}
+.chip--free { background: #DFF8EF; color: #0B7F60; }
+.chip--filtered { background: #E7EEFF; color: #2A4BB8; }
+.chip--ads { background: #FFE9E9; color: #B23C3C; }
+
+/* The address, and one press to take it to the app. */
+.cat-copy {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  margin-top: auto;
+  padding: 11px 14px;
+  border: 2px solid var(--line); border-radius: 14px;
+  background: #FBFAFE; color: var(--ink);
+  font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: var(--mono);
+}
+.cat-copy span { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cat-copy svg { width: 17px; height: 17px; flex: none; color: var(--ink-faint); }
+.cat-copy em {
+  font-style: normal; font-family: var(--font);
+  font-size: 13px; font-weight: 800; color: var(--blue);
+}
+.cat-copy:hover { border-color: var(--blue); }
+.cat-copy.is-done { border-color: var(--mint); background: #F1FBF6; }
+.cat-copy.is-done em { color: #0B7F60; }
+
+.cat-terms { font-size: 13.5px; font-weight: 700; color: var(--ink-faint); }
+.cat-terms:hover { color: var(--blue); }
+
+.cat-note {
+  margin: 40px auto 0; max-width: 720px;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: 22px; padding: 22px 26px;
+  text-align: center;
+}
+.cat-note p { margin: 0 0 10px; font-size: 15px; color: var(--ink-soft); }
+.cat-note p:last-child { margin: 0; }

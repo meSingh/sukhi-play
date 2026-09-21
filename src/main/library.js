@@ -43,7 +43,11 @@ function clean (raw) {
     ...app,
     enabled: false,                 // a suggestion is never on by itself
     adSupported: raw.adSupported === true,
-    category: typeof raw.category === 'string' ? raw.category.trim() : 'Other'
+    category: typeof raw.category === 'string' ? raw.category.trim() : 'Other',
+    // The site's own name, which is what a parent recognises. The tile a child
+    // sees keeps the friendlier title.
+    siteName: typeof raw.siteName === 'string' ? raw.siteName.trim() : '',
+    blurb: typeof raw.blurb === 'string' ? raw.blurb.trim() : ''
   };
 }
 

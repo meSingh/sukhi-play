@@ -37,11 +37,9 @@ contextBridge.exposeInMainWorld('sukhi', {
   /** Hold only, or hold and a sum, before the grown-up screen opens. */
   setGateMode: (mode) => ipcRenderer.invoke('shell:set-gate-mode', String(mode)),
 
-  /** Put the suggested settings back. Parent only. */
-  useRecommended: () => ipcRenderer.invoke('shell:use-recommended'),
 
-  /** Grant another session after the play time ran out. Parent only. */
-  moreTime: () => ipcRenderer.invoke('shell:more-time'),
+  /** Add minutes to the session that just ran out. Parent only. */
+  moreTime: (minutes) => ipcRenderer.invoke('shell:more-time', Number(minutes)),
 
   /** Set how long a session lasts, in minutes. 0 is no limit. Parent only. */
   setSessionMinutes: (minutes) => ipcRenderer.invoke('shell:set-session-minutes', Number(minutes)),

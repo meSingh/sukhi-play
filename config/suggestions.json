@@ -34,7 +34,9 @@
       ],
       "denyHosts": [],
       "termsUrl": "https://mitscratch.freshdesk.com/en/support/solutions/articles/4000219182-scratch-terms-of-service",
-      "termsChecked": "2026-09-21"
+      "termsChecked": "2026-09-21",
+      "siteName": "Scratch",
+      "blurb": "Make your own games and animations, then play them."
     },
     {
       "id": "blockly",
@@ -51,7 +53,9 @@
       ],
       "denyHosts": [],
       "termsUrl": "https://github.com/google/blockly-games/blob/master/LICENSE",
-      "termsChecked": "2026-09-21"
+      "termsChecked": "2026-09-21",
+      "siteName": "Blockly Games",
+      "blurb": "Puzzles that quietly teach programming."
     },
     {
       "id": "pbskids",
@@ -68,7 +72,9 @@
       ],
       "denyHosts": [],
       "termsUrl": "https://pbskids.org/privacy/termsofuse",
-      "termsChecked": "2026-09-21"
+      "termsChecked": "2026-09-21",
+      "siteName": "PBS Kids",
+      "blurb": "Games with the characters from US public television."
     },
     {
       "id": "nasakids",
@@ -86,13 +92,15 @@
         "googleapis.com",
         "gstatic.com"
       ],
-      "denyHosts": []
+      "denyHosts": [],
+      "siteName": "NASA Space Place",
+      "blurb": "Space games, pictures and facts for children."
     },
     {
       "id": "toytheater",
       "title": "Toy Theater",
       "url": "https://toytheater.com/",
-      "shape": "ball",
+      "shape": "paint",
       "color": "#ec4899",
       "blockAds": true,
       "adSupported": true,
@@ -103,13 +111,15 @@
       ],
       "denyHosts": [],
       "termsUrl": "https://toytheater.com/terms/",
-      "termsChecked": "2026-09-21"
+      "termsChecked": "2026-09-21",
+      "siteName": "Toy Theater",
+      "blurb": "Simple games: shapes, numbers, music and drawing."
     },
     {
       "id": "starfall",
       "title": "Reading",
       "url": "https://www.starfall.com/h/",
-      "shape": "note",
+      "shape": "book",
       "color": "#06b6d4",
       "blockAds": true,
       "adSupported": false,
@@ -120,13 +130,15 @@
       ],
       "denyHosts": [],
       "termsUrl": "https://teach.starfall.com/terms",
-      "termsChecked": "2026-09-21"
+      "termsChecked": "2026-09-21",
+      "siteName": "Starfall",
+      "blurb": "Letters, phonics and early reading."
     },
     {
       "id": "natgeokids",
       "title": "Animals",
       "url": "https://kids.nationalgeographic.com/",
-      "shape": "leaf",
+      "shape": "fish",
       "color": "#84cc16",
       "blockAds": false,
       "adSupported": true,
@@ -141,13 +153,15 @@
       ],
       "denyHosts": [],
       "termsUrl": "https://disneytermsofuse.com/english/",
-      "termsChecked": "2026-09-21"
+      "termsChecked": "2026-09-21",
+      "siteName": "National Geographic Kids",
+      "blurb": "Animal facts, photos and videos."
     },
     {
       "id": "abcya",
       "title": "ABCya",
       "url": "https://www.abcya.com/",
-      "shape": "blocks",
+      "shape": "cloud",
       "color": "#a855f7",
       "blockAds": true,
       "adSupported": true,
@@ -160,13 +174,15 @@
         "google.com",
         "gstatic.com"
       ],
-      "denyHosts": []
+      "denyHosts": [],
+      "siteName": "ABCya",
+      "blurb": "Educational games, sorted by school year."
     },
     {
       "id": "poki",
       "title": "Poki",
       "url": "https://poki.com/",
-      "shape": "rocket",
+      "shape": "ball",
       "color": "#1e40af",
       "blockAds": true,
       "adSupported": true,
@@ -184,7 +200,9 @@
         "adservice.poki.com"
       ],
       "termsUrl": "https://poki.com/en/privacy/our-website-rules",
-      "termsChecked": "2026-09-21"
+      "termsChecked": "2026-09-21",
+      "siteName": "Poki",
+      "blurb": "A big free games portal, with plenty of choice."
     }
   ]
 }

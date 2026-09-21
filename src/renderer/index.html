@@ -202,7 +202,7 @@
       <img class="timeup-mark" src="assets/mascot.png" alt="" width="512" height="512">
       <h2>That is all for now</h2>
       <p>Play time is over. See you next time!</p>
-      <button id="timeup-gate" class="ghost-btn" type="button">Grown-ups</button>
+      <button id="timeup-gate" class="ghost-btn" type="button">Ask for more time</button>
     </div>
   </section>
 
@@ -228,6 +228,24 @@
         </footer>
       </div>
 
+      <!-- More time, once a grown-up has answered the gate. Minutes are
+           added to this session only; the standing rule does not move. -->
+      <div id="gate-step-time" hidden>
+        <header class="gate-head">
+          <h2>How much more?</h2>
+        </header>
+        <p class="gate-hint">This session only. Tomorrow starts from your usual limit again.</p>
+        <div class="more-chips" id="more-chips">
+          <button type="button" data-min="5">5 min</button>
+          <button type="button" data-min="10">10 min</button>
+          <button type="button" data-min="15">15 min</button>
+          <button type="button" data-min="30">30 min</button>
+        </div>
+        <footer class="gate-foot">
+          <button id="more-cancel" class="ghost-btn" type="button">Not now</button>
+        </footer>
+      </div>
+
       <!-- Optional PIN, when one is set. -->
       <div id="gate-step-answer" hidden>
         <header class="gate-head">
@@ -246,8 +264,156 @@
            came here to do, so it is not hidden behind a menu of two items. -->
       <!-- One form for adding and editing. Every value the catalog understands is
            editable here, because a parent should never need to open a text file. -->
-      <div id="gate-step-form" hidden>
-        <header class="panel-head">
+      <div id="gate-step-library" hidden>
+        <header class="portal-head">
+          <div class="panel-brand">
+            <!-- A grown-up and a child, not the generic single figure that
+                 could as easily mean "account". -->
+            <span class="panel-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="8.5" cy="6" r="3.1" fill="currentColor"/>
+                <path d="M3 20c0-3.3 2.5-5.4 5.5-5.4s5.5 2.1 5.5 5.4" fill="currentColor"/>
+                <circle cx="17" cy="10.5" r="2.2" fill="currentColor" opacity=".55"/>
+                <path d="M13.4 20c0-2.3 1.6-3.8 3.6-3.8s3.6 1.5 3.6 3.8" fill="currentColor" opacity=".55"/>
+              </svg>
+            </span>
+            <div class="panel-titles">
+              <h2 class="panel-title">Grown-ups</h2>
+              <p class="panel-sub">Everything your child sees is set here.</p>
+            </div>
+          </div>
+          <!-- Two different exits, both spelled out. One goes back to the
+               tiles, the other closes the app, and neither should be a guess. -->
+          <div class="panel-actions">
+            <button id="lib-done" class="head-btn" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor"
+                      stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Back to the tiles</span>
+            </button>
+            <button id="choice-quit" class="head-btn head-btn--quit" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h4" fill="none"
+                      stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                <path d="M14 8l4 4-4 4M18 12H9" fill="none" stroke="currentColor"
+                      stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Quit Sukhi Play</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Four places rather than one long scroll. The panel began as a list
+             of apps in a box; it now holds the clock, the catalogue and the
+             settings too, and a parent should be able to find one without
+             reading past the other three. -->
+        <nav class="portal-tabs" id="portal-tabs" aria-label="Grown-up settings">
+          <button type="button" data-tab="time" class="on">Play time</button>
+          <button type="button" data-tab="apps">Installed apps</button>
+          <button type="button" data-tab="catalog">Catalogue</button>
+          <button type="button" data-tab="settings">Settings</button>
+        </nav>
+
+        <div class="portal-body">
+          <section class="portal-panel" data-panel="time">
+            <div class="panel-title-row">
+              <div>
+                <h3>Play time</h3>
+                <p>How long a session lasts. It starts again every time Sukhi Play opens.</p>
+              </div>
+              <span id="time-state" class="count-pill"></span>
+            </div>
+
+            <div class="time-pick" id="sec-time">
+              <div class="time-chips" id="time-chips" role="group" aria-label="Session length">
+                <button type="button" data-min="0">No limit</button>
+                <button type="button" data-min="10">10 min</button>
+                <button type="button" data-min="15">15 min</button>
+                <button type="button" data-min="20">20 min</button>
+                <button type="button" data-min="30">30 min</button>
+                <button type="button" data-min="45">45 min</button>
+                <button type="button" data-min="60">1 hour</button>
+              </div>
+
+              <!-- The presets are a shortcut, not the whole choice. Anyone who
+                   wants 12 minutes or 90 can say so. -->
+              <div class="time-custom">
+                <label for="time-input">Or set your own</label>
+                <div class="time-input-row">
+                  <input id="time-input" type="number" inputmode="numeric"
+                         min="1" max="240" step="1" placeholder="25">
+                  <span>minutes</span>
+                  <button id="time-set" class="lib-go" type="button">Set</button>
+                </div>
+                <p class="field-note">Anything from one minute to four hours.</p>
+              </div>
+            </div>
+
+            <!-- What a child actually experiences, in order. The paragraph
+                 that used to be here said the same thing and was not read. -->
+            <ol class="time-story">
+              <li>
+                <span class="story-art story-art--play" aria-hidden="true"></span>
+                <b>They play</b>
+                <small>No clock on screen. Nothing to watch or argue about.</small>
+              </li>
+              <li>
+                <span class="story-art story-art--warn" aria-hidden="true">0:30</span>
+                <b>A countdown appears near the end</b>
+                <small>The last thirty seconds, or ten on a short session.</small>
+              </li>
+              <li>
+                <span class="story-art story-art--stop" aria-hidden="true"></span>
+                <b>It stops by itself</b>
+                <small>A gentle screen. Nothing else opens without a grown-up.</small>
+              </li>
+            </ol>
+          </section>
+
+          <section class="portal-panel" data-panel="apps" hidden>
+            <div class="panel-title-row">
+              <div>
+                <h3>Installed apps</h3>
+                <p>The buttons your child sees. Switch one off to hide it without removing it.</p>
+              </div>
+              <span id="mine-count" class="count-pill"></span>
+            </div>
+            <div id="lib-mine" class="apps"></div>
+            <button id="add-new" class="make-own" type="button">
+              <span class="make-own-plus" aria-hidden="true">+</span>
+              <span>
+                <b>Create a custom app</b>
+                <small>Any address you like. Sukhi Play works out what it needs.</small>
+              </span>
+            </button>
+          </section>
+
+          <section class="portal-panel" data-panel="catalog" hidden>
+            <div class="panel-title-row">
+              <div>
+                <h3>Catalogue</h3>
+                <p class="sec-note">
+              Sites that are known to work, with the hosts each one needs already
+              filled in. Pick one to load those settings, then change whatever you
+              like before saving.
+              <span class="sec-fine">
+                Sukhi Play is not connected to any of these sites, is not endorsed
+                by them, and does not vet what they show. Please read each site's
+                own terms and decide for yourself.
+                </span>
+                </p>
+              </div>
+            </div>
+            <p class="sec-note" id="catalog-empty" hidden>
+              Everything in the catalogue is already installed. Use
+              <b>Add an app</b> to set up any other site by its address.
+            </p>
+            <div id="lib-suggest-list" class="cards"></div>
+          </section>
+
+          <section class="portal-panel portal-panel--form" data-panel="form" id="gate-step-form" hidden>
+            <header class="form-head">
           <div class="panel-brand">
             <span class="panel-badge" id="form-badge" aria-hidden="true"></span>
             <div class="panel-titles">
@@ -261,7 +427,7 @@
                     stroke-width="2.6" stroke-linecap="round"/>
             </svg>
           </button>
-        </header>
+            </header>
 
         <div class="panel-body">
           <!-- Step 1, only when adding by address. -->
@@ -363,105 +529,6 @@
             <button id="form-save" class="lib-go" type="button" disabled>Save</button>
           </div>
         </footer>
-      </div>
-
-      <!-- One page, not tabs. You land on what is set up, and adding more is
-           directly beneath it rather than behind a separate screen. -->
-      <div id="gate-step-library" hidden>
-        <header class="portal-head">
-          <div class="panel-brand">
-            <span class="panel-badge" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2.1"/>
-                <path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6" fill="none"
-                      stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <div class="panel-titles">
-              <h2 class="panel-title">Grown-ups</h2>
-              <p class="panel-sub">Everything your child sees is set here.</p>
-            </div>
-          </div>
-          <div class="panel-actions">
-            <button id="add-new" class="add-new" type="button">
-              <span class="add-new-plus" aria-hidden="true">+</span>
-              <span>Add an app</span>
-            </button>
-            <button id="lib-done" class="panel-close" type="button" aria-label="Done">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor"
-                      stroke-width="2.6" stroke-linecap="round"/>
-              </svg>
-            </button>
-          </div>
-        </header>
-
-        <!-- Four places rather than one long scroll. The panel began as a list
-             of apps in a box; it now holds the clock, the catalogue and the
-             settings too, and a parent should be able to find one without
-             reading past the other three. -->
-        <nav class="portal-tabs" id="portal-tabs" aria-label="Grown-up settings">
-          <button type="button" data-tab="time" class="on">Play time</button>
-          <button type="button" data-tab="apps">Installed apps</button>
-          <button type="button" data-tab="catalog">Catalogue</button>
-          <button type="button" data-tab="settings">Settings</button>
-        </nav>
-
-        <div class="portal-body">
-          <section class="portal-panel" data-panel="time">
-            <div class="sec sec--time" id="sec-time">
-              <div class="time-head">
-                <div class="time-titles">
-                  <h3>Play time</h3>
-                  <p id="time-note">Sessions are not limited.</p>
-                </div>
-                <button id="time-more" class="time-more" type="button">More time</button>
-              </div>
-              <div class="time-chips" id="time-chips" role="group" aria-label="Session length">
-                <button type="button" data-min="0">Off</button>
-                <button type="button" data-min="10">10 min</button>
-                <button type="button" data-min="15">15 min</button>
-                <button type="button" data-min="20">20 min</button>
-                <button type="button" data-min="30">30 min</button>
-                <button type="button" data-min="45">45 min</button>
-                <button type="button" data-min="60">1 hour</button>
-              </div>
-              <p class="sec-note">
-                This is the standing rule: every time Sukhi Play opens, the clock
-                starts again from here. When it runs out your child sees a gentle
-                stop screen and nothing else opens. Warnings come at five minutes
-                and at one minute, and <b>More time</b> restarts the clock without
-                closing the app.
-              </p>
-            </div>
-          </section>
-
-          <section class="portal-panel" data-panel="apps" hidden>
-            <h3 class="sec-head">
-              <span>Installed apps</span>
-              <span id="mine-count" class="sec-count"></span>
-            </h3>
-            <p class="sec-note">These are the buttons your child sees. Switch one off to hide it.</p>
-            <div id="lib-mine" class="apps"></div>
-          </section>
-
-          <section class="portal-panel" data-panel="catalog" hidden>
-            <h3 class="sec-head"><span>Catalogue</span></h3>
-            <p class="sec-note">
-              Sites that are known to work, with the hosts each one needs already
-              filled in. Pick one to load those settings, then change whatever you
-              like before saving.
-              <span class="sec-fine">
-                Sukhi Play is not connected to any of these sites, is not endorsed
-                by them, and does not vet what they show. Please read each site's
-                own terms and decide for yourself.
-              </span>
-            </p>
-            <p class="sec-note" id="catalog-empty" hidden>
-              Everything in the catalogue is already installed. Use
-              <b>Add an app</b> to set up any other site by its address.
-            </p>
-            <div id="lib-suggest-list" class="cards"></div>
           </section>
 
           <section class="portal-panel" data-panel="settings" hidden>
@@ -476,40 +543,35 @@
             </div>
             <p class="update-note" id="update-note"></p>
 
-            <div class="setting">
-              <div class="setting-text">
-                <b>Getting in here</b>
-                <span>What a grown-up does before this screen opens.</span>
-              </div>
-              <div class="seg" id="gate-mode" role="group" aria-label="Way in">
-                <button type="button" data-mode="hold">Hold only</button>
-                <button type="button" data-mode="sum">Hold and a sum</button>
-              </div>
-            </div>
-            <p class="sec-note" id="gate-mode-note"></p>
-
-            <div class="setting">
-              <div class="setting-text">
-                <b>Recommended settings</b>
-                <span>Twenty minutes of play, and a sum on the way in.</span>
-              </div>
-              <button id="use-recommended" class="ghost-btn" type="button">Use these</button>
-            </div>
-
-            <div class="setting">
-              <div class="setting-text">
-                <b>Start over</b>
-                <span>Remove every app and setting, and run the walkthrough again.</span>
-              </div>
-              <button id="reset-all" class="btn-quiet" type="button">Start over</button>
+            <h4 class="setting-head">Getting in here</h4>
+            <p class="sec-note">What you do to reach this screen, or to quit.</p>
+            <div class="ways" id="gate-mode" role="group" aria-label="Way in">
+              <button type="button" data-mode="hold" class="way">
+                <span class="way-art" aria-hidden="true">
+                  <span class="way-ring"><span class="way-fill"></span><b>Hold</b></span>
+                </span>
+                <b>Hold</b>
+                <small>Press the button and keep pressing for three seconds.</small>
+              </button>
+              <button type="button" data-mode="sum" class="way">
+                <span class="way-art" aria-hidden="true">
+                  <span class="way-ring way-ring--done"><b>Hold</b></span>
+                  <span class="way-sum">7 + 5 = <i>?</i></span>
+                </span>
+                <b>Hold, then a sum</b>
+                <small>The same hold, then answer a small addition. For a child who has
+                  worked the hold out.</small>
+              </button>
             </div>
 
-            <div class="setting">
+            <h4 class="setting-head">Reset</h4>
+            <div class="setting setting--danger">
               <div class="setting-text">
-                <b>Close Sukhi Play</b>
-                <span>Quit the app and give the computer back.</span>
+                <b>Reset Sukhi Play to factory settings</b>
+                <span>Removes every app you added, your play time, your way in and every
+                  other setting, then runs the walkthrough again. This cannot be undone.</span>
               </div>
-              <button id="choice-quit" class="btn-danger" type="button">Quit Sukhi Play</button>
+              <button id="reset-all" class="btn-quiet" type="button">Reset everything</button>
             </div>
           </section>
         </div>

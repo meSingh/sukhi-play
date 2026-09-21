@@ -123,7 +123,8 @@ test('the published catalogue is built from the shipped list', () => {
   const data = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'suggestions.json'), 'utf8'));
   const page = fs.readFileSync(path.join(ROOT, 'docs', 'catalogue.html'), 'utf8');
   for (const entry of data.suggestions) {
-    assert.ok(page.includes(`>${entry.title}<`), `${entry.title} is missing from the page`);
+    const shown = entry.siteName || entry.title;
+    assert.ok(page.includes(`>${shown}<`), `${shown} is missing from the page`);
   }
   const cards = (page.match(/class="cat-card"/g) || []).length;
   assert.equal(cards, data.suggestions.length, 'the page and the list disagree on how many sites');
@@ -131,12 +132,15 @@ test('the published catalogue is built from the shipped list', () => {
 
 test('the catalogue page carries no third-party imagery and claims nothing', () => {
   const page = fs.readFileSync(path.join(ROOT, 'docs', 'catalogue.html'), 'utf8');
-  assert.match(page, /compatibility list, not a recommendation/i);
-  assert.match(page, /not connected to any of these sites/i);
+  // Wrapped lines are still one sentence to a reader, so match on the text
+  // rather than on where the editor happened to break it.
+  const text = page.replace(/\s+/g, ' ');
+  assert.match(text, /compatibility list, not a recommendation/i);
+  assert.match(text, /not connected to any of these sites/i);
   // No logos, favicons or anything else loaded from somebody else's server.
   const external = [...page.matchAll(/(?:src|srcset)="(https?:[^"]+)"/g)].map((m) => m[1]);
   assert.deepEqual(external, [], `the page should load no remote images: ${external.join(', ')}`);
-  for (const word of ['recommended', 'child-safe', 'vetted', 'approved by us']) {
+  for (const word of ['recommended', 'child-safe', 'vetted', 'approved by us', 'mesingh90@']) {
     assert.ok(!new RegExp(word, 'i').test(page), `"${word}" claims more than this project checks`);
   }
 });

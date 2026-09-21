@@ -50,39 +50,35 @@ function host (url) {
 
 function card (entry) {
   const art = SHAPES[entry.shape] || SHAPES.star;
-  const hosts = (entry.allowHosts || []).map((h) => `<code>${esc(h)}</code>`).join(' ');
+  const name = entry.siteName || entry.title;
+  const address = host(entry.url);
   const ads = entry.adSupported
     ? (entry.blockAds === false
-      ? '<span class="tagline tagline--warn">Ad supported, filtering off in this profile</span>'
-      : '<span class="tagline">Ad supported, filtering on</span>')
-    : '<span class="tagline tagline--ok">No advertising</span>';
+      ? '<span class="chip chip--ads">Adverts shown</span>'
+      : '<span class="chip chip--filtered">Adverts filtered</span>')
+    : '<span class="chip chip--free">No adverts</span>';
   const terms = entry.termsUrl
-    ? `<a href="${esc(entry.termsUrl)}" rel="nofollow noopener">Their terms</a>`
+    ? `<a class="cat-terms" href="${esc(entry.termsUrl)}" rel="nofollow noopener">Their terms</a>`
     : '';
 
-  return `        <article class="cat-card">
-          <header>
-            <span class="cat-art" style="--art:${esc(entry.color)}" aria-hidden="true">
-              <svg viewBox="0 0 100 100">${art}</svg>
-            </span>
-            <span>
-              <b>${esc(entry.title)}</b>
-              <small>${esc(host(entry.url))}</small>
-            </span>
-          </header>
-          <p>${esc(entry.notes)}</p>
-          <div class="cat-meta">
-            <span class="tagline tagline--cat">${esc(entry.category || 'Other')}</span>
+  return `        <article class="cat-card" style="--art:${esc(entry.color)}">
+          <span class="cat-art" aria-hidden="true"><svg viewBox="0 0 100 100">${art}</svg></span>
+          <h3>${esc(name)}</h3>
+          <p>${esc(entry.blurb || entry.notes)}</p>
+          <div class="cat-chips">
+            <span class="chip">${esc(entry.category || 'Other')}</span>
             ${ads}
           </div>
-          <details>
-            <summary>What it needs to work</summary>
-            <div class="cat-hosts">${hosts || '<code>none recorded</code>'}</div>
-          </details>
-          <div class="cat-links">
-            <a href="${esc(entry.url)}" rel="nofollow noopener">Visit the site</a>
-            ${terms}
-          </div>
+          <button class="cat-copy" type="button" data-copy="${esc(entry.url)}">
+            <span>${esc(address)}</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="9" y="9" width="11" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="M6 15H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <em>Copy</em>
+          </button>
+          ${terms}
         </article>`;
 }
 
@@ -107,7 +103,7 @@ function main () {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Sukhi Play catalogue</title>
-<meta name="description" content="Sites that are known to work in Sukhi Play, with the hosts each one needs. A compatibility list, not a recommendation.">
+<meta name="description" content="Sites that work in Sukhi Play. Copy an address and the app sets the rest up. A compatibility list, not a recommendation.">
 <link rel="icon" href="assets/sukhi-icon.png">
 <link rel="stylesheet" href="site.css">
 <script>document.documentElement.classList.remove('no-js')</script>
@@ -130,43 +126,42 @@ ${nav}
 
 <main class="wrap">
   <div class="hero hero--page">
-    <h1>The catalogue</h1>
-    <p class="lede">Sites that are known to work, with the hosts each one needs
-      already worked out. The same list ships inside the app.</p>
+    <h1>What you can add</h1>
+    <p class="lede">Sites that work in Sukhi Play. Copy an address, paste it into
+      the app, and it sets the rest up for you.</p>
   </div>
 
-  <div class="card warn reveal">
-    <p><b>This is a compatibility list, not a recommendation.</b> Sukhi Play is
-      not connected to any of these sites, is not endorsed by them, and does not
-      check what they show your child. Every one of them can change what it
-      publishes tomorrow. Read each site's own terms and decide for yourself,
-      the same way you would before handing over any screen.</p>
-  </div>
-
-  <div class="cat-grid reveal d1">
+  <div class="cat-grid">
 ${cards}
   </div>
 
-  <div class="block">
-    <h2 class="reveal">What the hosts are for</h2>
-    <p class="reveal">Sukhi Play blocks every request a site makes unless you
-      allowed the host it goes to. That is what stops a game carrying your child
-      somewhere else. Each entry above lists the hosts that site needs before it
-      works, which is the tedious part of setting one up and the reason this
-      list exists.</p>
-    <p class="reveal">Anything not on this list can still be added: type the
-      address in the app and it opens the site once, watches what it asks for,
-      and fills the hosts in for you.</p>
-  </div>
-
-  <div class="block">
-    <h2 class="reveal">If you run one of these sites</h2>
-    <p class="reveal">Tell us and we will remove your entry. No argument, no
-      conditions: <a href="${REPO}/issues">open an issue</a> or write to
-      <a href="mailto:mesingh90@gmail.com">mesingh90@gmail.com</a>. The same
-      goes for anything here you think is wrong.</p>
+  <div class="cat-note">
+    <p><b>A compatibility list, not a recommendation.</b> Sukhi Play is not
+      connected to any of these sites and does not check what they show. You choose
+      what your child opens.</p>
+    <p>Run one of these sites and want it off this page?
+      <a href="${REPO}/issues">Open an issue</a> and it goes, no questions asked.</p>
   </div>
 </main>
+
+<script>
+(function () {
+  // Copy the address, because typing one out on a laptop with a toddler on
+  // your lap is the whole reason this page exists.
+  document.querySelectorAll('.cat-copy').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var label = b.querySelector('em');
+      navigator.clipboard.writeText(b.dataset.copy).then(function () {
+        label.textContent = 'Copied';
+        b.classList.add('is-done');
+        setTimeout(function () { label.textContent = 'Copy'; b.classList.remove('is-done'); }, 1600);
+      }, function () {
+        label.textContent = 'Press Ctrl+C';
+      });
+    });
+  });
+})();
+</script>
 `;
 
   const foot = fs.readFileSync(path.join(ROOT, 'docs', 'index.html'), 'utf8');

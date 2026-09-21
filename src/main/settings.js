@@ -115,10 +115,4 @@ function save (userDataDir, patch) {
   return merged;
 }
 
-// What a family gets if they take the suggestion during the walkthrough, and
-// what the Settings screen offers to restore. Twenty minutes because it is
-// long enough to finish something and short enough to end without a fight; the
-// sum because holding a button is a skill a toddler acquires by accident.
-const RECOMMENDED = { sessionMinutes: 20, gateMode: 'sum' };
-
-module.exports = { DEFAULTS, RECOMMENDED, coerce, load, save };
+module.exports = { DEFAULTS, coerce, load, save };

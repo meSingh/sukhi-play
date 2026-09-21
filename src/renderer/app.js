@@ -153,27 +153,26 @@ function applyState (state) {
  * page, which is the old behaviour and still usable.
  */
 function showPortalTab (name) {
+  // The form is a panel like any other, but it is not a tab: it opens from a
+  // card and the tab it came from stays lit, so a parent can see where they
+  // are and get back with one press.
+  if (name !== 'form') portalTab = name;
   for (const tab of document.querySelectorAll('#portal-tabs button')) {
-    tab.classList.toggle('on', tab.dataset.tab === name);
+    tab.classList.toggle('on', tab.dataset.tab === portalTab);
   }
   for (const panel of document.querySelectorAll('.portal-panel')) {
     panel.hidden = panel.dataset.panel !== name;
   }
 }
+let portalTab = 'time';
 
-/** Shows which way in is set, and says what it means. */
+/** Lights the way in that is set. Each card already says what it does. */
 function paintGateMode () {
   const mode = (config && config.settings.gateMode) || 'hold';
-  for (const b of document.querySelectorAll('#gate-mode button')) {
+  for (const b of document.querySelectorAll('#gate-mode .way')) {
     b.classList.toggle('on', b.dataset.mode === mode);
+    b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
   }
-  const note = el('gate-mode-note');
-  if (!note) return;
-  note.textContent = mode === 'sum'
-    ? 'After the hold, you answer a small addition such as 7 + 5. A child who has learned to hold the button has not learned to add.'
-    : mode === 'pin'
-      ? 'A PIN is set in settings.json, and is asked after the hold.'
-      : 'Holding the button for three seconds is the whole check.';
 }
 
 /* ---------------- the play clock ---------------- */
@@ -245,22 +244,42 @@ function applyClock (clock) {
     }, 1000);
   }
 
-  const note = el('time-note');
-  if (note && clock) {
-    note.textContent = !limited
-      ? 'Sessions are not limited.'
+  const state = el('time-state');
+  if (state && clock) {
+    state.textContent = !limited
+      ? 'No limit set'
       : timeUp
-        ? 'Time is up. Start a new session to carry on.'
-        : `${Math.ceil((clock.leftSeconds || 0) / 60)} minutes left in this session.`;
+        ? 'Time is up'
+        : `${Math.ceil((clock.leftSeconds || 0) / 60)} min left in this session`;
   }
   paintChips(clock ? Math.round((clock.limitSeconds || 0) / 60) : 0);
 }
 
-/** Marks which session length is the current one. */
+/** Shows which session length is the current one, preset or not. */
 function paintChips (minutes) {
+  let matched = false;
   for (const chip of document.querySelectorAll('#time-chips button')) {
-    chip.classList.toggle('is-on', Number(chip.dataset.min) === minutes);
+    const on = Number(chip.dataset.min) === minutes;
+    chip.classList.toggle('is-on', on);
+    matched = matched || on;
   }
+  const input = el('time-input');
+  if (input) input.value = matched || !minutes ? '' : String(minutes);
+}
+
+/** One way in for the presets and the number field alike. */
+async function setSessionMinutes (value) {
+  const minutes = Math.round(Number(value));
+  if (!Number.isFinite(minutes) || minutes < 0 || minutes > 240) {
+    return showToast('Pick anything from 1 to 240 minutes.');
+  }
+  const r = await api.setSessionMinutes(minutes);
+  if (!r || !r.ok) return showToast((r && r.message) || 'Could not save that.');
+  config.settings.sessionMinutes = r.sessionMinutes;
+  applyClock(r.clock);
+  showToast(r.sessionMinutes
+    ? `Play stops after ${r.sessionMinutes} minutes.`
+    : 'Play time is not limited.');
 }
 
 /* ---------------- the grown-up gate ---------------- */
@@ -293,6 +312,7 @@ function resetGate () {
   el('gate-step-hold').hidden = false;
   el('gate-step-answer').hidden = true;
   el('gate-step-library').hidden = true;
+  el('gate-step-time').hidden = true;
   el('gate-step-form').hidden = true;
   libCard().classList.remove('is-portal');
   el('gate-input').value = '';
@@ -545,24 +565,42 @@ function renderMine (mine) {
     // this", when in fact it is the one you most likely came to change.
     box.className = 'app' + (entry.enabled ? '' : ' is-hidden-app');
 
-    box.appendChild(appArtwork(entry));
+    // Top row: whether adverts will reach the child, and whether the app is
+    // on the tiles at all. Both are things a parent scans for, so neither is
+    // buried in the body of the card.
+    const top = document.createElement('div');
+    top.className = 'app-top';
 
-    const name = document.createElement('div');
-    name.className = 'app-name';
-    name.textContent = entry.title;
-    if (!entry.blockAds) name.appendChild(tag('ads on', 'lib-tag--ads'));
-
-    const host = document.createElement('div');
-    host.className = 'app-host';
-    try { host.textContent = new URL(entry.url).hostname; } catch { host.textContent = entry.url; }
+    if (!entry.blockAds) {
+      const flag = document.createElement('span');
+      flag.className = 'app-flag';
+      flag.textContent = 'Ads showing';
+      flag.title = 'Adverts on this site are not filtered';
+      top.appendChild(flag);
+    } else {
+      top.appendChild(document.createElement('span'));
+    }
 
     const toggle = visibilitySwitch(entry);
     toggle.classList.add('app-toggle');
     // The switch sits inside the card, so its clicks must not also open the
     // editor behind it.
     toggle.addEventListener('click', (e) => e.stopPropagation());
+    top.appendChild(toggle);
 
-    box.append(toggle, name, host);
+    const name = document.createElement('div');
+    name.className = 'app-name';
+    name.textContent = entry.title;
+
+    const host = document.createElement('div');
+    host.className = 'app-host';
+    try { host.textContent = new URL(entry.url).hostname; } catch { host.textContent = entry.url; }
+
+    const state = document.createElement('div');
+    state.className = 'app-state';
+    state.textContent = entry.enabled ? 'On the tiles' : 'Hidden from your child';
+
+    box.append(top, appArtwork(entry, 76), name, host, state);
 
     // The whole card opens the editor. A separate Edit button was one more
     // thing to read on a card that is already a picture of the thing.
@@ -637,16 +675,21 @@ function renderSuggestions (list) {
 
     const name = document.createElement('span');
     name.className = 'card-name';
-    name.textContent = sug.title;
+    // The site's own name, because that is what a parent recognises.
+    name.textContent = sug.siteName || sug.title;
 
     const meta = document.createElement('span');
     meta.className = 'card-meta';
     meta.textContent = sug.category;
     meta.appendChild(sug.adSupported
-      ? tag('has ads', 'lib-tag--ads')
+      ? tag(sug.blockAds === false ? 'ads showing' : 'ads filtered', 'lib-tag--ads')
       : tag('no ads', 'lib-tag--free'));
 
-    body.append(name, meta);
+    const blurb = document.createElement('span');
+    blurb.className = 'card-blurb';
+    blurb.textContent = sug.blurb || sug.notes || '';
+
+    body.append(name, meta, blurb);
 
     const state = document.createElement('span');
     state.className = 'card-state';
@@ -676,8 +719,7 @@ function openForm (mode, entry) {
   if (!form.color) form.color = catalogue.colors[0] || BLANK.color;
   if (!form.shape) form.shape = 'star';
 
-  el('gate-step-library').hidden = true;
-  el('gate-step-form').hidden = false;
+  showPortalTab('form');
 
   const addingByAddress = mode === 'address';
   el('form-address').hidden = !addingByAddress;
@@ -720,8 +762,7 @@ function closeForm () {
   clearInterval(probeTimer);
   probeTimer = null;
   form = null;
-  el('gate-step-form').hidden = true;
-  el('gate-step-library').hidden = false;
+  showPortalTab(portalTab);
   loadLibrary();
 }
 
@@ -1006,6 +1047,15 @@ async function afterUnlock () {
 
   el('gate-step-hold').hidden = true;
   el('gate-step-answer').hidden = true;
+
+  // Asking for more time is its own small screen. Dropping a parent into the
+  // whole grown-up screen to grant five minutes is a detour.
+  if (gateIntent === 'time') {
+    el('gate-step-time').hidden = false;
+    startPortalHeartbeat();
+    return;
+  }
+
   el('gate-step-library').hidden = false;
   libCard().classList.add('is-portal');
   showPortalTab('time');
@@ -1181,13 +1231,25 @@ function wire () {
   on('gate-cancel-pin', 'click', () => api.closeGate());
   on('add-new', 'click', () => openForm('address'));
 
-  on('timeup-gate', 'click', () => api.openGate('portal'));
+  on('timeup-gate', 'click', () => api.openGate('time'));
+
+  for (const chip of document.querySelectorAll('#more-chips button')) {
+    chip.addEventListener('click', async () => {
+      const r = await api.moreTime(chip.dataset.min);
+      if (!r || !r.ok) return showToast((r && r.message) || 'Could not add that.');
+      applyClock(r.clock);
+      api.closeGate();
+      showToast(`${r.minutes} more minutes.`);
+    });
+  }
+
+  on('more-cancel', 'click', () => api.closeGate());
 
   for (const tab of document.querySelectorAll('#portal-tabs button')) {
     tab.addEventListener('click', () => showPortalTab(tab.dataset.tab));
   }
 
-  for (const b of document.querySelectorAll('#gate-mode button')) {
+  for (const b of document.querySelectorAll('#gate-mode .way')) {
     b.addEventListener('click', async () => {
       const r = await api.setGateMode(b.dataset.mode);
       if (!r || !r.ok) return showToast((r && r.message) || 'Could not save that.');
@@ -1199,34 +1261,17 @@ function wire () {
     });
   }
 
-  on('use-recommended', 'click', async () => {
-    const r = await api.useRecommended();
-    if (!r || !r.ok) return showToast((r && r.message) || 'Could not save those.');
-    config.settings.sessionMinutes = r.sessionMinutes;
-    config.settings.gateMode = r.gateMode;
-    paintGateMode();
-    applyClock(r.clock);
-    showToast('Recommended settings are in place.');
-  });
 
   for (const chip of document.querySelectorAll('#time-chips button')) {
-    chip.addEventListener('click', async () => {
-      const r = await api.setSessionMinutes(chip.dataset.min);
-      if (!r || !r.ok) return showToast((r && r.message) || 'Could not save that.');
-      config.settings.sessionMinutes = r.sessionMinutes;
-      applyClock(r.clock);
-      showToast(r.sessionMinutes
-        ? `Play stops after ${r.sessionMinutes} minutes.`
-        : 'Play time is not limited.');
-    });
+    chip.addEventListener('click', () => setSessionMinutes(chip.dataset.min));
   }
 
-  on('time-more', 'click', async () => {
-    const r = await api.moreTime();
-    if (!r || !r.ok) return showToast((r && r.message) || 'Could not start one.');
-    applyClock(r.clock);
-    showToast('A new session has started.');
+  on('time-set', 'click', () => setSessionMinutes(el('time-input').value));
+  on('time-input', 'keydown', (e) => {
+    if (e.key === 'Enter') setSessionMinutes(el('time-input').value);
   });
+
+
 
   on('form-close', 'click', closeForm);
   on('form-cancel', 'click', closeForm);

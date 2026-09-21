@@ -25,6 +25,9 @@ const MAX_MINUTES = 240;
 
 function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTimeUp } = {}) {
   let limit = clampMinutes(limitMinutes) * 60;
+  // Time a grown-up granted for this session only. The standing rule in
+  // settings is not touched: tomorrow starts from the rule again.
+  let bonus = 0;
   let used = 0;
   let since = null;
   let timeUp = false;
@@ -51,7 +54,7 @@ function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTime
 
   function leftSeconds () {
     if (!limit) return null;
-    return Math.max(0, limit - usedSeconds());
+    return Math.max(0, limit + bonus - usedSeconds());
   }
 
   function check () {
@@ -88,12 +91,34 @@ function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTime
     /** Called once a second while the app runs. */
     tick () { check(); },
 
-    /** A grown-up granting another session. */
+    /** A grown-up granting another session from the beginning. */
     reset () {
       used = 0;
+      bonus = 0;
       since = null;
       timeUp = false;
       warned.clear();
+    },
+
+    /**
+     * A grown-up granting more time to the session that just ran out.
+     *
+     * Only this session: the limit a parent set is the standing rule and stays
+     * where it is, so granting ten minutes now does not quietly make every day
+     * ten minutes longer.
+     */
+    extend (minutes) {
+      const add = clampMinutes(minutes);
+      if (!add || !limit) return false;
+      bonus += add * 60;
+      timeUp = false;
+      // Running out stopped the clock, so granting time starts it again.
+      // Waiting for something else to call setActive leaves a clock that looks
+      // granted and is not counting.
+      if (since === null) since = now();
+      // The warnings belong to the new stretch, not the one that just ended.
+      warned.clear();
+      return true;
     },
 
     /** The parent changed the limit in the portal. */
@@ -104,7 +129,7 @@ function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTime
         warned.clear();
         return;
       }
-      if (timeUp && usedSeconds() < limit) {
+      if (timeUp && usedSeconds() < limit + bonus) {
         timeUp = false;
         warned.clear();
       }
@@ -116,6 +141,7 @@ function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTime
     state () {
       return {
         limitSeconds: limit,
+        bonusSeconds: bonus,
         usedSeconds: usedSeconds(),
         leftSeconds: leftSeconds(),
         timeUp

@@ -1499,3 +1499,227 @@ img, svg { -webkit-user-drag: none; }
   padding: 9px 16px; border-radius: 11px;
 }
 .seg button.on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(23,21,58,.16); }
+
+/* ---------------- the add/edit form, inside the tabs ---------------- */
+
+.portal-panel--form { max-width: 820px; }
+.form-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; padding-bottom: 16px; margin-bottom: 18px;
+  border-bottom: 1px solid #EDEBF8;
+}
+.portal-panel--form .panel-body { max-height: none; overflow: visible; padding: 0; }
+.portal-panel--form .panel-foot { margin-top: 22px; }
+
+/* A web address is long and a parent has to be able to read all of it. */
+.portal-panel--form .lib-input,
+.portal-panel--form .lib-area { width: 100%; font-size: 16px; }
+.portal-panel--form .field { margin-bottom: 22px; }
+#form-addr { font-family: var(--mono, ui-monospace, Menlo, monospace); font-size: 15px; }
+
+/* ---------------- the grown-up screen, second pass ---------------- */
+
+/* Two exits, both spelled out, both where a parent looks first. */
+.head-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 11px 18px;
+  border: 2px solid #E6E2F6; border-radius: 999px;
+  background: var(--paper); color: var(--ink);
+  font: inherit; font-size: 15.5px; font-weight: 800;
+  cursor: pointer;
+}
+.head-btn svg { width: 18px; height: 18px; }
+.head-btn:hover { border-color: var(--ink); }
+.head-btn--quit { border-color: #FFD9DF; color: var(--danger); }
+.head-btn--quit:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+.panel-title-row {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 18px; margin-bottom: 20px;
+}
+.panel-title-row h3 { margin: 0 0 4px; font-size: 26px; font-weight: 900; letter-spacing: -.4px; }
+.panel-title-row p { margin: 0; font-size: 15.5px; color: var(--ink-soft); max-width: 60ch; }
+.count-pill {
+  flex: none;
+  background: #F0EEFB; color: var(--ink-soft);
+  font-size: 14px; font-weight: 800;
+  padding: 7px 14px; border-radius: 999px;
+}
+
+/* Making your own app is a thing you do here, not a button in a header. */
+.make-own {
+  display: flex; align-items: center; gap: 16px; width: 100%;
+  margin-top: 18px; padding: 20px 22px;
+  border: 2px dashed #D9D4F2; border-radius: 22px;
+  background: none; cursor: pointer; text-align: left;
+  font: inherit; color: var(--ink);
+}
+.make-own:hover { border-color: var(--blue); background: #F7F6FE; }
+.make-own-plus {
+  width: 46px; height: 46px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 14px; background: var(--blue); color: #fff;
+  font-size: 26px; font-weight: 900; line-height: 1;
+}
+.make-own b { display: block; font-size: 17.5px; }
+.make-own small { font-size: 14.5px; color: var(--ink-soft); }
+
+/* Settings: choices you can see, not a segmented control and a paragraph. */
+.setting-head { margin: 26px 0 4px; font-size: 20px; font-weight: 900; }
+.setting-head:first-child { margin-top: 0; }
+
+.ways { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0 6px; }
+.way {
+  border: 2px solid #E6E2F6; border-radius: 22px;
+  background: var(--paper); cursor: pointer; text-align: left;
+  padding: 18px 20px; font: inherit; color: var(--ink);
+}
+.way:hover { border-color: #C9C2F0; }
+.way.on { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(59, 107, 255, .12); }
+.way b { display: block; font-size: 17.5px; margin-bottom: 4px; }
+.way small { font-size: 14.5px; color: var(--ink-soft); line-height: 1.45; display: block; }
+.way-art { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.way-ring {
+  position: relative; width: 62px; height: 62px; flex: none;
+  border-radius: 50%; background: #F0EEFB; overflow: hidden;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 900; color: var(--ink);
+}
+.way-ring b { position: relative; z-index: 1; font-size: 13px; margin: 0; }
+.way-fill { position: absolute; inset: auto 0 0 0; height: 55%; background: var(--blue); opacity: .85; }
+.way-ring--done { background: #DFF8EF; }
+.way-sum {
+  font-size: 19px; font-weight: 900; color: var(--ink-soft);
+  background: #F9F8FE; border: 2px solid #E2DFF5; border-radius: 14px;
+  padding: 10px 14px;
+}
+.way-sum i { font-style: normal; color: var(--blue); }
+
+.setting--danger { border: 2px solid #FFE0E6; border-radius: 20px; padding: 18px 20px; }
+.setting--danger .setting-text span { max-width: 62ch; display: block; }
+
+@media (max-width: 720px) {
+  .ways { grid-template-columns: 1fr; }
+}
+
+/* ---------------- installed apps, bolder ---------------- */
+
+.portal-panel .apps { grid-template-columns: repeat(auto-fill, minmax(216px, 1fr)); gap: 16px; }
+.portal-panel .app {
+  padding: 14px 16px 18px;
+  border-radius: 22px;
+  border: 2px solid #ECE9F8;
+  gap: 4px;
+}
+.app-top {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; min-height: 30px; margin-bottom: 6px;
+}
+.portal-panel .app-toggle { position: static; }
+.app-flag {
+  background: #FFE9E9; color: #B23C3C;
+  font-size: 12px; font-weight: 900;
+  padding: 4px 10px; border-radius: 999px;
+  letter-spacing: .2px;
+}
+.portal-panel .app-name { font-size: 18px; font-weight: 900; letter-spacing: -.2px; }
+.portal-panel .app-host { font-size: 13.5px; color: var(--ink-faint); font-weight: 700; }
+.app-state { margin-top: 8px; font-size: 13px; font-weight: 800; color: var(--ink-faint); }
+.is-hidden-app .app-state { color: var(--ink-soft); }
+
+/* ---------------- catalogue, bigger ---------------- */
+
+.portal-panel .cards { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+.portal-panel .card {
+  align-items: flex-start;
+  padding: 18px 20px;
+  border-radius: 22px;
+  border: 2px solid #ECE9F8;
+}
+.portal-panel .card-badge { width: 54px; height: 54px; border-radius: 17px; }
+.portal-panel .card-badge svg { width: 28px; height: 28px; }
+.portal-panel .card-name { font-size: 18px; font-weight: 900; }
+.card-blurb {
+  display: block; margin-top: 8px;
+  font-size: 14px; line-height: 1.45; color: var(--ink-soft);
+  font-weight: 600;
+}
+
+/* ---------------- play time ---------------- */
+
+.time-pick {
+  background: linear-gradient(180deg, #F3F0FF, #FBFAFF);
+  border: 2px solid #E2DCFB;
+  border-radius: 24px;
+  padding: 22px 24px;
+}
+.time-pick .time-chips { margin: 0 0 18px; }
+
+.time-custom { border-top: 1px solid #E4DEFA; padding-top: 18px; }
+.time-custom > label {
+  display: block; margin-bottom: 10px;
+  font-size: 13px; font-weight: 900; letter-spacing: .9px;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+.time-input-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.time-input-row input {
+  width: 110px; padding: 12px 14px;
+  border: 2px solid #E2DFF5; border-radius: 14px;
+  background: var(--paper); color: var(--ink);
+  font: inherit; font-size: 20px; font-weight: 900;
+}
+.time-input-row input:focus { outline: none; border-color: var(--blue); }
+.time-input-row > span { font-size: 16px; font-weight: 800; color: var(--ink-soft); }
+.time-custom .field-note { margin: 10px 0 0; }
+
+/* What happens, in order, as three pictures rather than a paragraph. */
+.time-story {
+  list-style: none; margin: 22px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+.time-story li {
+  background: var(--paper); border: 2px solid #ECE9F8;
+  border-radius: 20px; padding: 18px 20px;
+}
+.time-story b { display: block; font-size: 16.5px; margin-bottom: 4px; }
+.time-story small { font-size: 14px; color: var(--ink-soft); line-height: 1.45; }
+.story-art {
+  display: grid; place-items: center;
+  width: 54px; height: 54px; margin-bottom: 12px;
+  border-radius: 16px;
+  font-size: 15px; font-weight: 900;
+}
+.story-art--play { background: #DFF8EF; }
+.story-art--play::after {
+  content: ""; width: 0; height: 0;
+  border-left: 16px solid #0FA07A;
+  border-top: 10px solid transparent; border-bottom: 10px solid transparent;
+  margin-left: 4px;
+}
+.story-art--warn { background: #FFF1CC; color: #8A6100; font-variant-numeric: tabular-nums; }
+.story-art--stop { background: #FFE9E9; }
+.story-art--stop::after {
+  content: ""; width: 18px; height: 18px; border-radius: 4px; background: var(--danger);
+}
+
+/* ---------------- more time ---------------- */
+
+.more-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 18px; }
+.more-chips button {
+  border: 2px solid #E2DFF5; border-radius: 18px;
+  background: var(--paper); color: var(--ink);
+  font: inherit; font-size: 19px; font-weight: 900;
+  padding: 18px 10px; cursor: pointer;
+}
+.more-chips button:hover { border-color: var(--blue); background: #F7F6FE; }
+.more-chips button:active { transform: scale(.97); }
+
+@media (max-width: 760px) {
+  .time-story { grid-template-columns: 1fr; }
+}
+
+/* A site's own name can be long. Let it wrap rather than cutting it off:
+   "National Geograp..." helps nobody decide anything. */
+.portal-panel .card-name { white-space: normal; line-height: 1.25; }
+.portal-panel .card-body { min-width: 0; }
