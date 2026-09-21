@@ -17,6 +17,9 @@ const path = require('node:path');
 
 const pkg = require('../package.json');
 const REPO = 'https://github.com/meSingh/sukhi-play';
+// The site is the front door now, so it is the homepage. The repository stays
+// the place to file things and to read the code.
+const SITE = 'https://sukhiplay.com';
 const RAW = 'https://raw.githubusercontent.com/meSingh/sukhi-play/main';
 
 const escape = (text) => String(text).replace(/[&<>"']/g, (c) => (
@@ -83,9 +86,9 @@ const buildXml = (desktopId) => `<?xml version="1.0" encoding="UTF-8"?>
     <keyword>toddler</keyword>
   </keywords>
 
-  <url type="homepage">${REPO}</url>
+  <url type="homepage">${SITE}</url>
   <url type="bugtracker">${REPO}/issues</url>
-  <url type="help">${REPO}#readme</url>
+  <url type="help">${SITE}/debug.html</url>
   <url type="vcs-browser">${REPO}</url>
 
   <screenshots>

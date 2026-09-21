@@ -71,7 +71,7 @@ tap. To be precise about what that is and is not:
   children are sent.
 
 The same list is published at
-<https://mesingh.github.io/sukhi-play/catalogue.html>, generated from the same
+<https://sukhiplay.com/catalogue.html>, generated from the same
 file, so what is written here describes what is on that page too.
 
 **If you operate a listed site and would like your profile removed, open an

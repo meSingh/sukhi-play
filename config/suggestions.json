@@ -203,6 +203,25 @@
       "termsChecked": "2026-09-21",
       "siteName": "Poki",
       "blurb": "A big free games portal, with plenty of choice."
+    },
+    {
+      "id": "musiclab",
+      "title": "Music",
+      "url": "https://musiclab.chromeexperiments.com/",
+      "shape": "note",
+      "color": "#f97316",
+      "blockAds": true,
+      "adSupported": false,
+      "category": "Creative",
+      "notes": "Music experiments you play with by touching and dragging. Made by Google Creative Lab, no advertising.",
+      "allowHosts": [
+        "musiclab.chromeexperiments.com"
+      ],
+      "denyHosts": [],
+      "termsUrl": "https://www.google.com/intl/en/policies/terms/",
+      "termsChecked": "2026-09-21",
+      "siteName": "Chrome Music Lab",
+      "blurb": "Draw a song and hear it play back."
     }
   ]
 }

@@ -86,7 +86,7 @@ Publisher: Mandeep Singh
 PublisherUrl: https://www.msingh.com
 PublisherSupportUrl: ${REPO}/issues
 PackageName: Sukhi Play
-PackageUrl: https://mesingh.github.io/sukhi-play/
+PackageUrl: https://sukhiplay.com/
 License: MIT
 LicenseUrl: ${REPO}/blob/main/LICENSE
 Copyright: Copyright (c) 2026 Mandeep Singh

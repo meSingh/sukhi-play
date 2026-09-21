@@ -6,7 +6,7 @@
 
 **A locked-down browser that lets a small child open only what you choose, and nothing else.**
 
-**[mesingh.github.io/sukhi-play](https://mesingh.github.io/sukhi-play/)**
+**[sukhiplay.com](https://sukhiplay.com/)**
 
 [![CI](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml/badge.svg)](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/meSingh/sukhi-play?sort=semver)](https://github.com/meSingh/sukhi-play/releases/latest)
@@ -442,7 +442,7 @@ reach; it does not childproof a computer.
 Window geometry cannot be reasoned about from another machine, so send real
 numbers rather than a description. Close the app, then run the installed copy
 with `--diagnose` (the exact line for each system is on the
-[troubleshooting page](https://mesingh.github.io/sukhi-play/debug.html)), or
+[troubleshooting page](https://sukhiplay.com/debug.html)), or
 from a clone:
 
 ```bash
