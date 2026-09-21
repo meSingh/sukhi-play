@@ -2,7 +2,7 @@
 'use strict';
 
 /**
- * Regenerates docs/screenshots from the real application.
+ * Regenerates the site's screenshots from the real application.
  *
  * Two passes are needed because the interesting states do not coexist. The
  * onboarding screens only exist before setup, and the tile screen only has
@@ -20,7 +20,11 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const { seedProfile, electronBin, ROOT } = require('./seed-profile');
-const OUT = path.join(ROOT, 'docs', 'screenshots');
+// web/public for the copy the site serves, and web/src/images for the copy
+// Astro optimises into the features page. docs/ is build output and is
+// emptied by every build.
+const OUT = path.join(ROOT, 'web', 'public', 'screenshots');
+const IMAGES = path.join(ROOT, 'web', 'src', 'images');
 const SEED_IDS = ['poki', 'pbskids', 'scratch', 'toytheater', 'natgeokids', 'musiclab'];
 
 function seededProfile () {
@@ -54,9 +58,17 @@ function main () {
 
   for (const dir of [seeded.dir, fresh]) fs.rmSync(dir, { recursive: true, force: true });
 
+  // The features page imports these through astro:assets, which needs them in
+  // src/. Copied rather than symlinked so a checkout without the site build
+  // still has both, and so Astro's content hashing sees real files.
+  fs.mkdirSync(IMAGES, { recursive: true });
+  for (const f of fs.readdirSync(OUT)) {
+    if (f.endsWith('.png')) fs.copyFileSync(path.join(OUT, f), path.join(IMAGES, f));
+  }
+
   const manifest = JSON.parse(fs.readFileSync(path.join(OUT, 'captions.json'), 'utf8'));
   const bad = manifest.filter((s) => s.error);
-  console.log(`\n[shots] ${manifest.length - bad.length}/${manifest.length} captured into docs/screenshots`);
+  console.log(`\n[shots] ${manifest.length - bad.length}/${manifest.length} captured into web/public/screenshots`);
   for (const s of bad) console.error(`[shots] FAILED ${s.name}: ${s.error}`);
 
   // The metainfo screenshot list is generated from captions.json, so a new

@@ -1584,19 +1584,26 @@ async function runDemo () {
   await sleep(1600);
   capturing = false;
 
-  await scene('play time is the first thing a grown-up sees', 3400, async () => {
-    await js(`(() => {
-      if (window.__showPortalTab) window.__showPortalTab('time');
-      const body = document.querySelector('#gate-step-library .portal-body');
-      if (body) body.scrollTop = 0;
-      return 1;
-    })()`);
+  // The gate was answered from the stop screen, so what follows is the
+  // more-time box rather than the whole grown-up screen. This used to click
+  // `#time-more`, which stopped existing when that became its own screen --
+  // and a scene that throws simply records the previous frame for its whole
+  // length, which looks like a pause rather than a failure.
+  await scene('fifteen minutes, an hour, or the rest of the day', 3600, async () => {
+    const shown = await js(`(() => JSON.stringify({
+      box: !document.getElementById('gate-step-time').hidden,
+      choices: [...document.querySelectorAll('#more-chips button b')].map(b => b.textContent)
+    }))()`);
+    console.log(`[DEMO] more time: ${shown}`);
   });
 
-  await scene('more time, and back to playing', 3000, async () => {
-    await js(`(() => { document.getElementById('time-more').click(); return 1; })()`);
-    await sleep(900);
-    await js(`(() => { document.getElementById('lib-done').click(); return 1; })()`);
+  await scene('back to playing, with the usual limit untouched', 3200, async () => {
+    await js(`(() => {
+      const first = document.querySelector('#more-chips button');
+      if (first) first.click();
+      return 1;
+    })()`);
+    await sleep(1400);
   });
 
   stopped = true;

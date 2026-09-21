@@ -237,3 +237,28 @@ test('the built site keeps the files GitHub Pages needs', () => {
   }
   assert.equal(fs.readFileSync(path.join(docs, 'CNAME'), 'utf8').trim(), 'sukhiplay.com');
 });
+
+test('no script writes into docs, which the site build empties', () => {
+  const dir = path.join(__dirname, '..', 'scripts');
+  for (const name of fs.readdirSync(dir).filter((f) => f.endsWith('.js'))) {
+    const text = fs.readFileSync(path.join(dir, name), 'utf8');
+    // `npm run site` deletes docs/ and rebuilds it. A recorder that writes
+    // there produces files that survive until the next build and then vanish,
+    // which is a confusing way to lose a screenshot.
+    const writes = text.match(/path\.join\([^)]*['"]docs['"]/g) || [];
+    assert.deepEqual(writes, [],
+      `scripts/${name} builds a path into docs/; put it in web/public instead`);
+  }
+});
+
+test('the demo recording in the site source is the one that got published', () => {
+  const root = path.join(__dirname, '..');
+  for (const name of ['demo.webp', 'demo.gif', 'demo-poster.png']) {
+    const src = path.join(root, 'web', 'public', 'assets', name);
+    const out = path.join(root, 'docs', 'assets', name);
+    assert.ok(fs.existsSync(src), `web/public/assets/${name} is missing`);
+    assert.ok(fs.existsSync(out), `docs/assets/${name} is missing; run \`npm run site\``);
+    assert.equal(fs.readFileSync(src).length, fs.readFileSync(out).length,
+      `docs/assets/${name} is stale; run \`npm run site\``);
+  }
+});

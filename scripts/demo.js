@@ -17,8 +17,11 @@ const http = require('node:http');
 const { spawn, spawnSync } = require('node:child_process');
 const { seedProfile, electronBin, ROOT } = require('./seed-profile');
 
-const OUT = path.join(ROOT, 'docs', 'assets');
-const SEED_IDS = ['poki', 'pbskids', 'scratch', 'toytheater', 'natgeokids', 'blockly'];
+// web/public, not docs. docs/ is the built site: Astro empties it on every
+// build, so anything written straight into it survives only until the next
+// `npm run site`. Everything in web/public is copied there by the build.
+const OUT = path.join(ROOT, 'web', 'public', 'assets');
+const SEED_IDS = ['poki', 'pbskids', 'scratch', 'toytheater', 'natgeokids', 'musiclab'];
 
 /**
  * Serves the little page the recording plays on.
@@ -53,8 +56,10 @@ async function main () {
       id: 'shapes',
       title: 'Shapes',
       url: `http://127.0.0.1:${port}/`,
-      shape: 'ball',
-      color: '#3B6BFF',
+      // Not 'ball': Poki is seeded beside it and uses that shape, so the
+      // recording opened with two tiles a viewer cannot tell apart.
+      shape: 'drop',
+      color: '#0ea5e9',
       enabled: true,
       allowHosts: ['127.0.0.1'],
       denyHosts: [],

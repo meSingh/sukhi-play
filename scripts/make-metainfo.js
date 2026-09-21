@@ -108,19 +108,19 @@ ${screenshots()}
 const out = path.join(__dirname, '..', 'build', 'linux');
 fs.mkdirSync(out, recursiveOpt());
 function screenshots () {
-  const dir = path.join(__dirname, '..', 'docs', 'screenshots');
+  const dir = path.join(__dirname, '..', 'web', 'public', 'screenshots');
   let manifest;
   try {
     manifest = JSON.parse(fs.readFileSync(path.join(dir, 'captions.json'), 'utf8'));
   } catch (err) {
     throw new Error(
-      'docs/screenshots/captions.json is missing or unreadable. ' +
+      'web/public/screenshots/captions.json is missing or unreadable. ' +
       'Run `npm run shots` to regenerate the screenshot set. (' + err.message + ')'
     );
   }
 
   const usable = manifest.filter((s) => !s.error && fs.existsSync(path.join(dir, s.name + '.png')));
-  if (!usable.length) throw new Error('no usable screenshots in docs/screenshots');
+  if (!usable.length) throw new Error('no usable screenshots in web/public/screenshots');
 
   // AppStream wants the primary view first. The launcher is what the app is,
   // so it leads regardless of filename order.
@@ -131,7 +131,7 @@ function screenshots () {
     return [
       '    ' + tag,
       '      <caption>' + escape(s.caption) + '</caption>',
-      '      <image>' + RAW + '/docs/screenshots/' + s.name + '.png</image>',
+      '      <image>' + RAW + '/web/public/screenshots/' + s.name + '.png</image>',
       '    </screenshot>'
     ].join('\n');
   }).join('\n');
