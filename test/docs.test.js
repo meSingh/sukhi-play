@@ -217,7 +217,7 @@ test('the old .html addresses still lead somewhere', () => {
   // The site was live at these before the move to clean URLs, and GitHub
   // Pages forwards the github.io path to the custom domain keeping the path,
   // so an old link arrives here rather than at a 404.
-  for (const name of ['features', 'catalogue', 'download', 'macos', 'windows', 'linux', 'debug']) {
+  for (const name of ['catalogue', 'download', 'macos', 'windows', 'linux', 'debug']) {
     const file = path.join(docs, `${name}.html`);
     assert.ok(fs.existsSync(file) && fs.statSync(file).isFile(),
       `docs/${name}.html should be a redirect file`);

@@ -9,12 +9,11 @@
 import { REPO } from '../site';
 
 interface Props {
-  /** The page being rendered, e.g. "features" — used to mark the current link. */
+  /** The page being rendered, e.g. "docs" — used to mark the current link. */
   page?: string;
 }
 const { page = '' } = Astro.props;
 
-// Features is built and reachable at /features/, just not listed here yet.
 const LINKS = [
   { href: '/', key: 'index', label: 'Overview' },
   { href: '/catalogue/', key: 'catalogue', label: 'Catalogue' },

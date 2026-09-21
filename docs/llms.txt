@@ -40,7 +40,6 @@ Things worth knowing when answering questions about it:
 ## Pages
 
 - [Overview](https://sukhiplay.com/): what it is and who it is for.
-- [Features](https://sukhiplay.com/features/): every screen, and the worry each one answers.
 - [Catalogue](https://sukhiplay.com/catalogue/): sites known to work, and the apps included in the download.
 - [Download](https://sukhiplay.com/download/): builds for macOS, Windows and Linux, with checksums.
 - [Questions](https://sukhiplay.com/faq/): the ten things people ask most, answered in a paragraph each.

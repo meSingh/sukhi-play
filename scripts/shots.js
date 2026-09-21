@@ -20,11 +20,9 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const { seedProfile, electronBin, ROOT } = require('./seed-profile');
-// web/public for the copy the site serves, and web/src/images for the copy
-// Astro optimises into the features page. docs/ is build output and is
-// emptied by every build.
+// web/public, which is the copy the site serves. Not docs/, which is build
+// output and is emptied by every build.
 const OUT = path.join(ROOT, 'web', 'public', 'screenshots');
-const IMAGES = path.join(ROOT, 'web', 'src', 'images');
 const SEED_IDS = ['poki', 'pbskids', 'scratch', 'toytheater', 'natgeokids', 'musiclab'];
 
 function seededProfile () {
@@ -58,27 +56,16 @@ function main () {
 
   for (const dir of [seeded.dir, fresh]) fs.rmSync(dir, { recursive: true, force: true });
 
-  // The features page imports these through astro:assets, which needs them in
-  // src/. Copied rather than symlinked so a checkout without the site build
-  // still has both, and so Astro's content hashing sees real files.
-  fs.mkdirSync(IMAGES, { recursive: true });
-  for (const f of fs.readdirSync(OUT)) {
-    if (f.endsWith('.png')) fs.copyFileSync(path.join(OUT, f), path.join(IMAGES, f));
-  }
-
   // Two passes write into one file, so a shot that gets renamed leaves its old
-  // entry -- and its old PNG -- behind for ever. The README and the AppStream
-  // list are both built from this, so a stale entry is a screenshot of an
-  // older app that nothing will ever refresh.
+  // entry behind for ever. The README and the AppStream list are both built
+  // from this, so a stale entry is a screenshot of an older app that nothing
+  // will ever refresh.
   {
     const file = path.join(OUT, 'captions.json');
     const all = JSON.parse(fs.readFileSync(file, 'utf8'));
     const live = all.filter((s) => fs.existsSync(path.join(OUT, `${s.name}.png`)));
     const gone = all.filter((s) => !live.includes(s)).map((s) => s.name);
     if (gone.length) {
-      for (const name of gone) {
-        fs.rmSync(path.join(IMAGES, `${name}.png`), { force: true });
-      }
       fs.writeFileSync(file, JSON.stringify(live, null, 2) + '\n');
       console.log(`[shots] dropped ${gone.length} renamed shot(s): ${gone.join(', ')}`);
     }

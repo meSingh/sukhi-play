@@ -56,7 +56,6 @@ export const GET: APIRoute = async () => {
     '## Pages',
     '',
     `- [Overview](${SITE}/): what it is and who it is for.`,
-    `- [Features](${SITE}/features/): every screen, and the worry each one answers.`,
     `- [Catalogue](${SITE}/catalogue/): sites known to work, and the apps included in the download.`,
     `- [Download](${SITE}/download/): builds for macOS, Windows and Linux, with checksums.`,
     `- [Questions](${SITE}/faq/): the ten things people ask most, answered in a paragraph each.`,
