@@ -28,6 +28,9 @@ function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTime
   // Time a grown-up granted for this session only. The standing rule in
   // settings is not touched: tomorrow starts from the rule again.
   let bonus = 0;
+  // A grown-up who waved the rest of the day through. Only for this run: the
+  // next launch starts from the standing rule again, like any other session.
+  let unlimited = false;
   let used = 0;
   let since = null;
   let timeUp = false;
@@ -53,12 +56,12 @@ function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTime
   }
 
   function leftSeconds () {
-    if (!limit) return null;
+    if (!limit || unlimited) return null;
     return Math.max(0, limit + bonus - usedSeconds());
   }
 
   function check () {
-    if (!limit || timeUp) return;
+    if (!limit || unlimited || timeUp) return;
     const left = leftSeconds();
     for (const at of WARN_AT) {
       if (left <= at && !warned.has(at)) {
@@ -95,6 +98,7 @@ function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTime
     reset () {
       used = 0;
       bonus = 0;
+      unlimited = false;
       since = null;
       timeUp = false;
       warned.clear();
@@ -108,8 +112,18 @@ function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTime
      * ten minutes longer.
      */
     extend (minutes) {
+      if (!limit) return false;
+      // 'day' is the grown-up deciding the clock is not the right tool today.
+      // It is still only this session: closing the app puts the rule back.
+      if (minutes === 'day') {
+        unlimited = true;
+        timeUp = false;
+        if (since === null) since = now();
+        warned.clear();
+        return true;
+      }
       const add = clampMinutes(minutes);
-      if (!add || !limit) return false;
+      if (!add) return false;
       bonus += add * 60;
       timeUp = false;
       // Running out stopped the clock, so granting time starts it again.
@@ -142,6 +156,7 @@ function createClock ({ limitMinutes = 0, now = () => Date.now(), onWarn, onTime
       return {
         limitSeconds: limit,
         bonusSeconds: bonus,
+        unlimited,
         usedSeconds: usedSeconds(),
         leftSeconds: leftSeconds(),
         timeUp

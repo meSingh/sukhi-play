@@ -162,3 +162,48 @@ test('there is nothing to extend without a limit', () => {
   assert.equal(clock.extend(10), false);
   assert.equal(clock.state().leftSeconds, null);
 });
+
+test('the rest of the day stops the clock without moving the rule', () => {
+  const { clock, advance } = fake(10);
+  clock.setActive(true);
+  advance(600);
+  assert.equal(clock.isTimeUp(), true);
+
+  assert.equal(clock.extend('day'), true);
+  assert.equal(clock.isTimeUp(), false);
+  assert.equal(clock.state().unlimited, true);
+  assert.equal(clock.state().leftSeconds, null, 'nothing is counting down');
+  // The whole point: the standing rule a parent set is untouched.
+  assert.equal(clock.state().limitSeconds, 600);
+
+  advance(60 * 60 * 6);
+  assert.equal(clock.isTimeUp(), false, 'six hours later it is still open');
+});
+
+test('the rest of the day never warns', () => {
+  const warns = [];
+  const { clock, advance } = fake(10, { onWarn: (l) => warns.push(l) });
+  clock.setActive(true);
+  clock.extend('day');
+  advance(60 * 60);
+  assert.equal(warns.length, 0);
+});
+
+test('a new session starts from the rule again, not from the grant', () => {
+  const { clock, advance } = fake(10);
+  clock.setActive(true);
+  clock.extend('day');
+  clock.reset();
+  assert.equal(clock.state().unlimited, false);
+  assert.equal(clock.state().bonusSeconds, 0);
+  assert.equal(clock.state().limitSeconds, 600);
+  clock.setActive(true);
+  advance(600);
+  assert.equal(clock.isTimeUp(), true, 'the rule is back in force');
+});
+
+test('the rest of the day is still nothing when no limit is set', () => {
+  const { clock } = fake(0);
+  clock.setActive(true);
+  assert.equal(clock.extend('day'), false);
+});

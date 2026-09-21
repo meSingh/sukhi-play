@@ -1613,7 +1613,14 @@ img, svg { -webkit-user-drag: none; }
 }
 .way-sum i { font-style: normal; color: var(--blue); }
 
-.setting--danger { border: 2px solid #FFE0E6; border-radius: 20px; padding: 18px 20px; }
+/* A boxed card, not a row in a list, so it keeps all four of its sides.
+   `.setting:last-of-type` drops the bottom hairline that separates rows, and
+   this is the last setting on the page: without this it loses its own edge. */
+.setting.setting--danger {
+  border: 2px solid #FFE0E6;
+  border-radius: 20px;
+  padding: 18px 20px;
+}
 .setting--danger .setting-text span { max-width: 62ch; display: block; }
 
 @media (max-width: 720px) {
@@ -1723,15 +1730,29 @@ img, svg { -webkit-user-drag: none; }
 
 /* ---------------- more time ---------------- */
 
-.more-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 18px; }
+/* One choice per row, each saying what it means. A grid of bare numbers made
+   a parent work out which one was the "just this once" option. */
+.more-chips { display: grid; gap: 10px; margin: 6px 0 16px; }
 .more-chips button {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
   border: 2px solid #E2DFF5; border-radius: 18px;
   background: var(--paper); color: var(--ink);
-  font: inherit; font-size: 19px; font-weight: 900;
-  padding: 18px 10px; cursor: pointer;
+  font: inherit; text-align: left;
+  padding: 15px 18px; cursor: pointer;
+  transition: border-color .14s, background .14s;
 }
+.more-chips button b { font-size: 19px; font-weight: 900; }
+.more-chips button small { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
 .more-chips button:hover { border-color: var(--blue); background: #F7F6FE; }
-.more-chips button:active { transform: scale(.97); }
+.more-chips button:active { transform: scale(.99); }
+
+/* The standing rule, spelled out where the temptation is to assume that
+   granting an hour has just made every session an hour. */
+.more-standing {
+  margin: 0 0 18px;
+  font-size: 13.5px; font-weight: 700; color: var(--ink-soft);
+}
+.more-standing:empty { display: none; }
 
 @media (max-width: 760px) {
   .time-story { grid-template-columns: 1fr; }
@@ -1747,13 +1768,16 @@ img, svg { -webkit-user-drag: none; }
 .portal-panel .card { flex-direction: column; align-items: stretch; gap: 12px; }
 .card-head { display: flex; align-items: center; gap: 13px; width: 100%; }
 .card-head .card-body { flex: 1; min-width: 0; }
-.portal-panel .card-state {
-  flex: none;
-  padding: 10px 18px; border-radius: 999px;
-  background: var(--blue); color: #fff;
-  font-size: 14.5px; font-weight: 800;
+/* No button on the card: the card is the button. It has to look like one,
+   so it lifts and takes the blue on hover. */
+.portal-panel .card { cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.portal-panel .card:hover,
+.portal-panel .card:focus-visible {
+  border-color: #C7BFF6;
+  box-shadow: 0 10px 22px rgba(79, 70, 229, .13);
+  transform: translateY(-2px);
 }
-.portal-panel .card:hover .card-state { filter: brightness(1.06); }
+.portal-panel .card:active { transform: translateY(0); }
 .portal-panel .card-blurb { margin: 0; width: 100%; }
 
 /* Where the card actually goes. Quiet, because it is a check rather than
@@ -1765,4 +1789,13 @@ img, svg { -webkit-user-drag: none; }
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12.5px; font-weight: 700; color: var(--ink-soft);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* The disclaimer sits under the catalogue, where someone who has already
+   chosen will read it, rather than in front of the thing they came for. */
+.catalog-fine {
+  margin: 26px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid #F1EFFA;
+  max-width: 78ch;
 }

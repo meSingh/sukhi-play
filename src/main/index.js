@@ -372,13 +372,20 @@ function registerIpc () {
    */
   ipcMain.handle('shell:more-time', (_e, minutes) => {
     if (!isUnlocked()) return locked();
-    const added = playClock.extend(minutes);
+    const whole = minutes === 'day';
+    const added = playClock.extend(whole ? 'day' : minutes);
     if (!added) return { ok: false, message: 'There is no limit running.' };
     playClock.setActive(shellApp.mode === 'launcher' || shellApp.mode === 'playing');
     shellApp.goHome();
     shellApp.pushState();
-    console.log(`[clock] a grown-up added ${Math.round(Number(minutes))} minutes`);
-    return { ok: true, minutes: Math.round(Number(minutes)), clock: playClock.state() };
+    const granted = whole ? 'the rest of the day' : `${Math.round(Number(minutes))} minutes`;
+    console.log(`[clock] a grown-up added ${granted}; the ${settings.sessionMinutes || 0}-minute rule is unchanged`);
+    return {
+      ok: true,
+      whole,
+      minutes: whole ? 0 : Math.round(Number(minutes)),
+      clock: playClock.state()
+    };
   });
 
   /** How long a session lasts. 0 switches the limit off. */
@@ -1087,6 +1094,26 @@ async function runPortalShots () {
     fs.writeFileSync(path.join(PORTAL_SHOTS, `${tab}.png`), image.toPNG());
     console.log(`[PORTAL] ${tab} ${fit}`);
   }
+
+  // And the other screen a parent sees: asking for more time, which is a box
+  // with three choices and not the grown-up screen.
+  shellApp.closeGate();
+  await sleep(400);
+  settings.sessionMinutes = settings.sessionMinutes || 20;
+  playClock.setLimit(settings.sessionMinutes);
+  shellApp.pushState();
+  await sleep(200);
+  shellApp.openGate('time');
+  await sleep(500);
+  await js(`(async () => {
+    if (window.__markGatePassed) window.__markGatePassed();
+    if (window.__afterUnlock) await window.__afterUnlock();
+    return 1;
+  })()`);
+  await sleep(700);
+  const more = await shellApp.shellView.webContents.capturePage();
+  fs.writeFileSync(path.join(PORTAL_SHOTS, 'more-time.png'), more.toPNG());
+  console.log('[PORTAL] more-time captured');
 
   shellApp.allowQuit = true;
   app.exit(0);

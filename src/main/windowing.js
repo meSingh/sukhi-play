@@ -583,9 +583,16 @@ class Shell {
 
   // --- gate ----------------------------------------------------------------
 
+  // Why the gate was opened, which decides what happens once it is answered.
+  // 'exit' is the plain way in to the grown-up screen; the others go straight
+  // to the one thing that was asked for.
+  static GATE_INTENTS = ['exit', 'quit', 'portal', 'time'];
+
   openGate (intent) {
     if (this.mode === 'gate') return { ok: true };
-    this.gateIntent = intent === 'quit' ? 'quit' : 'exit';
+    // The intent has to survive. Folding everything down to quit-or-exit sent
+    // a parent who asked for more time into the whole grown-up screen instead.
+    this.gateIntent = Shell.GATE_INTENTS.includes(intent) ? intent : 'exit';
     this.previousMode = this.mode;
     if (this.gameView && !this.gameView.webContents.isDestroyed()) {
       this.gameView.webContents.setAudioMuted(true);

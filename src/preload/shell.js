@@ -42,7 +42,8 @@ contextBridge.exposeInMainWorld('sukhi', {
 
 
   /** Add minutes to the session that just ran out. Parent only. */
-  moreTime: (minutes) => ipcRenderer.invoke('shell:more-time', Number(minutes)),
+  moreTime: (minutes) => ipcRenderer.invoke(
+    'shell:more-time', minutes === 'day' ? 'day' : Number(minutes)),
 
   /** Set how long a session lasts, in minutes. 0 is no limit. Parent only. */
   setSessionMinutes: (minutes) => ipcRenderer.invoke('shell:set-session-minutes', Number(minutes)),

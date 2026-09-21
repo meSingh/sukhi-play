@@ -234,13 +234,23 @@
         <header class="gate-head">
           <h2>How much more?</h2>
         </header>
-        <p class="gate-hint">This session only. Tomorrow starts from your usual limit again.</p>
+        <p class="gate-hint">Added to this session. Your usual play time is not
+          changed, so the next time Sukhi Play opens it starts from that again.</p>
         <div class="more-chips" id="more-chips">
-          <button type="button" data-min="5">5 min</button>
-          <button type="button" data-min="10">10 min</button>
-          <button type="button" data-min="15">15 min</button>
-          <button type="button" data-min="30">30 min</button>
+          <button type="button" data-min="15">
+            <b>15 minutes</b>
+            <small>A bit longer</small>
+          </button>
+          <button type="button" data-min="60">
+            <b>1 hour</b>
+            <small>A proper go</small>
+          </button>
+          <button type="button" data-min="day">
+            <b>Rest of the day</b>
+            <small>No limit until Sukhi Play is closed</small>
+          </button>
         </div>
+        <p class="more-standing" id="more-standing"></p>
         <footer class="gate-foot">
           <button id="more-cancel" class="ghost-btn" type="button">Not now</button>
         </footer>
@@ -393,23 +403,20 @@
             <div class="panel-title-row">
               <div>
                 <h3>Catalogue</h3>
-                <p class="sec-note">
-              Sites that are known to work, with the hosts each one needs already
-              filled in. Pick one to load those settings, then change whatever you
-              like before saving.
-              <span class="sec-fine">
-                Sukhi Play is not connected to any of these sites, is not endorsed
-                by them, and does not vet what they show. Please read each site's
-                own terms and decide for yourself.
-                </span>
-                </p>
+                <p>Sites that are known to work. Pick one to load its settings,
+                  then change whatever you like before saving.</p>
               </div>
             </div>
             <p class="sec-note" id="catalog-empty" hidden>
               Everything in the catalogue is already installed. Use
-              <b>Add an app</b> to set up any other site by its address.
+              <b>Create a custom app</b> to set up any other site by its address.
             </p>
             <div id="lib-suggest-list" class="cards"></div>
+            <p class="sec-fine catalog-fine">
+              Sukhi Play is not connected to any of these sites, is not endorsed
+              by them, and does not vet what they show. Please read each site's
+              own terms and decide for yourself.
+            </p>
           </section>
 
           <section class="portal-panel portal-panel--form" data-panel="form" id="gate-step-form" hidden>

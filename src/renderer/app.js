@@ -220,6 +220,17 @@ function formatLeft (seconds) {
   return `${m}:${s}`;
 }
 
+/** "45 minutes", "1 hour", "1 hour 30 minutes". Plain, for a parent to read. */
+function describeMinutes (total) {
+  const n = Number(total) || 0;
+  const hours = Math.floor(n / 60);
+  const mins = n % 60;
+  const parts = [];
+  if (hours) parts.push(`${hours} hour${hours === 1 ? '' : 's'}`);
+  if (mins) parts.push(`${mins} minute${mins === 1 ? '' : 's'}`);
+  return parts.join(' ') || '0 minutes';
+}
+
 function applyClock (clock) {
   const timeUp = Boolean(clock && clock.timeUp);
   app.classList.toggle('is-timeup', timeUp);
@@ -227,7 +238,10 @@ function applyClock (clock) {
   clearInterval(clockTimer);
   clockTimer = 0;
 
-  const limited = Boolean(clock && clock.limitSeconds);
+  // A grown-up waved the rest of the day through. The rule is still set, and
+  // the chips still show it, but nothing is counting down today.
+  const freeToday = Boolean(clock && clock.unlimited);
+  const limited = Boolean(clock && clock.limitSeconds) && !freeToday;
   clockLimit = limited ? clock.limitSeconds : 0;
   clockLeft = limited && !timeUp ? Math.max(0, clock.leftSeconds || 0) : null;
   paintClock();
@@ -249,11 +263,13 @@ function applyClock (clock) {
 
   const state = el('time-state');
   if (state && clock) {
-    state.textContent = !limited
-      ? 'No limit set'
-      : timeUp
-        ? 'Time is up'
-        : `${Math.ceil((clock.leftSeconds || 0) / 60)} min left in this session`;
+    state.textContent = freeToday
+      ? 'No limit for the rest of today'
+      : !limited
+        ? 'No limit set'
+        : timeUp
+          ? 'Time is up'
+          : `${Math.ceil((clock.leftSeconds || 0) / 60)} min left in this session`;
   }
   paintChips(clock ? Math.round((clock.limitSeconds || 0) / 60) : 0);
 }
@@ -712,15 +728,12 @@ function renderSuggestions (list) {
 
     body.append(name, meta);
 
-    const state = document.createElement('span');
-    state.className = 'card-state';
-    state.textContent = 'Set up';
-
-    // A row of who it is, then the description across the full width beneath.
-    // The description is the part a parent reads, so it gets the space.
+    // No button: the whole card is the button. A card with one action on it
+    // that is not the card itself asks a parent to aim at a small target for
+    // no reason.
     const head = document.createElement('span');
     head.className = 'card-head';
-    head.append(badge, body, state);
+    head.append(badge, body);
 
     card.append(head, blurb, addr);
     // A suggestion is a starting point, not a decision: choosing one opens the
@@ -1079,7 +1092,15 @@ async function afterUnlock () {
   // Asking for more time is its own small screen. Dropping a parent into the
   // whole grown-up screen to grant five minutes is a detour.
   if (gateIntent === 'time') {
+    // Read the rule off the clock rather than the settings copy: the clock is
+    // where the limit actually lives, and it is in every state push.
+    const mins = Math.round(clockLimit / 60);
+    el('more-standing').textContent = mins
+      ? `Your usual play time stays at ${describeMinutes(mins)} a session.`
+      : '';
     el('gate-step-time').hidden = false;
+    const first = document.querySelector('#more-chips button');
+    if (first) first.focus();
     startPortalHeartbeat();
     return;
   }
@@ -1267,7 +1288,7 @@ function wire () {
       if (!r || !r.ok) return showToast((r && r.message) || 'Could not add that.');
       applyClock(r.clock);
       api.closeGate();
-      showToast(`${r.minutes} more minutes.`);
+      showToast(r.whole ? 'No limit for the rest of today.' : `${r.minutes} more minutes.`);
     });
   }
 
@@ -1333,6 +1354,7 @@ function wire () {
   window.__loadLibrary = loadLibrary;
   window.__showPortalTab = showPortalTab;
   window.__markGatePassed = () => { gatePassed = true; };
+  window.__afterUnlock = afterUnlock;
   // Fills the editor with a finished-looking app, so the capture and scroll
   // tooling can see the whole form without a network probe.
   window.__fillDemoForm = () => {
