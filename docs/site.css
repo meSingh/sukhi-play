@@ -890,3 +890,43 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
 }
 .getting.started .gt-cancel { display: none; }
 .probe-list .card.yours { border: 2px solid var(--mint); }
+
+/* ================= the play time dial ================= */
+
+.timer {
+  display: grid; grid-template-columns: auto 1fr; gap: 44px;
+  align-items: center; max-width: 940px; margin: 0 auto;
+}
+.dial { position: relative; width: 240px; height: 240px; flex: none; }
+.dial svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.dial circle { fill: none; stroke-width: 12; }
+.dial-track { stroke: #EFECFA; }
+.dial-prog {
+  stroke: var(--blue); stroke-linecap: round;
+  stroke-dasharray: 365; stroke-dashoffset: 0;
+}
+.dial-face {
+  position: absolute; inset: 0;
+  display: grid; place-content: center; text-align: center;
+}
+.dial-face b { display: block; font-size: 46px; font-weight: 900; letter-spacing: -1.5px; font-variant-numeric: tabular-nums; }
+.dial-face span { font-size: 15px; font-weight: 800; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px; }
+.dial.is-up .dial-prog { stroke: var(--coral); }
+.dial.is-up .dial-face b { font-size: 30px; color: var(--coral); }
+
+.timer-copy .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.timer-copy .chips span {
+  border: 2px solid var(--line); border-radius: 999px;
+  padding: 7px 14px; font-size: 14.5px; font-weight: 800; color: var(--ink-soft);
+  background: var(--paper);
+}
+.timer-copy .chips .on { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+.ticks { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.ticks li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; font-size: 16px; line-height: 1.5; color: var(--ink-soft); }
+.ticks li b { color: var(--ink); }
+
+@media (max-width: 860px) {
+  .timer { grid-template-columns: 1fr; justify-items: center; gap: 28px; }
+  .timer-copy .chips { justify-content: center; }
+}

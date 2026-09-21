@@ -150,15 +150,29 @@
       <div class="section-head reveal">
         <span class="kicker">You decide when</span>
         <h2>Play time that ends by itself</h2>
-        <p>Set twenty minutes and hand it over. No negotiating, no watching the clock.</p>
+        <p>Set it once. Every time the app opens, the clock starts again.</p>
       </div>
-      <div class="flow reveal d1">
-        <div><div class="n">1</div><b>Pick a length</b>
-          <p>Ten minutes to an hour, or no limit at all.</p></div>
-        <div><div class="n">2</div><b>They can see it</b>
-          <p>A countdown sits in the bar, and warnings come at five minutes and at one.</p></div>
-        <div><div class="n">3</div><b>It stops on its own</b>
-          <p>A gentle screen, and nothing else opens. Only your three second hold starts more.</p></div>
+
+      <div class="timer reveal d1">
+        <div class="dial" aria-hidden="true">
+          <svg viewBox="0 0 132 132">
+            <circle class="dial-track" cx="66" cy="66" r="58"/>
+            <circle class="dial-prog" cx="66" cy="66" r="58"/>
+          </svg>
+          <div class="dial-face"><b id="dial-time">20:00</b><span id="dial-word">left</span></div>
+        </div>
+
+        <div class="timer-copy">
+          <div class="chips" aria-hidden="true">
+            <span>Off</span><span>10 min</span><span>15 min</span>
+            <span class="on">20 min</span><span>30 min</span><span>1 hour</span>
+          </div>
+          <ul class="ticks">
+            <li><span class="tick yes">&check;</span><span><b>Hand it over and walk away.</b> No negotiating, no watching the clock yourself.</span></li>
+            <li><span class="tick yes">&check;</span><span><b>The countdown only appears at the end.</b> A clock on screen all afternoon is a thing to watch, and then a thing to argue about.</span></li>
+            <li><span class="tick yes">&check;</span><span><b>Then it stops.</b> A gentle screen, and nothing else opens until you hold the button.</span></li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -493,6 +507,43 @@
       }, { threshold: .35 });
       seen.observe(stage);
     }
+  }
+
+  /* ---------- the play time dial ---------- */
+  // A whole session in ten seconds: the ring empties, the clock counts down,
+  // and it ends the way it ends in the app. Decoration, so without the script
+  // the dial simply reads 20:00.
+  var dial = document.querySelector('.dial');
+  if (dial && !reduced) {
+    var ring = dial.querySelector('.dial-prog');
+    var time = document.getElementById('dial-time');
+    var word = document.getElementById('dial-word');
+    var LENGTH = 365;
+    var run = async function () {
+      for (;;) {
+        dial.classList.remove('is-up');
+        word.textContent = 'left';
+        for (var step = 0; step <= 40; step++) {
+          var part = step / 40;
+          var secs = Math.round(20 * 60 * (1 - part));
+          ring.style.strokeDashoffset = (LENGTH * part).toFixed(1);
+          time.textContent = Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+          await wait(220);
+        }
+        dial.classList.add('is-up');
+        time.textContent = 'That is all';
+        word.textContent = 'for now';
+        await wait(2600);
+        ring.style.strokeDashoffset = '0';
+        await wait(500);
+      }
+    };
+    var started = false;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting && !started) { started = true; run(); }
+      }, { threshold: .4 }).observe(dial);
+    } else { run(); }
   }
 
   /* ---------- hold to get out: the real thing, to try ---------- */
