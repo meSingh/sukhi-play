@@ -1,0 +1,62 @@
+---
+/**
+ * One documentation page, with the rest of the manual beside it.
+ *
+ * The content comes from src/content/docs as markdown, which means the same
+ * text can be served as-is at /docs/<slug>.md for anything that would rather
+ * read it that way -- see src/pages/docs/[...slug].md.ts.
+ */
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import DocsNav from '../../components/DocsNav.astro';
+
+export async function getStaticPaths() {
+  const docs = await getCollection('docs');
+  return docs.map((doc) => ({ params: { slug: doc.id }, props: { doc } }));
+}
+
+const { doc } = Astro.props;
+const { Content, headings } = await render(doc);
+const all = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+const here = all.findIndex((d) => d.id === doc.id);
+const prev = all[here - 1];
+const next = all[here + 1];
+
+// Only h2s: an h3 in the sidebar turns a short page into a wall of links.
+const onThisPage = headings.filter((h) => h.depth === 2);
+---
+
+<Base title={`${doc.data.title} — Sukhi Play`} description={doc.data.summary} page="docs">
+  <div class="docs-shell wrap">
+    <DocsNav docs={all} current={doc.id} />
+
+    <article class="doc">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/docs/">Docs</a> <span aria-hidden="true">/</span> <span>{doc.data.group}</span>
+      </nav>
+
+      <h1>{doc.data.title}</h1>
+      <p class="doc-summary">{doc.data.summary}</p>
+
+      {onThisPage.length > 2 && (
+        <details class="doc-toc">
+          <summary>On this page</summary>
+          <ul>
+            {onThisPage.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}
+          </ul>
+        </details>
+      )}
+
+      <div class="doc-body">
+        <Content />
+      </div>
+
+      <nav class="doc-ends" aria-label="More documentation">
+        {prev
+          ? <a class="doc-end" href={`/docs/${prev.id}/`}><small>Previous</small>{prev.data.title}</a>
+          : <span></span>}
+        {next && <a class="doc-end doc-end--next" href={`/docs/${next.id}/`}><small>Next</small>{next.data.title}</a>}
+      </nav>
+    </article>
+  </div>
+</Base>

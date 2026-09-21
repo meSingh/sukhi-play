@@ -1,15 +1,50 @@
 ---
-/** Every page: the head, the header, the footer, and the one stylesheet. */
+/**
+ * Every page: the head, the header, the footer, and the one stylesheet.
+ *
+ * The head carries what a search engine, a social preview and an answer
+ * engine each need. They want much the same thing -- a title, a sentence, a
+ * picture, and a machine-readable statement of what this is -- so it is
+ * written once here rather than per page.
+ */
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { REPO, SITE } from '../site';
 import '../styles/site.css';
 
 interface Props {
   title: string;
   description: string;
   page?: string;
+  /** Overrides the social image for a page that has a better one. */
+  image?: string;
+  /** Extra JSON-LD for this page, on top of the site-wide graph. */
+  schema?: Record<string, unknown>;
 }
-const { title, description, page } = Astro.props;
+const { title, description, page, image = '/social-preview.png', schema } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE);
+const social = new URL(image, Astro.site ?? SITE);
+
+// Stated once, in the vocabulary a search engine already understands. The
+// price is here because "free" is the single fact most people are checking.
+const app = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Sukhi Play',
+  url: SITE,
+  description: 'A locked-down browser that lets a small child open only the websites a grown-up chose, and nothing else.',
+  applicationCategory: 'BrowserApplication',
+  applicationSubCategory: 'Parental control',
+  operatingSystem: 'macOS, Windows, Linux',
+  license: 'https://opensource.org/licenses/MIT',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  softwareHelp: `${SITE}/docs/`,
+  downloadUrl: `${SITE}/download/`,
+  codeRepository: REPO,
+  author: { '@type': 'Person', name: 'Mandeep Singh', url: 'https://www.msingh.com' }
+};
 ---
 <!doctype html>
 <html lang="en" class="no-js">
@@ -18,13 +53,36 @@ const { title, description, page } = Astro.props;
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
   <meta name="description" content={description}>
+  <link rel="canonical" href={canonical}>
   <link rel="icon" href="/assets/sukhi-icon.png">
-  <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)}>
+  <meta name="theme-color" content="#FFF7EC">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Sukhi Play">
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:url" content={canonical}>
+  <meta property="og:image" content={social}>
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={title}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content={social}>
+
+  <!-- A plain-language brief for assistants, and the markdown this page is
+       written in where there is one. Both are cheaper to read than the HTML. -->
+  <link rel="alternate" type="text/markdown" href="/llms.txt" title="Brief for language models">
+
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(app)} />
+  {schema && <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />}
+
   <script is:inline>document.documentElement.classList.remove('no-js')</script>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
   <Nav page={page} />
-  <slot />
+  <div id="main"><slot /></div>
   <Footer />
 </body>
 </html>

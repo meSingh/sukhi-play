@@ -1,0 +1,14 @@
+# Sukhi Play — https://sukhiplay.com
+#
+# Everything here is public and there is nothing to keep out. The .html paths
+# are redirect stubs for addresses the site used to have; they are excluded so
+# a crawler indexes the real page rather than a meta-refresh.
+
+User-agent: *
+Allow: /
+Disallow: /*.html$
+
+# Assistants are welcome, and there is a short brief written for them.
+# See https://sukhiplay.com/llms.txt
+
+Sitemap: https://sukhiplay.com/sitemap-index.xml

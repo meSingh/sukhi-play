@@ -262,3 +262,98 @@ test('the demo recording in the site source is the one that got published', () =
       `docs/assets/${name} is stale; run \`npm run site\``);
   }
 });
+
+test('every page carries the tags a search or answer engine needs', () => {
+  for (const page of builtPages()) {
+    const html = fs.readFileSync(page.file, 'utf8');
+    const meta = (re) => (html.match(re) || [])[1];
+
+    assert.ok(/<title>[^<]{10,}<\/title>/.test(html), `${page.name} has no useful title`);
+    assert.ok((meta(/<meta name="description" content="([^"]+)"/) || '').length > 40,
+      `${page.name} has no description worth showing in a result`);
+
+    const canonical = meta(/<link rel="canonical" href="([^"]+)"/);
+    assert.ok(canonical && canonical.startsWith('https://sukhiplay.com/'),
+      `${page.name} has no absolute canonical`);
+
+    // Social previews need absolute URLs: a relative og:image resolves against
+    // whatever is doing the unfurling, which is never this site.
+    const og = meta(/<meta property="og:image" content="([^"]+)"/);
+    assert.ok(og && og.startsWith('https://'), `${page.name} has no absolute og:image`);
+    for (const tag of ['og:title', 'og:description', 'og:url', 'twitter:card']) {
+      assert.ok(html.includes(tag), `${page.name} is missing ${tag}`);
+    }
+  }
+});
+
+test('the structured data on every page is valid and says what it is', () => {
+  for (const page of builtPages()) {
+    const html = fs.readFileSync(page.file, 'utf8');
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+    assert.ok(blocks.length >= 1, `${page.name} has no JSON-LD`);
+
+    const types = blocks.map((m) => {
+      // Invalid JSON-LD is worse than none: a parser drops the lot silently.
+      const data = JSON.parse(m[1]);
+      assert.equal(data['@context'], 'https://schema.org');
+      return data['@type'];
+    });
+    assert.ok(types.includes('SoftwareApplication'),
+      `${page.name} does not say what this software is`);
+  }
+});
+
+test('llms.txt follows the shape the proposal asks for', () => {
+  const file = path.join(__dirname, '..', 'docs', 'llms.txt');
+  assert.ok(fs.existsSync(file), 'docs/llms.txt is missing');
+  const lines = fs.readFileSync(file, 'utf8').split('\n');
+
+  // llmstxt.org: an H1 with the name first, then a blockquote summary, then
+  // any prose, then H2 sections of annotated links.
+  assert.match(lines[0], /^# \S/, 'the first line must be the H1 name');
+  assert.ok(lines.slice(1, 6).some((l) => l.startsWith('> ')), 'no blockquote summary');
+  assert.ok(lines.some((l) => l.startsWith('## ')), 'no link sections');
+
+  const links = lines.filter((l) => /^- \[.+\]\(https?:\/\/\S+\): .+/.test(l));
+  assert.ok(links.length >= 10, `only ${links.length} annotated links`);
+});
+
+test('the markdown twin of every doc page is served', () => {
+  const docsDir = path.join(__dirname, '..', 'docs', 'docs');
+  const pages = fs.readdirSync(docsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name);
+
+  for (const slug of pages) {
+    const md = path.join(docsDir, `${slug}.md`);
+    // llms.txt points at these. A missing one sends a reader to a 404.
+    assert.ok(fs.existsSync(md), `docs/docs/${slug}.md is missing`);
+    const text = fs.readFileSync(md, 'utf8');
+    assert.match(text, /^# \S/, `${slug}.md does not start with its title`);
+  }
+
+  const llms = fs.readFileSync(path.join(__dirname, '..', 'docs', 'llms.txt'), 'utf8');
+  for (const m of llms.matchAll(/\]\(https:\/\/sukhiplay\.com(\/docs\/[^)]+\.md)\)/g)) {
+    const local = path.join(__dirname, '..', 'docs', m[1]);
+    assert.ok(fs.existsSync(local), `llms.txt links ${m[1]}, which is not built`);
+  }
+});
+
+test('robots.txt points at a sitemap that exists and lists real pages', () => {
+  const root = path.join(__dirname, '..', 'docs');
+  const robots = fs.readFileSync(path.join(root, 'robots.txt'), 'utf8');
+  assert.match(robots, /^Sitemap: https:\/\/sukhiplay\.com\/sitemap-index\.xml$/m);
+  assert.ok(fs.existsSync(path.join(root, 'sitemap-index.xml')));
+
+  const urls = [...fs.readFileSync(path.join(root, 'sitemap-0.xml'), 'utf8')
+    .matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  assert.ok(urls.length >= 15, `the sitemap lists only ${urls.length} pages`);
+
+  for (const url of urls) {
+    const rel = url.replace('https://sukhiplay.com/', '');
+    const file = rel === '' ? 'index.html' : path.join(rel, 'index.html');
+    assert.ok(fs.existsSync(path.join(root, file)), `the sitemap lists ${url}, which is not built`);
+    // The .html stubs are redirects; indexing them would rank a meta-refresh.
+    assert.ok(!/\.html$/.test(rel), `the sitemap lists the redirect stub ${url}`);
+  }
+});

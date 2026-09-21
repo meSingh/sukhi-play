@@ -1,0 +1,41 @@
+---
+/** The manual's front page: everything, grouped, with a sentence each. */
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+const ORDER = ['Getting started', 'Using it', 'Under the bonnet', 'When things go wrong'] as const;
+const groups = ORDER
+  .map((name) => ({ name, items: docs.filter((d) => d.data.group === name) }))
+  .filter((g) => g.items.length);
+---
+
+<Base
+  title="Documentation — Sukhi Play"
+  description="How to install Sukhi Play, add sites, set play time, and what it does and does not protect against. Written plainly, for parents."
+  page="docs">
+
+  <main class="wrap docs-index">
+    <header class="hero hero--page">
+      <p class="f-kicker">Documentation</p>
+      <h1>How it all works</h1>
+      <p class="lede">Everything from installing it to what it deliberately
+        cannot do. If you would rather read the short version, the
+        <a href="/features/">features page</a> is a tour of the same ground.</p>
+    </header>
+
+    {groups.map((g) => (
+      <section class="docs-group">
+        <h2>{g.name}</h2>
+        <div class="docs-cards">
+          {g.items.map((d) => (
+            <a class="docs-card" href={`/docs/${d.id}/`}>
+              <b>{d.data.title}</b>
+              <span>{d.data.summary}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </main>
+</Base>

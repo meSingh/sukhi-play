@@ -1,0 +1,39 @@
+{
+  "$ref": "#/definitions/docs",
+  "definitions": {
+    "docs": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "order": {
+          "type": "number"
+        },
+        "group": {
+          "type": "string",
+          "enum": [
+            "Getting started",
+            "Using it",
+            "Under the bonnet",
+            "When things go wrong"
+          ]
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "summary",
+        "order",
+        "group"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

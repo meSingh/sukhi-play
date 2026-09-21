@@ -1378,3 +1378,106 @@ footer.foot .foot-links { margin-left: auto; display: flex; gap: 8px 18px; flex-
   .worry--ink .worry-aside { border-top-color: var(--yellow); }
   .rest-list { grid-template-columns: 1fr; }
 }
+
+/* ---------------- the documentation ---------------- */
+
+.skip {
+  position: absolute; left: -9999px;
+  padding: 12px 18px; border-radius: 0 0 12px 0;
+  background: var(--ink); color: #fff; font-weight: 800; z-index: 100;
+}
+.skip:focus { left: 0; top: 0; }
+
+.docs-index { padding-bottom: 72px; }
+.docs-group { margin-bottom: 44px; }
+.docs-group h2 { font-size: 15px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 16px; }
+.docs-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.docs-card {
+  display: grid; gap: 6px; padding: 20px 22px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 18px;
+  text-decoration: none; transition: border-color .14s, box-shadow .14s, transform .14s;
+}
+.docs-card:hover { border-color: #C7BFF6; box-shadow: 0 10px 24px rgba(23,21,58,.12); transform: translateY(-2px); }
+.docs-card b { font-size: 18px; color: var(--ink); }
+.docs-card span { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+
+/* A page of the manual: contents down the side, prose in a readable measure. */
+.docs-shell { display: grid; grid-template-columns: 236px 1fr; gap: 56px; padding: 44px 0 80px; align-items: start; }
+
+.docs-nav { position: sticky; top: 24px; font-size: 15px; }
+.docs-nav section { margin-bottom: 22px; }
+.docs-nav h2 { font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-faint); margin: 0 0 8px; }
+.docs-nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.docs-nav a {
+  display: block; padding: 7px 12px; border-radius: 10px;
+  color: var(--ink-soft); text-decoration: none; font-weight: 700; line-height: 1.35;
+}
+.docs-nav a:hover { background: var(--paper); color: var(--ink); }
+.docs-nav a[aria-current="page"] { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.docs-home { display: block; margin-bottom: 20px; font-weight: 800 !important; color: var(--blue) !important; }
+
+.doc { min-width: 0; max-width: 74ch; }
+.crumbs { font-size: 13.5px; font-weight: 700; color: var(--ink-faint); margin-bottom: 14px; }
+.crumbs a { color: var(--ink-soft); }
+.doc h1 { font-size: clamp(30px, 4vw, 42px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -1px; }
+.doc-summary { font-size: 18.5px; line-height: 1.5; color: var(--ink-soft); margin: 0 0 28px; }
+
+.doc-toc {
+  margin: 0 0 32px; padding: 14px 18px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+}
+.doc-toc summary { font-weight: 800; cursor: pointer; font-size: 15px; }
+.doc-toc ul { margin: 12px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+.doc-toc a { font-size: 15px; color: var(--ink-soft); }
+
+.doc-body { font-size: 17px; line-height: 1.68; color: var(--ink-soft); }
+.doc-body h2 { font-size: 26px; line-height: 1.2; color: var(--ink); margin: 42px 0 12px; letter-spacing: -.5px; }
+.doc-body h3 { font-size: 20px; color: var(--ink); margin: 32px 0 10px; }
+.doc-body p { margin: 0 0 16px; }
+.doc-body ul, .doc-body ol { margin: 0 0 18px; padding-left: 22px; display: grid; gap: 8px; }
+.doc-body strong { color: var(--ink); }
+.doc-body code {
+  padding: 2px 6px; border-radius: 6px; background: var(--paper);
+  border: 1px solid var(--line); font-size: .88em;
+}
+.doc-body pre {
+  margin: 0 0 20px; padding: 18px 20px; border-radius: 14px; overflow-x: auto;
+  background: var(--ink); color: #E8E6F5; font-size: 14.5px; line-height: 1.6;
+}
+.doc-body pre code { padding: 0; border: 0; background: none; color: inherit; font-size: inherit; }
+.doc-body blockquote {
+  margin: 0 0 20px; padding: 2px 0 2px 18px;
+  border-left: 3px solid var(--blue); color: var(--ink);
+}
+.doc-body table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 15.5px; }
+.doc-body th, .doc-body td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.doc-body th { color: var(--ink); font-size: 13.5px; letter-spacing: .4px; text-transform: uppercase; }
+.doc-body img { max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); }
+
+.doc-ends { display: flex; justify-content: space-between; gap: 16px; margin-top: 52px; padding-top: 26px; border-top: 1px solid var(--line); }
+.doc-end {
+  display: grid; gap: 3px; padding: 14px 20px; border-radius: 14px;
+  background: var(--paper); border: 1px solid var(--line);
+  text-decoration: none; font-weight: 800; color: var(--ink); max-width: 48%;
+}
+.doc-end small { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-faint); font-weight: 800; }
+.doc-end--next { text-align: right; }
+.doc-end:hover { border-color: #C7BFF6; }
+
+@media (max-width: 900px) {
+  .docs-shell { grid-template-columns: 1fr; gap: 28px; }
+  .docs-nav { position: static; }
+  .docs-cards { grid-template-columns: 1fr; }
+}
+
+/* ---------------- questions ---------------- */
+
+/* Every answer stands alone: an answer engine quotes one passage, not a page,
+   so "as described above" is a sentence that arrives somewhere useless. */
+.faq { padding-bottom: 72px; }
+.faq-list { display: grid; gap: 4px; max-width: 74ch; }
+.faq-item { padding: 26px 0; border-bottom: 1px solid var(--line); }
+.faq-item h2 { font-size: 21px; line-height: 1.3; margin: 0 0 10px; letter-spacing: -.3px; }
+.faq-item p { font-size: 17px; line-height: 1.65; color: var(--ink-soft); margin: 0; }
+.faq-more { display: inline-block; margin-top: 12px; font-size: 15px; font-weight: 800; text-decoration: none; }
+.faq-end { margin-top: 36px; font-size: 16px; color: var(--ink-soft); }

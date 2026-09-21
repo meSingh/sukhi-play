@@ -1,0 +1,102 @@
+---
+/**
+ * The questions people actually ask, answered in one paragraph each.
+ *
+ * Every answer is self-contained on purpose. An answer engine quotes a single
+ * passage rather than a page, so "as described above" is a sentence that
+ * arrives somewhere useless. The same shape is emitted as FAQPage JSON-LD.
+ */
+import Base from '../layouts/Base.astro';
+import { REPO } from '../site';
+
+const FAQ: Array<{ q: string; a: string; more?: { href: string; label: string } }> = [
+  {
+    q: 'What is Sukhi Play?',
+    a: 'Sukhi Play is a free, open-source kiosk browser for a small child. It fills the screen with big tiles for the websites you chose, and nothing else opens: there is no address bar, no new tabs, no downloads, and no way back to the desktop without an adult. It runs on macOS, Windows and Linux.'
+  },
+  {
+    q: 'How much does it cost?',
+    a: 'Nothing. There is no paid tier, no subscription, no trial and no account to create. It is MIT licensed and the whole source is public.',
+    more: { href: '/download/', label: 'Download it' }
+  },
+  {
+    q: 'How does a parent get back out?',
+    a: 'Press and hold the button for three seconds. A quick tap does nothing at all, which is every tap a small child makes. If your child ever works the hold out, you can switch it for a small addition instead, and then holding the button stops working entirely.',
+    more: { href: '/docs/the-gate/', label: 'How the gate works' }
+  },
+  {
+    q: 'Can my child get to YouTube or anywhere else I did not allow?',
+    a: 'No. Each site you add carries a list of the hosts it is allowed to load, and everything else is refused before it loads. Links out, popups, new windows and redirects to anywhere off that list are all cancelled, so a child cannot wander from a site you allowed to one you did not.',
+    more: { href: '/docs/lockdown/', label: 'How the lockdown works' }
+  },
+  {
+    q: 'Does it block adverts?',
+    a: 'Yes. Advert and tracker requests are cut before they load, on every site you add, and the bar shows a running count. A few sites ask in their terms that you do not filter them, and you can leave those alone per site — your child still cannot leave the site either way.'
+  },
+  {
+    q: 'Can I limit how long my child uses it?',
+    a: 'Yes. Set a session length once and it starts again every time the app opens, then ends on its own. No countdown is shown until the last thirty seconds, so there is nothing to watch or argue about. When it ends you can grant fifteen minutes, an hour or the rest of the day, and your usual limit does not move.',
+    more: { href: '/docs/play-time/', label: 'How play time works' }
+  },
+  {
+    q: 'Does it work without an internet connection?',
+    a: 'Partly. Three open-source apps ship inside the download — a colouring book, a keyboard playground and a set of first games — and those work with no connection at all. Websites you add naturally need one.',
+    more: { href: '/catalogue/', label: 'What is included' }
+  },
+  {
+    q: 'Does it collect any data about my child?',
+    a: 'No. There is no account, no sign-in, no analytics, no telemetry and no crash reporting. Nothing about what your child does is sent anywhere. The only request the app makes on its own is checking GitHub for a newer version, and only when you press the button.'
+  },
+  {
+    q: 'What can it not do?',
+    a: 'It cannot stop someone restarting the computer, and it is not a substitute for supervision. On Windows the Windows key still opens the Start menu — the app closes it immediately, but you will see it flash. Those limits are written down rather than glossed over.',
+    more: { href: '/docs/limits/', label: 'The honest list' }
+  },
+  {
+    q: 'Is it open source?',
+    a: 'Yes, under the MIT licence. Every line is public, including the parts that decide what your child can reach, so you do not have to take any of this on trust.',
+    more: { href: REPO, label: 'Read the code' }
+  }
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a }
+  }))
+};
+---
+
+<Base
+  title="Questions about Sukhi Play"
+  description="What Sukhi Play costs, how a parent gets back out, whether a child can reach anything you did not allow, and what it deliberately cannot do."
+  page="faq"
+  schema={schema}>
+
+  <main class="wrap faq">
+    <header class="hero hero--page">
+      <p class="f-kicker">Questions</p>
+      <h1>The things people ask</h1>
+      <p class="lede">Short answers. Each one stands on its own, so you can
+        read the single question you came for and stop.</p>
+    </header>
+
+    <div class="faq-list">
+      {FAQ.map((f) => (
+        <section class="faq-item">
+          <h2>{f.q}</h2>
+          <p>{f.a}</p>
+          {f.more && <a class="faq-more" href={f.more.href}>{f.more.label} &rarr;</a>}
+        </section>
+      ))}
+    </div>
+
+    <div class="faq-end">
+      <p>Something not here? <a href={`${REPO}/issues`}>Ask in an issue</a> and
+        it will end up on this page.</p>
+    </div>
+  </main>
+</Base>

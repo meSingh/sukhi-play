@@ -1,0 +1,33 @@
+---
+/** The manual's contents, grouped, with the current page marked. */
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  docs: CollectionEntry<'docs'>[];
+  current?: string;
+}
+const { docs, current } = Astro.props;
+
+const ORDER = ['Getting started', 'Using it', 'Under the bonnet', 'When things go wrong'] as const;
+const groups = ORDER
+  .map((name) => ({ name, items: docs.filter((d) => d.data.group === name) }))
+  .filter((g) => g.items.length);
+---
+
+<nav class="docs-nav" aria-label="Documentation">
+  <a class="docs-home" href="/docs/" aria-current={current ? undefined : 'page'}>All docs</a>
+  {groups.map((g) => (
+    <section>
+      <h2>{g.name}</h2>
+      <ul>
+        {g.items.map((d) => (
+          <li>
+            <a href={`/docs/${d.id}/`} aria-current={d.id === current ? 'page' : undefined}>
+              {d.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</nav>

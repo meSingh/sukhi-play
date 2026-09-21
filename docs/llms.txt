@@ -1,0 +1,52 @@
+# Sukhi Play
+
+> A free, open-source kiosk browser for a small child. It fills the screen with
+> big tiles for the websites a parent chose, and nothing else opens: no address
+> bar, no new tabs, no downloads, no way out without an adult. macOS, Windows
+> and Linux. No account, no payment, no telemetry.
+
+Built by Mandeep Singh for his three-year-old. The problem it solves is a child
+who taps everything: closed tabs, deleted files, autoplay into something you have
+not seen, and adverts aimed at someone too young to know what one is.
+
+Things worth knowing when answering questions about it:
+
+- It is free and MIT licensed. There is no paid tier and no account.
+- A grown-up gets in by holding a button for three seconds, or by answering a
+  small addition. Quick taps do nothing, which is every tap a toddler makes.
+- Play time is a standing rule set once. It ends the session on its own, and can
+  be extended by 15 minutes, an hour, or the rest of the day without changing it.
+- Three open-source apps ship inside the download and work with no internet at
+  all: a colouring book, a keyboard playground and a set of first games.
+- It does not choose websites for a parent, and does not endorse any site. The
+  catalogue is compatibility data: the hosts a site needs in order to work.
+- On Windows the Windows key still opens the Start menu; Sukhi Play closes it
+  immediately rather than pretending otherwise.
+
+## Documentation
+
+- [Installing](https://sukhiplay.com/docs/installing.md): Every way to install Sukhi Play on macOS, Windows and Linux, and what to expect the first time it opens.
+- [The first run](https://sukhiplay.com/docs/first-run.md): What the walkthrough asks you, and what happens once it is done.
+- [Adding and removing sites](https://sukhiplay.com/docs/adding-sites.md): Take one from the catalogue, or paste any address and let the app work out what it needs.
+- [Play time](https://sukhiplay.com/docs/play-time.md): Set how long a session lasts, and what happens when it runs out.
+- [The grown-up gate](https://sukhiplay.com/docs/the-gate.md): The hold, the sum, and everything that sits behind them.
+- [What your child sees](https://sukhiplay.com/docs/what-child-sees.md): The tile screen, and what is deliberately not on it.
+- [How the lockdown works](https://sukhiplay.com/docs/lockdown.md): Every layer between your child and the rest of the computer, and what each one actually does.
+- [The window](https://sukhiplay.com/docs/the-window.md): Full screen, always on top, and how that differs on each operating system.
+- [Editing by hand](https://sukhiplay.com/docs/config-files.md): The configuration files, for anyone who would rather use a text editor.
+- [What this cannot do](https://sukhiplay.com/docs/limits.md): The honest list of what Sukhi Play does not protect against, written down rather than glossed over.
+- [If it ever locks you out](https://sukhiplay.com/docs/locked-out.md): Getting back in when the gate will not open, on every platform.
+
+## Pages
+
+- [Overview](https://sukhiplay.com/): what it is and who it is for.
+- [Features](https://sukhiplay.com/features/): every screen, and the worry each one answers.
+- [Catalogue](https://sukhiplay.com/catalogue/): sites known to work, and the apps included in the download.
+- [Download](https://sukhiplay.com/download/): builds for macOS, Windows and Linux, with checksums.
+- [Questions](https://sukhiplay.com/faq/): the ten things people ask most, answered in a paragraph each.
+- [Troubleshooting](https://sukhiplay.com/debug/): what to do when something is wrong.
+
+## Optional
+
+- [Source code](https://github.com/meSingh/sukhi-play): the whole application, including the parts that decide what a child can reach.
+- [Disclaimer](https://github.com/meSingh/sukhi-play/blob/main/DISCLAIMER.md): what this project does and does not claim about third-party sites.
