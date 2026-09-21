@@ -14,7 +14,7 @@ slides away and <strong>Esc</strong> brings it back.</p> </div> <nav class="doc-
 <a href="https://www.msingh.com">Mandeep Singh</a>,<br>for his cheeky little Sukhraj.</p> <p class="story">It began with a three-year-old who pressed every key and clicked
     every button. So Mandeep built a screen where pressing all of them is perfectly safe.</p> </section> <footer class="foot"> <div class="wrap"> <div class="foot-grid"> <div class="foot-brand"> <a class="foot-mark" href="/"> <img src="/assets/sukhi-icon.png" alt="" width="34" height="34">Sukhi Play
 </a> <p>A locked-down browser that opens only what a grown-up chose.
-          Free, open source, and it asks for nothing.</p> </div> <nav class="foot-col" aria-label="Sukhi Play"> <h2>Sukhi Play</h2> <ul> <li><a href="/catalogue/">Catalogue</a></li><li><a href="/download/">Download</a></li> </ul> </nav><nav class="foot-col" aria-label="Help"> <h2>Help</h2> <ul> <li><a href="/docs/">Documentation</a></li><li><a href="/faq/">Questions</a></li><li><a href="/debug/">Troubleshooting</a></li> </ul> </nav><nav class="foot-col" aria-label="Project"> <h2>Project</h2> <ul> <li><a href="https://github.com/meSingh/sukhi-play">Source on GitHub</a></li><li><a href="https://github.com/meSingh/sukhi-play/issues">Report a problem</a></li><li><a href="/privacy/">Privacy</a></li> </ul> </nav> </div> <div class="foot-end"> <span>&copy; 2026 Mandeep Singh &middot; MIT licence, Sukhi artwork excluded</span> <a href="#" data-consent-reopen>Cookie choice</a> </div> </div> </footer> <!-- Europe: nothing runs until this is answered. --><div class="consent" id="consent" hidden role="dialog" aria-live="polite" aria-labelledby="consent-title"> <div class="consent-say"> <b id="consent-title">May we count this visit?</b> <p>Google Analytics, for visitor numbers and which pages get read. No
+          Free, open source, and it asks for nothing.</p> </div> <nav class="foot-col" aria-label="Sukhi Play"> <h2>Sukhi Play</h2> <ul> <li><a href="/catalogue/">Catalogue</a></li><li><a href="/download/">Download</a></li> </ul> </nav><nav class="foot-col" aria-label="Help"> <h2>Help</h2> <ul> <li><a href="/docs/">Documentation</a></li><li><a href="/faq/">Questions</a></li><li><a href="/debug/">Troubleshooting</a></li> </ul> </nav><nav class="foot-col" aria-label="Project"> <h2>Project</h2> <ul> <li><a href="https://github.com/meSingh/sukhi-play">Source on GitHub</a></li><li><a href="https://github.com/meSingh/sukhi-play/issues">Report a problem</a></li><li><a href="/privacy/">Privacy</a></li> </ul> </nav> </div> <div class="foot-end"> <span>&copy; 2026 Mandeep Singh &middot; MIT licence, Sukhi artwork excluded</span> <a href="/privacy/" data-consent-reopen>Cookie choice</a> </div> </div> </footer> <!-- Europe: nothing runs until this is answered. --><div class="consent" id="consent" hidden role="dialog" aria-live="polite" aria-labelledby="consent-title"> <div class="consent-say"> <b id="consent-title">May we count this visit?</b> <p>Google Analytics, for visitor numbers and which pages get read. No
       advertising, and nothing is shared with anyone. Sukhi Play itself never
       sends anything anywhere &mdash; this is only the website.
 <a href="/privacy/">What it collects</a>.</p> </div> <div class="consent-do"> <button type="button" id="consent-no" class="consent-btn">No thanks</button> <button type="button" id="consent-yes" class="consent-btn consent-btn--yes">Yes, that&rsquo;s fine</button> </div> </div> <!-- Everywhere else: it is already running, and here is the off switch. --> <div class="notice" id="notice" hidden role="status"> <p>We count visits with Google Analytics. No advertising, nothing shared.
@@ -79,25 +79,16 @@ slides away and <strong>Esc</strong> brings it back.</p> </div> <nav class="doc-
       ].indexOf(tz) !== -1;
     }
 
-    var answer = get(KEY);
-    if (answer === 'no' || refused) { unload(); return; }
-    if (answer === 'yes') { load(); return; }
-
     var show = function (el) {
       var go = function () { el.hidden = false; };
       if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 2000 });
       else setTimeout(go, 1200);
     };
 
-    if (mustAsk()) {
-      show(ask);
-    } else {
-      // Lawful to start, so it starts. The notice is shown once, because a
-      // banner that returns on every visit is a banner people learn not to read.
-      load();
-      if (!get(SEEN)) show(tell);
-    }
-
+    // Every listener is attached before anything below can return early.
+    // Somebody who has already answered takes one of those early returns on
+    // every later visit, which is exactly the person most likely to want the
+    // footer link -- and it did nothing for them until this moved up here.
     document.getElementById('consent-yes').addEventListener('click', function () {
       set(KEY, 'yes'); ask.hidden = true; load();
     });
@@ -117,9 +108,24 @@ slides away and <strong>Esc</strong> brings it back.</p> </div> <nav class="doc-
       if (!t) return;
       e.preventDefault();
       try { localStorage.removeItem(KEY); localStorage.removeItem(SEEN); } catch (err) { /* private mode */ }
+      var other = mustAsk() ? tell : ask;
       var el = mustAsk() ? ask : tell;
+      other.hidden = true;
       el.hidden = false;
       el.scrollIntoView({ block: 'nearest' });
     });
+
+    var answer = get(KEY);
+    if (answer === 'no' || refused) { unload(); return; }
+    if (answer === 'yes') { load(); return; }
+
+    if (mustAsk()) {
+      show(ask);
+    } else {
+      // Lawful to start, so it starts. The notice is shown once, because a
+      // banner that returns on every visit is a banner people learn not to read.
+      load();
+      if (!get(SEEN)) show(tell);
+    }
   })();
 })();</script> </body></html>

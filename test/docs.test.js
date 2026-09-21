@@ -483,3 +483,28 @@ test('the privacy page says what is collected, and can be reached', () => {
   const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   assert.ok(home.includes('href="/privacy/"'), 'the footer should link the privacy page');
 });
+
+test('the cookie choice can still be reopened once it has been answered', () => {
+  const root = path.join(__dirname, '..', 'docs');
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+
+  // The script returns early for anyone with a stored answer -- which is
+  // everyone the footer link exists for. So the listener that reopens the
+  // choice has to be attached above that return, not below it.
+  const listener = html.indexOf("closest('[data-consent-reopen]')");
+  const earlyReturn = html.indexOf("if (answer === 'no'");
+  assert.ok(listener !== -1, 'nothing listens for the reopen link');
+  assert.ok(earlyReturn !== -1, 'the stored-answer shortcut has moved or gone');
+  assert.ok(listener < earlyReturn,
+    'the reopen listener is attached after the early return, so the link does nothing');
+
+  // And without JavaScript it should go somewhere, rather than jumping the
+  // reader to the top of the page they were already reading.
+  for (const page of ['index.html', path.join('privacy', 'index.html')]) {
+    const text = fs.readFileSync(path.join(root, page), 'utf8');
+    for (const m of text.matchAll(/<a[^>]*data-consent-reopen[^>]*>/g)) {
+      assert.doesNotMatch(m[0], /href="#"/, `${page} has a reopen link that goes nowhere`);
+      assert.match(m[0], /href="[^"]+"/, `${page} has a reopen link with no href`);
+    }
+  }
+});

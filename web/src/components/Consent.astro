@@ -114,25 +114,16 @@ import { GA_ID } from '../site';
       ].indexOf(tz) !== -1;
     }
 
-    var answer = get(KEY);
-    if (answer === 'no' || refused) { unload(); return; }
-    if (answer === 'yes') { load(); return; }
-
     var show = function (el) {
       var go = function () { el.hidden = false; };
       if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 2000 });
       else setTimeout(go, 1200);
     };
 
-    if (mustAsk()) {
-      show(ask);
-    } else {
-      // Lawful to start, so it starts. The notice is shown once, because a
-      // banner that returns on every visit is a banner people learn not to read.
-      load();
-      if (!get(SEEN)) show(tell);
-    }
-
+    // Every listener is attached before anything below can return early.
+    // Somebody who has already answered takes one of those early returns on
+    // every later visit, which is exactly the person most likely to want the
+    // footer link -- and it did nothing for them until this moved up here.
     document.getElementById('consent-yes').addEventListener('click', function () {
       set(KEY, 'yes'); ask.hidden = true; load();
     });
@@ -152,9 +143,24 @@ import { GA_ID } from '../site';
       if (!t) return;
       e.preventDefault();
       try { localStorage.removeItem(KEY); localStorage.removeItem(SEEN); } catch (err) { /* private mode */ }
+      var other = mustAsk() ? tell : ask;
       var el = mustAsk() ? ask : tell;
+      other.hidden = true;
       el.hidden = false;
       el.scrollIntoView({ block: 'nearest' });
     });
+
+    var answer = get(KEY);
+    if (answer === 'no' || refused) { unload(); return; }
+    if (answer === 'yes') { load(); return; }
+
+    if (mustAsk()) {
+      show(ask);
+    } else {
+      // Lawful to start, so it starts. The notice is shown once, because a
+      // banner that returns on every visit is a banner people learn not to read.
+      load();
+      if (!get(SEEN)) show(tell);
+    }
   })();
 </script>
