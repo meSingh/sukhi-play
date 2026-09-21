@@ -3,8 +3,28 @@
 const { shell } = require('electron');
 const { hostFromUrl, createHostGate } = require('./hosts');
 const blocklist = require('./blocklist');
+const fs = require('node:fs');
+const path = require('node:path');
 const keyboard = require('./keyboard');
 const bundled = require('./bundled');
+
+// What a bundled app is allowed to write. A picture, and nothing else: the
+// list is short so that adding to it has to be a decision somebody makes.
+const SAVEABLE = new Map([
+  ['image/png', '.png'],
+  ['image/jpeg', '.jpg'],
+  ['image/webp', '.webp']
+]);
+
+/** The extension for a download, from its type rather than its name. */
+function pickExtension (item) {
+  const byType = SAVEABLE.get(String(item.getMimeType() || '').toLowerCase());
+  if (byType) return byType;
+  // A blob: url often arrives with no useful type, so fall back to the
+  // extension the page asked for -- checked against the same short list.
+  const ext = path.extname(String(item.getFilename() || '')).toLowerCase();
+  return [...SAVEABLE.values()].includes(ext) ? ext : null;
+}
 
 // Schemes the page may use internally. Everything else -- mailto:, steam:,
 // itms-apps:, ms-windows-store:, file: -- is a way to launch another program
@@ -35,6 +55,8 @@ function createPolicy () {
   // title a parent typed and renamed on collision, so comparing against it
   // blocked an app whose tile had been given any other name.
   let bundleId = null;
+  // Where a bundled app's pictures go. Set once at start-up.
+  let saveDir = null;
   let blockAds = true;
   // While probing a new site we want to SEE what it loads rather than cut it.
   // Known ad hosts are still refused -- there is no reason to pull adverts down
@@ -111,14 +133,51 @@ function createPolicy () {
       if (bundleId) return false;
       return WEB_SCHEMES.has(schemeOf(url)) && this.verdict(hostFromUrl(url)) === 'allow';
     },
-    tally (key) { if (key in counts) counts[key] += 1; }
+    tally (key) { if (key in counts) counts[key] += 1; },
+
+    /**
+     * Where a download may be written, or null for "nowhere".
+     *
+     * Only a bundled app may save anything, and only into the one folder set
+     * up for it. The name is built here rather than taken from the page: a
+     * filename arriving from content is a path, and a path can contain "..".
+     */
+    savePathFor (item) {
+      if (!bundleId || !saveDir) return null;
+
+      const ext = pickExtension(item);
+      if (!ext) return null;
+
+      const when = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const stamp = `${when.getFullYear()}-${pad(when.getMonth() + 1)}-${pad(when.getDate())}` +
+                    `-${pad(when.getHours())}${pad(when.getMinutes())}${pad(when.getSeconds())}`;
+
+      try {
+        fs.mkdirSync(saveDir, { recursive: true });
+      } catch (err) {
+        console.warn('[download] could not make the folder:', err.message);
+        return null;
+      }
+
+      let file = path.join(saveDir, `${bundleId}-${stamp}${ext}`);
+      // Three saves in the same second is exactly what a delighted child does.
+      let n = 2;
+      while (fs.existsSync(file)) {
+        file = path.join(saveDir, `${bundleId}-${stamp}-${n}${ext}`);
+        n += 1;
+      }
+      return file;
+    },
+
+    setSaveDir (dir) { saveDir = dir || null; }
   };
 }
 
 /**
  * Locks down the isolated session the kid's content runs in.
  */
-function configureSession (ses, policy, { onBlocked } = {}) {
+function configureSession (ses, policy, { onBlocked, onSaved } = {}) {
   // --- every network request passes through here ---
   ses.webRequest.onBeforeRequest((details, callback) => {
     const { url, resourceType } = details;
@@ -188,11 +247,34 @@ function configureSession (ses, policy, { onBlocked } = {}) {
     ses.setBluetoothPairingHandler((details, callback) => callback({ confirmed: false }));
   }
 
-  // --- no downloads, ever ---
+  // --- no downloads from the web, ever ---
+  //
+  // One exception, and only one: an app that ships inside Sukhi Play saving
+  // the child's own picture. A colouring book whose save button does nothing
+  // is a colouring book with a broken promise, and the usual reasons to refuse
+  // a download -- a file of unknown provenance, from a host we do not control,
+  // landing somewhere the child can run it -- are all absent here. The app is
+  // on this disk, it has no network, and the file goes to one folder we pick.
   ses.on('will-download', (event, item) => {
-    policy.tally('downloads');
-    console.log(`[download] cancelled: ${item.getFilename()}`);
-    item.cancel();
+    const save = policy.savePathFor(item);
+    if (!save) {
+      policy.tally('downloads');
+      console.log(`[download] cancelled: ${item.getFilename()}`);
+      item.cancel();
+      return;
+    }
+
+    // Setting the path is what stops Electron opening a save dialog. A file
+    // browser is exactly the thing a kiosk must never put in front of a child.
+    item.setSavePath(save);
+    item.once('done', (_e, state) => {
+      if (state === 'completed') {
+        console.log(`[download] saved ${save}`);
+        if (typeof onSaved === 'function') onSaved(save);
+      } else {
+        console.warn(`[download] ${state}: ${save}`);
+      }
+    });
   });
 
   // Present as plain Chrome. Some sites behave oddly or nag when they spot

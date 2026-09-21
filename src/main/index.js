@@ -703,7 +703,10 @@ function registerIpc () {
   ipcMain.handle('shell:remove-site', (_e, id) => {
     if (!isUnlocked()) return locked();
     const result = library.removeSite(paths.catalog, String(id));
-    if (result.ok) reloadCatalog();
+    if (result.ok) {
+      reloadCatalog();
+      console.log(`[library] removed ${id}`);
+    }
     return result;
   });
 
@@ -1215,6 +1218,30 @@ async function runBundledCheck () {
       .then(r => 'REACHED (bad): ' + r.status).catch(() => 'refused')`);
     say('another app\'s files', other);
     if (!String(other).startsWith('refused')) allWell = false;
+
+    // The colouring app's save button went through the "no downloads" rule and
+    // silently did nothing. A child pressed it three times. Prove it works.
+    const saved = await js(`(() => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 8;
+      const g = c.getContext('2d');
+      g.fillStyle = '#f0f'; g.fillRect(0, 0, 8, 8);
+      return new Promise((done) => c.toBlob((blob) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'test.png';
+        a.click();
+        done('asked');
+      }, 'image/png'));
+    })()`);
+    await sleep(1200);
+    const dir = policy.savePathFor({ getMimeType: () => 'image/png', getFilename: () => 'x.png' });
+    const folder = dir ? require('node:path').dirname(dir) : null;
+    const wrote = folder && fs.existsSync(folder)
+      ? fs.readdirSync(folder).filter((f) => f.startsWith(`${b.id}-`)).length
+      : 0;
+    say('saving a picture', wrote > 0 ? `${wrote} file(s) in ${folder}` : `FAILED (${saved})`);
+    if (wrote === 0) allWell = false;
 
     if (typeof BUNDLED_CHECK === 'string') {
       fs.mkdirSync(BUNDLED_CHECK, { recursive: true });
@@ -1846,9 +1873,24 @@ app.whenReady().then(() => {
 
   const kidSession = session.fromPartition(SESSION_PARTITION);
   bundled.serve(kidSession.protocol, bundledApps);
+
+  // Where a bundled app's pictures land. The system Pictures folder, so a
+  // parent finds them without being told where to look; userData if there is
+  // no Pictures folder, which is better than losing the drawing.
+  let pictures;
+  try {
+    pictures = path.join(app.getPath('pictures'), 'Sukhi Play');
+  } catch {
+    pictures = path.join(paths.userData, 'pictures');
+  }
+  policy.setSaveDir(pictures);
+
   security.configureSession(kidSession, policy, {
     onBlocked: () => {
       if (shellApp) shellApp.pushState();
+    },
+    onSaved: () => {
+      if (shellApp) shellApp.toast('Picture saved');
     }
   });
 

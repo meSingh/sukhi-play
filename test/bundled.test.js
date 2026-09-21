@@ -189,3 +189,51 @@ test('every bundled shape is one the app can actually draw', () => {
       `${app.id} asks for the shape "${app.shape}", which has no drawing`);
   }
 });
+
+test('only a bundled app may save, and only a picture', () => {
+  const security = require('../src/main/security');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sukhi-saves-'));
+  const policy = security.createPolicy();
+  policy.setSaveDir(dir);
+
+  const item = (mime, name) => ({ getMimeType: () => mime, getFilename: () => name });
+
+  // A website: nothing may be written, whatever it claims to be.
+  policy.setApp({ id: 'site', url: 'https://example.com/', allowHosts: ['example.com'] });
+  assert.equal(policy.savePathFor(item('image/png', 'ok.png')), null);
+
+  // Nothing open at all: also nothing.
+  policy.clear();
+  assert.equal(policy.savePathFor(item('image/png', 'ok.png')), null);
+
+  policy.setApp({
+    id: 'anything', url: 'sukhiplay://colouring/index.html',
+    bundled: true, allowHosts: ['colouring']
+  });
+
+  // A picture, named after the bundle rather than after whatever the page
+  // asked for -- a filename from content is a path, and a path can hold "..".
+  const png = policy.savePathFor(item('image/png', '../../../etc/passwd'));
+  assert.equal(path.dirname(png), dir);
+  assert.ok(path.basename(png).startsWith('colouring-'));
+  assert.ok(png.endsWith('.png'));
+
+  // Anything that is not a picture is refused.
+  for (const bad of ['application/x-msdownload', 'text/html', 'application/pdf', '']) {
+    assert.equal(policy.savePathFor(item(bad, 'x.exe')), null, bad);
+  }
+
+  // A blob with no type falls back to the extension, checked against the same
+  // short list rather than trusted.
+  assert.ok(String(policy.savePathFor(item('', 'drawing.png'))).endsWith('.png'));
+  assert.equal(policy.savePathFor(item('', 'drawing.exe')), null);
+
+  // Three saves in the same second is what a delighted child does.
+  const names = new Set();
+  for (let i = 0; i < 3; i += 1) {
+    const p = policy.savePathFor(item('image/png', 'a.png'));
+    fs.writeFileSync(p, 'x');
+    names.add(p);
+  }
+  assert.equal(names.size, 3, 'each save gets its own file');
+});

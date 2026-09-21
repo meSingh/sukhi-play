@@ -95,4 +95,13 @@ edit('index.html', [
   ['aria-label="그림 고르기"', 'aria-label="Pick a picture"']
 ]);
 
+// The saved picture's filename is built in code, not translated, so the
+// English build was still writing Korean filenames into the parent's Pictures
+// folder. Sukhi Play renames the file on the way out anyway, but the app
+// should not be asking for a name nobody here can read.
+edit('src/canvas/save.ts', [[
+  'a.download = `색칠놀이-${stamp()}.png`',
+  'a.download = `colouring-${stamp()}.png`'
+]]);
+
 console.log('patched.');
