@@ -163,9 +163,11 @@ Found 1 host. 2 looked like advertising or tracking and will be blocked.
   pbskids.org
 ```
 
-Give the tile a name, press **Add**. It fetches the site's favicon for the tile
-and writes the allowlist for you. This is the same machinery as `npm run check`,
-driven from the interface.
+Give the tile a name, press **Add**, and it writes the allowlist for you. This
+is the same machinery as `npm run check`, driven from the interface. Pick one of
+the sixteen shapes and a colour for the tile: a site's own favicon is its
+trademark, and this project has no licence to put one on a tile or in a
+release.
 
 ### Your apps: turn things on and off
 

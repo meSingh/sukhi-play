@@ -18,8 +18,11 @@ const { sanitizeApp } = require('./catalog');
  */
 
 const SHAPES = ['star', 'rocket', 'ball', 'blocks', 'note', 'leaf', 'drop', 'bolt'];
+// Sixteen, to pair with sixteen shapes. Each one is dark enough for white
+// lettering or light enough for dark, which inkFor() in the renderer decides.
 const COLORS = ['#3b82f6', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6',
-                '#06b6d4', '#ef4444', '#84cc16', '#a855f7', '#1e40af'];
+                '#06b6d4', '#ef4444', '#84cc16', '#a855f7', '#1e40af',
+                '#14b8a6', '#f97316', '#f43f5e', '#6366f1', '#65a30d', '#0ea5e9'];
 
 function loadSuggestions (bundledPath) {
   try {
@@ -159,44 +162,18 @@ async function refreshFrom (url, fetchImpl) {
  * The shape the tile screen needs. Kept here rather than inline in the IPC so
  * it can be tested: the launcher showing a stale list after a parent adds a
  * game is exactly the sort of bug that hides behind an untested payload.
+ *
+ * No picture travels with it. Tiles wear this project's own shapes, never a
+ * site's favicon, which is someone else's mark and not ours to ship.
  */
 function toTilePayload (apps) {
   return (apps || [])
     .filter((a) => a.enabled)
-    .map(({ id, title, shape, color, icon }) => ({
-      id, title, shape, color, icon: encodeIcon(icon)
-    }));
-}
-
-const ICON_TYPES = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg',
-                     webp: 'image/webp', svg: 'image/svg+xml', ico: 'image/x-icon' };
-
-/**
- * Turns a downloaded favicon into a data: URI.
- *
- * The launcher runs under a strict content-security-policy that permits `self`
- * and `data:` only, and a favicon saved next to the catalog is neither. Inlining
- * it is what makes the site's own icon usable on a tile instead of a plain
- * coloured shape.
- */
-function encodeIcon (file) {
-  if (!file) return null;
-  try {
-    const ext = path.extname(file).slice(1).toLowerCase();
-    const type = ICON_TYPES[ext];
-    if (!type) return null;
-    const buf = fs.readFileSync(file);
-    // Tiles are small; anything larger than this is not a favicon.
-    if (!buf.length || buf.length > 512 * 1024) return null;
-    return `data:${type};base64,${buf.toString('base64')}`;
-  } catch {
-    return null;   // a missing icon just means the tile keeps its shape
-  }
+    .map(({ id, title, shape, color }) => ({ id, title, shape, color }));
 }
 
 module.exports = {
   toTilePayload,
-  encodeIcon,
   loadSuggestions, addSite, updateSite, removeSite, refreshFrom,
   readCatalogFile, writeCatalogFile, uniqueId, pickLook, SHAPES, COLORS
 };

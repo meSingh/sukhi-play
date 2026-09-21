@@ -510,14 +510,6 @@ function registerIpc () {
     });
     if (!result.ok) return result;
 
-    // Only when the parent actually chose the site's own icon over a shape.
-    if (entry.useIcon && Array.isArray(entry.iconUrls) && entry.iconUrls.length) {
-      const icon = await probe.downloadIcon({
-        urls: entry.iconUrls, userDataDir: paths.userData, id: result.app.id
-      });
-      if (icon) library.updateSite(paths.catalog, result.app.id, { icon });
-    }
-
     reloadCatalog();
     console.log(`[library] added ${result.app.id} -> ${result.app.url}`);
     return { ok: true, app: result.app };
@@ -729,7 +721,8 @@ function shotScript () {
         document.getElementById(id).hidden = true;
       }
       document.getElementById('gate-step-library').hidden = false;
-      document.querySelector('.gate-card').classList.add('is-wide');
+      document.querySelector('.gate-card').classList.add('is-portal');
+      if (window.__showPortalTab) window.__showPortalTab('apps');
       const fn = window.__loadLibrary; if (fn) await fn();
       return 1;
     })()`);
@@ -1104,7 +1097,8 @@ async function runDemo () {
 
   await scene('play time is the first thing a grown-up sees', 3400, async () => {
     await js(`(() => {
-      const body = document.querySelector('#gate-step-library .panel-body');
+      if (window.__showPortalTab) window.__showPortalTab('time');
+      const body = document.querySelector('#gate-step-library .portal-body');
       if (body) body.scrollTop = 0;
       return 1;
     })()`);
@@ -1368,7 +1362,6 @@ async function runProbe () {
   console.log('    ' + JSON.stringify(result.allowHosts));
   console.log(`\n  blocked as ads/trackers (${result.blockedHosts.length}):`);
   console.log('    ' + (result.blockedHosts.length ? JSON.stringify(result.blockedHosts) : '(none)'));
-  if (result.iconUrls.length) console.log(`\n  icon: ${result.iconUrls[0]}`);
   if (result.warning) console.log(`\n  WARNING: ${result.warning}`);
   console.log('');
 
@@ -1508,7 +1501,7 @@ app.whenReady().then(() => {
             await shellApp.shellView.webContents.executeJavaScript(`(async () => {
               document.getElementById('gate-step-hold').hidden = true;
               document.getElementById('gate-step-library').hidden = false;
-              document.querySelector('.gate-card').classList.add('is-wide');
+              document.querySelector('.gate-card').classList.add('is-portal');
               const fn = window.__loadLibrary; if (fn) await fn();
               return 1;
             })()`);

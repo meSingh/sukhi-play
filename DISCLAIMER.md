@@ -115,11 +115,12 @@ situations, all of them initiated by you:
 1. **Opening a site** your child selected, which is the whole point of the program.
 2. **Checking a site** when you use *Add a site*. It loads that address once,
    records the hostnames it requests, and discards the page.
-3. **Fetching a site's icon** when you add it, so the tile shows the site's own
-   favicon rather than a coloured shape.
+3. **Asking GitHub whether a newer version exists**, and only when you press
+   *Check for updates*.
 
 There is no fourth. Nothing is contacted at start-up, on a schedule, or in the
-background.
+background. Favicons are never fetched: tiles wear this project's own shapes,
+so no third party's mark is downloaded, stored or displayed.
 
 Websites a parent enables may themselves collect data and set cookies. Sukhi
 Play cannot change what a third-party site does once it is allowed to load.

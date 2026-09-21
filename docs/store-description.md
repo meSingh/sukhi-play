@@ -67,9 +67,9 @@ account to create, no telemetry, no analytics and no advertising of its own.
 Your child's list of approved sites is a plain file on your own computer and is
 never uploaded.
 
-It reaches the network in exactly three situations: loading a site your child
-opened, fetching a site's icon at the moment you add it, and asking GitHub
-whether a newer version exists when you press Check for updates. It never
+It reaches the network in exactly two situations: loading a site your child
+opened, and asking GitHub whether a newer version exists when you press Check
+for updates. It never
 downloads or installs an update by itself. A kiosk that can rewrite itself is a
 worse problem than one that is out of date.
 

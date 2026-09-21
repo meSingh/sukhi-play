@@ -55,8 +55,6 @@ async function probeSite ({ win, shellView, session, policy, url, seconds = PROB
 
   let finalUrl = target;
   let title = '';
-  let iconUrls = [];
-  let iconData = null;
 
   try {
     report('loading');
@@ -69,10 +67,6 @@ async function probeSite ({ win, shellView, session, policy, url, seconds = PROB
 
     finalUrl = safeUrl(contents) || finalUrl;
     title = (contents.getTitle() || title).trim();
-    iconUrls = await collectIconUrls(contents).catch(() => []);
-    // Fetched now, not on save, so the parent can actually see the site's own
-    // icon while choosing rather than discovering it afterwards.
-    iconData = await fetchIconData(iconUrls).catch(() => null);
   } finally {
     try { win.contentView.removeChildView(view); } catch { /* already detached */ }
     try { if (!contents.isDestroyed()) contents.close(); } catch { /* gone */ }
@@ -93,8 +87,6 @@ async function probeSite ({ win, shellView, session, policy, url, seconds = PROB
     blockedHosts: adLike,
     hostCount: allowed.length,
     blockedCount: blocked.length,
-    iconUrls,
-    icon: iconData,
     // A site that loaded nothing is usually offline or refused to render.
     warning: allowed.length === 0
       ? 'Nothing loaded. Check the address, and check this machine is online.'
@@ -141,98 +133,8 @@ function prettyTitle (title, url) {
   return pick;
 }
 
-async function collectIconUrls (contents) {
-  if (contents.isDestroyed()) return [];
-  const found = await contents.executeJavaScript(`
-    (() => {
-      const out = [];
-      for (const el of document.querySelectorAll('link[rel~="icon" i], link[rel~="apple-touch-icon" i]')) {
-        const href = el.getAttribute('href');
-        if (!href) continue;
-        const sizes = el.getAttribute('sizes') || '';
-        const n = parseInt(sizes, 10);
-        out.push({ href: new URL(href, location.href).toString(), size: Number.isFinite(n) ? n : 0 });
-      }
-      out.push({ href: new URL('/favicon.ico', location.origin).toString(), size: 0 });
-      return out;
-    })()
-  `, true);
-
-  // Biggest first: a 180px apple-touch-icon makes a far better tile than a 16px favicon.
-  return [...new Map(found.map((i) => [i.href, i])).values()]
-    .sort((a, b) => b.size - a.size)
-    .map((i) => i.href)
-    .slice(0, 6);
-}
-
-const ICON_TYPES = {
-  'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp',
-  'image/svg+xml': 'svg', 'image/x-icon': 'ico', 'image/vnd.microsoft.icon': 'ico'
-};
-
-function typeOf (header) {
-  const base = String(header || '').split(';')[0].trim().toLowerCase();
-  return ICON_TYPES[base] ? base : null;
-}
-
-/**
- * Fetches the first usable icon and hands it back as a data URI, without
- * touching the disk. Nothing is saved for a site the parent may not add.
- */
-async function fetchIconData (urls) {
-  for (const url of (urls || []).slice(0, 4)) {
-    try {
-      const res = await net.fetch(url, { credentials: 'omit' });
-      if (!res.ok) continue;
-      const type = typeOf(res.headers.get('content-type'));
-      if (!type) continue;
-
-      const buf = Buffer.from(await res.arrayBuffer());
-      if (buf.length < 64 || buf.length > 256 * 1024) continue;
-      return { url, dataUri: `data:${type};base64,${buf.toString('base64')}` };
-    } catch {
-      // try the next candidate
-    }
-  }
-  return null;
-}
-
-/**
- * Downloads the first icon that works and stores it beside the catalog.
- * Returns a path, or null -- a missing icon just means the tile keeps its shape.
- */
-async function downloadIcon ({ urls, userDataDir, id }) {
-  const dir = path.join(userDataDir, 'icons');
-  for (const url of urls || []) {
-    try {
-      const res = await net.fetch(url, { credentials: 'omit' });
-      if (!res.ok) continue;
-      const type = (res.headers.get('content-type') || '').toLowerCase();
-      if (!type.startsWith('image/')) continue;
-
-      const buf = Buffer.from(await res.arrayBuffer());
-      if (buf.length < 64 || buf.length > 2 * 1024 * 1024) continue;
-
-      const ext = type.includes('png') ? 'png'
-        : type.includes('svg') ? 'svg'
-        : type.includes('jpeg') || type.includes('jpg') ? 'jpg'
-        : type.includes('webp') ? 'webp'
-        : type.includes('icon') || type.includes('ico') ? 'ico' : null;
-      if (!ext) continue;
-
-      fs.mkdirSync(dir, { recursive: true });
-      const file = path.join(dir, `${id}.${ext}`);
-      fs.writeFileSync(file, buf);
-      return file;
-    } catch {
-      // Try the next candidate.
-    }
-  }
-  return null;
-}
-
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 module.exports = {
-  probeSite, downloadIcon, fetchIconData, normalizeUrl, summarise, prettyTitle, PROBE_SECONDS
+  probeSite, normalizeUrl, summarise, prettyTitle, PROBE_SECONDS
 };

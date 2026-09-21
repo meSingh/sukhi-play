@@ -316,6 +316,21 @@
                      autocomplete="off" spellcheck="false">
             </div>
 
+            <!-- Ad filtering is the thing most parents came for, so it is on
+                 the page rather than behind "Advanced", where it sat unseen. -->
+            <div class="field field--inline field--ads">
+              <label class="switch">
+                <input id="form-blockads" type="checkbox" checked>
+                <span class="switch-track"><span class="switch-knob"></span></span>
+                <span class="switch-text" id="form-blockads-text">Filtering ads</span>
+              </label>
+              <p class="field-note">
+                Adverts and trackers on this site are blocked before they load.
+                Turn it off to leave the site exactly as its owner intended;
+                some sites ask for that, and your child still cannot leave it.
+              </p>
+            </div>
+
             <details class="adv" id="form-adv">
               <summary class="adv-head">Advanced: what it may load</summary>
 
@@ -337,17 +352,6 @@
                 <textarea id="form-deny" class="lib-area" rows="3" spellcheck="false"></textarea>
               </div>
 
-              <div class="field field--inline">
-                <label class="switch">
-                  <input id="form-blockads" type="checkbox" checked>
-                  <span class="switch-track"><span class="switch-knob"></span></span>
-                  <span class="switch-text" id="form-blockads-text">Filtering ads</span>
-                </label>
-                <p class="field-note">
-                  Turn this off to leave a site exactly as its owner intended.
-                  Your child still cannot leave it.
-                </p>
-              </div>
             </details>
           </section>
         </div>
@@ -364,7 +368,7 @@
       <!-- One page, not tabs. You land on what is set up, and adding more is
            directly beneath it rather than behind a separate screen. -->
       <div id="gate-step-library" hidden>
-        <header class="panel-head">
+        <header class="portal-head">
           <div class="panel-brand">
             <span class="panel-badge" aria-hidden="true">
               <svg viewBox="0 0 24 24">
@@ -374,8 +378,8 @@
               </svg>
             </span>
             <div class="panel-titles">
-              <h2 class="panel-title">Parent Portal</h2>
-              <p class="panel-sub">Choose what your child can open.</p>
+              <h2 class="panel-title">Grown-ups</h2>
+              <p class="panel-sub">Everything your child sees is set here.</p>
             </div>
           </div>
           <div class="panel-actions">
@@ -392,66 +396,104 @@
           </div>
         </header>
 
-        <div class="panel-body">
-          <!-- First thing a grown-up sees, and deliberately not another
-               row in a list: a limit nobody notices is a limit nobody sets. -->
-          <section class="sec sec--time" id="sec-time">
-            <div class="time-head">
-              <div class="time-titles">
-                <h3>Play time</h3>
-                <p id="time-note">Sessions are not limited.</p>
+        <!-- Four places rather than one long scroll. The panel began as a list
+             of apps in a box; it now holds the clock, the catalogue and the
+             settings too, and a parent should be able to find one without
+             reading past the other three. -->
+        <nav class="portal-tabs" id="portal-tabs" aria-label="Grown-up settings">
+          <button type="button" data-tab="time" class="on">Play time</button>
+          <button type="button" data-tab="apps">Installed apps</button>
+          <button type="button" data-tab="catalog">Catalogue</button>
+          <button type="button" data-tab="settings">Settings</button>
+        </nav>
+
+        <div class="portal-body">
+          <section class="portal-panel" data-panel="time">
+            <div class="sec sec--time" id="sec-time">
+              <div class="time-head">
+                <div class="time-titles">
+                  <h3>Play time</h3>
+                  <p id="time-note">Sessions are not limited.</p>
+                </div>
+                <button id="time-more" class="time-more" type="button">More time</button>
               </div>
-              <button id="time-more" class="time-more" type="button">More time</button>
+              <div class="time-chips" id="time-chips" role="group" aria-label="Session length">
+                <button type="button" data-min="0">Off</button>
+                <button type="button" data-min="10">10 min</button>
+                <button type="button" data-min="15">15 min</button>
+                <button type="button" data-min="20">20 min</button>
+                <button type="button" data-min="30">30 min</button>
+                <button type="button" data-min="45">45 min</button>
+                <button type="button" data-min="60">1 hour</button>
+              </div>
+              <p class="sec-note">
+                This is the standing rule: every time Sukhi Play opens, the clock
+                starts again from here. When it runs out your child sees a gentle
+                stop screen and nothing else opens. Warnings come at five minutes
+                and at one minute, and <b>More time</b> restarts the clock without
+                closing the app.
+              </p>
             </div>
-            <div class="time-chips" id="time-chips" role="group" aria-label="Session length">
-              <button type="button" data-min="0">Off</button>
-              <button type="button" data-min="10">10 min</button>
-              <button type="button" data-min="15">15 min</button>
-              <button type="button" data-min="20">20 min</button>
-              <button type="button" data-min="30">30 min</button>
-              <button type="button" data-min="45">45 min</button>
-              <button type="button" data-min="60">1 hour</button>
-            </div>
-            <p class="sec-note">
-              This is the standing rule: every time Sukhi Play opens, the clock
-              starts again from here. When it runs out your child sees a gentle
-              stop screen and nothing else opens. Warnings come at five minutes
-              and at one minute, and <b>More time</b> restarts the clock without
-              closing the app.
-            </p>
           </section>
 
-          <section class="sec">
+          <section class="portal-panel" data-panel="apps" hidden>
             <h3 class="sec-head">
-              <span>Your apps</span>
+              <span>Installed apps</span>
               <span id="mine-count" class="sec-count"></span>
             </h3>
+            <p class="sec-note">These are the buttons your child sees. Switch one off to hide it.</p>
             <div id="lib-mine" class="apps"></div>
           </section>
 
-          <section class="sec" id="sec-suggest">
-            <h3 class="sec-head"><span>Suggestions</span></h3>
+          <section class="portal-panel" data-panel="catalog" hidden>
+            <h3 class="sec-head"><span>Catalogue</span></h3>
             <p class="sec-note">
-              Sites other parents set up. Pick one to fill in the settings, then
-              change whatever you like before saving.
+              Sites that are known to work, with the hosts each one needs already
+              filled in. Pick one to load those settings, then change whatever you
+              like before saving.
               <span class="sec-fine">
-                Sukhi Play is not connected to any of these sites and does not
-                endorse them. Please check each one's terms yourself.
+                Sukhi Play is not connected to any of these sites, is not endorsed
+                by them, and does not vet what they show. Please read each site's
+                own terms and decide for yourself.
               </span>
+            </p>
+            <p class="sec-note" id="catalog-empty" hidden>
+              Everything in the catalogue is already installed. Use
+              <b>Add an app</b> to set up any other site by its address.
             </p>
             <div id="lib-suggest-list" class="cards"></div>
           </section>
-        </div>
 
-        <footer class="panel-foot">
-          <div class="foot-left">
-            <button id="check-update" class="link-btn" type="button">Check for updates</button>
-            <span id="update-note" class="update-note"></span>
-          </div>
-          <div class="foot-actions">
-            <button id="reset-all" class="btn-quiet" type="button">Start over</button>
-            <button id="choice-quit" class="btn-danger" type="button">Quit Sukhi Play</button>
-          </div>
+          <section class="portal-panel" data-panel="settings" hidden>
+            <h3 class="sec-head"><span>Settings</span></h3>
+
+            <div class="setting">
+              <div class="setting-text">
+                <b>Version</b>
+                <span id="settings-version">Sukhi Play</span>
+              </div>
+              <button id="check-update" class="ghost-btn" type="button">Check for updates</button>
+            </div>
+            <p class="update-note" id="update-note"></p>
+
+            <div class="setting">
+              <div class="setting-text">
+                <b>Start over</b>
+                <span>Remove every app and setting, and run the walkthrough again.</span>
+              </div>
+              <button id="reset-all" class="btn-quiet" type="button">Start over</button>
+            </div>
+
+            <div class="setting">
+              <div class="setting-text">
+                <b>Close Sukhi Play</b>
+                <span>Quit the app and give the computer back.</span>
+              </div>
+              <button id="choice-quit" class="btn-danger" type="button">Quit Sukhi Play</button>
+            </div>
+          </section>
+        </div>
+      </div>
         </footer>
       </div>
 
@@ -495,6 +537,47 @@
   </symbol>
   <symbol id="shape-bolt" viewBox="0 0 100 100">
     <path d="M58 6 26 56h20l-6 38 34-52H54Z"/>
+  </symbol>
+  <symbol id="shape-heart" viewBox="0 0 100 100">
+    <path d="M50 86C20 62 12 47 22 34c10-13 24-8 28 4 4-12 18-17 28-4 10 13 2 28-28 52Z"/>
+  </symbol>
+  <symbol id="shape-cloud" viewBox="0 0 100 100">
+    <circle cx="36" cy="58" r="16"/>
+    <circle cx="53" cy="44" r="21"/>
+    <circle cx="70" cy="58" r="14"/>
+    <rect x="30" y="54" width="44" height="20" rx="10"/>
+  </symbol>
+  <symbol id="shape-moon" viewBox="0 0 100 100">
+    <path d="M64 14a36 36 0 1 0 20 56A30 30 0 0 1 64 14Z"/>
+  </symbol>
+  <symbol id="shape-flower" viewBox="0 0 100 100">
+    <circle cx="50" cy="28" r="14"/>
+    <circle cx="72" cy="44" r="14"/>
+    <circle cx="63" cy="70" r="14"/>
+    <circle cx="37" cy="70" r="14"/>
+    <circle cx="28" cy="44" r="14"/>
+    <circle cx="50" cy="50" r="12" fill="#fff" fill-opacity=".55"/>
+  </symbol>
+  <symbol id="shape-fish" viewBox="0 0 100 100">
+    <ellipse cx="45" cy="50" rx="29" ry="19"/>
+    <path d="M74 50 94 33v34Z"/>
+    <circle cx="33" cy="44" r="4.5" fill="#fff" fill-opacity=".85"/>
+  </symbol>
+  <symbol id="shape-book" viewBox="0 0 100 100">
+    <path d="M20 24h24a8 8 0 0 1 8 8v46a11 11 0 0 0-8-4H20Z"/>
+    <path d="M80 24H56a8 8 0 0 0-8 8v46a11 11 0 0 1 8-4h24Z" fill-opacity=".6"/>
+  </symbol>
+  <symbol id="shape-paint" viewBox="0 0 100 100">
+    <path d="M50 16c19 0 34 13 34 29 0 11-9 14-15 16-6 2-9 5-9 10 0 7-6 12-13 12-18 0-31-15-31-33S31 16 50 16Z"/>
+    <circle cx="37" cy="39" r="5.5" fill="#fff" fill-opacity=".8"/>
+    <circle cx="56" cy="34" r="5.5" fill="#fff" fill-opacity=".8"/>
+    <circle cx="67" cy="49" r="5.5" fill="#fff" fill-opacity=".8"/>
+  </symbol>
+  <symbol id="shape-car" viewBox="0 0 100 100">
+    <path d="M24 58h52l-6-16a11 11 0 0 0-10-7H40a11 11 0 0 0-10 7Z"/>
+    <rect x="16" y="56" width="68" height="16" rx="8"/>
+    <circle cx="33" cy="76" r="8"/>
+    <circle cx="67" cy="76" r="8"/>
   </symbol>
 </svg>
 

@@ -58,25 +58,11 @@ function renderTiles (apps) {
     tile.style.setProperty('--tile-ink', inkFor(entry.color));
     tile.dataset.appId = entry.id;
 
-    // The icon sits on a white coin: a site's own favicon and our flat shapes
-    // both read cleanly against it, whatever colour the tile is.
+    // A white coin with our own shape on it. Sites' own icons are not used:
+    // a favicon is someone else's mark, and this app has no licence for one.
     const badge = document.createElement('span');
     badge.className = 'tile-badge';
-
-    if (entry.icon) {
-      const img = document.createElement('img');
-      img.src = entry.icon;
-      img.alt = '';
-      // If the favicon will not decode, fall back to the shape rather than
-      // leaving an empty coin.
-      img.addEventListener('error', () => {
-        badge.textContent = '';
-        badge.appendChild(shapeIcon(entry.shape));
-      }, { once: true });
-      badge.appendChild(img);
-    } else {
-      badge.appendChild(shapeIcon(entry.shape));
-    }
+    badge.appendChild(shapeIcon(entry.shape));
 
     const label = document.createElement('span');
     label.className = 'tile-name';
@@ -158,6 +144,21 @@ function applyState (state) {
   applyClock(state.clock);
 
   if (state.mode !== 'gate') resetGate();
+}
+
+/**
+ * Moves between the four places in the grown-up screen.
+ *
+ * Without a script there are no tabs to press and every panel is simply on the
+ * page, which is the old behaviour and still usable.
+ */
+function showPortalTab (name) {
+  for (const tab of document.querySelectorAll('#portal-tabs button')) {
+    tab.classList.toggle('on', tab.dataset.tab === name);
+  }
+  for (const panel of document.querySelectorAll('.portal-panel')) {
+    panel.hidden = panel.dataset.panel !== name;
+  }
 }
 
 /* ---------------- the play clock ---------------- */
@@ -278,7 +279,7 @@ function resetGate () {
   el('gate-step-answer').hidden = true;
   el('gate-step-library').hidden = true;
   el('gate-step-form').hidden = true;
-  libCard().classList.remove('is-wide');
+  libCard().classList.remove('is-portal');
   el('gate-input').value = '';
   el('gate-error').textContent = '';
   describeGate();
@@ -485,8 +486,9 @@ async function loadLibrary () {
   el('mine-count').textContent = data.mine.length
     ? `${live} of ${data.mine.length} on the tiles`
     : '';
-  // With nothing left to suggest there is nothing to show.
-  el('sec-suggest').hidden = data.suggestions.length === 0;
+  // The tab stays whether or not anything is left to add, because a tab that
+  // comes and goes is a tab a parent stops trusting.
+  el('catalog-empty').hidden = data.suggestions.length > 0;
 }
 
 /* --- what is set up --- */
@@ -499,18 +501,7 @@ function appArtwork (entry, size) {
 
   const coin = document.createElement('span');
   coin.className = 'art-coin';
-  if (entry.icon) {
-    const img = document.createElement('img');
-    img.src = entry.icon;
-    img.alt = '';
-    img.addEventListener('error', () => {
-      coin.textContent = '';
-      coin.appendChild(shapeIcon(entry.shape));
-    }, { once: true });
-    coin.appendChild(img);
-  } else {
-    coin.appendChild(shapeIcon(entry.shape));
-  }
+  coin.appendChild(shapeIcon(entry.shape));
   art.appendChild(coin);
   return art;
 }
@@ -660,14 +651,11 @@ let probeTimer = null;
 
 const BLANK = {
   id: null, title: '', url: '', shape: 'star', color: '#3B6BFF',
-  allowHosts: [], denyHosts: [], blockAds: true, enabled: true,
-  iconUrls: [], icon: null, useIcon: false
+  allowHosts: [], denyHosts: [], blockAds: true, enabled: true
 };
 
 function openForm (mode, entry) {
   form = { mode, ...BLANK, ...(entry || {}) };
-  // An app that already wears the site's own icon keeps it selected.
-  form.useIcon = Boolean(form.icon);
   if (!form.color) form.color = catalogue.colors[0] || BLANK.color;
   if (!form.shape) form.shape = 'star';
 
@@ -734,35 +722,15 @@ function buildShapePicker () {
   const wrap = el('form-shapes');
   wrap.textContent = '';
 
-  // The site's own icon, when we have one, sits first and is the obvious pick.
-  if (form.icon) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'swatch swatch--icon' + (form.useIcon ? ' is-on' : '');
-    b.title = "The site's own icon";
-    b.setAttribute('aria-label', "The site's own icon");
-    const img = document.createElement('img');
-    img.src = form.icon;
-    img.alt = '';
-    b.appendChild(img);
-    b.addEventListener('click', () => {
-      form.useIcon = true;
-      buildShapePicker();
-      updatePreview();
-    });
-    wrap.appendChild(b);
-  }
-
   for (const shape of (catalogue.shapes.length ? catalogue.shapes : [form.shape])) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'swatch' + (!form.useIcon && shape === form.shape ? ' is-on' : '');
+    b.className = 'swatch' + (shape === form.shape ? ' is-on' : '');
     b.title = shape;
     b.setAttribute('aria-label', shape);
     b.appendChild(shapeIcon(shape));
     b.addEventListener('click', () => {
       form.shape = shape;
-      form.useIcon = false;
       buildShapePicker();
       updatePreview();
     });
@@ -802,14 +770,7 @@ function updatePreview () {
 
   const badge = document.createElement('span');
   badge.className = 'tile-badge';
-  if (form.useIcon && form.icon) {
-    const img = document.createElement('img');
-    img.src = form.icon;
-    img.alt = '';
-    badge.appendChild(img);
-  } else {
-    badge.appendChild(shapeIcon(form.shape));
-  }
+  badge.appendChild(shapeIcon(form.shape));
 
   const label = document.createElement('span');
   label.className = 'tile-name';
@@ -856,16 +817,12 @@ async function saveForm () {
   save.disabled = true;
   save.textContent = 'Saving…';
 
-  if (form.mode === 'edit' && !form.useIcon) {
-    // Dropping the site's icon in favour of a shape has to clear the stored
-    // file. The icon we were handed is an inline copy for display, never a
-    // path, so it is not sent back.
-    payload.icon = null;
-  }
+  // Any icon an older catalog file still carries is dropped on the next save.
+  payload.icon = null;
 
   const result = form.mode === 'edit'
     ? await api.updateSite(form.id, payload)
-    : await api.addSite({ ...payload, iconUrls: form.iconUrls, useIcon: form.useIcon });
+    : await api.addSite(payload);
 
   save.textContent = 'Save';
   if (!result || !result.ok) {
@@ -979,9 +936,6 @@ async function checkSite () {
   form.url = r.url;
   form.title = r.suggestedTitle;
   form.allowHosts = r.allowHosts;
-  form.iconUrls = r.iconUrls || [];
-  form.icon = r.icon ? r.icon.dataUri : null;
-  form.useIcon = Boolean(form.icon);
 
   const found = el('form-found');
   found.textContent = '';
@@ -1036,7 +990,8 @@ async function afterUnlock () {
   el('gate-step-hold').hidden = true;
   el('gate-step-answer').hidden = true;
   el('gate-step-library').hidden = false;
-  libCard().classList.add('is-wide');
+  libCard().classList.add('is-portal');
+  showPortalTab('time');
   loadLibrary();
   el('lib-done').focus();
   startPortalHeartbeat();
@@ -1208,6 +1163,10 @@ function wire () {
 
   on('timeup-gate', 'click', () => api.openGate('portal'));
 
+  for (const tab of document.querySelectorAll('#portal-tabs button')) {
+    tab.addEventListener('click', () => showPortalTab(tab.dataset.tab));
+  }
+
   for (const chip of document.querySelectorAll('#time-chips button')) {
     chip.addEventListener('click', async () => {
       const r = await api.setSessionMinutes(chip.dataset.min);
@@ -1254,9 +1213,10 @@ function wire () {
 
   buildKeypad();
 
-  // Reachable so the screenshot tooling can populate the portal before
-  // capturing it. Nothing in the app itself uses this.
+  // Reachable so the screenshot and demo tooling can drive the portal before
+  // capturing it. Nothing in the app itself uses these.
   window.__loadLibrary = loadLibrary;
+  window.__showPortalTab = showPortalTab;
 
   api.on('state', applyState);
   api.on('apps', (payload) => renderTiles(payload.apps || []));
@@ -1272,6 +1232,7 @@ async function boot () {
 
   el('version').textContent = `v${config.version}`;
   el('check-update').hidden = Boolean(config.storeBuild);
+  el('settings-version').textContent = `Sukhi Play v${config.version}`;
   paintChips(config.settings.sessionMinutes || 0);
   el('hold-secs').textContent = String(config.settings.holdSeconds);
 

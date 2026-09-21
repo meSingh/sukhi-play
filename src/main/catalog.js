@@ -3,7 +3,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const SHAPES = new Set(['star', 'rocket', 'ball', 'blocks', 'note', 'leaf', 'drop', 'bolt']);
+const SHAPES = new Set(['star', 'rocket', 'ball', 'blocks', 'note', 'leaf', 'drop', 'bolt',
+                        'heart', 'cloud', 'moon', 'flower', 'fish', 'book', 'paint', 'car']);
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
 function sanitizeApp (raw, index) {
@@ -47,9 +48,6 @@ function sanitizeApp (raw, index) {
     // child -- no other sites, no popups, no wandering off -- while the site
     // is left to run exactly as its operator intended.
     blockAds: raw.blockAds !== false,
-    // A local icon file (usually a favicon fetched when the site was added).
-    // Falls back to the coloured shape tile when absent.
-    icon: typeof raw.icon === 'string' && raw.icon.trim() ? raw.icon.trim() : null,
     notes: typeof raw.notes === 'string' ? raw.notes.trim() : ''
   };
 }
