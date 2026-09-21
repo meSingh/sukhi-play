@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="296" height="56" viewBox="0 0 296 56"
+     role="img" aria-label="Download for Windows, 64 bit, not from the Microsoft Store">
+  <!-- Not Microsoft's "Get it from Microsoft" badge. Sukhi Play is not in the
+       Microsoft Store, so that artwork would claim a listing that does not
+       exist. No Microsoft mark is used and the button says so on its face.
+       If the app is ever accepted into the Store, their official badge becomes
+       the correct thing to use and this can be replaced.
+
+       Sized for its text rather than constrained with textLength: forcing the
+       fit made the renderer squeeze glyphs until they overlapped. -->
+  <rect x="0.5" y="0.5" width="295" height="55" rx="12" fill="#17153a"/>
+  <text x="20" y="25" fill="#ffffff"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="15.5" font-weight="700">Download for Windows</text>
+  <text x="20" y="42" fill="#b9b6d6"
+        font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+        font-size="10" font-weight="600">Windows 10 and 11 &#183; not the Microsoft Store</text>
+</svg>

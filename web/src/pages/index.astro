@@ -1,0 +1,581 @@
+---
+/**
+ * Ported from the hand-written docs/index.html. The body is that page's own
+ * markup; the header, footer and stylesheet now come from the layout.
+ */
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Sukhi Play, a locked-down browser for a small child" description="Hand a child the laptop without handing over your work. Sukhi Play locks the screen to the websites you chose. Free, open source, for macOS, Windows and Linux." page="index">
+<main>
+  <div class="wrap">
+    <div class="hero">
+      <img class="mark bob" src="/assets/cutout-proud.png" alt="" width="104" height="104">
+      <h1 class="rotator">
+        <span class="sr-only">Hand over the laptop, keep your work. Sukhi Play keeps a small child inside the websites you chose.</span>
+      <span class="sizer" aria-hidden="true">Hand over the laptop.<br>Keep your work.</span>
+      <span class="sizer" aria-hidden="true">Let them press every key.<br>Nothing happens.</span>
+      <span class="sizer" aria-hidden="true">Your inbox stays shut.<br>No surprise emails.</span>
+      <span class="sizer" aria-hidden="true">No wandering off.<br>Only the sites you picked.</span>
+      <span class="sizer" aria-hidden="true">Tiny hands can’t close it.<br>Only you can.</span>
+      <span class="sizer" aria-hidden="true">Not one file deleted.<br>Not one tab closed.</span>
+      <span class="sizer" aria-hidden="true">Popups can’t open.<br>Ads get filtered out.</span>
+      <span class="sizer" aria-hidden="true">No accidental downloads.<br>No mystery installs.</span>
+      <span class="sizer" aria-hidden="true">No sneaky YouTube detours.<br>Unless you said so.</span>
+      <span class="sizer" aria-hidden="true">Screen time,<br>without the cleanup after.</span>
+        <span class="live" aria-hidden="true"><span class="l1">Hand over the laptop.</span><br><span class="l2">Keep your work.</span></span>
+      </h1>
+      <p class="lede">The websites you chose, full screen, and nothing else.</p>
+    </div>
+
+    <div class="os reveal">
+      <a href="/macos.html" data-os="mac"><span class="yours" hidden>Your computer</span><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="6" y="9" width="36" height="35" rx="10" fill="#17153A"/>
+  <rect x="6" y="4.5" width="36" height="35" rx="10" fill="#fff" stroke="#17153A" stroke-width="3"/>
+  <path transform="translate(12 10) " d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" stroke="#3B6BFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg><b>macOS</b><span>Apple Silicon &amp; Intel</span></a>
+      <a href="/windows.html" data-os="win"><span class="yours" hidden>Your computer</span><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="7" y="7" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+  <rect x="26" y="7" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="7" y="26" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="26" y="26" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+</svg><b>Windows</b><span>10 and 11</span></a>
+      <a href="/linux.html" data-os="linux"><span class="yours" hidden>Your computer</span><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <path d="M24 5c6 0 9 4.4 9 10v7c0 3 1.6 5 3.6 7.6 2.3 3 3.4 5.2 3.4 7.4 0 3.4-3 5-7 5-2.6 0-4-.7-5.2-1.4-1.2-.7-2.3-1.2-3.8-1.2s-2.6.5-3.8 1.2C19 41.3 17.6 42 15 42c-4 0-7-1.6-7-5 0-2.2 1.1-4.4 3.4-7.4C13.4 27 15 25 15 22v-7c0-5.6 3-10 9-10z" fill="#17153A"/>
+  <ellipse cx="24" cy="30" rx="7.5" ry="9.5" fill="#FFF7EC"/>
+  <circle cx="20.6" cy="15.5" r="2.6" fill="#fff"/><circle cx="27.4" cy="15.5" r="2.6" fill="#fff"/>
+  <circle cx="20.9" cy="16" r="1.3" fill="#17153A"/><circle cx="27.1" cy="16" r="1.3" fill="#17153A"/>
+  <path d="M24 18.4c1.9 0 3.2 1 3.2 2.1S25.9 22.8 24 22.8s-3.2-1.2-3.2-2.3 1.3-2.1 3.2-2.1z" fill="#FFBE18"/>
+</svg><b>Linux</b><span>Snap, deb, AppImage</span></a>
+    </div>
+    <p class="note-small">Free &middot; No account &middot; Open source</p>
+
+    <div class="device reveal">
+      <picture>
+        <source srcset="assets/demo.webp" type="image/webp">
+        <img src="/assets/demo.gif" width="1280" height="768" loading="lazy"
+             alt="The app running: the tile screen counting down, a one minute warning, the stop screen when play time ends, and a grown-up holding the button to start another session">
+      </picture>
+    </div>
+    <p class="note-small">The real app, recorded start to finish. Nothing here is a mock-up.
+      The site being played is a small demo page of ours, so no one else’s work is used to advertise this.</p>
+  </div>
+
+  <section class="band" style="margin-top:72px">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Locked while they play</span>
+        <h2>What they cannot reach</h2>
+        <p>Everything unlocks again the moment you close it.</p>
+      </div>
+      <ul class="vault">
+      <li><span class="lock" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/></svg></span><span class="art"><svg viewBox="0 0 48 48"><path d="M5 13a4 4 0 0 1 4-4h9.5l4 4H39a4 4 0 0 1 4 4v19a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="#E9A23B"/><path d="M5 19h38v17a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="#FFBE18"/><rect x="12" y="25" width="14" height="3" rx="1.5" fill="#fff" opacity=".7"/></svg></span>Your files<small>and folders</small></li>
+      <li><span class="lock" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/></svg></span><span class="art"><svg viewBox="0 0 48 48"><rect x="5" y="10" width="38" height="28" rx="6" fill="#3B6BFF"/><path d="M8 14l16 12 16-12" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="40" cy="11" r="6" fill="#FF5C5C"/></svg></span>Your email<small>and messages</small></li>
+      <li><span class="lock" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/></svg></span><span class="art"><svg viewBox="0 0 48 48"><rect x="4.5" y="9" width="39" height="31" rx="6" fill="#fff" stroke="#17153A" stroke-width="3"/><path d="M4.5 17.5h39" stroke="#17153A" stroke-width="3"/><rect x="9" y="11.5" width="9" height="3.6" rx="1.6" fill="#8B5CF6"/><rect x="20" y="11.5" width="9" height="3.6" rx="1.6" fill="#C9C6E0"/><rect x="10" y="23" width="19" height="3.2" rx="1.6" fill="#C9C6E0"/><rect x="10" y="29.5" width="26" height="3.2" rx="1.6" fill="#C9C6E0"/></svg></span>Your open tabs<small>and half-done work</small></li>
+      <li><span class="lock" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/></svg></span><span class="art"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="#10D6A0"/><path d="M6 24h36M24 6c-6.5 5-6.5 31 0 36M24 6c6.5 5 6.5 31 0 36M9 15h30M9 33h30" fill="none" stroke="#fff" stroke-width="2.4"/></svg></span>Other websites<small>links, popups, redirects</small></li>
+      <li><span class="lock" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/></svg></span><span class="art"><svg class="kb" viewBox="0 0 48 48"><rect x="2" y="11" width="44" height="27" rx="6" fill="#17153A"/><rect class="key" x="6.0" y="15.0" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="12.6" y="15.0" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="19.2" y="15.0" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="25.8" y="15.0" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="32.4" y="15.0" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="39.0" y="15.0" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="6.0" y="21.4" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="12.6" y="21.4" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="19.2" y="21.4" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="25.8" y="21.4" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="32.4" y="21.4" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="39.0" y="21.4" width="4.8" height="4.4" rx="1.2" fill="#5B5885"/><rect class="key" x="12.6" y="27.8" width="22.8" height="4.4" rx="1.2" fill="#5B5885"/></svg></span>Keyboard shortcuts<small>mash away</small></li>
+      <li><span class="lock" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/></svg></span><span class="art"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="#FF5C5C"/><path d="M24 13.5v10" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/><path d="M16.8 18a9.6 9.6 0 1 0 14.4 0" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/></svg></span>Closing the app<small>without a grown-up</small></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">For you</span>
+        <h2>Set up in a minute</h2>
+        <p>No settings to understand. Type an address and it does the rest.</p>
+      </div>
+
+      <div class="tour reveal d1">
+        <div class="tour-steps">
+          <button type="button" data-step="0" class="on"><span class="n">1</span><b>Type an address</b><small>Or pick from a list</small><span class="bar"><i></i></span></button>
+          <button type="button" data-step="1"><span class="n">2</span><b>It works out the rest</b><small>What it needs, what is an ad</small><span class="bar"><i></i></span></button>
+          <button type="button" data-step="2"><span class="n">3</span><b>Hand it over</b><small>One big button per site</small><span class="bar"><i></i></span></button>
+        </div>
+
+        <div class="stage" aria-hidden="true">
+          <span class="blob a"></span><span class="blob b"></span><span class="blob c"></span>
+          <div class="appbar"><img src="/assets/sukhi-icon.png" alt="">Sukhi Play<span class="chip">Grown-ups</span><span class="chip">Close</span></div>
+          <div class="launch"><h4>What do you want to do?</h4><div class="grid"><div class="tile" style="background:#2F48B8"><span class="face"><svg viewBox="0 0 24 24" fill="#2F48B8"><g transform="scale(.24)"><path d="M50 6c14 14 20 30 20 46v12H30V52c0-16 6-32 20-46Z"/><path d="M30 56 14 74l14-2 4 12Z"/><path d="M70 56l16 18-14-2-4 12Z"/><circle cx="50" cy="44" r="9" fill="rgba(0,0,0,.3)"/></g></svg></span>Poki</div></div></div>
+          <div class="scrim">
+            <div class="dialog">
+              <div class="head">
+                <span class="badge"><svg viewBox="0 0 24 24" fill="#17153A"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg></span>
+                <div><div class="title">Add a new app</div><div class="sub">Start with the address and change anything it suggests.</div></div>
+              </div>
+              <div class="label">Where is it?</div>
+              <div class="row">
+                <div class="input"><span class="txt">poki.com</span><span class="cur"></span></div>
+                <div class="btn-go">Check</div>
+              </div>
+              <div class="probe" hidden><div class="probe-bar"><span class="probe-fill"></span></div><p class="probe-step"></p></div>
+              <div class="found" hidden><p></p><div class="slot"></div></div>
+              <div class="foot"><span class="ghost">Cancel</span><span class="save">Save</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pills reveal">
+        <span>Ads filtered</span><span>No account</span><span>No tracking</span><span>Nothing uploaded</span><span>Never updates by itself</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">You decide when</span>
+        <h2>Play time that ends by itself</h2>
+        <p>Set it once. Every time the app opens, the clock starts again.</p>
+      </div>
+
+      <div class="timer reveal d1">
+        <div class="dial" aria-hidden="true">
+          <svg viewBox="0 0 132 132">
+            <circle class="dial-track" cx="66" cy="66" r="58"/>
+            <circle class="dial-prog" cx="66" cy="66" r="58"/>
+          </svg>
+          <div class="dial-face"><b id="dial-time">20:00</b><span id="dial-word">left</span></div>
+        </div>
+
+        <div class="timer-copy">
+          <div class="chips" aria-hidden="true">
+            <span>Off</span><span>10 min</span><span>15 min</span>
+            <span class="on">20 min</span><span>30 min</span><span>1 hour</span>
+          </div>
+          <ul class="ticks">
+            <li><span class="tick yes">&check;</span><span><b>Hand it over and walk away.</b> No negotiating, no watching the clock yourself.</span></li>
+            <li><span class="tick yes">&check;</span><span><b>The countdown only appears at the end.</b> A clock on screen all afternoon is a thing to watch, and then a thing to argue about.</span></li>
+            <li><span class="tick yes">&check;</span><span><b>Then it stops.</b> A gentle screen, and nothing else opens until you hold the button.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--violet">
+    <div class="gate">
+      <div class="reveal" style="padding-inline:24px">
+        <span class="kicker">For grown-ups only</span>
+        <h2>Little fingers tap.<br>Grown-ups hold.</h2>
+        <ul class="points">
+          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#3B6BFF" stroke-width="2.6"/><path d="M12 7v5l3.5 2" stroke="#17153A" stroke-width="2.6" stroke-linecap="round"/></svg></span>Closing needs a steady three-second hold</li>
+          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="11" rx="3" fill="#8B5CF6"/><circle cx="8" cy="12.5" r="1.4" fill="#fff"/><circle cx="12" cy="12.5" r="1.4" fill="#fff"/><circle cx="16" cy="12.5" r="1.4" fill="#fff"/></svg></span>Add a PIN for older, cleverer siblings</li>
+          <li><span class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="#17153A" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="8" r="4" fill="#FFBE18"/></svg></span>The same hold opens your settings</li>
+        </ul>
+      </div>
+      <div class="reveal d1" style="padding-inline:24px">
+        <div class="gate-card">
+          <img src="/assets/cutout-proud.png" alt="" width="70" height="70" loading="lazy">
+          <div class="t">Grown-ups only</div>
+          <p class="h" aria-live="polite">Press and hold for 3 seconds.</p>
+          <button class="hold" type="button" aria-label="Press and hold for three seconds"><span class="ring"></span><span class="fill"></span><span class="lbl">Hold</span></button>
+          <p class="try">Try it, right here</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">No surprises</span>
+        <h2>Know before you hand it over</h2>
+        <p>Each system decides what an app is allowed to hold. Here is where they draw the line.</p>
+      </div>
+
+      <div class="limits">
+        <div class="limit reveal">
+          <header><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="7" y="7" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+  <rect x="26" y="7" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="7" y="26" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="26" y="26" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+</svg><b>Windows</b></header>
+          <ul>
+            <li><span class="tick warn">!</span><span><b>The Windows key still opens Start</b>Windows lets no app hold that key, so Sukhi Play closes the menu the moment it appears. You see a flash, nothing more.</span></li>
+            <li><span class="tick yes">&check;</span><span><b>Everything else holds</b>Taskbar, Alt+Tab, Alt+F4, Print Screen.</span></li>
+          </ul>
+          <a class="more" href="/windows.html">Windows details &rarr;</a>
+        </div>
+        <div class="limit reveal d1">
+          <header><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <path d="M24 5c6 0 9 4.4 9 10v7c0 3 1.6 5 3.6 7.6 2.3 3 3.4 5.2 3.4 7.4 0 3.4-3 5-7 5-2.6 0-4-.7-5.2-1.4-1.2-.7-2.3-1.2-3.8-1.2s-2.6.5-3.8 1.2C19 41.3 17.6 42 15 42c-4 0-7-1.6-7-5 0-2.2 1.1-4.4 3.4-7.4C13.4 27 15 25 15 22v-7c0-5.6 3-10 9-10z" fill="#17153A"/>
+  <ellipse cx="24" cy="30" rx="7.5" ry="9.5" fill="#FFF7EC"/>
+  <circle cx="20.6" cy="15.5" r="2.6" fill="#fff"/><circle cx="27.4" cy="15.5" r="2.6" fill="#fff"/>
+  <circle cx="20.9" cy="16" r="1.3" fill="#17153A"/><circle cx="27.1" cy="16" r="1.3" fill="#17153A"/>
+  <path d="M24 18.4c1.9 0 3.2 1 3.2 2.1S25.9 22.8 24 22.8s-3.2-1.2-3.2-2.3 1.3-2.1 3.2-2.1z" fill="#FFBE18"/>
+</svg><b>Linux</b></header>
+          <ul>
+            <li><span class="tick warn">!</span><span><b>Wayland sessions keep some keys</b>No app can hold keys there. Alt+Tab and Super are still switched off on GNOME.</span></li>
+            <li><span class="tick warn">!</span><span><b>The Snap can&rsquo;t touch desktop shortcuts</b>Want Alt+Tab locked too? Use the .deb or AppImage.</span></li>
+          </ul>
+          <a class="more" href="/linux.html">Linux details &rarr;</a>
+        </div>
+        <div class="limit limit--all reveal d2">
+          <header><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="6" y="9" width="36" height="35" rx="10" fill="#17153A"/>
+  <rect x="6" y="4.5" width="36" height="35" rx="10" fill="#fff" stroke="#17153A" stroke-width="3"/>
+  <path transform="translate(12 10) " d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" stroke="#3B6BFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg><b>On a Mac, everything locks.</b></header>
+          <div class="oks"><span>Menu bar</span><span>Dock</span><span>Cmd+Tab</span><span>Screenshots</span></div>
+          <a class="more" href="/macos.html">macOS details &rarr;</a>
+        </div>
+      </div>
+
+      <p class="fineprint reveal">Force Quit is never blocked, on any system, so you can always get back in.
+        Sukhi Play is one layer for a toddler, not a babysitter. Stay close by.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:24px">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2>Ready when you are</h2>
+        <p>Free for every family, on every computer.</p>
+      </div>
+      <div class="os reveal">
+      <a href="/macos.html" data-os="mac"><span class="yours" hidden>Your computer</span><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="6" y="9" width="36" height="35" rx="10" fill="#17153A"/>
+  <rect x="6" y="4.5" width="36" height="35" rx="10" fill="#fff" stroke="#17153A" stroke-width="3"/>
+  <path transform="translate(12 10) " d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" stroke="#3B6BFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg><b>macOS</b><span>Apple Silicon &amp; Intel</span></a>
+      <a href="/windows.html" data-os="win"><span class="yours" hidden>Your computer</span><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="7" y="7" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+  <rect x="26" y="7" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="7" y="26" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="26" y="26" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+</svg><b>Windows</b><span>10 and 11</span></a>
+      <a href="/linux.html" data-os="linux"><span class="yours" hidden>Your computer</span><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <path d="M24 5c6 0 9 4.4 9 10v7c0 3 1.6 5 3.6 7.6 2.3 3 3.4 5.2 3.4 7.4 0 3.4-3 5-7 5-2.6 0-4-.7-5.2-1.4-1.2-.7-2.3-1.2-3.8-1.2s-2.6.5-3.8 1.2C19 41.3 17.6 42 15 42c-4 0-7-1.6-7-5 0-2.2 1.1-4.4 3.4-7.4C13.4 27 15 25 15 22v-7c0-5.6 3-10 9-10z" fill="#17153A"/>
+  <ellipse cx="24" cy="30" rx="7.5" ry="9.5" fill="#FFF7EC"/>
+  <circle cx="20.6" cy="15.5" r="2.6" fill="#fff"/><circle cx="27.4" cy="15.5" r="2.6" fill="#fff"/>
+  <circle cx="20.9" cy="16" r="1.3" fill="#17153A"/><circle cx="27.1" cy="16" r="1.3" fill="#17153A"/>
+  <path d="M24 18.4c1.9 0 3.2 1 3.2 2.1S25.9 22.8 24 22.8s-3.2-1.2-3.2-2.3 1.3-2.1 3.2-2.1z" fill="#FFBE18"/>
+</svg><b>Linux</b><span>Snap, deb, AppImage</span></a>
+    </div>
+      <a class="repo reveal" href="https://github.com/meSingh/sukhi-play">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span>
+          <span class="name">meSingh / <b>sukhi-play</b></span>
+          <span class="meta"><span>MIT License</span><span><i style="background:#F1E05A"></i>JavaScript</span><span><i style="background:#663399"></i>CSS</span><span><i style="background:#E34C26"></i>HTML</span></span>
+          <span class="langs"><i style="width:78%;background:#F1E05A"></i><i style="width:13%;background:#663399"></i><i style="width:6%;background:#E34C26"></i><i style="width:3%;background:#3572A5"></i></span>
+        </span>
+        <span class="cta">Read the code</span>
+      </a>
+      <p class="note-small" style="margin-top:22px">Sukhi Play is not affiliated with any website it can open. You choose where it may go.</p>
+    </div>
+  </section>
+</main>
+</Base>
+
+<script is:inline>
+/* Reveal on scroll, and mark the visitor's own platform. Both are decoration:
+   without this script every section is visible and every link works. */
+(function () {
+  var root = document.documentElement;
+  var ua = navigator.userAgent;
+  var plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+  var touch = navigator.maxTouchPoints > 1;
+  var os = /Android|iPhone|iPad/i.test(ua) ? null
+    : /Mac/i.test(plat + ua) && !touch ? 'mac'
+    : /Win/i.test(plat + ua) ? 'win'
+    : /Linux|X11|CrOS/i.test(plat + ua) ? 'linux' : null;
+  window.SUKHI_OS = os;
+
+  // Phone menu: the nav slides in from the side instead of wrapping.
+  var menuBtn = document.querySelector('.menu-btn');
+  var scrim = document.querySelector('.nav-scrim');
+  var setMenu = function (open) {
+    root.classList.toggle('nav-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    scrim.hidden = !open;
+    if (open) document.getElementById('site-nav').focus({ preventScroll: true });
+  };
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function () { setMenu(true); });
+    document.querySelector('.menu-close').addEventListener('click', function () { setMenu(false); menuBtn.focus(); });
+    scrim.addEventListener('click', function () { setMenu(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('nav-open')) { setMenu(false); menuBtn.focus(); } });
+    window.matchMedia('(min-width: 621px)').addEventListener('change', function (m) { if (m.matches) setMenu(false); });
+  }
+  if (os) {
+    document.querySelectorAll('[data-os="' + os + '"]').forEach(function (el) {
+      el.classList.add('yours');
+      var tag = el.querySelector('.yours[hidden]');
+      if (tag) tag.hidden = false;
+    });
+  }
+
+  var els = document.querySelectorAll('.reveal, .vault');
+  if (!('IntersectionObserver' in window) ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // Only now hide them, so nothing can leave the page blank.
+  root.classList.add('js');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+<script is:inline>
+(function () {
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  /* ---------- the headline: a different worry every visit ---------- */
+  var HEADLINES = [["Hand over the laptop.", "Keep your work."], ["Let them press every key.", "Nothing happens."], ["Your inbox stays shut.", "No surprise emails."], ["No wandering off.", "Only the sites you picked."], ["Tiny hands can’t close it.", "Only you can."], ["Not one file deleted.", "Not one tab closed."], ["Popups can’t open.", "Ads get filtered out."], ["No accidental downloads.", "No mystery installs."], ["No sneaky YouTube detours.", "Unless you said so."], ["Screen time,", "without the cleanup after."]];
+  var live = document.querySelector('.rotator .live');
+  if (live) {
+    var l1 = live.querySelector('.l1'), l2 = live.querySelector('.l2');
+    var at = Math.floor(Math.random() * HEADLINES.length);
+
+    // Each word is its own element so it can rise in, and fall away, a beat
+    // after the one before it.
+    var words = function (el, text, from) {
+      el.textContent = '';
+      text.split(' ').forEach(function (w, i) {
+        if (i) el.appendChild(document.createTextNode(' '));
+        var span = document.createElement('span');
+        span.className = 'w';
+        span.style.setProperty('--i', from + i);
+        span.textContent = w;
+        el.appendChild(span);
+      });
+      return from + text.split(' ').length;
+    };
+    var show = function (pair) { words(l2, pair[1], words(l1, pair[0], 0)); };
+    show(HEADLINES[at]);
+
+    if (!reduced) (async function () {
+      for (;;) {
+        await wait(2600);
+        if (document.hidden) continue;
+        live.classList.add('out');
+        await wait(520);
+        at = (at + 1) % HEADLINES.length;
+        live.classList.add('pre');
+        live.classList.remove('out');
+        show(HEADLINES[at]);
+        live.offsetWidth;
+        live.classList.remove('pre');
+        await wait(900);
+      }
+    })();
+  }
+
+  /* ---------- set up in a minute: the whole flow, on a loop ---------- */
+  var SITES = [{"addr": "poki.com", "name": "Poki", "color": "#2F48B8", "icon": "rocket", "hosts": 5, "ads": 9}, {"addr": "pbskids.org", "name": "PBS Kids", "color": "#4DB384", "icon": "star", "hosts": 7, "ads": 14}, {"addr": "scratch.mit.edu", "name": "Scratch", "color": "#E9A23B", "icon": "blocks", "hosts": 4, "ads": 0}];
+  var ICONS = {"rocket": "<g transform=\"scale(.24)\"><path d=\"M50 6c14 14 20 30 20 46v12H30V52c0-16 6-32 20-46Z\"/><path d=\"M30 56 14 74l14-2 4 12Z\"/><path d=\"M70 56l16 18-14-2-4 12Z\"/><circle cx=\"50\" cy=\"44\" r=\"9\" fill=\"rgba(0,0,0,.3)\"/></g>", "star": "<path d=\"M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z\"/>", "blocks": "<rect x=\"8.8\" y=\"3\" width=\"6.6\" height=\"6.6\" rx=\"1.3\"/><rect x=\"4.4\" y=\"11.4\" width=\"6.6\" height=\"6.6\" rx=\"1.3\"/><rect x=\"13\" y=\"11.4\" width=\"6.6\" height=\"6.6\" rx=\"1.3\"/>"};
+  var stage = document.querySelector('.stage');
+  if (stage) {
+    var tabs = [].slice.call(document.querySelectorAll('.tour-steps button'));
+    var txt = stage.querySelector('.txt'), input = stage.querySelector('.input');
+    var go = stage.querySelector('.btn-go'), save = stage.querySelector('.save');
+    var probe = stage.querySelector('.probe'), fillBar = stage.querySelector('.probe-fill');
+    var stepText = stage.querySelector('.probe-step');
+    var found = stage.querySelector('.found'), grid = stage.querySelector('.launch .grid');
+    var run = 0, site = 0, added = [];
+
+    var tile = function (s, isNew) {
+      return '<div class="tile' + (isNew ? ' new' : '') + '" style="background:' + s.color + '"><span class="face">' +
+        '<svg viewBox="0 0 24 24" fill="' + s.color + '">' + ICONS[s.icon] + '</svg></span>' + s.name + '</div>';
+    };
+    var step = function (n, ms) {
+      tabs.forEach(function (b, i) {
+        var bar = b.querySelector('.bar i');
+        b.classList.toggle('on', i === n);
+        b.classList.toggle('done', i < n);
+        bar.style.transition = 'none';
+        bar.style.width = i < n ? '100%' : '0%';
+        if (i === n && ms) {
+          bar.offsetWidth;
+          bar.style.transition = 'width ' + ms + 'ms linear';
+          bar.style.width = '100%';
+        }
+      });
+    };
+    var press = async function (el, token) { el.classList.add('pressed'); await pause(170, token); el.classList.remove('pressed'); };
+    var pause = function (ms, token) {
+      return wait(ms).then(function () { if (token !== run) throw 'stale'; });
+    };
+
+    var play = async function (from) {
+      var token = ++run;
+      try {
+        for (;;) {
+          var s = SITES[site];
+          // 1. type the address
+          if (from <= 0) {
+            stage.classList.remove('show-launch');
+            probe.hidden = true; found.hidden = true; save.classList.remove('ready');
+            txt.textContent = ''; input.classList.add('focus');
+            step(0, 900 + s.addr.length * 95 + 700);
+            await pause(700, token);
+            for (var i = 1; i <= s.addr.length; i++) { txt.textContent = s.addr.slice(0, i); await pause(95, token); }
+            await pause(500, token);
+            await press(go, token);
+          }
+          // 2. it checks the site and fills everything in
+          if (from <= 1) {
+            stage.classList.remove('show-launch');
+            txt.textContent = s.addr; input.classList.remove('focus');
+            found.hidden = true; save.classList.remove('ready');
+            step(1, 6200);
+            probe.hidden = false;
+            fillBar.style.transition = 'none'; fillBar.style.width = '0%'; fillBar.offsetWidth;
+            fillBar.style.transition = 'width 3400ms linear'; fillBar.style.width = '100%';
+            var msgs = [[0, 'Opening the page\u2026'], [750, 'Watching what it loads\u2026'], [1600, 'Sorting the adverts from the rest\u2026'], [900, 'Working out what it needs\u2026']];
+            for (var m = 0; m < msgs.length; m++) { await pause(msgs[m][0], token); stepText.textContent = msgs[m][1]; }
+            await pause(250, token);
+            probe.hidden = true;
+            found.querySelector('p').textContent = 'Needs ' + s.hosts + ' hosts. ' +
+              (s.ads ? s.ads + ' looked like advertising or tracking and will be blocked.' : 'Nothing looked like advertising.');
+            found.querySelector('.slot').innerHTML = tile(s, true);
+            found.hidden = false;
+            await pause(1500, token);
+            save.classList.add('ready');
+            await pause(500, token);
+            await press(save, token);
+          }
+          // 3. it is on the child's screen
+          step(2, 3600);
+          if (added.indexOf(site) < 0) added.push(site);
+          grid.innerHTML = added.map(function (i) { return tile(SITES[i], i === site); }).join('');
+          stage.classList.add('show-launch');
+          await pause(3600, token);
+
+          site = (site + 1) % SITES.length;
+          if (site === 0) added = [];
+          from = 0;
+        }
+      } catch (e) { if (e !== 'stale') throw e; }
+    };
+
+    tabs.forEach(function (b) {
+      b.addEventListener('click', function () { play(+b.dataset.step); });
+    });
+
+    if (!reduced && 'IntersectionObserver' in window) {
+      var seen = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) { seen.disconnect(); play(0); }
+      }, { threshold: .35 });
+      seen.observe(stage);
+    }
+  }
+
+  /* ---------- the play time dial ---------- */
+  // A whole session in ten seconds: the ring empties, the clock counts down,
+  // and it ends the way it ends in the app. Decoration, so without the script
+  // the dial simply reads 20:00.
+  var dial = document.querySelector('.dial');
+  if (dial && !reduced) {
+    var ring = dial.querySelector('.dial-prog');
+    var time = document.getElementById('dial-time');
+    var word = document.getElementById('dial-word');
+    var LENGTH = 365;
+    var runDial = async function () {
+      for (;;) {
+        dial.classList.remove('is-up');
+        word.textContent = 'left';
+        for (var step = 0; step <= 40; step++) {
+          var part = step / 40;
+          var secs = Math.round(20 * 60 * (1 - part));
+          ring.style.strokeDashoffset = (LENGTH * part).toFixed(1);
+          time.textContent = Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+          await wait(220);
+        }
+        dial.classList.add('is-up');
+        time.textContent = 'That is all';
+        word.textContent = 'for now';
+        await wait(2600);
+        ring.style.strokeDashoffset = '0';
+        await wait(500);
+      }
+    };
+    var started = false;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting && !started) { started = true; runDial(); }
+      }, { threshold: .4 }).observe(dial);
+    } else { runDial(); }
+  }
+
+  /* ---------- hold to get out: the real thing, to try ---------- */
+  var card = document.querySelector('.gate-card');
+  if (card) {
+    var btn = card.querySelector('.hold'), fill = btn.querySelector('.fill');
+    var title = card.querySelector('.t'), hint = card.querySelector('.h');
+    var HOLD = 3000, level = 0, raf = 0, started = 0, holding = false, unlocked = false, demo = true, demoTimer = 0;
+    var HINT = hint.textContent;
+
+    var set = function (p) { level = p; fill.style.height = (p * 100) + '%'; btn.classList.toggle('full', p > .55); };
+    var drain = function () {
+      var from = level, t0 = performance.now();
+      cancelAnimationFrame(raf);
+      (function d(now) {
+        var p = Math.max(0, from - (now - t0) / 450);
+        set(p);
+        if (p > 0) raf = requestAnimationFrame(d);
+      })(t0);
+    };
+    var tick = function (now) {
+      var p = Math.min(1, (now - started) / HOLD);
+      set(p);
+      if (p >= 1) return unlock();
+      raf = requestAnimationFrame(tick);
+    };
+    var unlock = function () {
+      holding = false; unlocked = true;
+      card.classList.add('unlocked');
+      title.textContent = 'You\u2019re in';
+      hint.textContent = 'Three whole seconds. Toddlers let go long before that.';
+      setTimeout(function () {
+        unlocked = false; card.classList.remove('unlocked');
+        title.textContent = 'Grown-ups only'; hint.textContent = HINT; set(0);
+      }, 2800);
+    };
+    var down = function (e) {
+      if (unlocked || holding) return;
+      if (e && e.preventDefault) e.preventDefault();
+      demo = false; clearTimeout(demoTimer);
+      holding = true;
+      cancelAnimationFrame(raf);
+      started = performance.now() - level * HOLD;
+      hint.textContent = 'Keep holding\u2026';
+      raf = requestAnimationFrame(tick);
+    };
+    var up = function () {
+      if (!holding) return;
+      holding = false;
+      if (level < 1) { hint.textContent = 'Let go too soon. That\u2019s the point.'; drain(); }
+    };
+    btn.addEventListener('pointerdown', down);
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) { btn.addEventListener(t, up); });
+    btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    btn.addEventListener('keydown', function (e) { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) down(e); });
+    btn.addEventListener('keyup', function (e) { if (e.key === ' ' || e.key === 'Enter') up(); });
+
+    // Until someone tries it: a small child's quick taps, doing nothing.
+    var tap = function () {
+      if (!demo) return;
+      btn.classList.remove('tap'); btn.offsetWidth; btn.classList.add('tap');
+      set(.09); drain();
+      hint.textContent = 'A quick tap does nothing.';
+      demoTimer = setTimeout(tap, 900 + Math.random() * 1600);
+    };
+    if (!reduced && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        clearTimeout(demoTimer);
+        if (entries[0].isIntersecting && demo) demoTimer = setTimeout(tap, 800);
+      }, { threshold: .5 }).observe(btn);
+    }
+  }
+})();
+</script>

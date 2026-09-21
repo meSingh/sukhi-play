@@ -1,0 +1,135 @@
+---
+/**
+ * The site header: brand, the pages, and the download button.
+ *
+ * One copy, used by every page. It replaces scripts/build-nav.js, which
+ * existed only because this markup used to be pasted into each of eight
+ * files and drift between them was invisible until somebody clicked.
+ */
+import { REPO } from '../site';
+
+interface Props {
+  /** The page being rendered, e.g. "features" — used to mark the current link. */
+  page?: string;
+}
+const { page = '' } = Astro.props;
+
+const LINKS = [
+  { href: '/', key: 'index', label: 'Overview' },
+  { href: '/features.html', key: 'features', label: 'Features' },
+  { href: '/catalogue.html', key: 'catalogue', label: 'Catalogue' }
+];
+
+// The platforms hang under the download button rather than sitting in the bar.
+// Four of them up front asked a parent to choose before they had a question.
+const DOWNLOADS = [
+  { href: '/download.html', key: 'download', label: 'All downloads', note: 'Every build, with checksums' },
+  { href: '/macos.html', key: 'macos', label: 'macOS', note: 'Apple Silicon, Intel, older Macs' },
+  { href: '/windows.html', key: 'windows', label: 'Windows', note: 'Installer or portable' },
+  { href: '/linux.html', key: 'linux', label: 'Linux', note: 'AppImage, deb, Snap' }
+];
+
+const inDownloads = DOWNLOADS.some((d) => d.key === page);
+---
+
+<header class="top">
+  <a class="brand" href="/"><img src="/assets/sukhi-icon.png" alt="" width="38" height="38">Sukhi Play</a>
+
+  <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+    <span></span><span></span><span></span>
+  </button>
+
+  <nav id="site-nav" tabindex="-1">
+    <div class="nav-head">
+      <img src="/assets/sukhi-icon.png" alt="" width="34" height="34">Sukhi Play
+      <button class="menu-close" type="button" aria-label="Close menu">&times;</button>
+    </div>
+
+    {LINKS.map((l) => (
+      <a href={l.href} aria-current={l.key === page ? 'page' : undefined}>{l.label}</a>
+    ))}
+
+    <a class="nav-gh" href={REPO}>
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span>GitHub</span>
+    </a>
+
+    <!-- Two controls in one pill: a link that goes to the download page,
+         because that is what a button marked Download should do, and a caret
+         for people who already know which machine they are on. -->
+    <div class:list={['nav-dl', inDownloads && 'is-current']}>
+      <a class="nav-cta" href="/download.html">
+        <span>Download</span>
+        <span class="nav-cta-sub">Free, no account</span>
+      </a>
+      <button class="nav-cta-more" type="button" id="nav-dl-btn"
+              aria-expanded="false" aria-controls="nav-dl-menu"
+              aria-label="Choose your platform">
+        <svg class="nav-caret" viewBox="0 0 12 8" aria-hidden="true">
+          <path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="nav-dl-menu" id="nav-dl-menu">
+        {DOWNLOADS.map((d) => (
+          <a href={d.href} aria-current={d.key === page ? 'page' : undefined}>
+            <b>{d.label}</b><small>{d.note}</small>
+          </a>
+        ))}
+      </div>
+    </div>
+  </nav>
+
+  <div class="nav-scrim" hidden></div>
+</header>
+
+<script>
+  // Both menus. This used to live in each page's own script, which meant a new
+  // page shipped a hamburger button that did nothing. It belongs with the
+  // markup it drives.
+  const root = document.documentElement;
+
+  const menuBtn = document.querySelector<HTMLButtonElement>('.menu-btn');
+  const scrim = document.querySelector<HTMLElement>('.nav-scrim');
+  const closeBtn = document.querySelector<HTMLButtonElement>('.menu-close');
+
+  if (menuBtn && scrim && closeBtn) {
+    const setMenu = (on: boolean) => {
+      root.classList.toggle('nav-open', on);
+      menuBtn.setAttribute('aria-expanded', String(on));
+      scrim.hidden = !on;
+      if (on) document.getElementById('site-nav')?.focus({ preventScroll: true });
+    };
+    menuBtn.addEventListener('click', () => setMenu(true));
+    closeBtn.addEventListener('click', () => { setMenu(false); menuBtn.focus(); });
+    scrim.addEventListener('click', () => setMenu(false));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && root.classList.contains('nav-open')) { setMenu(false); menuBtn.focus(); }
+    });
+    window.matchMedia('(min-width: 621px)').addEventListener('change', (m) => {
+      if (m.matches) setMenu(false);
+    });
+  }
+
+  const wrap = document.querySelector<HTMLElement>('.nav-dl');
+  const caret = document.getElementById('nav-dl-btn');
+  if (wrap && caret) {
+    // Closed only once there is a script to open it again: without JavaScript
+    // the panel stays visible and every link still works.
+    root.classList.add('has-nav-dl');
+    const open = (on: boolean) => {
+      wrap.classList.toggle('is-open', on);
+      caret.setAttribute('aria-expanded', String(on));
+    };
+    caret.addEventListener('click', (e) => {
+      e.stopPropagation();
+      open(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', (e) => {
+      if (!wrap.contains(e.target as Node)) open(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && wrap.classList.contains('is-open')) { open(false); caret.focus(); }
+    });
+  }
+</script>

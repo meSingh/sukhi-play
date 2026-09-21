@@ -1,0 +1,172 @@
+---
+/**
+ * Ported from the hand-written docs/windows.html. The body is that page's own
+ * markup; the header, footer and stylesheet now come from the layout.
+ */
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Sukhi Play on Windows" description="Install Sukhi Play on Windows 10 and 11. The SmartScreen warning, and what the Windows key can and cannot do." page="windows">
+<main class="wrap wrap--narrow">
+  <div class="hero hero--page">
+    <span class="bob" style="display:inline-block"><svg class="glyph" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="7" y="7" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+  <rect x="26" y="7" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="7" y="26" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="26" y="26" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+</svg></span>
+    <h1>Sukhi Play on Windows</h1>
+  </div>
+
+  <div class="getting" hidden>
+    <div class="gt-top">
+      <div class="gt-ring" aria-hidden="true"><svg viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="27"/><circle class="prog" cx="32" cy="32" r="27"/></svg><b class="gt-count">5</b><span class="gt-done">&check;</span></div>
+      <div class="gt-text" aria-live="polite"><b class="gt-title">Your download starts in a moment</b><span class="gt-file"></span></div>
+      <div class="gt-actions"><a class="gt-now" href="#">Download now</a><button class="gt-cancel" type="button">Cancel</button></div>
+    </div>
+    <div class="gt-note" data-for="*"><b>Windows will warn you once. That is expected.</b><ol><li><span>Click <b>More info</b></span></li><li><span>Click <b>Run anyway</b></span></li></ol><a href="#smartscreen">Full steps &darr;</a></div>
+  </div>
+  <script>
+  (function () {
+    var GETS = {"installer": {"url": "https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-Windows-Setup.exe", "name": "Windows installer"}, "portable": {"url": "https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-Windows-Portable.exe", "name": "Windows portable .exe"}};
+    var key = new URLSearchParams(location.search).get('get');
+    var pick = GETS[key];
+    var box = document.querySelector('.getting');
+    if (!pick || !box) return;
+
+    var note = box.querySelector('.gt-note[data-for="' + key + '"]') || box.querySelector('.gt-note[data-for="*"]');
+    [].forEach.call(box.querySelectorAll('.gt-note'), function (n) { n.hidden = n !== note; });
+    var title = box.querySelector('.gt-title'), count = box.querySelector('.gt-count');
+    var now = box.querySelector('.gt-now');
+    box.querySelector('.gt-file').textContent = pick.name;
+    now.href = pick.url;
+    box.hidden = false;
+
+    // The address keeps no trace of the download, so a reload does not start it again.
+    history.replaceState(null, '', location.pathname + location.hash);
+
+    var left = 5, timer;
+    var start = function () {
+      clearInterval(timer);
+      box.classList.add('started');
+      title.textContent = 'Downloading';
+      now.textContent = 'Didn’t start? Try again';
+      window.location.href = pick.url;
+    };
+    title.textContent = 'Your download starts in ' + left + ' seconds';
+    requestAnimationFrame(function () { box.classList.add('counting'); });
+    timer = setInterval(function () {
+      left -= 1;
+      count.textContent = left;
+      if (left <= 0) return start();
+      title.textContent = 'Your download starts in ' + left + ' second' + (left === 1 ? '' : 's');
+    }, 1000);
+    now.addEventListener('click', function (e) { e.preventDefault(); start(); });
+    box.querySelector('.gt-cancel').addEventListener('click', function () {
+      clearInterval(timer);
+      box.hidden = true;
+    });
+  })();
+  </script>
+
+  <div class="page-os reveal">
+    <a class="get" href="https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-Windows-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>Installer</b><small>Recommended</small></span></a>
+    <a class="get get--soft" href="https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-Windows-Portable.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>Portable</b><small>One file, nothing installed</small></span></a>
+  </div>
+  <p class="note-small">Windows 10 and 11, 64-bit.</p>
+
+  <div class="block" id="smartscreen">
+    <h2 class="reveal">SmartScreen will stop you once</h2>
+    <div class="card warn reveal">
+      <p><b>Windows protected your PC.</b> Microsoft Defender SmartScreen prevented an unrecognised app from starting.</p>
+    </div>
+    <ol class="steps reveal d1">
+      <li>Click <b>More info</b>. This is the step people miss.</li>
+      <li>Click <b>Run anyway</b>.</li>
+    </ol>
+    <p class="reveal">SmartScreen is reacting to a new, unfamiliar app, not to anything it found. Making it go away costs hundreds a year, and this app is free.</p>
+  </div>
+
+  <div class="block">
+    <h2 class="reveal">What it locks down</h2>
+    <ul class="checks reveal d1">
+      <li><span class="tick yes">&check;</span> The whole screen, taskbar included</li>
+      <li><span class="tick yes">&check;</span> Alt+Tab, Alt+F4 and the function keys</li>
+      <li><span class="tick yes">&check;</span> Print Screen and the Snipping Tool</li>
+      <li><span class="tick yes">&check;</span> The magnifier and clipboard history</li>
+      <li><span class="tick warn">!</span> The Windows key opens Start, then it is closed again</li>
+    </ul>
+    <div class="card stop reveal" style="margin-top:18px">
+      <h3>About that last one</h3>
+      <p>Windows will not hand the Windows key to any app, so pressing it opens the Start menu over Sukhi Play. Holding that key properly would mean a permanent change to your computer, and this app never makes those.</p>
+      <p>So it does what you would do: it presses Escape. While Sukhi Play is locked it watches for the Start menu, Search and the quick settings panel, closes whichever one appeared, and comes back to the front in about a quarter of a second. Any other window is left alone, so a real dialog never has keys sent into it.</p>
+      <p>Your child sees the menu flash. They cannot use it.</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2 class="reveal">Antivirus flagged it?</h2>
+    <p class="reveal">Some antivirus tools quarantine any unsigned app on sight. Check the file&rsquo;s fingerprint in PowerShell:</p>
+    <pre class="reveal"><code>Get-FileHash ~\Downloads\Sukhi-Play-Windows-Setup.exe</code></pre>
+    <p class="reveal">If it matches the line in <a href="https://github.com/meSingh/sukhi-play/releases/latest/download/SHA256SUMS.txt">SHA256SUMS.txt</a>, it is exactly what was built from the public code.</p>
+  </div>
+
+  <div class="help reveal">
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="#fff"/><path d="M30.5 11.5a8 8 0 0 0-9.8 10.3L11.8 30.7a3.2 3.2 0 1 0 4.5 4.5l8.9-8.9a8 8 0 0 0 10.3-9.8l-4.6 4.6-4.3-1.2-1.2-4.3z" fill="#8B5CF6"/></svg>
+    <div><b>Still stuck?</b><span>Run a two-minute check and send us the numbers.</span></div>
+    <a class="go" href="/debug.html">Troubleshooting</a>
+  </div>
+</main>
+</Base>
+
+<script is:inline>
+/* Reveal on scroll, and mark the visitor's own platform. Both are decoration:
+   without this script every section is visible and every link works. */
+(function () {
+  var root = document.documentElement;
+  var ua = navigator.userAgent;
+  var plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+  var touch = navigator.maxTouchPoints > 1;
+  var os = /Android|iPhone|iPad/i.test(ua) ? null
+    : /Mac/i.test(plat + ua) && !touch ? 'mac'
+    : /Win/i.test(plat + ua) ? 'win'
+    : /Linux|X11|CrOS/i.test(plat + ua) ? 'linux' : null;
+  window.SUKHI_OS = os;
+
+  // Phone menu: the nav slides in from the side instead of wrapping.
+  var menuBtn = document.querySelector('.menu-btn');
+  var scrim = document.querySelector('.nav-scrim');
+  var setMenu = function (open) {
+    root.classList.toggle('nav-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    scrim.hidden = !open;
+    if (open) document.getElementById('site-nav').focus({ preventScroll: true });
+  };
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function () { setMenu(true); });
+    document.querySelector('.menu-close').addEventListener('click', function () { setMenu(false); menuBtn.focus(); });
+    scrim.addEventListener('click', function () { setMenu(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('nav-open')) { setMenu(false); menuBtn.focus(); } });
+    window.matchMedia('(min-width: 621px)').addEventListener('change', function (m) { if (m.matches) setMenu(false); });
+  }
+  if (os) {
+    document.querySelectorAll('[data-os="' + os + '"]').forEach(function (el) {
+      el.classList.add('yours');
+      var tag = el.querySelector('.yours[hidden]');
+      if (tag) tag.hidden = false;
+    });
+  }
+
+  var els = document.querySelectorAll('.reveal, .vault');
+  if (!('IntersectionObserver' in window) ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // Only now hide them, so nothing can leave the page blank.
+  root.classList.add('js');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>

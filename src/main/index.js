@@ -904,15 +904,20 @@ function shotScript () {
       }
     },
     {
-      name: '04-suggestions',
-      caption: 'Suggestions: a curated list, each one already checked',
+      name: '04-catalogue',
+      caption: 'The catalogue: sites already set up, and apps that need no internet',
       run: async () => {
         await openPortal();
-        await js(`(() => {
-          const s = document.getElementById('sec-suggest');
-          if (s) s.scrollIntoView({ block: 'center', behavior: 'instant' });
-          return 1;
+        // The portal became tabs, and this used to scroll to #sec-suggest,
+        // which stopped existing. The `if (s)` guard meant it silently took a
+        // second picture of the previous screen instead of failing.
+        const shown = await js(`(() => {
+          if (!window.__showPortalTab) return 'no tab switcher';
+          window.__showPortalTab('catalog');
+          return document.querySelector('.portal-panel[data-panel="catalog"]:not([hidden])')
+            ? 'ok' : 'the catalogue tab did not open';
         })()`);
+        if (shown !== 'ok') throw new Error(shown);
         await settle(700);
       }
     },

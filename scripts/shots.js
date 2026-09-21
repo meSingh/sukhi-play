@@ -21,7 +21,7 @@ const { spawnSync } = require('node:child_process');
 
 const { seedProfile, electronBin, ROOT } = require('./seed-profile');
 const OUT = path.join(ROOT, 'docs', 'screenshots');
-const SEED_IDS = ['poki', 'pbskids', 'scratch', 'toytheater', 'natgeokids', 'blockly'];
+const SEED_IDS = ['poki', 'pbskids', 'scratch', 'toytheater', 'natgeokids', 'musiclab'];
 
 function seededProfile () {
   return seedProfile({ prefix: 'sukhi-shot-seeded-', ids: SEED_IDS });

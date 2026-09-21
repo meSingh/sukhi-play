@@ -148,28 +148,55 @@ test('the catalogue page carries no third-party imagery and claims nothing', () 
 test('every page carries the same navigation', () => {
   const docs = path.join(__dirname, '..', 'docs');
   const pages = fs.readdirSync(docs).filter((f) => f.endsWith('.html'));
-  const { header, START, END } = require('../scripts/build-nav');
+  assert.ok(pages.length >= 8, 'the site should have all its pages built');
+
+  // One <Nav> component renders into every page, so they must agree. Drift
+  // here means the build did not run, not that somebody edited one copy.
+  const navOf = (text) => {
+    const from = text.indexOf('<header class="top">');
+    const to = text.indexOf('</header>');
+    assert.ok(from !== -1 && to !== -1, 'no header');
+    return text.slice(from, to);
+  };
+
+  // Each page marks its own link and, on the download pages, lights the
+  // download pill. Both are per-page state, so compare with them removed.
+  const strip = (nav) => nav
+    .replace(/ aria-current="page"/g, '')
+    .replace(/class="nav-dl is-current"/g, 'class="nav-dl"');
+  const first = strip(navOf(fs.readFileSync(path.join(docs, pages[0]), 'utf8')));
 
   for (const page of pages) {
-    const text = fs.readFileSync(path.join(docs, page), 'utf8');
-    const from = text.indexOf(START);
-    const to = text.indexOf(END);
-    assert.ok(from !== -1 && to !== -1, `${page} has no nav markers`);
-
-    // Generated, so drift means somebody hand-edited one copy of eight.
-    assert.equal(text.slice(from, to + END.length), header(page),
-      `${page} has a stale navigation; run \`npm run nav\``);
+    const nav = strip(navOf(fs.readFileSync(path.join(docs, page), 'utf8')));
+    assert.equal(nav, first,
+      `${page} has a different navigation; run \`npm run site\``);
   }
 });
 
 test('the navigation only points at pages that exist', () => {
   const docs = path.join(__dirname, '..', 'docs');
-  const { header } = require('../scripts/build-nav');
-  const nav = header('index.html');
+  const text = fs.readFileSync(path.join(docs, 'index.html'), 'utf8');
+  const nav = text.slice(text.indexOf('<header class="top">'), text.indexOf('</header>'));
 
-  for (const href of nav.match(/href="([^"]+)"/g).map((m) => m.slice(6, -1))) {
-    if (href.startsWith('http')) continue;
-    assert.ok(fs.existsSync(path.join(docs, href.split('#')[0])),
+  for (const href of (nav.match(/href="([^"]+)"/g) || []).map((m) => m.slice(6, -1))) {
+    if (href.startsWith('http') || href.startsWith('/assets/')) continue;
+    // Paths are explicit: existing links like sukhiplay.com/debug.html keep
+    // working, and nothing relies on the host resolving an extensionless path.
+    const file = href === '/' ? 'index.html' : href.replace(/^\//, '').split('#')[0];
+    assert.ok(file.endsWith('.html'), `${href} should be an explicit .html path`);
+    assert.ok(fs.existsSync(path.join(docs, file)),
       `the navigation links to ${href}, which is not there`);
   }
+});
+
+test('the built site keeps the files GitHub Pages needs', () => {
+  const docs = path.join(__dirname, '..', 'docs');
+  // Astro empties its output directory on every build. These live in
+  // web/public/ so the build puts them back; without CNAME the custom domain
+  // silently reverts to github.io on the next deploy.
+  for (const name of ['CNAME', '.nojekyll']) {
+    assert.ok(fs.existsSync(path.join(docs, name)),
+      `docs/${name} is missing -- it belongs in web/public/`);
+  }
+  assert.equal(fs.readFileSync(path.join(docs, 'CNAME'), 'utf8').trim(), 'sukhiplay.com');
 });

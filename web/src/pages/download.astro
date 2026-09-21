@@ -1,0 +1,229 @@
+---
+/**
+ * Ported from the hand-written docs/download.html. The body is that page's own
+ * markup; the header, footer and stylesheet now come from the layout.
+ */
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Download Sukhi Play" description="Sukhi Play for macOS, Windows and Linux. Free, open source, no account. Every link points at the newest release." page="download">
+<main class="wrap">
+  <div class="hero hero--page">
+    <h1>Download Sukhi Play</h1>
+    <p class="lede">Free, no account, always the newest version.</p>
+  </div>
+
+  <div class="dl">
+    <div class="dl-card reveal" data-os="mac">
+      <span class="yours-tag">Your computer</span>
+      <header><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="6" y="9" width="36" height="35" rx="10" fill="#17153A"/>
+  <rect x="6" y="4.5" width="36" height="35" rx="10" fill="#fff" stroke="#17153A" stroke-width="3"/>
+  <path transform="translate(12 10) " d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" stroke="#3B6BFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg><span><b>macOS</b><small>macOS 13 or later</small></span></header>
+      <a class="get" href="macos.html?get=apple-silicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>Apple Silicon</b><small>M1, M2, M3, M4 and later</small></span></a>
+      <a class="get get--soft" href="macos.html?get=intel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>Intel</b><small>Older Macs with an Intel chip</small></span></a>
+      <p class="aside">On macOS 10.15 to 12? <a href="/macos.html#catalina">There is a separate build</a>.</p>
+    </div>
+    <div class="dl-card reveal d1" data-os="win">
+      <span class="yours-tag">Your computer</span>
+      <header><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="7" y="7" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+  <rect x="26" y="7" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="7" y="26" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="26" y="26" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+</svg><span><b>Windows</b><small>Windows 10 and 11, 64-bit</small></span></header>
+      <a class="get" href="windows.html?get=installer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>Installer</b><small>Recommended</small></span></a>
+      <a class="get get--soft" href="windows.html?get=portable"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>Portable</b><small>One file, nothing installed</small></span></a>
+    </div>
+    <div class="dl-card reveal d2" data-os="linux">
+      <span class="yours-tag">Your computer</span>
+      <header><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <path d="M24 5c6 0 9 4.4 9 10v7c0 3 1.6 5 3.6 7.6 2.3 3 3.4 5.2 3.4 7.4 0 3.4-3 5-7 5-2.6 0-4-.7-5.2-1.4-1.2-.7-2.3-1.2-3.8-1.2s-2.6.5-3.8 1.2C19 41.3 17.6 42 15 42c-4 0-7-1.6-7-5 0-2.2 1.1-4.4 3.4-7.4C13.4 27 15 25 15 22v-7c0-5.6 3-10 9-10z" fill="#17153A"/>
+  <ellipse cx="24" cy="30" rx="7.5" ry="9.5" fill="#FFF7EC"/>
+  <circle cx="20.6" cy="15.5" r="2.6" fill="#fff"/><circle cx="27.4" cy="15.5" r="2.6" fill="#fff"/>
+  <circle cx="20.9" cy="16" r="1.3" fill="#17153A"/><circle cx="27.1" cy="16" r="1.3" fill="#17153A"/>
+  <path d="M24 18.4c1.9 0 3.2 1 3.2 2.1S25.9 22.8 24 22.8s-3.2-1.2-3.2-2.3 1.3-2.1 3.2-2.1z" fill="#FFBE18"/>
+</svg><span><b>Linux</b><small>64-bit Intel and AMD</small></span></header>
+      <a class="snap-badge" href="https://snapcraft.io/sukhi-play"><img src="https://snapcraft.io/en/dark/install.svg" alt="Get it from the Snap Store" height="56"></a>
+      <a class="get get--soft" href="linux.html?get=deb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>.deb</b><small>Ubuntu, Debian, Mint, Pop!_OS</small></span></a>
+      <a class="get get--soft" href="linux.html?get=appimage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span><b>.AppImage</b><small>Any other distribution</small></span></a>
+    </div>
+  </div>
+
+  <div class="verify reveal">
+    <header><span class="ic"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z" fill="#10D6A0"/><path d="M8.5 12.2l2.4 2.4 4.8-5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Verify your download</b>
+      <small>Every release publishes a fingerprint for each file in <a href="https://github.com/meSingh/sukhi-play/releases/latest/download/SHA256SUMS.txt">SHA256SUMS.txt</a>. Run the line for your system; the result must match.</small></span></header>
+    <pre><code><span class="c"># macOS</span>
+shasum -a 256 ~/Downloads/Sukhi-Play-macOS-*.dmg
+<span class="c"># Windows, in PowerShell</span>
+Get-FileHash ~\Downloads\Sukhi-Play-Windows-*.exe
+<span class="c"># Linux</span>
+sha256sum ~/Downloads/Sukhi-Play-Linux.*</code></pre>
+  </div>
+
+  <section style="padding-bottom:0">
+    <div class="section-head reveal">
+      <span class="kicker">Not sure?</span>
+      <h2>Which one do I need?</h2>
+      <p>Thirty seconds to find out. No tech knowledge needed.</p>
+    </div>
+
+    <div class="which-tabs" role="tablist">
+      <button type="button" role="tab" data-tab="mac" aria-selected="true"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="6" y="9" width="36" height="35" rx="10" fill="#17153A"/>
+  <rect x="6" y="4.5" width="36" height="35" rx="10" fill="#fff" stroke="#17153A" stroke-width="3"/>
+  <path transform="translate(12 10) " d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" stroke="#3B6BFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>Mac</button>
+      <button type="button" role="tab" data-tab="win" aria-selected="false"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <rect x="7" y="7" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+  <rect x="26" y="7" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="7" y="26" width="15" height="15" rx="2.5" fill="#17153A" opacity=".82"/>
+  <rect x="26" y="26" width="15" height="15" rx="2.5" fill="#3B6BFF"/>
+</svg>Windows</button>
+      <button type="button" role="tab" data-tab="linux" aria-selected="false"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+  <path d="M24 5c6 0 9 4.4 9 10v7c0 3 1.6 5 3.6 7.6 2.3 3 3.4 5.2 3.4 7.4 0 3.4-3 5-7 5-2.6 0-4-.7-5.2-1.4-1.2-.7-2.3-1.2-3.8-1.2s-2.6.5-3.8 1.2C19 41.3 17.6 42 15 42c-4 0-7-1.6-7-5 0-2.2 1.1-4.4 3.4-7.4C13.4 27 15 25 15 22v-7c0-5.6 3-10 9-10z" fill="#17153A"/>
+  <ellipse cx="24" cy="30" rx="7.5" ry="9.5" fill="#FFF7EC"/>
+  <circle cx="20.6" cy="15.5" r="2.6" fill="#fff"/><circle cx="27.4" cy="15.5" r="2.6" fill="#fff"/>
+  <circle cx="20.9" cy="16" r="1.3" fill="#17153A"/><circle cx="27.1" cy="16" r="1.3" fill="#17153A"/>
+  <path d="M24 18.4c1.9 0 3.2 1 3.2 2.1S25.9 22.8 24 22.8s-3.2-1.2-3.2-2.3 1.3-2.1 3.2-2.1z" fill="#FFBE18"/>
+</svg>Linux</button>
+    </div>
+
+    <div class="which-panel" data-panel="mac">
+      <div>
+        <h3>On a Mac</h3>
+        <ol class="steps">
+          <li>Click the Apple menu, in the top-left corner of the screen.</li>
+          <li>Choose <b>About This Mac</b>.</li>
+          <li>Look at the lines circled.</li>
+        </ol>
+        <div class="answer">
+          <div><span>Chip: <b>Apple</b> M1, M2, M3 or later</span><a class="pick" href="macos.html?get=apple-silicon" style="text-decoration:none">Apple Silicon</a></div>
+          <div><span>Processor: <b>Intel</b></span><a class="pick" href="macos.html?get=intel" style="text-decoration:none">Intel</a></div>
+          <div><span>macOS <b>10.15, 11 or 12</b> under the name</span><a class="pick" href="/macos.html#catalina" style="text-decoration:none">Older Mac build</a></div>
+        </div>
+      </div>
+      <div class="about" aria-hidden="true">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="body">
+          <svg class="laptop" viewBox="0 0 110 64"><rect x="14" y="2" width="82" height="52" rx="5" fill="#2B2B33"/><rect x="18" y="6" width="74" height="44" rx="2" fill="#8FB6FF"/><path d="M2 56h106l-5 6H7z" fill="#C7C7CE"/></svg>
+          <div class="nm">MacBook Air</div>
+          <div class="ver"><span class="hl">macOS Sequoia 15.2</span></div>
+          <dl>
+            <dt>Chip</dt><dd><span class="hl">Apple M2</span></dd>
+            <dt>Memory</dt><dd>8 GB</dd>
+            <dt>Serial number</dt><dd>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="which-panel" data-panel="win">
+      <div>
+        <h3>On Windows</h3>
+        <p style="color:var(--ink-soft)">Every current Windows computer works. The only choice is how you want it.</p>
+        <div class="answer">
+          <div><span><b>Installer.</b> Appears in the Start menu like any app.</span><a class="pick" href="windows.html?get=installer" style="text-decoration:none">Pick this if unsure</a></div>
+          <div><span><b>Portable.</b> A single file you can run from anywhere, even a USB stick. Nothing installed.</span></div>
+        </div>
+        <p style="color:var(--ink-soft);font-size:15px;margin-top:16px">Very old computer? Open <b>Settings</b> &rarr; <b>System</b> &rarr; <b>About</b>. It needs a <b>64-bit operating system</b>.</p>
+      </div>
+      <div class="winsys" aria-hidden="true">
+        <div class="bar">Settings</div>
+        <div class="body">
+          <div class="crumb">System &rsaquo; About</div>
+          <dl>
+            <dt>Device name</dt><dd>FAMILY-PC</dd>
+            <dt>Processor</dt><dd>Intel Core i5</dd>
+            <dt>System type</dt><dd><span class="hl" style="position:relative">64-bit operating system</span></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="which-panel" data-panel="linux">
+      <div>
+        <h3>On Linux</h3>
+        <div class="answer">
+          <div><span>Using <b>Ubuntu</b>?</span><a class="pick" href="https://snapcraft.io/sukhi-play" style="text-decoration:none">Snap Store</a></div>
+          <div><span><b>Debian, Mint, Pop!_OS</b> or similar?</span><a class="pick" href="linux.html?get=deb" style="text-decoration:none">.deb</a></div>
+          <div><span>Something else?</span><a class="pick" href="linux.html?get=appimage" style="text-decoration:none">.AppImage</a></div>
+        </div>
+        <p style="color:var(--ink-soft);font-size:15px;margin-top:16px">On Ubuntu you can also open <b>App Center</b> and search for <b>Sukhi Play</b>.
+          Want Alt+Tab locked too? The .deb does that; the Snap can&rsquo;t. <a href="/linux.html">Why</a></p>
+      </div>
+      <div class="formats" style="grid-template-columns:1fr">
+        <a href="https://snapcraft.io/sukhi-play"><b>Snap</b><span>Updates itself. Restricted permissions.</span></a>
+        <a href="linux.html?get=deb"><b>.deb</b><span>Double-click to install. Locks desktop shortcuts too.</span></a>
+        <a href="linux.html?get=appimage"><b>.AppImage</b><span>Make it executable, then run it. Works anywhere.</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+</Base>
+
+<script is:inline>
+/* Reveal on scroll, and mark the visitor's own platform. Both are decoration:
+   without this script every section is visible and every link works. */
+(function () {
+  var root = document.documentElement;
+  var ua = navigator.userAgent;
+  var plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+  var touch = navigator.maxTouchPoints > 1;
+  var os = /Android|iPhone|iPad/i.test(ua) ? null
+    : /Mac/i.test(plat + ua) && !touch ? 'mac'
+    : /Win/i.test(plat + ua) ? 'win'
+    : /Linux|X11|CrOS/i.test(plat + ua) ? 'linux' : null;
+  window.SUKHI_OS = os;
+
+  // Phone menu: the nav slides in from the side instead of wrapping.
+  var menuBtn = document.querySelector('.menu-btn');
+  var scrim = document.querySelector('.nav-scrim');
+  var setMenu = function (open) {
+    root.classList.toggle('nav-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    scrim.hidden = !open;
+    if (open) document.getElementById('site-nav').focus({ preventScroll: true });
+  };
+  if (menuBtn) {
+    menuBtn.addEventListener('click', function () { setMenu(true); });
+    document.querySelector('.menu-close').addEventListener('click', function () { setMenu(false); menuBtn.focus(); });
+    scrim.addEventListener('click', function () { setMenu(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('nav-open')) { setMenu(false); menuBtn.focus(); } });
+    window.matchMedia('(min-width: 621px)').addEventListener('change', function (m) { if (m.matches) setMenu(false); });
+  }
+  if (os) {
+    document.querySelectorAll('[data-os="' + os + '"]').forEach(function (el) {
+      el.classList.add('yours');
+      var tag = el.querySelector('.yours[hidden]');
+      if (tag) tag.hidden = false;
+    });
+  }
+
+  var els = document.querySelectorAll('.reveal, .vault');
+  if (!('IntersectionObserver' in window) ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // Only now hide them, so nothing can leave the page blank.
+  root.classList.add('js');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+<script is:inline>
+(function () {
+  var tabs = [].slice.call(document.querySelectorAll('.which-tabs button'));
+  var panels = [].slice.call(document.querySelectorAll('.which-panel'));
+  function show(name) {
+    tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.tab === name)); });
+    panels.forEach(function (p) { p.hidden = p.dataset.panel !== name; });
+  }
+  tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.dataset.tab); }); });
+  show(window.SUKHI_OS || 'mac');
+})();
+</script>

@@ -1,0 +1,133 @@
+---
+import Base from '../layouts/Base.astro';
+import Feature from '../components/Feature.astro';
+import { REPO } from '../site';
+
+import launcher from '../images/01-launcher.png';
+import portal from '../images/02-parent-portal.png';
+import addApp from '../images/03-add-an-app.png';
+import suggestions from '../images/04-catalogue.png';
+import closing from '../images/05-closing-needs-a-grownup.png';
+import firstRun from '../images/00-first-run.png';
+
+// The short ones. Everything above is shown; these are the rest, said once.
+const REST = [
+  {
+    h: 'Add any site by its address',
+    p: 'Paste an address and Sukhi Play works out what the site needs, suggests a name and a picture, and lets you change all of it before you save.'
+  },
+  {
+    h: 'No favicons, no logos',
+    p: 'Every tile is a shape and a colour we drew. Nothing is fetched from the sites you add, so nothing on your screen is theirs to change.'
+  },
+  {
+    h: 'More time without changing the rule',
+    p: 'Grant fifteen minutes, an hour, or the rest of the day. It applies to this session only; tomorrow starts from your usual limit again.'
+  },
+  {
+    h: 'Keyboard shortcuts held down',
+    p: 'Alt+Tab, Alt+F4, Command+Q, Print Screen and the rest are caught while the window has focus. The one exception is the Windows key, and we say so plainly.'
+  },
+  {
+    h: 'No downloads, no popups, no new windows',
+    p: 'A site cannot open a window, start a download, or ask for your camera. The one thing that may write a file is a bundled app saving a picture.'
+  },
+  {
+    h: 'Nothing is sent anywhere',
+    p: 'No analytics, no accounts, no telemetry, no crash reporting. The only request Sukhi Play makes on its own is checking for a newer version, and only when you press the button.'
+  }
+];
+---
+
+<Base
+  title="Everything Sukhi Play does"
+  description="A locked screen, a play-time limit that ends by itself, adverts filtered, apps that work with no internet, and a grown-up gate a three-year-old cannot pass. Free and open source."
+  page="features">
+
+  <main>
+    <div class="wrap">
+      <div class="hero hero--page">
+        <h1>Everything it does</h1>
+        <p class="lede">One screen, locked to the sites you chose, that gives
+          itself back when the time is up. Every picture below is the real app.</p>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="wrap">
+        <Feature title="The screen is only what you chose" shot={launcher}
+                 alt="The Sukhi Play tile screen: six large coloured tiles, each a site a parent added.">
+          <p>Sukhi Play fills the display. There is no address bar to type into,
+            no new tab, no back button out of it, and no link that leads anywhere
+            you did not allow.</p>
+          <p>A child who taps everything finds only the tiles you put there.</p>
+        </Feature>
+
+        <Feature title="A grown-up screen behind a real gate" shot={portal} flip
+                 alt="The grown-up screen, with tabs for play time, installed apps, the catalogue and settings."
+                 note="Play time, the apps, the catalogue and every setting live here.">
+          <p>Everything a parent decides is in one place, and a child cannot
+            reach it. Getting in means holding a button for three seconds — or
+            answering a small sum, if your child has worked the hold out.</p>
+        </Feature>
+
+        <Feature title="Play time that ends by itself" shot={closing}
+                 alt="The screen shown when play time is over, offering to ask a grown-up for more."
+                 note="The countdown only appears in the last thirty seconds, so there is nothing to watch or bargain with.">
+          <p>Set how long a session lasts. It starts again every time the app
+            opens, and stops on its own — no argument, because it was never your
+            decision in the moment.</p>
+          <p>When it ends you can grant fifteen minutes, an hour, or the rest of
+            the day. Your usual limit does not move.</p>
+        </Feature>
+
+        <Feature title="A catalogue to start from" shot={suggestions} flip
+                 alt="The catalogue inside the app: cards for sites that are known to work.">
+          <p>Sites that are known to work, already set up, with the hosts each
+            one needs filled in. Three of them are not sites at all — a colouring
+            book, a keyboard playground and a set of first games ship inside the
+            download and work with no internet.</p>
+          <p><a href="/catalogue.html">Have a look at the catalogue</a>. It is a
+            compatibility list, not a recommendation.</p>
+        </Feature>
+
+        <Feature title="Adding your own takes a minute" shot={addApp}
+                 alt="The add-an-app form, with a name, a picture, a colour and an address."
+                 note="Advert filtering is on by default, and you can turn it off for a site whose terms ask you to.">
+          <p>Paste an address. Sukhi Play loads the site, works out which hosts
+            it actually needs, and suggests a name and a picture. Change any of
+            it before you save.</p>
+        </Feature>
+
+        <Feature title="It sets itself up the first time" shot={firstRun} flip
+                 alt="The first-run walkthrough, asking whether to start from the catalogue.">
+          <p>The first run walks you through picking a few sites and choosing how
+            you will get back in. After that it opens straight onto the tiles.</p>
+        </Feature>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <h2 class="sec-title">And the rest of it</h2>
+      <div class="feat-list">
+        {REST.map((r) => (
+          <div class="feat-row">
+            <h3>{r.h}</h3>
+            <p>{r.p}</p>
+          </div>
+        ))}
+        <div class="feat-row">
+          <h3>Free, and open source</h3>
+          <p>MIT licensed. Every line is on <a href={REPO}>GitHub</a>, including
+            the bits that decide what your child can reach.</p>
+        </div>
+      </div>
+
+      <div class="feat-cta">
+        <h2>Ready when you are</h2>
+        <p>macOS, Windows and Linux. No account, no payment, no trial.</p>
+        <a class="big-dl" href="/download.html">Download Sukhi Play</a>
+      </div>
+    </div>
+  </main>
+</Base>

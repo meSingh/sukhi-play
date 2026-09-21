@@ -1,0 +1,30 @@
+---
+/** Every page: the head, the header, the footer, and the one stylesheet. */
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/site.css';
+
+interface Props {
+  title: string;
+  description: string;
+  page?: string;
+}
+const { title, description, page } = Astro.props;
+---
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <link rel="icon" href="/assets/sukhi-icon.png">
+  <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)}>
+  <script is:inline>document.documentElement.classList.remove('no-js')</script>
+</head>
+<body>
+  <Nav page={page} />
+  <slot />
+  <Footer />
+</body>
+</html>

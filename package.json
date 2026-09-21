@@ -21,7 +21,7 @@
     "probe": "electron . --probe=",
     "metainfo": "node scripts/make-metainfo.js",
     "diagnose": "electron . --diagnose",
-    "catalogue": "node scripts/build-catalogue.js",
+    "catalogue": "npm run site",
     "demo": "node scripts/demo.js",
     "shots": "node scripts/shots.js",
     "flathub:lint": "node scripts/flathub-lint.js",
@@ -32,8 +32,8 @@
     "start-probe": "electron . --start-probe",
     "dist:mac:catalina": "electron-builder --config electron-builder.catalina.yml --mac --publish never",
     "dist:mac:all": "npm run dist:mac && npm run dist:mac:catalina",
-    "nav": "node scripts/build-nav.js",
-    "site": "npm run nav && npm run catalogue"
+    "site": "npm --prefix web run build",
+    "site:dev": "npm --prefix web run dev"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

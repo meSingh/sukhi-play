@@ -11,3 +11,7 @@ build/linux/*.metainfo.xml
 # The Catalina build output.
 dist-catalina/
 dist-legacy*/
+
+# The Astro site's dependencies. The built output in docs/ is committed.
+web/node_modules/
+web/.astro/
