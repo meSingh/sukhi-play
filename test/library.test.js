@@ -142,3 +142,26 @@ test('tile names stay short enough to read', () => {
   assert.equal(prettyTitle('The Very Best Free Online Games For Everyone', 'https://poki.com/'), 'Poki');
   assert.equal(prettyTitle('', 'https://scratch.mit.edu/'), 'Mit');
 });
+
+test('a fresh install ships the bundled apps, switched on', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const ROOT = path.join(__dirname, '..');
+  const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'catalog.json'), 'utf8'));
+  const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'bundled.json'), 'utf8'));
+
+  assert.ok(raw.apps.length > 0, 'a first run should have something on the screen');
+
+  for (const app of raw.apps) {
+    // Only the apps that ship inside the download may be on by default. A
+    // website would mean choosing a destination and accepting somebody's
+    // terms on the parent's behalf, which this project does not do.
+    assert.match(app.url, /^sukhiplay:\/\//,
+      `${app.id} is a website and must not ship enabled`);
+    assert.equal(app.enabled, true, `${app.id} should be on by default`);
+
+    const id = new URL(app.url).hostname;
+    assert.ok(manifest.apps.some((b) => b.id === id),
+      `${app.id} points at ${id}, which is not in config/bundled.json`);
+  }
+});

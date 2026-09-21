@@ -1118,6 +1118,52 @@ async function runPortalShots () {
     console.log(`[PORTAL] ${tab} ${fit}`);
   }
 
+  // The waiting screen, over a site that is deliberately slow to answer. A
+  // blank rectangle and a loading screen look identical in a screenshot taken
+  // at the wrong moment, so this one is timed against a server that holds the
+  // response open.
+  const http = require('node:http');
+  const slow = http.createServer((_req, res) => {
+    setTimeout(() => {
+      res.writeHead(200, { 'content-type': 'text/html' });
+      res.end('<!doctype html><title>Slow</title><h1>Finally.</h1>');
+    }, 2600);
+  });
+  await new Promise((r) => slow.listen(0, '127.0.0.1', r));
+  const slowUrl = `http://127.0.0.1:${slow.address().port}/`;
+
+  const added = await ipcCall('shell:add-site', {
+    title: 'Slow Site', url: slowUrl, shape: 'cloud', color: '#0ea5e9',
+    allowHosts: ['127.0.0.1'], denyHosts: [], blockAds: true
+  });
+  if (added && added.app) {
+    await ipcCall('shell:launch', added.app.id);
+    await sleep(700);
+    const waiting = await js(`(() => {
+      const on = document.getElementById('app').classList.contains('is-loading');
+      const card = document.getElementById('loading');
+      const r = card.getBoundingClientRect();
+      return JSON.stringify({
+        showing: on,
+        covers: Math.round(r.width) + 'x' + Math.round(r.height),
+        says: document.getElementById('loading-name').textContent
+      });
+    })()`);
+    console.log(`[PORTAL] waiting ${waiting}`);
+    const wait = await shellApp.shellView.webContents.capturePage();
+    fs.writeFileSync(path.join(PORTAL_SHOTS, 'loading.png'), wait.toPNG());
+
+    // And it must go away once the page arrives.
+    await sleep(2600);
+    const after = await js(`(() => JSON.stringify({
+      stillShowing: document.getElementById('app').classList.contains('is-loading')
+    }))()`);
+    console.log(`[PORTAL] after load ${after}`);
+    shellApp.goHome();
+    await sleep(400);
+  }
+  slow.close();
+
   // The stop screen itself, which covers the whole window. A parent who is
   // not granting more time has to be able to close the app from here; without
   // that button there was no way out of it at all.

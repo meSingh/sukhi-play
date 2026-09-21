@@ -195,6 +195,17 @@
     </button>
   </header>
 
+  <!-- Between pressing a tile and the page being ready. Without this a child
+       sees a blank rectangle and cannot tell waiting from broken. -->
+  <section id="loading" class="screen">
+    <div class="loading-card">
+      <span class="loading-badge" id="loading-badge" aria-hidden="true"></span>
+      <p class="loading-name" id="loading-name">Opening</p>
+      <span class="loading-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <p class="loading-note">Just a moment&hellip;</p>
+    </div>
+  </section>
+
   <!-- ============ grown-ups only ============ -->
   <!-- Play time is over. Nothing here works without a grown-up. -->
   <section id="timeup" class="screen">

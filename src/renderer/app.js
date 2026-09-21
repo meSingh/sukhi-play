@@ -120,11 +120,43 @@ async function launch (tile, appId) {
 
 /* ---------------- state from main ---------------- */
 
+/**
+ * The waiting screen, between pressing a tile and the page being ready.
+ *
+ * It wears the tile's own colour and picture, so the wait belongs to the thing
+ * the child just pressed rather than being a generic spinner they have no
+ * reason to connect with it.
+ */
+function paintLoading (state) {
+  const on = Boolean(state.loading);
+  app.classList.toggle('is-loading', on);
+  if (!on) return;
+
+  const info = state.loadingApp || {};
+  const badge = el('loading-badge');
+  const name = el('loading-name');
+  if (!badge || !name) return;
+
+  // Only repaint when it is a different app, so the bob does not restart on
+  // every state push while a slow site is still coming.
+  if (badge.dataset.for === (info.title || '')) return;
+  badge.dataset.for = info.title || '';
+
+  badge.style.setProperty('--load-color', info.color || '');
+  app.style.setProperty('--load-color', info.color || '');
+  badge.textContent = '';
+  badge.appendChild(shapeIcon(info.shape));
+  name.textContent = info.title || 'Opening';
+}
+
+
 function applyState (state) {
   if (!state) return;
   app.dataset.mode = state.mode;
   if (state.gateIntent) gateIntent = state.gateIntent;
   if (state.mode === 'gate' && !gatePassed) describeGate();
+
+  paintLoading(state);
 
   // "Back" and "Stop this game" are only distinguishable if we know whether a
   // game is actually open. When none is, "stop" is meaningless and is hidden

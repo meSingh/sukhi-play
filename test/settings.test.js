@@ -64,3 +64,20 @@ test('the sum gate is a setting the file can carry', () => {
   assert.equal(coerce({ gateMode: 'fingerprint' }).gateMode, 'hold');
 });
 
+
+test('the shipped defaults survive being loaded and sanitised', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const { parse } = require('../src/main/catalog');
+  const file = path.join(__dirname, '..', 'config', 'catalog.json');
+  const apps = parse(fs.readFileSync(file, 'utf8'));
+
+  // A default that sanitises away would leave a first run with a blank screen
+  // and nothing in the log to say why.
+  const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
+  assert.equal(apps.length, raw.apps.length, 'every shipped default should survive');
+  for (const app of apps) {
+    assert.equal(app.bundled, true);
+    assert.equal(app.enabled, true);
+  }
+});

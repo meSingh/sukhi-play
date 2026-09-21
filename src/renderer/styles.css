@@ -1831,3 +1831,51 @@ img, svg { -webkit-user-drag: none; }
 }
 .quit-btn svg { width: 17px; height: 17px; }
 .quit-btn:hover { background: #FFF5F7; }
+
+/* ---------------- waiting for a site ---------------- */
+
+/* Shown over the blank page between pressing a tile and the page arriving.
+   A small child cannot tell "loading" from "broken", and a white rectangle
+   that lasts four seconds is indistinguishable from one that lasts forever. */
+#loading {
+  position: absolute; inset: 0; z-index: 4;
+  display: none; align-items: center; justify-content: center;
+  background: var(--base);
+}
+#app.is-loading #loading { display: flex; }
+
+.loading-card { display: grid; justify-items: center; gap: 18px; text-align: center; }
+
+/* The tile they just pressed, so the wait belongs to the thing they chose. */
+.loading-badge {
+  display: grid; place-items: center;
+  width: 118px; height: 118px; border-radius: 34px;
+  background: var(--load-color, var(--blue));
+  box-shadow: 0 16px 34px rgba(23, 21, 58, .18);
+  animation: loadbob 1.6s ease-in-out infinite;
+}
+.loading-badge svg { width: 58px; height: 58px; fill: #fff; }
+@keyframes loadbob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-9px) scale(1.03); }
+}
+
+.loading-name { margin: 0; font-size: 27px; font-weight: 900; color: var(--ink); }
+.loading-note { margin: 0; font-size: 15px; font-weight: 700; color: var(--ink-soft); }
+
+.loading-dots { display: flex; gap: 9px; }
+.loading-dots i {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--load-color, var(--blue)); opacity: .3;
+  animation: loaddot 1.1s ease-in-out infinite;
+}
+.loading-dots i:nth-child(2) { animation-delay: .16s; }
+.loading-dots i:nth-child(3) { animation-delay: .32s; }
+@keyframes loaddot {
+  0%, 100% { opacity: .28; transform: translateY(0); }
+  40%      { opacity: 1; transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-badge, .loading-dots i { animation: none; }
+}

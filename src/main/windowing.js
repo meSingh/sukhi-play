@@ -394,6 +394,14 @@ class Shell {
     const BAR = this.barHeight || BAR_HEIGHT;
 
     if (this.mode === 'playing' && this.gameView) {
+      // While a site is still loading the shell keeps the whole window, so it
+      // can hold a waiting screen over the blank page underneath. A small
+      // child staring at white has no way to tell "loading" from "broken".
+      if (this.loading) {
+        this.shellView.setBounds({ x: 0, y: 0, width, height });
+        this.gameView.setBounds({ x: 0, y: BAR, width, height: Math.max(0, height - BAR) });
+        return;
+      }
       const bar = this.htmlFullscreen ? 0 : BAR;
       this.shellView.setBounds({ x: 0, y: 0, width, height: bar });
       this.gameView.setBounds({ x: 0, y: bar, width, height: Math.max(0, height - bar) });
@@ -429,6 +437,10 @@ class Shell {
       activeAppId: this.activeApp ? this.activeApp.id : null,
       activeAppTitle: this.activeApp ? this.activeApp.title : null,
       htmlFullscreen: this.htmlFullscreen,
+      // True between pressing a tile and the page being ready, with enough
+      // about the app to show whose tile is opening.
+      loading: Boolean(this.loading),
+      loadingApp: this.loading ? this.loadingApp : null,
       blocked: this.policy.totalBlocked,
       counts: this.policy.counts,
       // Set by index.js when a session limit is running; null when there is
@@ -545,9 +557,47 @@ class Shell {
 
     contents.once('did-finish-load', () => { if (isCurrent()) this.gameStarted = true; });
 
+    /**
+     * Ends the waiting screen.
+     *
+     * `dom-ready` rather than `did-finish-load`: a page is usable once its
+     * document is there, and waiting for every last image on a slow line
+     * would hold the curtain closed over a site that is already playing.
+     */
+    const doneLoading = () => {
+      if (!isCurrent() || !this.loading) return;
+      this.loading = false;
+      clearTimeout(this.loadingTimer);
+      this.layout();
+      this.pushState();
+      focusGame();
+    };
+    contents.on('dom-ready', doneLoading);
+    contents.on('did-finish-load', doneLoading);
+    contents.on('did-fail-load', (_e, code, _d, _u, isMainFrame) => {
+      // -20 is our own blocking, which the failure handler above already
+      // decides about. Anything else that stops the main frame means no page
+      // is coming, so the curtain must not stay up over nothing.
+      if (isMainFrame && code !== -20) doneLoading();
+    });
+
     // Order matters: game first, shell re-added so it stays on top for the gate.
     this.win.contentView.addChildView(this.gameView);
     this.win.contentView.addChildView(this.shellView);
+
+    // Held until the page is ready, or until the wait is long enough that
+    // something has plainly gone wrong and a child should be let back out.
+    this.loading = true;
+    this.loadingApp = { title: appEntry.title, color: appEntry.color, shape: appEntry.shape };
+    clearTimeout(this.loadingTimer);
+    this.loadingTimer = setTimeout(() => {
+      if (!this.loading) return;
+      console.warn(`[game] ${appEntry.id} is still not loading after 20s`);
+      this.loading = false;
+      this.layout();
+      this.goHome();
+      this.toast('That is taking too long. Try again in a moment.');
+    }, 20000);
 
     contents.loadURL(appEntry.url).catch((err) => {
       console.warn('[game] loadURL rejected:', err.message);
@@ -574,6 +624,10 @@ class Shell {
 
   goHome () {
     this.destroyGameView();
+    // Going home during a load leaves the curtain up over the launcher.
+    this.loading = false;
+    this.loadingApp = null;
+    clearTimeout(this.loadingTimer);
     this.activeApp = null;
     this.policy.clear();
     this.htmlFullscreen = false;
