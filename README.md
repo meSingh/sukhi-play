@@ -127,39 +127,35 @@ grown-up* and it walks you through four short steps:
 That is the whole setup. Afterwards the walkthrough never appears again, and the
 tile screen is what opens.
 
-If the tile screen is ever empty it says so plainly and offers an **Add games**
-button that takes you to the grown-up screen, with no hunting through files.
+If the tile screen is ever empty it says so plainly and offers a button that
+takes you to the grown-up screen, with no hunting through files.
 
 ## Adding and removing sites
 
-**Sukhi Play ships with an empty launcher.** It does not pick sites for you. But
-it does make picking easy, and you never need to work out hostnames yourself.
+**Sukhi Play does not pick websites for you.** What it ships enabled is the
+three apps that live inside the download -- a colouring book, a keyboard
+playground and first games -- because those are files on your own disk with no
+network behind them and nobody's terms to accept. Every website is yours to
+add, and you never need to work out hostnames yourself.
 
-Open the grown-up screen (**For grown-ups**, hold 3 seconds) → **Add or remove
-games**. Three tabs:
+Open the grown-up screen (**Grown-ups**, hold 3 seconds). Four tabs: play time,
+installed apps, the catalogue, and settings.
 
-### Suggestions, in one tap
+### The catalogue, in one tap
 
-A bundled list of sites other parents use, grouped by category, each labelled
-**no ads** or **has ads**. Tap *Add* and it appears on the tile screen.
+Sites that are known to work, grouped by category and labelled **no ads**,
+**ads filtered** or **ads showing**. Tap one and it arrives on the tile screen
+with the hosts it needs already filled in.
 
-Nothing here is installed, enabled, or endorsed by this project, and none of
-these sites is connected to it. Read [DISCLAIMER.md](DISCLAIMER.md).
+The list is not reproduced here: it would drift the moment it changed, and it
+has. It lives at **[sukhiplay.com/catalogue](https://sukhiplay.com/catalogue/)**
+and in [config/suggestions.json](config/suggestions.json), which is the one file
+both the app and the site are built from.
 
-| | Site | |
-| --- | --- | --- |
-| Creative | Scratch | MIT, non-profit, no advertising |
-| Learning | Blockly Games | Open source puzzles that teach programming |
-| Learning | NASA Space Place | US government, no advertising |
-| Learning | Starfall | Letters, phonics, early reading |
-| Learning | Nat Geo Kids | Animals and photography |
-| Learning | ABCya | Educational games by grade, ad-supported |
-| Games | PBS Kids | US public broadcasting, made for pre-schoolers |
-| Games | Toy Theater | Simple educational games |
-| Games | Poki | Large free game portal, ad-supported |
-| Video | YouTube Kids | Ad filtering **off** by design, see below |
+Nothing in it is endorsed by this project, and none of those sites is connected
+to it. Read [DISCLAIMER.md](DISCLAIMER.md).
 
-### Add an app: type an address and it works out the rest
+### Create a custom app: type an address and it works out the rest
 
 Type `pbskids.org`. The app opens it once, watches every request it makes, and
 tells you:
@@ -169,7 +165,7 @@ Found 1 host. 2 looked like advertising or tracking and will be blocked.
   pbskids.org
 ```
 
-Give the tile a name, press **Add**, and it writes the allowlist for you. This
+Give the tile a name, press **Save**, and it writes the allowlist for you. This
 is the same machinery as `npm run check`, driven from the interface. Pick one of
 the sixteen shapes and a colour for the tile: a site's own favicon is its
 trademark, and this project has no licence to put one on a tile or in a

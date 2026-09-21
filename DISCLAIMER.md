@@ -34,11 +34,20 @@ The project is not named after, branded after, or designed around any third
 party's service. No third party's logo, artwork, or trademark appears in the
 application, its icon, or its user interface.
 
-## No site is enabled by default
+## No website is enabled by default
 
-**The application ships with an empty launcher.** Nothing loads until a parent
-explicitly adds a site. This is enforced in continuous integration: a build
-fails if the shipped catalog enables anything.
+**No third-party website is enabled until a parent adds it.** Nothing on the
+network loads until then. This is enforced in continuous integration: a build
+fails if the shipped catalog enables any website.
+
+What the application does ship enabled is a small number of **open-source apps
+included in the download itself** -- currently a colouring book, a keyboard
+playground and a set of first games. They are files on the user's own disk.
+They make no network requests of any kind, there is no operator behind them and
+no terms of service to accept, and each is included under its own licence with
+its author credited in the interface and in NOTICE. Enabling those is not a
+recommendation about anybody else's service; it is the application shipping
+with its own contents.
 
 ### About the suggestions list
 
