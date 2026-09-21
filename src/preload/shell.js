@@ -34,6 +34,12 @@ contextBridge.exposeInMainWorld('sukhi', {
   /** Submit a PIN, only used when gateMode is "pin". Resolves { ok, message }. */
   answerGate: (answer) => ipcRenderer.invoke('shell:answer-gate', String(answer)),
 
+  /** Hold only, or hold and a sum, before the grown-up screen opens. */
+  setGateMode: (mode) => ipcRenderer.invoke('shell:set-gate-mode', String(mode)),
+
+  /** Put the suggested settings back. Parent only. */
+  useRecommended: () => ipcRenderer.invoke('shell:use-recommended'),
+
   /** Grant another session after the play time ran out. Parent only. */
   moreTime: () => ipcRenderer.invoke('shell:more-time'),
 

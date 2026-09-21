@@ -231,7 +231,7 @@
       <!-- Optional PIN, when one is set. -->
       <div id="gate-step-answer" hidden>
         <header class="gate-head">
-          <h2>Enter your PIN</h2>
+          <h2 id="gate-answer-title">One more thing</h2>
         </header>
         <p class="gate-hint" id="gate-prompt">Enter the parent PIN</p>
         <input id="gate-input" class="gate-input" type="text" inputmode="numeric"
@@ -475,6 +475,26 @@
               <button id="check-update" class="ghost-btn" type="button">Check for updates</button>
             </div>
             <p class="update-note" id="update-note"></p>
+
+            <div class="setting">
+              <div class="setting-text">
+                <b>Getting in here</b>
+                <span>What a grown-up does before this screen opens.</span>
+              </div>
+              <div class="seg" id="gate-mode" role="group" aria-label="Way in">
+                <button type="button" data-mode="hold">Hold only</button>
+                <button type="button" data-mode="sum">Hold and a sum</button>
+              </div>
+            </div>
+            <p class="sec-note" id="gate-mode-note"></p>
+
+            <div class="setting">
+              <div class="setting-text">
+                <b>Recommended settings</b>
+                <span>Twenty minutes of play, and a sum on the way in.</span>
+              </div>
+              <button id="use-recommended" class="ghost-btn" type="button">Use these</button>
+            </div>
 
             <div class="setting">
               <div class="setting-text">

@@ -161,6 +161,21 @@ function showPortalTab (name) {
   }
 }
 
+/** Shows which way in is set, and says what it means. */
+function paintGateMode () {
+  const mode = (config && config.settings.gateMode) || 'hold';
+  for (const b of document.querySelectorAll('#gate-mode button')) {
+    b.classList.toggle('on', b.dataset.mode === mode);
+  }
+  const note = el('gate-mode-note');
+  if (!note) return;
+  note.textContent = mode === 'sum'
+    ? 'After the hold, you answer a small addition such as 7 + 5. A child who has learned to hold the button has not learned to add.'
+    : mode === 'pin'
+      ? 'A PIN is set in settings.json, and is asked after the hold.'
+      : 'Holding the button for three seconds is the whole check.';
+}
+
 /* ---------------- the play clock ---------------- */
 
 /**
@@ -319,7 +334,9 @@ async function revealChallenge () {
 
   el('gate-step-hold').hidden = true;
 
-  if (result.needsPin) {
+  if (result.needsAnswer || result.needsPin) {
+    el('gate-answer-title').textContent =
+      config && config.settings.gateMode === 'sum' ? 'One more thing' : 'Enter your PIN';
     el('gate-prompt').textContent = result.prompt || 'Enter the parent PIN';
     el('gate-step-answer').hidden = false;
     el('gate-input').focus();
@@ -1022,6 +1039,9 @@ async function submitAnswer () {
   }
   el('gate-input').value = '';
   el('gate-error').textContent = (result && result.message) || 'Not quite.';
+  // A wrong answer gets a different pair, so guessing the same number twice
+  // cannot work.
+  if (result && result.prompt) el('gate-prompt').textContent = result.prompt;
   if (result && result.locked) {
     el('gate-step-hold').hidden = false;
     el('gate-step-answer').hidden = true;
@@ -1167,6 +1187,28 @@ function wire () {
     tab.addEventListener('click', () => showPortalTab(tab.dataset.tab));
   }
 
+  for (const b of document.querySelectorAll('#gate-mode button')) {
+    b.addEventListener('click', async () => {
+      const r = await api.setGateMode(b.dataset.mode);
+      if (!r || !r.ok) return showToast((r && r.message) || 'Could not save that.');
+      config.settings.gateMode = r.gateMode;
+      paintGateMode();
+      showToast(r.gateMode === 'sum'
+        ? 'A sum is asked after the hold.'
+        : 'Holding the button is the whole check.');
+    });
+  }
+
+  on('use-recommended', 'click', async () => {
+    const r = await api.useRecommended();
+    if (!r || !r.ok) return showToast((r && r.message) || 'Could not save those.');
+    config.settings.sessionMinutes = r.sessionMinutes;
+    config.settings.gateMode = r.gateMode;
+    paintGateMode();
+    applyClock(r.clock);
+    showToast('Recommended settings are in place.');
+  });
+
   for (const chip of document.querySelectorAll('#time-chips button')) {
     chip.addEventListener('click', async () => {
       const r = await api.setSessionMinutes(chip.dataset.min);
@@ -1234,6 +1276,7 @@ async function boot () {
   el('check-update').hidden = Boolean(config.storeBuild);
   el('settings-version').textContent = `Sukhi Play v${config.version}`;
   paintChips(config.settings.sessionMinutes || 0);
+  paintGateMode();
   el('hold-secs').textContent = String(config.settings.holdSeconds);
 
   // Hold the splash briefly so it reads as a loading screen rather than a blink.

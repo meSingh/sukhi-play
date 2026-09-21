@@ -56,6 +56,12 @@ const KEY_PROBE = process.argv.includes('--key-probe');
 // the Start menu was closed and the window came back to the front.
 const START_PROBE = process.argv.includes('--start-probe');
 
+// `--gate-check` walks the grown-up gate the way a parent does: hold the
+// button, answer the sum wrongly, then correctly, and report what happened.
+// The gate is the one thing in here that keeps a child out, so it is worth
+// being able to watch it work rather than trusting that it does.
+const GATE_CHECK = process.argv.includes('--gate-check');
+
 // `--demo=DIR` records the app for the website: it drives the real screens and
 // writes a PNG per frame. No mock, no reconstruction, and a throwaway profile
 // so the recording never contains anyone's own list of sites.
@@ -70,7 +76,7 @@ const SHOTS_DIR = SHOTS_ARG ? SHOTS_ARG.slice('--shots='.length) : null;
 // app is a windowed program: its output usually never reaches the terminal it
 // was started from. A file can be attached to a bug report by anyone.
 const REPORT_NAME = DIAGNOSE ? 'diagnose' : COVER_PROBE ? 'cover-probe' : KEY_PROBE ? 'key-probe'
-  : START_PROBE ? 'start-probe' : null;
+  : START_PROBE ? 'start-probe' : GATE_CHECK ? 'gate-check' : null;
 const reportLines = [];
 if (REPORT_NAME) {
   const log = console.log.bind(console);
@@ -136,6 +142,9 @@ const gate = {
   openedAt: 0,
   wrongAttempts: 0,
   lockedUntil: 0,
+  // The addition currently being asked, when gateMode is 'sum'. Generated
+  // here, never in the page: a check the page could read is not a check.
+  sum: null,
   // Set once the grown-up has answered correctly. Quitting is only honoured
   // while this is true, and it expires so a solved gate left open on the couch
   // does not stay solved.
@@ -169,6 +178,47 @@ function holdSatisfied () {
   const required = settings.holdSeconds * 1000;
   // A small tolerance for the renderer's animation frame timing.
   return (Date.now() - gate.openedAt) >= (required - 250);
+}
+
+/**
+ * Makes up the addition a grown-up is asked after the hold.
+ *
+ * Both numbers are at least two, and the total is kept under twenty, so it is
+ * a question any adult answers without thinking and a small child cannot.
+ */
+function newSum () {
+  const pick = () => 2 + crypto.randomInt(8);      // 2..9
+  const a = pick();
+  const b = pick();
+  gate.sum = { a, b, answer: a + b };
+  return gate.sum;
+}
+
+function checkSum (given) {
+  const now = Date.now();
+  if (now < gate.lockedUntil) {
+    const seconds = Math.ceil((gate.lockedUntil - now) / 1000);
+    return { ok: false, message: `Wait ${seconds}s and try again.` };
+  }
+  if (!gate.sum) return { ok: false, message: 'Hold the button first.' };
+
+  if (Number(String(given).trim()) === gate.sum.answer) {
+    gate.wrongAttempts = 0;
+    gate.sum = null;
+    gate.unlockedUntil = Date.now() + UNLOCK_WINDOW_MS;
+    return { ok: true };
+  }
+
+  gate.wrongAttempts += 1;
+  if (gate.wrongAttempts >= 3) {
+    gate.wrongAttempts = 0;
+    gate.lockedUntil = Date.now() + 10_000;
+    gate.sum = null;
+    return { ok: false, message: 'Too many tries. Wait 10 seconds.', locked: true };
+  }
+  // A new pair, so a wrong answer cannot be brute-forced by repetition.
+  const next = newSum();
+  return { ok: false, message: 'Not quite.', prompt: `What is ${next.a} + ${next.b}?` };
 }
 
 function checkPin (given) {
@@ -341,7 +391,15 @@ function registerIpc () {
   });
 
   ipcMain.handle('shell:finish-onboarding', () => {
-    settings = settingsStore.save(paths.userData, { onboarded: true });
+    // A family finishing the walkthrough starts on the suggested settings,
+    // rather than on whatever happens to be the bare default. Anyone who has
+    // already changed something keeps their own choice.
+    const recommend = settings.sessionMinutes === settingsStore.DEFAULTS.sessionMinutes &&
+      settings.gateMode === settingsStore.DEFAULTS.gateMode
+      ? settingsStore.RECOMMENDED
+      : {};
+    settings = settingsStore.save(paths.userData, { onboarded: true, ...recommend });
+    if (playClock) playClock.setLimit(settings.sessionMinutes);
     gate.unlockedUntil = 0;
     console.log('[boot] walkthrough finished');
     shellApp.goHome();
@@ -374,7 +432,11 @@ function registerIpc () {
       return { ok: false, message: 'Hold the button a little longer.' };
     }
     if (settings.gateMode === 'pin') {
-      return { ok: true, needsPin: true, prompt: 'Enter the parent PIN' };
+      return { ok: true, needsAnswer: true, prompt: 'Enter the parent PIN' };
+    }
+    if (settings.gateMode === 'sum') {
+      const { a, b } = newSum();
+      return { ok: true, needsAnswer: true, prompt: `What is ${a} + ${b}?` };
     }
     // Holding is the whole check. Unlock, but decide nothing: the grown-up
     // picks "close" or "back to the games" next.
@@ -384,11 +446,37 @@ function registerIpc () {
 
   ipcMain.handle('shell:answer-gate', (_e, answer) => {
     if (shellApp.mode !== 'gate') return { ok: false, message: 'not at the gate' };
-    if (settings.gateMode !== 'pin') return { ok: false, message: 'no PIN required' };
+    if (settings.gateMode === 'hold') return { ok: false, message: 'no answer required' };
     if (!holdSatisfied()) return { ok: false, message: 'Hold the button first.' };
-    const result = checkPin(answer);
+    const result = settings.gateMode === 'sum' ? checkSum(answer) : checkPin(answer);
     if (result.ok) return { ok: true, action: 'unlocked' };
     return result;
+  });
+
+  /** Hold only, or hold and a sum. A parent chooses in Settings. */
+  ipcMain.handle('shell:set-gate-mode', (_e, mode) => {
+    if (!isUnlocked()) return locked();
+    if (mode !== 'hold' && mode !== 'sum') {
+      return { ok: false, message: 'That is not a way in.' };
+    }
+    settings = settingsStore.save(paths.userData, { gateMode: mode });
+    console.log(`[gate] way in is now ${settings.gateMode}`);
+    return { ok: true, gateMode: settings.gateMode };
+  });
+
+  /** Puts the suggested settings back, in one press. */
+  ipcMain.handle('shell:use-recommended', () => {
+    if (!isUnlocked()) return locked();
+    settings = settingsStore.save(paths.userData, settingsStore.RECOMMENDED);
+    playClock.setLimit(settings.sessionMinutes);
+    shellApp.pushState();
+    console.log('[settings] recommended settings applied');
+    return {
+      ok: true,
+      sessionMinutes: settings.sessionMinutes,
+      gateMode: settings.gateMode,
+      clock: playClock.state()
+    };
   });
 
   /**
@@ -920,6 +1008,59 @@ async function runKeyProbe () {
  * button, the real clock running out. Only the waiting is skipped, by pausing
  * the capture between scenes rather than by faking any state.
  */
+async function runGateCheck () {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const say = (k, v) => console.log(`  ${String(k).padEnd(30)} ${v}`);
+  console.log('\n  ===== the grown-up gate =====\n');
+  say('way in', settings.gateMode);
+
+  shellApp.openGate('portal');
+  await sleep(400);
+
+  // No hold yet: the answer must be refused even if someone guesses it.
+  gate.openedAt = Date.now();
+  const early = await ipcCall('shell:answer-gate', '7');
+  say('answer before the hold', early.ok ? 'ACCEPTED (bad)' : `refused: ${early.message}`);
+
+  // Hold long enough, and the question arrives.
+  gate.openedAt = Date.now() - (settings.holdSeconds * 1000) - 200;
+  const held = await ipcCall('shell:complete-hold');
+  say('after holding', JSON.stringify(held));
+  if (!gate.sum) {
+    say('result', 'FAIL: no sum was asked');
+    return finishGateCheck();
+  }
+
+  const right = gate.sum.answer;
+  const wrong = right === 4 ? 5 : 4;
+  const bad = await ipcCall('shell:answer-gate', String(wrong));
+  say(`wrong answer (${wrong})`, bad.ok ? 'ACCEPTED (bad)' : `refused: ${bad.message}`);
+  say('a fresh sum is asked', bad.prompt || '(none)');
+
+  const answer = gate.sum ? gate.sum.answer : right;
+  const good = await ipcCall('shell:answer-gate', String(answer));
+  say(`right answer (${answer})`, good.ok ? 'accepted' : `REFUSED (bad): ${good.message}`);
+  say('result', (!early.ok && !bad.ok && good.ok)
+    ? 'PASS: only the hold plus the right sum opens it'
+    : 'FAIL: see above');
+  finishGateCheck();
+}
+
+function finishGateCheck () {
+  console.log('');
+  try { shortcuts.releaseAll(); } catch { /* nothing held */ }
+  shellApp.allowQuit = true;
+  saveReport();
+  app.exit(0);
+}
+
+/** Calls a registered IPC handler the way the page would. */
+function ipcCall (channel, ...args) {
+  const handler = ipcMain._invokeHandlers.get(channel);
+  if (!handler) return Promise.resolve({ ok: false, message: `no handler for ${channel}` });
+  return Promise.resolve(handler({}, ...args));
+}
+
 async function runDemo () {
   const fs = require('node:fs');
   const path = require('node:path');
@@ -1612,6 +1753,11 @@ app.whenReady().then(() => {
     return;
   }
 
+  if (GATE_CHECK) {
+    ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runGateCheck(); }, 1500));
+    return;
+  }
+
   if (DEMO_DIR) {
     ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runDemo(); }, 1600));
     return;
@@ -1657,7 +1803,7 @@ app.whenReady().then(() => {
 
 app.on('before-quit', (event) => {
   if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || KEY_PROBE || START_PROBE ||
-      SHOTS_DIR || DEMO_DIR) return;
+      SHOTS_DIR || DEMO_DIR || GATE_CHECK) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');

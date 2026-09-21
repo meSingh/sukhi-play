@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { coerce, DEFAULTS } = require('../src/main/settings');
+const { coerce, DEFAULTS, RECOMMENDED } = require('../src/main/settings');
 
 test('the gate defaults to hold', () => {
   assert.equal(coerce({}).gateMode, 'hold');
@@ -54,4 +54,22 @@ test('garbage input yields usable defaults', () => {
   for (const bad of [null, undefined, 'nope', 42, []]) {
     assert.equal(coerce(bad).gateMode, 'hold');
   }
+});
+
+test('the sum gate is a setting the file can carry', () => {
+  assert.equal(coerce({ gateMode: 'sum' }).gateMode, 'sum');
+  assert.equal(coerce({ gateMode: 'hold' }).gateMode, 'hold');
+  // Anything unrecognised falls back to the hold rather than locking a parent
+  // out of their own machine.
+  assert.equal(coerce({ gateMode: 'fingerprint' }).gateMode, 'hold');
+});
+
+test('the recommended settings are a real session and the sum', () => {
+  const r = RECOMMENDED;
+  assert.ok(r.sessionMinutes > 0 && r.sessionMinutes <= 60, 'a session a family would keep');
+  assert.equal(r.gateMode, 'sum');
+  // They have to survive coercion, or "use recommended" would not apply them.
+  const applied = coerce({ ...DEFAULTS, ...r });
+  assert.equal(applied.sessionMinutes, r.sessionMinutes);
+  assert.equal(applied.gateMode, 'sum');
 });

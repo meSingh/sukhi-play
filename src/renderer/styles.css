@@ -1490,3 +1490,12 @@ img, svg { -webkit-user-drag: none; }
   border-radius: 18px;
   padding: 16px 18px;
 }
+
+/* A two-way choice, shown as one control rather than two buttons. */
+.seg { display: inline-flex; background: #F0EEFB; border-radius: 14px; padding: 4px; gap: 4px; }
+.seg button {
+  border: none; background: none; cursor: pointer;
+  font: inherit; font-size: 15px; font-weight: 800; color: var(--ink-soft);
+  padding: 9px 16px; border-radius: 11px;
+}
+.seg button.on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(23,21,58,.16); }

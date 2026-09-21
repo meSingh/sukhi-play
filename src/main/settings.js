@@ -6,6 +6,8 @@ const path = require('node:path');
 const DEFAULTS = {
   // How the grown-up proves they are a grown-up before the app will quit.
   //   'hold' -> press and hold the button, nothing else (the default)
+  //   'sum'  -> hold, then answer a small addition. A three-year-old who has
+  //             learned to hold a button has not learned to add.
   //   'pin'  -> hold, then type the pin below
   gateMode: 'hold',
   pin: null,
@@ -52,7 +54,7 @@ function coerce (raw) {
   const out = { ...DEFAULTS };
   if (!raw || typeof raw !== 'object') return out;
 
-  out.gateMode = raw.gateMode === 'pin' ? 'pin' : 'hold';
+  out.gateMode = ['pin', 'sum'].includes(raw.gateMode) ? raw.gateMode : 'hold';
   out.pin = typeof raw.pin === 'string' && /^\d{4,8}$/.test(raw.pin) ? raw.pin : null;
   // A pin mode with no valid pin would lock the parent out; fall back to hold.
   if (out.gateMode === 'pin' && !out.pin) out.gateMode = 'hold';
@@ -113,4 +115,10 @@ function save (userDataDir, patch) {
   return merged;
 }
 
-module.exports = { DEFAULTS, coerce, load, save };
+// What a family gets if they take the suggestion during the walkthrough, and
+// what the Settings screen offers to restore. Twenty minutes because it is
+// long enough to finish something and short enough to end without a fight; the
+// sum because holding a button is a skill a toddler acquires by accident.
+const RECOMMENDED = { sessionMinutes: 20, gateMode: 'sum' };
+
+module.exports = { DEFAULTS, RECOMMENDED, coerce, load, save };

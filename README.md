@@ -282,6 +282,24 @@ what is behind it.
 A site that asks for fullscreen with its own button still gets it. The bar
 slides away and **Esc** brings it back.
 
+## Getting in: the hold, and the sum
+
+Pressing **Close** or **Grown-ups** asks for a button held down for three
+seconds. A toddler does not manage that by accident, but a toddler who uses the
+app every day learns it eventually, which is exactly what happened here.
+
+So Settings offers a second step: **hold and a sum**. After the hold you answer
+a small addition, two numbers between two and nine. A wrong answer gets a fresh
+pair, three wrong answers wait ten seconds, and the question is made and marked
+in the main process, never in the page. A child who has learned to hold a
+button has not learned to add.
+
+A PIN still works for anyone who prefers one: set `gateMode` to `pin` and a
+`pin` in `settings.json`.
+
+New installs finish the walkthrough on the recommended settings: twenty minutes
+of play, and the sum on the way in. Settings has a button to put them back.
+
 ## Play time
 
 Set a session length at the top of the grown-up screen: ten minutes to an
