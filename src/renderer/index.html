@@ -158,12 +158,6 @@
 
   <!-- ============ the bar shown over a game ============ -->
   <header id="bar">
-    <!-- The app names itself while a child plays, so they can ask for it by
-         name instead of describing it. -->
-    <div class="bar-brand">
-      <img class="bar-mark" src="assets/mascot.png" alt="" width="512" height="512">
-      <span class="bar-name">Sukhi&nbsp;Play</span>
-    </div>
     <button id="home-btn" class="bar-btn bar-btn--home" type="button">
       <svg class="bar-icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M3 11.5 12 4l9 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -171,6 +165,12 @@
       </svg>
       <span>Back</span>
     </button>
+    <!-- The app names itself while a child plays, so they can ask for it by
+         name instead of describing it. -->
+    <div class="bar-brand">
+      <img class="bar-mark" src="assets/mascot.png" alt="" width="512" height="512">
+      <span class="bar-name">Sukhi&nbsp;Play</span>
+    </div>
 
     <div class="bar-mid">
       <span id="bar-title"></span>
@@ -201,7 +201,7 @@
     <div class="timeup-card">
       <img class="timeup-mark" src="assets/mascot.png" alt="" width="512" height="512">
       <h2>That is all for now</h2>
-      <p>Play time is over. A grown-up can start some more.</p>
+      <p>Play time is over. See you next time!</p>
       <button id="timeup-gate" class="ghost-btn" type="button">Grown-ups</button>
     </div>
   </section>
@@ -401,7 +401,7 @@
                 <h3>Play time</h3>
                 <p id="time-note">Sessions are not limited.</p>
               </div>
-              <button id="time-more" class="time-more" type="button">New session</button>
+              <button id="time-more" class="time-more" type="button">More time</button>
             </div>
             <div class="time-chips" id="time-chips" role="group" aria-label="Session length">
               <button type="button" data-min="0">Off</button>
@@ -413,9 +413,11 @@
               <button type="button" data-min="60">1 hour</button>
             </div>
             <p class="sec-note">
-              When the time runs out your child sees a gentle stop screen and
-              nothing else opens. A grown-up hold starts another session.
-              Warnings come at five minutes and at one minute.
+              This is the standing rule: every time Sukhi Play opens, the clock
+              starts again from here. When it runs out your child sees a gentle
+              stop screen and nothing else opens. Warnings come at five minutes
+              and at one minute, and <b>More time</b> restarts the clock without
+              closing the app.
             </p>
           </section>
 

@@ -18,8 +18,36 @@ FPS = 10
 WIDTH = 960          # enough to read the interface, small enough to send
 
 
+def compose(shell_path):
+    """Puts the interface and the site back together.
+
+    They are captured separately, because they are separate views. The site
+    sits below the bar, and the bar's height is the difference between the two
+    captures, so this does not have to know the layout a second time.
+    """
+    shell = Image.open(shell_path).convert("RGB")
+    game_path = shell_path[:-4] + ".game.png"
+    if not os.path.exists(game_path):
+        return shell
+    game = Image.open(game_path).convert("RGB")
+    if game.width != shell.width:
+        game = game.resize((shell.width, round(game.height * shell.width / game.width)),
+                           Image.LANCZOS)
+    if shell.height > game.height:
+        # The interface was captured whole, with the site's area left blank.
+        shell.paste(game, (0, shell.height - game.height))
+        return shell
+    # While a site is open the interface is only the bar, so the two are
+    # stacked: bar on top, site below, which is how the window looked.
+    canvas = Image.new("RGB", (shell.width, shell.height + game.height))
+    canvas.paste(shell, (0, 0))
+    canvas.paste(game, (0, shell.height))
+    return canvas
+
+
 def load(frames_dir):
-    files = sorted(glob.glob(os.path.join(frames_dir, "f*.png")))
+    files = sorted(f for f in glob.glob(os.path.join(frames_dir, "f*.png"))
+                   if not f.endswith(".game.png"))
     if not files:
         sys.exit("no frames found")
     # Every frame has to end up the same size. A frame captured at a different
@@ -29,7 +57,9 @@ def load(frames_dir):
     height = round(first.height * WIDTH / first.width)
     out = []
     for f in files:
-        im = Image.open(f).convert("RGB")
+        im = compose(f)
+        if im.width != WIDTH:
+            im = im.resize((WIDTH, round(im.height * WIDTH / im.width)), Image.LANCZOS)
         if im.size != (WIDTH, height):
             scale = min(WIDTH / im.width, height / im.height)
             fitted = im.resize((max(1, round(im.width * scale)),
@@ -56,18 +86,18 @@ def main():
     # difference between a file that loads on a phone and one that does not.
     # The palette is built once from the whole recording, because built per
     # frame the background shifts colour as scenes change.
-    gif_w = 640
+    gif_w = 560
     gif_frames = [f.resize((gif_w, round(f.height * gif_w / f.width)), Image.LANCZOS)
-                  for f in frames[::2]]
-    palette = gif_frames[0].quantize(colors=96, method=Image.MEDIANCUT)
+                  for f in frames[::3]]
+    palette = gif_frames[0].quantize(colors=64, method=Image.MEDIANCUT)
     gif = os.path.join(out_dir, "demo.gif")
     gif_frames[0].quantize(palette=palette).save(
         gif, save_all=True,
         append_images=[f.quantize(palette=palette) for f in gif_frames[1:]],
-        duration=duration * 2, loop=0, optimize=True, disposal=2)
+        duration=duration * 3, loop=0, optimize=True, disposal=2)
 
     still = os.path.join(out_dir, "demo-poster.png")
-    frames[len(frames) // 8].save(still, optimize=True)
+    frames[round(len(frames) * 0.22)].save(still, optimize=True)
 
     for path in (webp, gif, still):
         print(f"[demo] {os.path.basename(path)}  {os.path.getsize(path) / 1e6:.1f} MB")

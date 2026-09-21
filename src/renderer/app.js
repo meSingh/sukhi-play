@@ -170,17 +170,29 @@ function applyState (state) {
  * Every message from main resets it, so the two cannot drift apart.
  */
 let clockLeft = null;
+let clockLimit = 0;
 let clockTimer = 0;
 
+/**
+ * When the countdown appears.
+ *
+ * A clock on screen all session is a thing to watch and then argue about, so
+ * it stays away until the end is close enough to mean something: the last ten
+ * seconds of a short session, the last thirty of a longer one.
+ */
+function showFrom (limitSeconds) {
+  return limitSeconds <= 300 ? 10 : 30;
+}
+
 function paintClock () {
-  const text = clockLeft === null ? '' : formatLeft(clockLeft);
+  const show = clockLeft !== null && clockLeft <= showFrom(clockLimit);
   for (const id of ['bar-time', 'top-time']) {
     const pill = el(id);
     if (!pill) continue;
-    pill.hidden = clockLeft === null;
-    if (clockLeft === null) continue;
-    pill.querySelector('b').textContent = text;
-    pill.classList.toggle('is-last', clockLeft <= 60);
+    pill.hidden = !show;
+    if (!show) continue;
+    pill.querySelector('b').textContent = formatLeft(clockLeft);
+    pill.classList.toggle('is-last', clockLeft <= 10);
   }
 }
 
@@ -198,6 +210,7 @@ function applyClock (clock) {
   clockTimer = 0;
 
   const limited = Boolean(clock && clock.limitSeconds);
+  clockLimit = limited ? clock.limitSeconds : 0;
   clockLeft = limited && !timeUp ? Math.max(0, clock.leftSeconds || 0) : null;
   paintClock();
 
@@ -206,6 +219,13 @@ function applyClock (clock) {
       if (clockLeft === null || clockLeft <= 0) return;
       clockLeft -= 1;
       paintClock();
+      // Main is the authority and its message is milliseconds behind, but a
+      // countdown that sits on 0:00 while play carries on looks broken.
+      if (clockLeft === 0) {
+        clockLeft = null;
+        paintClock();
+        app.classList.add('is-timeup');
+      }
     }, 1000);
   }
 

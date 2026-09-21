@@ -14,7 +14,7 @@ const ROOT = path.join(__dirname, '..');
  * app would actually produce. A throwaway profile also means a recording never
  * contains whoever ran it: their own list of sites stays theirs.
  */
-function seedProfile ({ prefix = 'sukhi-seeded-', ids, settings = {} } = {}) {
+function seedProfile ({ prefix = 'sukhi-seeded-', ids, settings = {}, extraApps = [] } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
   const raw = JSON.parse(fs.readFileSync(path.join(ROOT, 'config', 'suggestions.json'), 'utf8'));
   const all = Array.isArray(raw) ? raw : raw.sites || raw.suggestions || [];
@@ -39,6 +39,7 @@ function seedProfile ({ prefix = 'sukhi-seeded-', ids, settings = {} } = {}) {
     });
   }
   if (!apps.length) throw new Error('could not seed any apps from config/suggestions.json');
+  apps.unshift(...extraApps);
 
   // The catalog reader expects { apps: [...] }; a bare array parses to nothing
   // and produces pictures of an empty screen.

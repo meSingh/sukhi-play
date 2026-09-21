@@ -13,30 +13,84 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+const http = require('node:http');
+const { spawn, spawnSync } = require('node:child_process');
 const { seedProfile, electronBin, ROOT } = require('./seed-profile');
 
 const OUT = path.join(ROOT, 'docs', 'assets');
 const SEED_IDS = ['poki', 'pbskids', 'scratch', 'toytheater', 'natgeokids', 'blockly'];
 
-function main () {
+/**
+ * Serves the little page the recording plays on.
+ *
+ * A recording has to show a child actually playing, and using somebody else's
+ * website to advertise this one would be taking a liberty with their brand.
+ * So the demo opens a page of ours, served from 127.0.0.1 for the length of
+ * the recording, through the app's ordinary site machinery: allowlist, ad
+ * filtering, bar and all.
+ */
+function serveDemoSite () {
+  const file = fs.readFileSync(path.join(__dirname, 'demo-site', 'index.html'));
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    res.end(file);
+  });
+  // listen() is asynchronous: the port does not exist until it is listening.
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => resolve(server));
+  });
+}
+
+async function main () {
   const frames = fs.mkdtempSync(path.join(os.tmpdir(), 'sukhi-demo-frames-'));
-  // One minute, so the recording waits about a minute rather than an hour.
+  const server = await serveDemoSite();
+  const port = server.address().port;
   const seeded = seedProfile({
     prefix: 'sukhi-demo-',
     ids: SEED_IDS,
-    // A window of a known size, not the whole screen: every frame has to be
-    // the same shape or the animation cannot be assembled.
-    settings: { sessionMinutes: 1, kiosk: false, fullscreenOnLaunch: false }
+    extraApps: [{
+      id: 'shapes',
+      title: 'Shapes',
+      url: `http://127.0.0.1:${port}/`,
+      shape: 'ball',
+      color: '#3B6BFF',
+      enabled: true,
+      allowHosts: ['127.0.0.1'],
+      denyHosts: [],
+      blockAds: true
+    }],
+    // Two minutes, so the one minute warning lands while a child is playing
+    // rather than before the recording starts. A window of a known size, not
+    // the whole screen: every frame has to be the same shape.
+    settings: { sessionMinutes: 2, kiosk: false, fullscreenOnLaunch: false }
   });
-  console.log(`[demo] seeded ${seeded.count} apps, session limit 1 minute`);
+  console.log(`[demo] seeded ${seeded.count} apps, session limit 2 minutes`);
 
-  const res = spawnSync(electronBin(), [
-    '.', `--demo=${frames}`, `--user-data-dir=${seeded.dir}`
-  ], { cwd: ROOT, encoding: 'utf8', timeout: 5 * 60 * 1000 });
+  // spawn, not spawnSync: the demo page is served from this process, and a
+  // synchronous wait here would block the server the app is trying to load.
+  const res = await new Promise((resolve, reject) => {
+    const child = spawn(electronBin(), [
+      '.', `--demo=${frames}`, `--user-data-dir=${seeded.dir}`
+    ], { cwd: ROOT });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (d) => { stdout += d; });
+    child.stderr.on('data', (d) => { stderr += d; });
+    const cap = setTimeout(() => child.kill(), 8 * 60 * 1000);
+    child.on('error', reject);
+    child.on('close', (status) => {
+      clearTimeout(cap);
+      resolve({ status, stdout, stderr });
+    });
+  });
+  server.close();
 
   for (const line of (res.stdout || '').split('\n')) {
     if (line.startsWith('[DEMO]')) console.log('  ' + line.replace('[DEMO] ', ''));
+  }
+  for (const line of (res.stdout || '').split('\n')) {
+    if (line.startsWith('[game]') || line.startsWith('[policy]')) console.log('  ' + line);
   }
   if (res.status !== 0) {
     console.error((res.stderr || '').trim().split('\n').slice(-10).join('\n'));
@@ -60,4 +114,7 @@ function main () {
   console.log('[demo] done');
 }
 
-main();
+main().catch((err) => {
+  console.error(`[demo] ${err.message}`);
+  process.exit(1);
+});

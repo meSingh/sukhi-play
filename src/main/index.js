@@ -930,30 +930,61 @@ async function runKeyProbe () {
 async function runDemo () {
   const fs = require('node:fs');
   const path = require('node:path');
-  fs.mkdirSync(DEMO_DIR, { recursive: true });
 
   const js = (code) => shellApp.shellView.webContents.executeJavaScript(code);
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  fs.mkdirSync(DEMO_DIR, { recursive: true });
 
   const w = Number(process.env.SUKHI_DEMO_W || 1280);
   const h = Number(process.env.SUKHI_DEMO_H || 800);
   shellApp.win.setBounds({ x: 40, y: 40, width: w, height: h });
   shellApp.layout();
+  // The window has to be in front while this runs. A view that is covered by
+  // another window is not painted, and capturePage then returns its background
+  // colour and nothing else: a recording of an empty page.
+  shellApp.win.show();
+  shellApp.win.moveTop();
+  if (process.platform === 'darwin') app.focus({ steal: true });
   await sleep(1200);
 
   let frame = 0;
   let capturing = false;
   let stopped = false;
+  let latestGame = null;
+  let subscribed = null;
   const FPS = 10;
 
+  /** Takes painted frames from the site's view for as long as it exists. */
+  const watchGame = () => {
+    const wc = shellApp.gameView && shellApp.gameView.webContents;
+    if (!wc || wc.isDestroyed() || wc === subscribed) return;
+    subscribed = wc;
+    latestGame = null;
+    wc.setBackgroundThrottling(false);
+    wc.beginFrameSubscription(false, (image) => {
+      if (image && image.getSize().width > 0) latestGame = image;
+    });
+  };
+
+  // The interface and the site a child is playing are two separate views, and
+  // each is captured on its own. They are put back together when the frames
+  // are assembled, using the gap between the two heights as the bar's height,
+  // so nothing has to know the layout twice.
   const loop = (async () => {
     while (!stopped) {
       const started = Date.now();
       if (capturing) {
+        const name = `f${String(frame++).padStart(4, '0')}`;
         try {
-          const image = await shellApp.shellView.webContents.capturePage();
-          fs.writeFileSync(path.join(DEMO_DIR, `f${String(frame++).padStart(4, '0')}.png`),
-            image.toPNG());
+          const shell = await shellApp.shellView.webContents.capturePage();
+          fs.writeFileSync(path.join(DEMO_DIR, `${name}.png`), shell.toPNG());
+          // capturePage on the site's view comes back as its background
+          // colour and nothing else, so the painted frames are taken from the
+          // view's own frame stream instead.
+          if (shellApp.mode === 'playing' && latestGame) {
+            fs.writeFileSync(path.join(DEMO_DIR, `${name}.game.png`), latestGame.toPNG());
+          }
         } catch { /* a frame lost to a resize is not worth stopping for */ }
       }
       await sleep(Math.max(0, (1000 / FPS) - (Date.now() - started)));
@@ -971,66 +1002,115 @@ async function runDemo () {
     capturing = false;
   };
 
-  await scene('the tile screen, with the session running', 3200, async () => {
+  /** A tap inside the site, so the recording shows playing and not a still. */
+  const tapGame = async (x, y) => {
+    const wc = shellApp.gameView && shellApp.gameView.webContents;
+    if (!wc || wc.isDestroyed()) return;
+    wc.sendInputEvent({ type: 'mouseDown', x, y, button: 'left', clickCount: 1 });
+    wc.sendInputEvent({ type: 'mouseUp', x, y, button: 'left', clickCount: 1 });
+  };
+
+  await scene('the tile screen a child sees', 2600, async () => {
     shellApp.closeGate();
     shellApp.goHome();
   });
 
-  // The clock is real: the profile this runs in is seeded with a one minute
-  // session, so this waits for it rather than pretending.
-  await scene('the last seconds', 2600, async () => {
-    while (!playClock.isTimeUp() && (playClock.state().leftSeconds || 0) > 6) {
+  await scene('opening a site, and playing it', 6000, async () => {
+    await js(`(() => {
+      const tile = document.querySelector('#tiles .tile');
+      if (tile) tile.click();
+      return 1;
+    })()`);
+    // Give the page time to load, and to be painted, before the camera starts.
+    await sleep(2200);
+    watchGame();
+    const wc = shellApp.gameView && shellApp.gameView.webContents;
+    if (wc && !wc.isDestroyed()) wc.focus();
+    await sleep(900);
+  });
+  // The taps happen inside the recorded scene above's successor, so they land
+  // on camera: four shapes, roughly a second apart.
+  capturing = true;
+  const taps = [[364, 324], [547, 324], [720, 324], [915, 324]];
+  for (const [x, y] of taps) {
+    await tapGame(x, y);
+    await sleep(900);
+  }
+  capturing = false;
+
+  // A short run for working on the recording itself: everything up to the
+  // first play scene, then out, rather than sitting through a session.
+  if (process.env.SUKHI_DEMO_QUICK) {
+    const wc = shellApp.gameView && shellApp.gameView.webContents;
+    if (wc && !wc.isDestroyed()) {
+      const seen = await wc.executeJavaScript(
+        `JSON.stringify({ url: location.href, text: document.body.innerText.slice(0, 40),
+          bg: getComputedStyle(document.body).backgroundColor })`);
+      const shot = await wc.capturePage();
+      console.log(`[DEMO] site: ${seen}`);
+      console.log(`[DEMO] site capture: ${JSON.stringify(shot.getSize())} empty=${shot.isEmpty()}`);
+    } else {
+      console.log('[DEMO] site: no game view at all');
+    }
+    stopped = true;
+    await loop;
+    shellApp.allowQuit = true;
+    app.exit(0);
+    return;
+  }
+
+  await scene('one minute left, said out loud', 3400, async () => {
+    while (!playClock.isTimeUp() && (playClock.state().leftSeconds || 0) > 62) {
       await sleep(250);
     }
   });
 
-  await scene('time is up', 3000, async () => {
+  await scene('time is up, and nothing else opens', 3400, async () => {
     while (!playClock.isTimeUp()) await sleep(200);
-    await sleep(600);
-    // Says whether the stop screen actually reached the child's view. A
-    // recording that quietly missed it is worse than no recording.
     const seen = await js(`(() => {
       const el = document.getElementById('timeup');
       const r = el.getBoundingClientRect();
       return JSON.stringify({
         classes: document.getElementById('app').className,
         display: getComputedStyle(el).display,
-        size: Math.round(r.width) + 'x' + Math.round(r.height)
+        // Where it is, not just how big: laid out below the fold it was the
+        // right size and never once on screen.
+        box: Math.round(r.top) + ',' + Math.round(r.left) +
+             ' ' + Math.round(r.width) + 'x' + Math.round(r.height)
       });
     })()`);
     console.log(`[DEMO] stop screen: ${seen}`);
   });
 
-  await scene('a grown-up holds the button', 4200, async () => {
+  await scene('a grown-up holds the button', 1200, async () => {
     await js(`(() => { document.getElementById('timeup-gate').click(); return 1; })()`);
     await sleep(700);
   });
-  // The hold happens inside the recorded scene, so the ring fills on camera.
+  // The hold itself is recorded, so the ring fills on camera.
   capturing = true;
   await js(`(() => {
-    const b = document.getElementById('hold-btn');
-    b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    document.getElementById('hold-btn')
+      .dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     return 1;
   })()`);
   await sleep(3400);
   await js(`(() => {
-    const b = document.getElementById('hold-btn');
-    b.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    document.getElementById('hold-btn')
+      .dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
     return 1;
   })()`);
-  await sleep(1400);
+  await sleep(1600);
   capturing = false;
 
-  await scene('the grown-up screen: play time first', 3600, async () => {
+  await scene('play time is the first thing a grown-up sees', 3400, async () => {
     await js(`(() => {
-      const body = document.querySelector('#gate-step-form .panel-body') ||
-                   document.querySelector('.panel-body');
+      const body = document.querySelector('#gate-step-library .panel-body');
       if (body) body.scrollTop = 0;
       return 1;
     })()`);
   });
 
-  await scene('a new session, and back to playing', 3200, async () => {
+  await scene('more time, and back to playing', 3000, async () => {
     await js(`(() => { document.getElementById('time-more').click(); return 1; })()`);
     await sleep(900);
     await js(`(() => { document.getElementById('lib-done').click(); return 1; })()`);
@@ -1491,18 +1571,19 @@ app.whenReady().then(() => {
   // One tick a second, and a fresh state to the renderer while the last five
   // minutes run down so the countdown in the bar stays honest.
   if (!CHECK_MODE && !PROBE_MODE) {
-    let sinceSync = 0;
+    // Four times a second rather than once: at one tick a second the stop
+    // screen could arrive most of a second after the countdown showed 0:00,
+    // which reads as the app being slow to keep its own promise.
+    let ticks = 0;
     setInterval(() => {
       playClock.tick();
       const { limitSeconds, timeUp } = playClock.state();
       // The renderer counts the seconds down on its own; these messages are
-      // what keeps its count honest. Often near the end, rarely before.
-      sinceSync += 1;
-      if (limitSeconds && !timeUp && sinceSync >= 20) {
-        sinceSync = 0;
-        shellApp.pushState();
-      }
-    }, 1000).unref();
+      // what keeps its count honest. Rarely, and never after it has stopped.
+      ticks += 1;
+      const near = (playClock.state().leftSeconds || 0) <= 35;
+      if (limitSeconds && !timeUp && ticks % (near ? 4 : 80) === 0) shellApp.pushState();
+    }, 250).unref();
   }
 
   if (process.platform === 'win32' && !IS_DEV && !CHECK_MODE && !PROBE_MODE &&

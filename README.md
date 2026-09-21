@@ -551,7 +551,8 @@ software centres show.
 
 ## Licence
 
-Code is [MIT](LICENSE). **The Sukhi character artwork is not.** It belongs to
+Code is [MIT](LICENSE). **The Sukhi character artwork is not**, and the terms
+for it are in [NOTICE](NOTICE). It belongs to
 Mandeep Singh. If you fork this and ship your own builds, replace it first;
 `python3 branding/generate-mascot.py` swaps in an MIT placeholder. See
 [branding/README.md](branding/README.md).

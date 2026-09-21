@@ -508,12 +508,21 @@ img, svg { -webkit-user-drag: none; }
    The main process refuses to launch anything as well: this screen is the
    polite half of the answer, not the enforcement. */
 #timeup {
+  /* Over whatever is on screen, not after it. Screens are laid out in a
+     column, so a second visible screen was pushed below the fold: displayed,
+     the right size, and never once seen. */
+  position: absolute;
+  inset: 0;
+  z-index: 5;
   align-items: center;
   justify-content: center;
   padding: 32px;
   background: rgba(23, 21, 58, .58);
 }
 #app.is-timeup #timeup { display: flex; }
+/* The gate is the grown-up's screen and gets it to itself. */
+#app.is-timeup[data-mode="gate"] #timeup,
+#app.is-timeup[data-mode="onboarding"] #timeup { display: none; }
 #app.is-timeup #bar { pointer-events: none; }
 
 .timeup-card {
