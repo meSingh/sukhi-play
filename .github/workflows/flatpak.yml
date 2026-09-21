@@ -77,8 +77,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The committed manifest pins the release tag, which is what Flathub
+      # builds. CI is asking a different question -- does the tree in front of
+      # us build -- and the tag for it usually does not exist yet, so building
+      # the committed manifest fails on "unknown revision" for every commit
+      # between a version bump and its release.
+      - name: Build the commit under test, not the release tag
+        run: |
+          set -euo pipefail
+          src=packaging/flathub/com.msingh.sukhi.play.yml
+          out=/tmp/ci-manifest.yml
+          sed -E "s/^([[:space:]]*)tag: v[0-9].*/\1commit: ${GITHUB_SHA}/" "$src" > "$out"
+          if ! grep -q "commit: ${GITHUB_SHA}" "$out"; then
+            echo "::error::no git tag line found in $src to replace"
+            exit 1
+          fi
+          grep -n -A 2 'type: git' "$out"
+
       - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: sukhi-play.flatpak
-          manifest-path: packaging/flathub/com.msingh.sukhi.play.yml
+          manifest-path: /tmp/ci-manifest.yml
           cache-key: flatpak-builder-${{ github.sha }}

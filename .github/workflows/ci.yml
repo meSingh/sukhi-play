@@ -77,16 +77,31 @@ jobs:
             console.log(list.length + ' suggestions, all valid, none enabled');
           "
 
-      - name: The shipped catalog must not enable any site
+      # The rule is about websites, not about everything with a tile. An app
+      # bundled inside the download is a file on the user's own disk: no
+      # network, no operator, nobody's terms. Enabling one of those is not
+      # choosing a destination on a parent's behalf, and it is what lets a
+      # first run have something on it. Enabling a website still is, and is
+      # still refused here.
+      - name: The shipped catalog must not enable any website
         shell: bash
         run: |
           node -e "
             const c = JSON.parse(require('fs').readFileSync('config/catalog.json','utf8'));
             const on = (c.apps || []).filter(a => a.enabled !== false);
-            if (on.length) {
-              console.error('Shipped catalog enables ' + on.length + ' site(s): ' + on.map(a=>a.id).join(', '));
-              console.error('Sukhi Play must ship with an empty launcher. See DISCLAIMER.md.');
+            const sites = on.filter(a => !String(a.url).startsWith('sukhiplay://'));
+            if (sites.length) {
+              console.error('Shipped catalog enables ' + sites.length + ' website(s): ' + sites.map(a=>a.id).join(', '));
+              console.error('Sukhi Play must not pick destinations for a parent. See DISCLAIMER.md.');
               process.exit(1);
             }
-            console.log('catalog ships with nothing enabled');
+            const bundled = JSON.parse(require('fs').readFileSync('config/bundled.json','utf8'));
+            for (const a of on) {
+              const id = new URL(a.url).hostname;
+              if (!bundled.apps.some(b => b.id === id)) {
+                console.error(a.id + ' points at ' + id + ', which is not in config/bundled.json');
+                process.exit(1);
+              }
+            }
+            console.log('catalog ships ' + on.length + ' bundled app(s) and no websites');
           "
