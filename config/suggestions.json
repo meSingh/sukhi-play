@@ -39,25 +39,6 @@
       "blurb": "Make your own games and animations, then play them."
     },
     {
-      "id": "blockly",
-      "title": "Puzzles",
-      "url": "https://blockly.games/",
-      "shape": "bolt",
-      "color": "#8b5cf6",
-      "blockAds": true,
-      "adSupported": false,
-      "category": "Learning",
-      "notes": "Puzzle games that quietly teach programming. Open source, no advertising.",
-      "allowHosts": [
-        "blockly.games"
-      ],
-      "denyHosts": [],
-      "termsUrl": "https://github.com/google/blockly-games/blob/master/LICENSE",
-      "termsChecked": "2026-09-21",
-      "siteName": "Blockly Games",
-      "blurb": "Puzzles that quietly teach programming."
-    },
-    {
       "id": "pbskids",
       "title": "PBS Kids",
       "url": "https://pbskids.org/games/",

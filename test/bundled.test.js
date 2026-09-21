@@ -1,0 +1,144 @@
+'use strict';
+
+const test = require('node:test');
+const assert = require('node:assert');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+
+const bundled = require('../src/main/bundled');
+const { sanitizeApp } = require('../src/main/catalog');
+
+const ROOT = path.join(__dirname, '..');
+
+/** A throwaway vendor tree with one real app in it. */
+function fakeVendor (apps) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sukhi-bundled-'));
+  for (const [folder, files] of Object.entries(apps)) {
+    const appDir = path.join(dir, folder, 'app');
+    fs.mkdirSync(appDir, { recursive: true });
+    for (const [name, body] of Object.entries(files)) {
+      fs.writeFileSync(path.join(appDir, name), body);
+    }
+  }
+  return dir;
+}
+
+function manifest (apps) {
+  const file = path.join(os.tmpdir(), `sukhi-manifest-${Date.now()}-${Math.random()}.json`);
+  fs.writeFileSync(file, JSON.stringify({ apps }));
+  return file;
+}
+
+test('a manifest entry with no files on disk is dropped', () => {
+  const vendor = fakeVendor({});
+  const list = bundled.load(manifest([{ id: 'ghost', title: 'Ghost' }]), vendor);
+  assert.deepEqual(list, [], 'a tile that opens nothing must not be offered');
+});
+
+test('an id that is not hostname-safe is refused', () => {
+  const vendor = fakeVendor({ 'Bad Name': { 'index.html': '<html></html>' } });
+  for (const id of ['Bad Name', '../escape', 'UPPER', '-leading', 'has/slash']) {
+    const list = bundled.load(manifest([{ id, dir: 'Bad Name' }]), vendor);
+    assert.deepEqual(list, [], `${id} must not become a hostname`);
+  }
+});
+
+test('the folder may differ from the id', () => {
+  const vendor = fakeVendor({ 'kids-coloring': { 'index.html': '<html></html>' } });
+  const list = bundled.load(
+    manifest([{ id: 'colouring', dir: 'kids-coloring', title: 'Colouring' }]), vendor);
+  assert.equal(list.length, 1);
+  assert.equal(list[0].id, 'colouring');
+  assert.equal(list[0].url, 'sukhiplay://colouring/index.html');
+});
+
+test('two entries cannot claim the same id', () => {
+  const vendor = fakeVendor({ one: { 'index.html': 'a' }, two: { 'index.html': 'b' } });
+  const list = bundled.load(manifest([
+    { id: 'same', dir: 'one' },
+    { id: 'same', dir: 'two' }
+  ]), vendor);
+  assert.equal(list.length, 1);
+});
+
+test('a bundled url belongs only to its own app', () => {
+  assert.equal(bundled.belongsTo('sukhiplay://colouring/index.html', 'colouring'), true);
+  assert.equal(bundled.belongsTo('sukhiplay://colouring/index.html', 'music'), false);
+  assert.equal(bundled.belongsTo('https://colouring/index.html', 'colouring'), false);
+  // No app open is not the same as every app open.
+  assert.equal(bundled.belongsTo('sukhiplay://colouring/index.html', null), false);
+  assert.equal(bundled.isBundledUrl('sukhiplay://x/'), true);
+  assert.equal(bundled.isBundledUrl('https://example.com/'), false);
+  assert.equal(bundled.isBundledUrl('not a url'), false);
+});
+
+test('the catalog accepts a bundled url and marks it bundled', () => {
+  const app = sanitizeApp({
+    id: 'colouring', title: 'Colouring', url: 'sukhiplay://colouring/index.html'
+  }, 0);
+  assert.equal(app.bundled, true);
+  // With no allowlist of its own it falls back to its own host, which for a
+  // bundled app is the app id -- so it can never reach a real hostname.
+  assert.deepEqual(app.allowHosts, ['colouring']);
+});
+
+test('an ordinary site is not marked bundled', () => {
+  const app = sanitizeApp({ id: 'x', title: 'X', url: 'https://example.com/' }, 0);
+  assert.equal(app.bundled, false);
+});
+
+test('schemes other than http, https and ours are still refused', () => {
+  for (const url of ['file:///etc/passwd', 'mailto:a@b.c', 'steam://run/1',
+                     'sukhiplayx://a/', 'javascript:alert(1)']) {
+    assert.equal(sanitizeApp({ id: 'x', title: 'X', url }, 0), null, url);
+  }
+});
+
+test('every app in the real manifest is on disk and credited', () => {
+  const list = bundled.load(
+    path.join(ROOT, 'config', 'bundled.json'), path.join(ROOT, 'vendor'));
+  assert.ok(list.length > 0, 'the manifest should describe at least one app');
+
+  const notice = fs.readFileSync(path.join(ROOT, 'NOTICE'), 'utf8');
+  for (const app of list) {
+    assert.ok(app.credit, `${app.id} ships without a credit`);
+    assert.ok(app.licence, `${app.id} ships without a licence`);
+    assert.ok(app.sourceUrl, `${app.id} ships without a link to its source`);
+    assert.ok(notice.includes(app.sourceUrl),
+      `${app.id} is not credited in NOTICE`);
+
+    // Somebody else's licence has to travel with their code.
+    const folder = path.dirname(app.dir);
+    assert.ok(fs.existsSync(path.join(folder, 'LICENSE')),
+      `${app.id} ships without the upstream licence file`);
+    assert.ok(fs.existsSync(path.join(folder, 'UPSTREAM')),
+      `${app.id} does not record which commit it was built from`);
+  }
+});
+
+test('nothing bundled reaches out to the network', () => {
+  const list = bundled.load(
+    path.join(ROOT, 'config', 'bundled.json'), path.join(ROOT, 'vendor'));
+
+  for (const app of list) {
+    const files = [];
+    const walk = (dir) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, e.name);
+        if (e.isDirectory()) walk(full);
+        else if (/\.(html|js|mjs|css|json|webmanifest)$/i.test(e.name)) files.push(full);
+      }
+    };
+    walk(app.dir);
+
+    for (const file of files) {
+      const text = fs.readFileSync(file, 'utf8');
+      // The point of a bundled app is that it works on a train. A remote font,
+      // script or image would make that false without anyone noticing.
+      const remote = text.match(/https?:\/\/(?!www\.w3\.org|schemas?\.|localhost)[\w.-]+/gi) || [];
+      assert.deepEqual(remote, [],
+        `${path.relative(ROOT, file)} refers to ${remote.join(', ')}`);
+    }
+  }
+});

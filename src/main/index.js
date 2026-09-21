@@ -4,7 +4,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const { execFile } = require('node:child_process');
-const { app, session, ipcMain, Menu, nativeImage, net } = require('electron');
+const { app, session, ipcMain, Menu, nativeImage, net, protocol } = require('electron');
 
 const settingsStore = require('./settings');
 const catalogStore = require('./catalog');
@@ -16,6 +16,7 @@ const { createClock } = require('./playclock');
 const probe = require('./probe');
 const library = require('./library');
 const { Shell, BAR_HEIGHT: BAR_HEIGHT_FALLBACK } = require('./windowing');
+const bundled = require('./bundled');
 
 const RELEASES_URL = 'https://github.com/meSingh/sukhi-play/releases/latest';
 
@@ -62,6 +63,15 @@ const START_PROBE = process.argv.includes('--start-probe');
 // being able to watch it work rather than trusting that it does.
 const GATE_CHECK = process.argv.includes('--gate-check');
 
+// `--bundled-check=DIR` opens each app that ships inside the download, proves
+// it drew something, and proves it cannot reach anything else. A bundled app
+// is code somebody else wrote running next to a child, so "it loaded" is not
+// the interesting question; "and nothing else did" is.
+const BUNDLED_ARG = process.argv.find((a) => a.startsWith('--bundled-check'));
+const BUNDLED_CHECK = BUNDLED_ARG
+  ? (BUNDLED_ARG.includes('=') ? BUNDLED_ARG.slice(BUNDLED_ARG.indexOf('=') + 1) : true)
+  : null;
+
 // `--portal-shots=DIR` captures each tab of the grown-up screen.
 const PORTAL_ARG = process.argv.find((a) => a.startsWith('--portal-shots='));
 const PORTAL_SHOTS = PORTAL_ARG ? PORTAL_ARG.slice('--portal-shots='.length) : null;
@@ -80,7 +90,8 @@ const SHOTS_DIR = SHOTS_ARG ? SHOTS_ARG.slice('--shots='.length) : null;
 // app is a windowed program: its output usually never reaches the terminal it
 // was started from. A file can be attached to a bug report by anyone.
 const REPORT_NAME = DIAGNOSE ? 'diagnose' : COVER_PROBE ? 'cover-probe' : KEY_PROBE ? 'key-probe'
-  : START_PROBE ? 'start-probe' : GATE_CHECK ? 'gate-check' : null;
+  : START_PROBE ? 'start-probe' : GATE_CHECK ? 'gate-check'
+  : BUNDLED_CHECK ? 'bundled-check' : null;
 const reportLines = [];
 if (REPORT_NAME) {
   const log = console.log.bind(console);
@@ -132,6 +143,7 @@ let policy = null;
 let settings = null;
 let catalog = null;
 let paths = {};
+let bundledApps = [];
 let suggestions = [];
 let probeBusy = false;
 
@@ -549,17 +561,20 @@ function registerIpc () {
       // able to change any of this without opening a text file.
       mine: catalog.apps.map((a) => ({
         id: a.id, title: a.title, url: a.url, shape: a.shape, color: a.color,
-        enabled: a.enabled, blockAds: a.blockAds,
+        enabled: a.enabled, blockAds: a.blockAds, bundled: a.bundled,
         allowHosts: a.allowHosts, denyHosts: a.denyHosts, notes: a.notes
       })),
       // Ones already set up are dropped rather than greyed out -- a suggestion
       // you have taken is not a suggestion any more.
-      suggestions: suggestions
+      // Apps that ship inside the download come first: they always work, and
+      // "always works" is the thing a parent on a bad connection wants.
+      suggestions: bundledSuggestions().concat(suggestions)
         .filter((s) => !catalog.apps.some((a) => a.url === s.url))
         .map((s) => ({
           id: s.id, title: s.title, siteName: s.siteName, blurb: s.blurb,
           url: s.url, shape: s.shape, color: s.color,
           category: s.category, adSupported: s.adSupported, blockAds: s.blockAds,
+          bundled: s.bundled, credit: s.credit,
           notes: s.notes, allowHosts: s.allowHosts, denyHosts: s.denyHosts
         })),
       shapes: library.SHAPES,
@@ -1119,6 +1134,111 @@ async function runPortalShots () {
   app.exit(0);
 }
 
+/**
+ * Opens every bundled app for real and reports what it did and did not do.
+ *
+ * Three questions, in order of how much they matter: did it paint anything,
+ * could it read its own files, and could it reach anything else. The last one
+ * is asked from inside the app's own page, because that is where an answer
+ * means something.
+ */
+async function runBundledCheck () {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const say = (k, v) => console.log(`  ${String(k).padEnd(30)} ${v}`);
+
+  console.log('\n  ===== apps that ship inside the download =====\n');
+  if (bundledApps.length === 0) {
+    console.log('  none on disk\n');
+    return finishBundledCheck();
+  }
+
+  let allWell = true;
+
+  for (const b of bundledApps) {
+    console.log(`  --- ${b.title} (${b.credit || 'no credit recorded'}) ---`);
+
+    // Installed the same way a parent installs it, from the catalogue entry,
+    // so the check exercises the path that actually ships.
+    const added = await ipcCall('shell:add-site', {
+      title: b.title, url: b.url, shape: b.shape, color: b.color,
+      allowHosts: [b.id], denyHosts: [], blockAds: true
+    });
+    const appId = added && added.app ? added.app.id : null;
+    if (!appId) {
+      say('installed', `FAILED: ${added && added.message}`);
+      allWell = false;
+      continue;
+    }
+
+    await ipcCall('shell:launch', appId);
+    await sleep(2500);
+
+    const view = shellApp.gameView;
+    if (!view || view.webContents.isDestroyed()) {
+      say('opened', 'FAILED: no view');
+      allWell = false;
+      continue;
+    }
+    const js = (code) => view.webContents.executeJavaScript(code, true);
+
+    const here = await js('location.href');
+    say('address', here);
+
+    // Did it draw? An empty body means it loaded nothing that matters.
+    const drew = await js(`(() => {
+      const n = document.querySelectorAll('button, canvas, svg, img').length;
+      return JSON.stringify({ parts: n, title: document.title, lang: document.documentElement.lang });
+    })()`);
+    const shape = JSON.parse(drew);
+    say('drew', `${shape.parts} parts, title "${shape.title}", lang ${shape.lang}`);
+    if (shape.parts < 3) allWell = false;
+
+    // Its own files: reachable.
+    const own = await js(`fetch('${b.url}').then(r => r.status).catch(e => 'threw: ' + e.message)`);
+    say('its own files', own === 200 ? 'reachable' : `FAILED: ${own}`);
+    if (own !== 200) allWell = false;
+
+    // Everything else: not.
+    const out = await js(`fetch('https://example.com/', { mode: 'no-cors' })
+      .then(() => 'REACHED (bad)').catch(() => 'refused')`);
+    say('the internet', out);
+    if (out !== 'refused') allWell = false;
+
+    // And another bundled app's files, which is the one thing our own scheme
+    // could accidentally hand over.
+    const other = await js(`fetch('sukhiplay://somewhere-else/index.html')
+      .then(r => 'REACHED (bad): ' + r.status).catch(() => 'refused')`);
+    say('another app\'s files', other);
+    if (!String(other).startsWith('refused')) allWell = false;
+
+    if (typeof BUNDLED_CHECK === 'string') {
+      fs.mkdirSync(BUNDLED_CHECK, { recursive: true });
+      const image = await view.webContents.capturePage();
+      fs.writeFileSync(path.join(BUNDLED_CHECK, `${b.id}.png`), image.toPNG());
+      say('picture', path.join(BUNDLED_CHECK, `${b.id}.png`));
+    }
+
+    shellApp.goHome();
+    await sleep(400);
+    console.log('');
+  }
+
+  console.log(allWell
+    ? '  PASS: every bundled app runs, and none of them can reach anything else'
+    : '  FAIL: see above');
+  finishBundledCheck();
+}
+
+function finishBundledCheck () {
+  console.log('');
+  try { shortcuts.releaseAll(); } catch { /* nothing held */ }
+  shellApp.allowQuit = true;
+  saveReport();
+  app.exit(0);
+}
+
 async function runGateCheck () {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const say = (k, v) => console.log(`  ${String(k).padEnd(34)} ${v}`);
@@ -1651,6 +1771,43 @@ function applyDevIcon () {
   }
 }
 
+// Declared before the app is ready, which is the only time Electron accepts it.
+// Without `standard` the bundled apps get an opaque origin and localStorage
+// throws; without `secure` they count as insecure and lose the same APIs a
+// page served over http would.
+protocol.registerSchemesAsPrivileged([{
+  scheme: bundled.SCHEME,
+  privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true }
+}]);
+
+/**
+ * The bundled apps, shaped like catalogue suggestions.
+ *
+ * They are not in suggestions.json because that file is about sites: hosts,
+ * advertising, somebody's terms. None of that applies to files on this disk,
+ * and pretending otherwise would put a "no adverts" badge on something that
+ * has nowhere to serve one from.
+ */
+function bundledSuggestions () {
+  return bundledApps.map((b) => ({
+    id: b.id,
+    title: b.title,
+    siteName: b.siteName,
+    blurb: b.blurb,
+    url: b.url,
+    shape: b.shape,
+    color: b.color,
+    category: b.category,
+    adSupported: false,
+    blockAds: true,
+    bundled: true,
+    credit: b.credit,
+    notes: b.credit ? `${b.credit} (${b.licence}). Included in Sukhi Play.` : '',
+    allowHosts: [b.id],
+    denyHosts: []
+  }));
+}
+
 app.whenReady().then(() => {
   applyDevIcon();
   paths = {
@@ -1672,6 +1829,11 @@ app.whenReady().then(() => {
   suggestions = library.loadSuggestions(
     path.join(__dirname, '..', '..', 'config', 'suggestions.json'));
 
+  // Apps that live inside the download. No network, nothing to filter.
+  bundledApps = bundled.load(
+    path.join(__dirname, '..', '..', 'config', 'bundled.json'),
+    path.join(__dirname, '..', '..', 'vendor'));
+
   console.log(`[boot] ${catalog.apps.length} apps from ${catalog.source} catalog, ` +
               `${suggestions.length} suggestions available`);
   console.log(`[boot] config folder: ${paths.userData}`);
@@ -1680,6 +1842,7 @@ app.whenReady().then(() => {
   security.installGlobalHardening(app, () => policy);
 
   const kidSession = session.fromPartition(SESSION_PARTITION);
+  bundled.serve(kidSession.protocol, bundledApps);
   security.configureSession(kidSession, policy, {
     onBlocked: () => {
       if (shellApp) shellApp.pushState();
@@ -1883,6 +2046,11 @@ app.whenReady().then(() => {
     return;
   }
 
+  if (BUNDLED_CHECK) {
+    ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runBundledCheck(); }, 1500));
+    return;
+  }
+
   if (DEMO_DIR) {
     ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runDemo(); }, 1600));
     return;
@@ -1928,7 +2096,7 @@ app.whenReady().then(() => {
 
 app.on('before-quit', (event) => {
   if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || KEY_PROBE || START_PROBE ||
-      SHOTS_DIR || DEMO_DIR || GATE_CHECK || PORTAL_SHOTS) return;
+      SHOTS_DIR || DEMO_DIR || GATE_CHECK || PORTAL_SHOTS || BUNDLED_CHECK) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');

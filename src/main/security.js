@@ -4,6 +4,7 @@ const { shell } = require('electron');
 const { hostFromUrl, createHostGate } = require('./hosts');
 const blocklist = require('./blocklist');
 const keyboard = require('./keyboard');
+const bundled = require('./bundled');
 
 // Schemes the page may use internally. Everything else -- mailto:, steam:,
 // itms-apps:, ms-windows-store:, file: -- is a way to launch another program
@@ -29,6 +30,10 @@ function schemeOf (url) {
 function createPolicy () {
   let gate = createHostGate({ allow: [], deny: [] });
   let activeAppId = null;
+  // True while the open app is one that ships inside the download. It has no
+  // hosts to allow, so the ordinary allowlist would let nothing through -- and
+  // that is exactly right for everything except its own files.
+  let bundledActive = false;
   let blockAds = true;
   // While probing a new site we want to SEE what it loads rather than cut it.
   // Known ad hosts are still refused -- there is no reason to pull adverts down
@@ -46,6 +51,7 @@ function createPolicy () {
       probing = true;
       blockAds = true;
       activeAppId = '__probe__';
+      bundledActive = false;
       gate = createHostGate({ allow: [], deny: [] });
       for (const key of Object.keys(counts)) counts[key] = 0;
       seen.allowed.clear();
@@ -73,6 +79,7 @@ function createPolicy () {
     },
     setApp (app) {
       activeAppId = app ? app.id : null;
+      bundledActive = Boolean(app && app.bundled);
       blockAds = app ? app.blockAds !== false : true;
       gate = createHostGate({
         allow: app ? app.allowHosts : [],
@@ -96,6 +103,10 @@ function createPolicy () {
     // with each other during a probe.
     allowsHost (host) { return this.verdict(host) === 'allow'; },
     allowsUrl (url) {
+      // A bundled app is confined to its own origin. Nothing else on this
+      // scheme, and no web address, because it has no business on the network.
+      if (bundled.isBundledUrl(url)) return bundled.belongsTo(url, activeAppId);
+      if (bundledActive) return false;
       return WEB_SCHEMES.has(schemeOf(url)) && this.verdict(hostFromUrl(url)) === 'allow';
     },
     tally (key) { if (key in counts) counts[key] += 1; }
@@ -112,6 +123,15 @@ function configureSession (ses, policy, { onBlocked } = {}) {
     const scheme = schemeOf(url);
 
     if (INTERNAL_SCHEMES.has(scheme)) return callback({});
+
+    // A bundled app reading its own files. Checked against the open app so one
+    // bundled app can never pull another one's files into itself.
+    if (scheme === `${bundled.SCHEME}:`) {
+      if (bundled.belongsTo(url, policy.activeAppId)) return callback({});
+      policy.tally('offlist');
+      log('bundled', url, 'not this app');
+      return callback({ cancel: true });
+    }
 
     if (!WEB_SCHEMES.has(scheme)) {
       // file:, mailto:, steam:, and friends. Never.

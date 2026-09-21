@@ -15,3 +15,23 @@ Those files are (c) 2026 Mandeep Singh, all rights reserved. If you fork
 this project and distribute your own builds, replace them first. Running
 `python3 branding/generate-mascot.py` overwrites them with MIT-licensed
 placeholder artwork. See branding/README.md.
+
+
+Open-source apps bundled with Sukhi Play
+========================================
+
+Sukhi Play ships a small number of open-source apps so that a child with no
+internet connection still has something to open. They are other people's work,
+included under their own licences and unmodified except where noted. Each one
+lives under vendor/<name>/, with the upstream licence in vendor/<name>/LICENSE,
+the exact commit it was built from in vendor/<name>/UPSTREAM, and any changes
+we made recorded in vendor/<name>/patch.mjs.
+
+    vendor/kids-coloring
+        Kids Coloring, copyright (c) 2026 oh-namgyu, MIT licence.
+        https://github.com/oh-namgyu/kids-coloring
+        Changed for this build: English only, the language toggle removed,
+        the service worker removed, and asset paths made relative.
+
+Neither the authors of these apps nor their projects are connected to Sukhi
+Play or endorse it.

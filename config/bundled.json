@@ -1,0 +1,19 @@
+{
+  "_comment": "Open-source apps that ship inside Sukhi Play. Each lives in vendor/<id>/app, built by vendor/<id>/build.sh from the commit in vendor/<id>/UPSTREAM. Credit and licence are shown to the parent and repeated in NOTICE.",
+  "apps": [
+    {
+      "id": "colouring",
+      "title": "Colouring",
+      "siteName": "Kids Coloring",
+      "blurb": "Colour in animals, flowers and rockets, or just draw.",
+      "category": "Creative",
+      "shape": "paint",
+      "color": "#ec4899",
+      "entry": "index.html",
+      "credit": "Kids Coloring by oh-namgyu",
+      "licence": "MIT",
+      "sourceUrl": "https://github.com/oh-namgyu/kids-coloring",
+      "dir": "kids-coloring"
+    }
+  ]
+}

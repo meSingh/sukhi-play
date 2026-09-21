@@ -6,6 +6,9 @@ const path = require('node:path');
 const SHAPES = new Set(['star', 'rocket', 'ball', 'blocks', 'note', 'leaf', 'drop', 'bolt',
                         'heart', 'cloud', 'moon', 'flower', 'fish', 'book', 'paint', 'car']);
 const HEX = /^#[0-9a-fA-F]{6}$/;
+// Kept in step with bundled.js. Required here rather than imported, because
+// catalog.js is loaded by tests that never start Electron.
+const BUNDLED_SCHEME = 'sukhiplay';
 
 function sanitizeApp (raw, index) {
   if (!raw || typeof raw !== 'object') return null;
@@ -13,15 +16,19 @@ function sanitizeApp (raw, index) {
   const id = typeof raw.id === 'string' && raw.id.trim() ? raw.id.trim() : `app-${index}`;
   const title = typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : id;
 
-  // Only http/https may ever be launched. This is the first of several places
-  // that rule is enforced; see security.js for navigation and request checks.
+  // Only http/https and our own bundled scheme may ever be launched. This is
+  // the first of several places that rule is enforced; see security.js for
+  // navigation and request checks.
   let url;
   try {
     url = new URL(String(raw.url));
-    if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+    const ok = url.protocol === 'https:' || url.protocol === 'http:' ||
+               url.protocol === `${BUNDLED_SCHEME}:`;
+    if (!ok) return null;
   } catch {
     return null;
   }
+  const isBundled = url.protocol === `${BUNDLED_SCHEME}:`;
 
   const allowHosts = Array.isArray(raw.allowHosts)
     ? raw.allowHosts.filter((h) => typeof h === 'string' && h.trim()).map((h) => h.trim())
@@ -43,6 +50,9 @@ function sanitizeApp (raw, index) {
     enabled: raw.enabled !== false,
     allowHosts,
     denyHosts,
+    // A bundled app is files on this disk. There is no network behind it, so
+    // there is nothing to allow, nothing to filter, and no terms to weigh up.
+    bundled: isBundled,
     // Some sites say plainly in their terms that you may not block their
     // advertising. Set this false for those: the kiosk still contains the
     // child -- no other sites, no popups, no wandering off -- while the site
