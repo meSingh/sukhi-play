@@ -117,9 +117,22 @@ test('every app in the real manifest is on disk and credited', () => {
   }
 });
 
-test('nothing bundled reaches out to the network', () => {
+test('nothing bundled loads anything from the network', () => {
   const list = bundled.load(
     path.join(ROOT, 'config', 'bundled.json'), path.join(ROOT, 'vendor'));
+
+  // Things that make the browser go and fetch something. A plain <a href> is
+  // deliberately not one of them: the credit link back to an author's own
+  // repository stays, and the kiosk refuses to follow it anyway.
+  const FETCHES = [
+    [/\bsrc\s*=\s*["']https?:/i, 'a remote src'],
+    [/<link\b[^>]*\bhref\s*=\s*["']https?:/i, 'a remote stylesheet or preload'],
+    [/url\(\s*["']?https?:/i, 'a remote url() in CSS'],
+    [/@import\s+(url\()?["']https?:/i, 'a remote @import'],
+    [/\b(fetch|importScripts|import)\s*\(\s*["']https?:/i, 'a remote fetch or import'],
+    [/\bnew\s+(Image|Audio|Worker|EventSource|WebSocket)\s*\(\s*["']?(https?|wss?):/i,
+      'a remote resource constructor']
+  ];
 
   for (const app of list) {
     const files = [];
@@ -131,14 +144,48 @@ test('nothing bundled reaches out to the network', () => {
       }
     };
     walk(app.dir);
+    assert.ok(files.length > 0, `${app.id} has no files`);
 
     for (const file of files) {
       const text = fs.readFileSync(file, 'utf8');
-      // The point of a bundled app is that it works on a train. A remote font,
-      // script or image would make that false without anyone noticing.
-      const remote = text.match(/https?:\/\/(?!www\.w3\.org|schemas?\.|localhost)[\w.-]+/gi) || [];
-      assert.deepEqual(remote, [],
-        `${path.relative(ROOT, file)} refers to ${remote.join(', ')}`);
+      for (const [pattern, what] of FETCHES) {
+        // The point of a bundled app is that it works on a train. One remote
+        // font or script would make that false without anyone noticing.
+        const hit = text.match(pattern);
+        assert.equal(hit, null,
+          `${path.relative(ROOT, file)} has ${what}: ${hit && hit[0]}`);
+      }
     }
+  }
+});
+
+test('bundled apps do not reuse a catalogue shape or colour', () => {
+  const list = bundled.load(
+    path.join(ROOT, 'config', 'bundled.json'), path.join(ROOT, 'vendor'));
+  const sites = JSON.parse(
+    fs.readFileSync(path.join(ROOT, 'config', 'suggestions.json'), 'utf8')).suggestions;
+
+  // They sit in one grid, so a repeated shape or colour is two tiles a child
+  // cannot tell apart -- and telling them apart by picture is the whole point
+  // of not using favicons.
+  const shapes = new Map();
+  const colours = new Map();
+  for (const e of [...sites, ...list]) {
+    assert.ok(!shapes.has(e.shape),
+      `${e.id} and ${shapes.get(e.shape)} both use the shape "${e.shape}"`);
+    assert.ok(!colours.has(e.color),
+      `${e.id} and ${colours.get(e.color)} both use the colour ${e.color}`);
+    shapes.set(e.shape, e.id);
+    colours.set(e.color, e.id);
+  }
+});
+
+test('every bundled shape is one the app can actually draw', () => {
+  const list = bundled.load(
+    path.join(ROOT, 'config', 'bundled.json'), path.join(ROOT, 'vendor'));
+  const html = fs.readFileSync(path.join(ROOT, 'src', 'renderer', 'index.html'), 'utf8');
+  for (const app of list) {
+    assert.ok(html.includes(`id="shape-${app.shape}"`),
+      `${app.id} asks for the shape "${app.shape}", which has no drawing`);
   }
 });

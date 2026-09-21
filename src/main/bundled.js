@@ -184,6 +184,16 @@ function belongsTo (url, id) {
   }
 }
 
+/** The bundle id inside a sukhiplay:// address, or null. */
+function idOf (url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === `${SCHEME}:` ? u.hostname : null;
+  } catch {
+    return null;
+  }
+}
+
 function isBundledUrl (url) {
   try {
     return new URL(url).protocol === `${SCHEME}:`;
@@ -192,4 +202,4 @@ function isBundledUrl (url) {
   }
 }
 
-module.exports = { SCHEME, load, serve, belongsTo, isBundledUrl };
+module.exports = { SCHEME, load, serve, belongsTo, idOf, isBundledUrl };

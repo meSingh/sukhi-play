@@ -483,15 +483,19 @@
               <div class="picker picker--colors" id="form-colors"></div>
             </div>
 
-            <div class="field">
+            <div class="field" id="form-addr-field">
               <label class="field-label" for="form-addr">Address</label>
               <input id="form-addr" class="lib-input" type="text" inputmode="url"
                      autocomplete="off" spellcheck="false">
             </div>
 
+            <!-- Shown instead of the address for an app that lives inside the
+                 download. There is no address to type and no host to allow. -->
+            <p class="field-note form-inside" id="form-inside" hidden></p>
+
             <!-- Ad filtering is the thing most parents came for, so it is on
                  the page rather than behind "Advanced", where it sat unseen. -->
-            <div class="field field--inline field--ads">
+            <div class="field field--inline field--ads" id="form-ads-field">
               <label class="switch">
                 <input id="form-blockads" type="checkbox" checked>
                 <span class="switch-track"><span class="switch-knob"></span></span>

@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#7048e8" />
+    <title>Magic Smash</title>
+    <link rel="icon" href="icons/icon-512.png" type="image/png" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Magic Smash" />
+    <!-- Web fonts removed: this app ships offline. See vendor/magic-smash/patch.mjs. -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-theme="vehicles">
+    <main class="app-shell">
+      <header class="topbar">
+        <button class="brand" id="homeButton" type="button" aria-label="Ir para o início">
+          <span class="brand-star">✦</span>
+          <span>magic<br /><b>smash</b></span>
+        </button>
+
+        <div class="topbar-actions">
+          <div class="language-picker">
+            <label class="sr-only" for="languageSelect" data-i18n="language">Idioma</label>
+            <select id="languageSelect" aria-label="Idioma">
+              <option selected disabled>Carregando…</option>
+            </select>
+          </div>
+          <button class="icon-button" id="statsButton" type="button" data-open-panel="stats" aria-label="Estatísticas">
+            <span aria-hidden="true">⌁</span>
+          </button>
+          <button class="icon-button" id="settingsButton" type="button" data-open-panel="settings" aria-label="Configurações">
+            <span aria-hidden="true">⚙</span>
+          </button>
+          <span class="gate-hint hidden" id="gateHint" aria-live="polite" data-i18n="parentGateHint">Segure para abrir</span>
+        </div>
+      </header>
+
+      <section class="play-area" id="playArea" aria-live="polite">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+        <div class="ambient ambient-three"></div>
+        <div class="magic-layer" id="magicLayer" aria-hidden="true"></div>
+        <canvas class="doodle-canvas" id="doodleCanvas" aria-hidden="true"></canvas>
+        <div class="sparkles" id="sparkles" aria-hidden="true"></div>
+        <div class="theme-effects" id="themeEffects" aria-hidden="true"></div>
+
+        <div class="session-chip hidden" id="sessionChip">
+          <span class="pulse-dot"></span>
+          <span id="timer">05:00</span>
+        </div>
+        <button class="fullscreen-recovery hidden" id="fullscreenRecoveryButton" type="button">
+          <span aria-hidden="true">⛶</span> <span data-i18n="fullscreenRecovery">Voltar para tela cheia</span>
+        </button>
+
+        <div class="welcome-card" id="welcomeCard">
+          <p class="eyebrow" data-i18n="welcomeEyebrow">UM LUGAR SÓ SEU</p>
+          <h1 data-i18n="welcomeTitle">Aperte qualquer tecla<br />e faça acontecer.</h1>
+          <p class="welcome-copy" data-i18n="welcomeCopy">Cores, sons e surpresas para cada descoberta.</p>
+          <button class="primary-button" id="startButton" type="button">
+            <span class="play-icon" aria-hidden="true">▶</span>
+            <span data-i18n="start">Começar a brincar</span>
+          </button>
+          <p class="keyboard-tip"><span aria-hidden="true">⌨</span> <span data-i18n="keyboardTip">Use o teclado para brincar</span></p>
+          <section class="quick-options" aria-label="Opções rápidas para quem cuida">
+            <p class="quick-options-title" data-i18n="quickOptions">AJUSTES RÁPIDOS PARA QUEM CUIDA</p>
+            <div class="quick-controls">
+              <div class="quick-control theme-quick-control">
+                <span id="quickThemeName">Veículos</span>
+                <div class="quick-theme-buttons">
+                  <button class="quick-theme-button active" type="button" data-theme-choice="vehicles"><span aria-hidden="true">🚜</span><span class="sr-only" data-i18n="themeVehicles">Veículos</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="bubbles"><span aria-hidden="true">🫧</span><span class="sr-only" data-i18n="themeBubbles">Bolhas</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="music"><span aria-hidden="true">♫</span><span class="sr-only" data-i18n="themeMusic">Música</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="colors"><span aria-hidden="true">🌈</span><span class="sr-only" data-i18n="themeColors">Cores</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="weather"><span aria-hidden="true">🌦️</span><span class="sr-only" data-i18n="themeWeather">Clima</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="dinosaurs"><span aria-hidden="true">🦕</span><span class="sr-only" data-i18n="themeDinosaurs">Dinossauros</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="farm"><span aria-hidden="true">🐄</span><span class="sr-only" data-i18n="themeFarm">Fazenda</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="party"><span aria-hidden="true">🎈</span><span class="sr-only" data-i18n="themeParty">Festa</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="space"><span aria-hidden="true">👽</span><span class="sr-only" data-i18n="themeSpace">Espaço fofo</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="beach"><span aria-hidden="true">🏖️</span><span class="sr-only" data-i18n="themeBeach">Praia</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="ocean"><span aria-hidden="true">🐠</span><span class="sr-only" data-i18n="themeOcean">Oceano</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="lights"><span aria-hidden="true">💡</span><span class="sr-only" data-i18n="themeLights">Luzes</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="toys"><span aria-hidden="true">🧸</span><span class="sr-only" data-i18n="themeToys">Brinquedos</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="bedtime"><span aria-hidden="true">🌙</span><span class="sr-only" data-i18n="themeBedtime">Hora de dormir</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="safari"><span aria-hidden="true">🦁</span><span class="sr-only" data-i18n="themeSafari">Safári</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="robots"><span aria-hidden="true">🤖</span><span class="sr-only" data-i18n="themeRobots">Robôs</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="garden"><span aria-hidden="true">🌻</span><span class="sr-only" data-i18n="themeGarden">Jardim</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="seasons"><span aria-hidden="true">🍂</span><span class="sr-only" data-i18n="themeSeasons">Estações</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="construction"><span aria-hidden="true">🏗️</span><span class="sr-only" data-i18n="themeConstruction">Obra</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="fantasy"><span aria-hidden="true">🦄</span><span class="sr-only" data-i18n="themeFantasy">Fantasia</span></button>
+                  <button class="quick-theme-button" type="button" data-theme-choice="polar"><span aria-hidden="true">🐧</span><span class="sr-only" data-i18n="themePolar">Polar</span></button>
+                </div>
+              </div>
+              <label class="quick-control sound-quick-control" for="quickSoundToggle"><span data-i18n="quickSound">Som</span>
+                <span class="quick-sound-switch"><input id="quickSoundToggle" data-sound-toggle type="checkbox" checked /><i></i></span>
+              </label>
+              <label class="quick-control vibration-quick-control" for="quickVibrationToggle"><span data-i18n="vibration">Vibração</span>
+                <span class="quick-sound-switch"><input id="quickVibrationToggle" data-vibration-toggle type="checkbox" /><i></i></span>
+              </label>
+              <div class="quick-control mode-quick-control">
+                <span data-i18n="appearance">Aparência</span>
+                <div class="quick-mode-buttons">
+                  <button class="quick-mode-button active" type="button" data-mode-choice="light" aria-label="Modo claro">☀</button>
+                  <button class="quick-mode-button" type="button" data-mode-choice="dark" aria-label="Modo escuro">☾</button>
+                </div>
+              </div>
+            </div>
+            <div class="ios-install-tip hidden" id="iosInstallTip">
+              <p data-i18n="iosInstallTip">No iPhone ou iPad, toque no botão Compartilhar e depois em "Adicionar à Tela de Início" para instalar o Magic Smash.</p>
+              <button class="text-button" id="dismissIosTip" type="button" data-i18n="gotIt">Entendi</button>
+            </div>
+          </section>
+        </div>
+
+        <div class="key-stage hidden" id="keyStage">
+          <p class="tiny-message" id="encouragement">Você conseguiu!</p>
+          <div class="key-orb-wrap">
+            <div class="held-key-ring" id="heldKeyRing" aria-hidden="true"></div>
+            <div class="key-orb" id="keyOrb" role="img" aria-label="Última tecla pressionada">?</div>
+          </div>
+          <p class="key-name" id="keyName">vamos lá!</p>
+          <div class="streak-pill" id="streakPill"><span>✦</span> <span id="streakText">1 sequência</span></div>
+        </div>
+
+        <div class="bottom-prompt" id="bottomPrompt"><span data-i18n="bottomPrompt">É só apertar uma tecla</span> <span aria-hidden="true">↓</span></div>
+        <p class="credit-footer">Made with <span aria-hidden="true">❤️</span> by <a href="https://github.com/MenesesEvandro/MagicSmash" target="_blank" rel="noopener noreferrer">MenesesEvandro</a></p>
+      </section>
+    </main>
+
+    <aside class="side-panel" id="sidePanel" aria-hidden="true" aria-labelledby="panelTitle">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow" id="panelEyebrow">PARA QUEM CUIDA</p>
+          <h2 id="panelTitle">Configurações</h2>
+        </div>
+        <button class="close-button" id="closePanel" type="button" aria-label="Fechar">×</button>
+      </div>
+
+      <section class="panel-content" id="settingsPanel">
+        <div class="child-card">
+          <span class="child-avatar" id="childAvatar">✦</span>
+          <div>
+            <p data-i18n="playingAs">Brincando como</p>
+            <strong id="profileName">Pequena estrela</strong>
+          </div>
+          <button class="text-button" id="editProfile" type="button" data-i18n="edit">Editar</button>
+        </div>
+
+        <div class="setting-group">
+          <label for="durationSelect" data-i18n="duration">Tempo de brincadeira</label>
+          <select id="durationSelect" data-duration-select>
+            <option value="0" data-i18n="unlimited">Sem limite</option>
+            <option value="3">3 min</option>
+            <option value="5" selected>5 min</option>
+            <option value="10">10 min</option>
+            <option value="15">15 min</option>
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60">60 min</option>
+          </select>
+          <button class="secondary-button end-session-button hidden" id="endSessionButton" type="button">
+            <span data-i18n="endSession">Encerrar brincadeira agora</span>
+          </button>
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-label-row">
+            <span class="setting-label" data-i18n="theme">Tema</span>
+            <span id="themeName">Cosmos</span>
+          </div>
+          <div class="theme-grid" id="themeGrid">
+            <button class="theme-option active" type="button" data-theme-choice="vehicles"><span class="theme-swatch vehicles">🚜</span><span data-i18n="themeVehicles">Veículos</span></button>
+            <button class="theme-option" type="button" data-theme-choice="bubbles"><span class="theme-swatch bubbles">🫧</span><span data-i18n="themeBubbles">Bolhas</span></button>
+            <button class="theme-option" type="button" data-theme-choice="music"><span class="theme-swatch music">♫</span><span data-i18n="themeMusic">Música</span></button>
+            <button class="theme-option" type="button" data-theme-choice="colors"><span class="theme-swatch colors">🌈</span><span data-i18n="themeColors">Cores</span></button>
+            <button class="theme-option" type="button" data-theme-choice="weather"><span class="theme-swatch weather">🌦️</span><span data-i18n="themeWeather">Clima</span></button>
+            <button class="theme-option" type="button" data-theme-choice="dinosaurs"><span class="theme-swatch dinosaurs">🦕</span><span data-i18n="themeDinosaurs">Dinossauros</span></button>
+            <button class="theme-option" type="button" data-theme-choice="farm"><span class="theme-swatch farm">🐄</span><span data-i18n="themeFarm">Fazenda</span></button>
+            <button class="theme-option" type="button" data-theme-choice="party"><span class="theme-swatch party">🎈</span><span data-i18n="themeParty">Festa</span></button>
+            <button class="theme-option" type="button" data-theme-choice="space"><span class="theme-swatch space">👽</span><span data-i18n="themeSpace">Espaço fofo</span></button>
+            <button class="theme-option" type="button" data-theme-choice="beach"><span class="theme-swatch beach">🏖️</span><span data-i18n="themeBeach">Praia</span></button>
+            <button class="theme-option" type="button" data-theme-choice="ocean"><span class="theme-swatch ocean">🐠</span><span data-i18n="themeOcean">Oceano</span></button>
+            <button class="theme-option" type="button" data-theme-choice="lights"><span class="theme-swatch lights">💡</span><span data-i18n="themeLights">Luzes</span></button>
+            <button class="theme-option" type="button" data-theme-choice="toys"><span class="theme-swatch toys">🧸</span><span data-i18n="themeToys">Brinquedos</span></button>
+            <button class="theme-option" type="button" data-theme-choice="bedtime"><span class="theme-swatch bedtime">🌙</span><span data-i18n="themeBedtime">Hora de dormir</span></button>
+            <button class="theme-option" type="button" data-theme-choice="safari"><span class="theme-swatch safari">🦁</span><span data-i18n="themeSafari">Safári</span></button>
+            <button class="theme-option" type="button" data-theme-choice="robots"><span class="theme-swatch robots">🤖</span><span data-i18n="themeRobots">Robôs</span></button>
+            <button class="theme-option" type="button" data-theme-choice="garden"><span class="theme-swatch garden">🌻</span><span data-i18n="themeGarden">Jardim</span></button>
+            <button class="theme-option" type="button" data-theme-choice="seasons"><span class="theme-swatch seasons">🍂</span><span data-i18n="themeSeasons">Estações</span></button>
+            <button class="theme-option" type="button" data-theme-choice="construction"><span class="theme-swatch construction">🏗️</span><span data-i18n="themeConstruction">Obra</span></button>
+            <button class="theme-option" type="button" data-theme-choice="fantasy"><span class="theme-swatch fantasy">🦄</span><span data-i18n="themeFantasy">Fantasia</span></button>
+            <button class="theme-option" type="button" data-theme-choice="polar"><span class="theme-swatch polar">🐧</span><span data-i18n="themePolar">Polar</span></button>
+          </div>
+        </div>
+
+        <div class="setting-group appearance-group">
+          <span class="setting-label" data-i18n="appearance">Aparência</span>
+          <div class="mode-options">
+            <button class="mode-option active" type="button" data-mode-choice="light"><span aria-hidden="true">☀</span><span data-i18n="lightMode">Claro</span></button>
+            <button class="mode-option" type="button" data-mode-choice="dark"><span aria-hidden="true">☾</span><span data-i18n="darkMode">Escuro</span></button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div><strong id="highContrastLabel" data-i18n="highContrast">Alto contraste</strong><p id="highContrastDesc" data-i18n="highContrastHelp">Reforça o contraste do modo escolhido</p></div>
+          <label class="toggle"><input id="highContrastToggle" data-high-contrast-toggle type="checkbox" aria-labelledby="highContrastLabel" aria-describedby="highContrastDesc" /><span></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div><strong id="soundLabel" data-i18n="sound">Sons suaves</strong><p id="soundDesc" data-i18n="soundHelp">Um som a cada tecla</p></div>
+          <label class="toggle"><input id="soundToggle" data-sound-toggle type="checkbox" checked aria-labelledby="soundLabel" aria-describedby="soundDesc" /><span></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong id="vibrationLabel" data-i18n="vibration">Vibração</strong><p id="vibrationDesc" data-i18n="vibrationHelp">Uma vibração a cada tecla, se o aparelho permitir</p></div>
+          <label class="toggle"><input id="vibrationToggle" data-vibration-toggle type="checkbox" aria-labelledby="vibrationLabel" aria-describedby="vibrationDesc" /><span></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong id="kaleidoscopeLabel" data-i18n="kaleidoscope">Caleidoscópio</strong><p id="kaleidoscopeDesc" data-i18n="kaleidoscopeHelp">Espelha os efeitos ao redor da tela</p></div>
+          <label class="toggle"><input id="kaleidoscopeToggle" data-kaleidoscope-toggle type="checkbox" aria-labelledby="kaleidoscopeLabel" aria-describedby="kaleidoscopeDesc" /><span></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong id="doodleModeLabel" data-i18n="doodleMode">Modo rabiscos</strong><p id="doodleModeDesc" data-i18n="doodleModeHelp">Arraste o dedo ou o mouse para desenhar por cima da tela, em qualquer tema</p></div>
+          <label class="toggle"><input id="doodleModeToggle" data-doodle-mode-toggle type="checkbox" aria-labelledby="doodleModeLabel" aria-describedby="doodleModeDesc" /><span></span></label>
+        </div>
+        <div class="setting-row doodle-actions" aria-live="polite">
+          <button class="secondary-button doodle-button" id="clearDoodleButton" type="button" data-i18n="clearDrawing">Limpar desenho</button>
+          <button class="secondary-button doodle-button" id="saveDoodleButton" type="button" data-i18n="saveDrawing">Salvar desenho</button>
+        </div>
+        <div class="setting-row">
+          <div><strong id="shakeToClearLabel" data-i18n="shakeToClear">Sacudir para limpar</strong><p id="shakeToClearDesc" data-i18n="shakeToClearHelp">Sacuda o aparelho para limpar a tela com um som de "shhh", como uma lousa mágica</p></div>
+          <label class="toggle"><input id="shakeToClearToggle" data-shake-to-clear-toggle type="checkbox" aria-labelledby="shakeToClearLabel" aria-describedby="shakeToClearDesc" /><span></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong id="noteColorsLabel" data-i18n="noteColors">Cor por nota</strong><p id="noteColorsDesc" data-i18n="noteColorsHelp">A bolinha central sempre acende a mesma cor para a mesma nota musical</p></div>
+          <label class="toggle"><input id="noteColorsToggle" data-note-colors-toggle type="checkbox" aria-labelledby="noteColorsLabel" aria-describedby="noteColorsDesc" /><span></span></label>
+        </div>
+        <div class="setting-row">
+          <div><strong id="parentGateLabel" data-i18n="parentGate">Acesso dos pais</strong><p id="parentGateDesc" data-i18n="parentGateHelp">Segure os botões do topo por 2 segundos para abrir</p></div>
+          <label class="toggle"><input id="parentGateToggle" data-parent-gate-toggle type="checkbox" checked aria-labelledby="parentGateLabel" aria-describedby="parentGateDesc" /><span></span></label>
+        </div>
+        <button class="text-button screen-pinning-link" id="screenPinningButton" type="button" data-i18n="screenPinningLink">Como travar a tela de vez</button>
+        <div class="setting-row">
+          <div><strong id="edgeDeadZoneLabel" data-i18n="edgeDeadZone">Ignorar bordas</strong><p id="edgeDeadZoneDesc" data-i18n="edgeDeadZoneHelp">Toques bem na borda da tela não contam, para mãozinhas que seguram o tablet pelas bordas</p></div>
+          <label class="toggle"><input id="edgeDeadZoneToggle" data-edge-dead-zone-toggle type="checkbox" aria-labelledby="edgeDeadZoneLabel" aria-describedby="edgeDeadZoneDesc" /><span></span></label>
+        </div>
+        <div class="setting-row range-row">
+          <div><strong id="edgeDeadZoneSizeLabel" data-i18n="edgeDeadZoneSize">Tamanho da zona morta</strong><p id="edgeDeadZoneSizeDesc" data-i18n="edgeDeadZoneSizeHelp">Quanto maior, mais espaço perto das bordas é ignorado</p></div>
+          <input id="edgeDeadZoneSize" type="range" min="0" max="2" value="1" aria-labelledby="edgeDeadZoneSizeLabel" aria-describedby="edgeDeadZoneSizeDesc" />
+        </div>
+        <div class="setting-row">
+          <div><strong id="palmRejectionLabel" data-i18n="palmRejection">Ignorar mão apoiada</strong><p id="palmRejectionDesc" data-i18n="palmRejectionHelp">Um antebraço ou a palma da mão apoiados na tela não contam como toque</p></div>
+          <label class="toggle"><input id="palmRejectionToggle" data-palm-rejection-toggle type="checkbox" aria-labelledby="palmRejectionLabel" aria-describedby="palmRejectionDesc" /><span></span></label>
+        </div>
+        <div class="setting-row range-row">
+          <div><strong id="letterSizeLabel" data-i18n="letterSize">Tamanho das letras</strong><p id="letterSizeDesc" data-i18n="letterSizeHelp">Mais conforto para enxergar</p></div>
+          <input id="letterSize" type="range" min="0" max="2" value="1" aria-labelledby="letterSizeLabel" aria-describedby="letterSizeDesc" />
+        </div>
+        <button class="secondary-button" id="fullscreenButton" type="button"><span aria-hidden="true">⛶</span> <span data-i18n="fullscreen">Abrir em tela cheia</span></button>
+
+        <div class="update-banner hidden" id="updateBanner">
+          <p data-i18n="updateAvailable">Uma nova versão está disponível.</p>
+          <button class="secondary-button" id="updateNowButton" type="button" data-i18n="updateNow">Atualizar agora</button>
+        </div>
+      </section>
+
+      <section class="panel-content hidden" id="statsPanel">
+        <div class="stats-hero">
+          <span>✦</span>
+          <p data-i18n="allTime">DESDE O COMEÇO</p>
+          <strong id="totalPresses">0</strong>
+          <small data-i18n="keysPressed">teclas apertadas</small>
+        </div>
+        <div class="stat-grid">
+          <article><span>⌁</span><strong id="totalMinutes">0 min</strong><small data-i18n="timePlaying">tempo brincando</small></article>
+          <article><span>♢</span><strong id="totalUnique">0</strong><small data-i18n="uniqueKeys">teclas diferentes</small></article>
+          <article><span>⚡</span><strong id="bestSpeed">0</strong><small data-i18n="bestSpeed">melhor ritmo / min</small></article>
+          <article><span>♥</span><strong id="favoriteKey">—</strong><small data-i18n="favoriteKey">tecla favorita</small></article>
+        </div>
+        <div class="session-summary" id="sessionSummary">
+          <p data-i18n="sessionStats">ESTA BRINCADEIRA</p>
+          <div><span id="sessionPresses">0</span><small data-i18n="keysPressed">teclas apertadas</small></div>
+          <div><span id="sessionStreak">0</span><small data-i18n="bestStreak">melhor sequência</small></div>
+        </div>
+        <button class="danger-link" id="resetStats" type="button" data-i18n="resetStats">Apagar estatísticas deste aparelho</button>
+      </section>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <dialog class="profile-dialog" id="profileDialog">
+      <form method="dialog" id="profileForm">
+        <button class="dialog-close" type="submit" value="cancel" aria-label="Fechar">×</button>
+        <span class="dialog-star">✦</span>
+        <h2 data-i18n="profileTitle">Quem está brincando?</h2>
+        <p data-i18n="profileHelp">Este nome fica salvo só neste aparelho.</p>
+        <label for="childName" data-i18n="nameLabel">Nome ou apelido</label>
+        <input id="childName" maxlength="18" autocomplete="off" placeholder="Pequena estrela" />
+        <button class="primary-button small" type="submit" value="save" data-i18n="save">Salvar</button>
+      </form>
+    </dialog>
+
+    <dialog class="end-dialog" id="endDialog">
+      <div>
+        <span class="celebration">★</span>
+        <p class="eyebrow" data-i18n="greatSession">QUE BRINCADEIRA LINDA!</p>
+        <h2 data-i18n="sessionComplete">Sessão concluída</h2>
+        <div class="end-stats"><div><strong id="endPresses">0</strong><span data-i18n="keysPressed">teclas apertadas</span></div><div><strong id="endUnique">0</strong><span data-i18n="uniqueKeys">teclas diferentes</span></div><div><strong id="endStreak">0</strong><span data-i18n="bestStreak">melhor sequência</span></div></div>
+        <button class="primary-button" id="playAgain" type="button"><span data-i18n="playAgain">Brincar mais</span></button>
+        <div class="end-dialog-actions">
+          <button class="secondary-button" id="goHomeButton" type="button"><span data-i18n="backToHome">Voltar para a página inicial</span></button>
+          <button class="secondary-button" id="shareButton" type="button"><span data-i18n="share">Compartilhar</span></button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="screen-pinning-dialog" id="screenPinningDialog">
+      <button class="dialog-close" id="closeScreenPinningDialog" type="button" aria-label="Fechar">×</button>
+      <h2 data-i18n="screenPinningTitle">Travar a tela de vez</h2>
+      <p data-i18n="screenPinningIntro">O acesso dos pais impede toques curiosos, mas não trava os gestos do próprio aparelho — um deslizar ou o botão de início ainda saem do app. Para travar de verdade, use o recurso do próprio sistema:</p>
+      <h3 data-i18n="screenPinningIosTitle">iPhone ou iPad (Acesso Guiado)</h3>
+      <ol>
+        <li data-i18n="screenPinningIosStep1">Ajustes → Acessibilidade → Acesso Guiado → ativar</li>
+        <li data-i18n="screenPinningIosStep2">Com o Magic Smash aberto, aperte o botão lateral três vezes</li>
+        <li data-i18n="screenPinningIosStep3">Toque em Iniciar, no canto superior direito</li>
+      </ol>
+      <h3 data-i18n="screenPinningAndroidTitle">Android (fixar app)</h3>
+      <ol>
+        <li data-i18n="screenPinningAndroidStep1">Ajustes → Segurança → Fixar app → ativar</li>
+        <li data-i18n="screenPinningAndroidStep2">Nos apps recentes, toque no ícone do Magic Smash e escolha Fixar</li>
+      </ol>
+      <p class="screen-pinning-note" data-i18n="screenPinningAndroidNote">O caminho exato varia um pouco de aparelho para aparelho.</p>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>

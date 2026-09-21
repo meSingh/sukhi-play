@@ -1,0 +1,469 @@
+import { $, $$ } from "./dom.js";
+import { clearDoodle, initializeDoodle, saveDoodleArtwork } from "./doodle.js";
+import {
+	resetIdleTimer,
+	startBackgroundShuffle,
+	stopIdleTimer,
+} from "./effects.js";
+import {
+	endGame,
+	pressKey,
+	pressPointer,
+	releaseKey,
+	releasePointer,
+	startGame,
+	stopHeldKeyGrowth,
+	updateParentGateLocks,
+	updateStats,
+} from "./game.js";
+import { languages, loadLanguages, populateLanguageSelect, t } from "./i18n.js";
+import {
+	disableShakeToClear,
+	enableShakeToClear,
+	initializeShakeToClear,
+} from "./motion.js";
+import {
+	dismissIosInstallTip,
+	linkManifest,
+	registerServiceWorker,
+	shouldShowIosInstallTip,
+} from "./pwa.js";
+import { data, initialData, resetStats, saveData, state } from "./state.js";
+import { themeIcons } from "./themes.js";
+import {
+	applyAnimationSettings,
+	closePanel,
+	openPanel,
+	PARENT_GATE_HOLD_MS,
+	setColorMode,
+	setLanguage,
+	setTheme,
+	shareSessionResults,
+	showIosInstallTip,
+	showParentGateHint,
+	showUpdateBanner,
+	updateDoodleMode,
+	updateDuration,
+	updateEdgeDeadZone,
+	updateHighContrast,
+	updateKaleidoscope,
+	updateLetterSize,
+	updateNoteColors,
+	updatePalmRejection,
+	updateParentGate,
+	updateShakeToClear,
+	updateSound,
+	updateVibration,
+} from "./ui.js";
+
+initializeDoodle();
+initializeShakeToClear();
+
+$("#clearDoodleButton").addEventListener("click", () => {
+	clearDoodle();
+});
+$("#saveDoodleButton").addEventListener("click", () => {
+	saveDoodleArtwork();
+});
+
+$("#startButton").addEventListener("click", async () => {
+	if (!document.fullscreenElement) {
+		try {
+			await document.documentElement.requestFullscreen();
+		} catch {
+			/* Full screen is optional if the browser blocks it. */
+		}
+	}
+	startGame();
+});
+$("#homeButton").addEventListener("click", () => {
+	if (!state.playing) window.scrollTo({ top: 0, behavior: "smooth" });
+});
+window.addEventListener("keydown", pressKey, { passive: false });
+window.addEventListener("keyup", releaseKey, { passive: true });
+$("#playArea").addEventListener("pointerdown", pressPointer, {
+	passive: false,
+});
+$("#playArea").addEventListener("pointermove", pressPointer, {
+	passive: false,
+});
+$("#playArea").addEventListener("pointerup", releasePointer, { passive: true });
+$("#playArea").addEventListener("pointercancel", releasePointer, {
+	passive: true,
+});
+$("#playArea").addEventListener("pointerleave", releasePointer, {
+	passive: true,
+});
+/**
+ * Whether the parent gate stands between a press and the panels right now:
+ * whenever the setting is on, welcome screen included — a toddler left
+ * alone with the tablet before a session even starts can otherwise open
+ * Settings with a single tap. Once the panel is already open, the buttons
+ * behave normally again: the gate exists to stop a toddler getting in, not
+ * to slow the parent down switching between Settings and Stats once
+ * they're already past it.
+ */
+function parentGateActive() {
+	return data.parentGate && !$("#sidePanel").classList.contains("open");
+}
+
+/**
+ * The panel-button hold in progress, if any: its button, its timer, and the
+ * holder that started it — a pointerId, or "keyboard" for an Enter/Space
+ * hold. Only that same holder can cancel it, so a toddler's concurrent taps
+ * landing on the buttons can't break the parent's hold partway through.
+ */
+let gateHold = null;
+
+function cancelGateHold() {
+	if (!gateHold) return;
+	clearTimeout(gateHold.timerId);
+	gateHold.button.classList.remove("gate-holding");
+	gateHold = null;
+}
+
+/**
+ * The key whose hold just opened the panel, from that moment until it is
+ * released; null otherwise. Opening the panel moves focus to its close
+ * button while the Enter/Space is still physically down, so the OS's key
+ * repeats would otherwise natively activate the close button — shutting the
+ * panel right after it opened. Swallowing that key's repeats (and only its
+ * repeats — a fresh press is a deliberate act) until its own keyup closes
+ * the gap; tracking the specific key means some other key's keyup (a
+ * toddler's finger lifting elsewhere on the keyboard) can't end the
+ * suppression early while the held key is still down.
+ */
+let swallowRepeatsOfKey = null;
+window.addEventListener(
+	"keydown",
+	(event) => {
+		if (event.repeat && event.key === swallowRepeatsOfKey) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	},
+	{ capture: true },
+);
+window.addEventListener(
+	"keyup",
+	(event) => {
+		if (event.key === swallowRepeatsOfKey) swallowRepeatsOfKey = null;
+	},
+	{ capture: true },
+);
+// Once the window loses focus, key events stop being delivered — the held
+// key's keyup may simply never arrive, which would leave the suppression
+// stuck until some future press of the same key. By the time the app is
+// back, the key is long released, so clearing is always the right call.
+// The same loss of context also strands a held-key growth loop — its
+// keyup, just like the gate's repeat suppression above, may never arrive.
+window.addEventListener("blur", () => {
+	swallowRepeatsOfKey = null;
+	stopHeldKeyGrowth();
+});
+document.addEventListener("visibilitychange", () => {
+	if (document.visibilityState === "hidden") {
+		swallowRepeatsOfKey = null;
+		stopHeldKeyGrowth();
+		// Attract mode exists to catch a nearby child's eye; on a page
+		// nobody can see, its ticker would just churn the DOM for nothing.
+		stopIdleTimer();
+	} else {
+		// Back in view: re-arm the countdown so the background can still
+		// liven up for a child who's watching but not touching. A no-op
+		// unless a session is actually running.
+		resetIdleTimer();
+	}
+});
+
+function beginGateHold(button, holder, heldKey) {
+	button.classList.add("gate-holding");
+	gateHold = {
+		button,
+		holder,
+		timerId: window.setTimeout(() => {
+			cancelGateHold();
+			if (holder === "keyboard") swallowRepeatsOfKey = heldKey;
+			openPanel(button.dataset.openPanel);
+		}, PARENT_GATE_HOLD_MS),
+	};
+}
+
+// With the gate down, a plain click opens the panel. With it up, the click
+// only shows the "hold to open" hint, and holding the button for
+// PARENT_GATE_HOLD_MS — pointer kept down and on the button the whole time,
+// with a CSS fill animating the same duration as feedback — is what opens
+// it. Deliberately parent-shaped: a toddler's taps are far too brief.
+// Holding Enter or Space on the focused button works the same way, so the
+// gate never locks out someone who can't use a pointer.
+$$("[data-open-panel]").forEach((button) => {
+	button.addEventListener("click", () => {
+		if (parentGateActive()) {
+			showParentGateHint();
+			return;
+		}
+		openPanel(button.dataset.openPanel);
+	});
+	button.addEventListener("pointerdown", (event) => {
+		if (!parentGateActive() || gateHold) return;
+		beginGateHold(button, event.pointerId);
+	});
+	for (const type of ["pointerup", "pointercancel", "pointerleave"]) {
+		button.addEventListener(type, (event) => {
+			if (gateHold?.button === button && gateHold.holder === event.pointerId)
+				cancelGateHold();
+		});
+	}
+	button.addEventListener("keydown", (event) => {
+		if (!parentGateActive()) return;
+		if (event.key !== "Enter" && event.key !== " ") return;
+		// No native click synthesis (the click would only flash the hint),
+		// and no play effects from the game's global keydown handler while
+		// the parent is deliberately holding the gate open.
+		event.preventDefault();
+		event.stopPropagation();
+		if (event.repeat || gateHold) return;
+		beginGateHold(button, "keyboard", event.key);
+	});
+	button.addEventListener("keyup", (event) => {
+		if (event.key !== "Enter" && event.key !== " ") return;
+		if (gateHold?.button === button && gateHold.holder === "keyboard") {
+			cancelGateHold();
+			// Pointer users get the hint from the click that follows a short
+			// press; a released key produces no click, so show it here.
+			showParentGateHint();
+		}
+	});
+	button.addEventListener("blur", () => {
+		if (gateHold?.button === button && gateHold.holder === "keyboard")
+			cancelGateHold();
+	});
+	// A 2-second touch hold is also how browsers open context menus; that
+	// would interrupt the hold right before it completes.
+	button.addEventListener("contextmenu", (event) => {
+		if (parentGateActive()) event.preventDefault();
+	});
+});
+$("#closePanel").addEventListener("click", closePanel);
+$("#scrim").addEventListener("click", closePanel);
+$("#languageSelect").addEventListener("change", (event) =>
+	setLanguage(event.target.value),
+);
+$$("[data-duration-select]").forEach((select) => {
+	select.addEventListener("change", (event) => {
+		data.duration = Number(event.target.value);
+		updateDuration();
+		saveData();
+	});
+});
+$$("[data-theme-choice]").forEach((button) => {
+	button.addEventListener("click", () => setTheme(button.dataset.themeChoice));
+});
+$$("[data-mode-choice]").forEach((button) => {
+	button.addEventListener("click", () =>
+		setColorMode(button.dataset.modeChoice),
+	);
+});
+$$("[data-high-contrast-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", (event) => {
+		data.highContrast = event.target.checked;
+		updateHighContrast();
+		saveData();
+	});
+});
+$$("[data-sound-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", (event) => {
+		data.sound = event.target.checked;
+		updateSound();
+		saveData();
+	});
+});
+$$("[data-vibration-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", (event) => {
+		data.vibration = event.target.checked;
+		updateVibration();
+		saveData();
+	});
+});
+$$("[data-kaleidoscope-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", (event) => {
+		data.kaleidoscope = event.target.checked;
+		updateKaleidoscope();
+		saveData();
+	});
+});
+$$("[data-doodle-mode-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", (event) => {
+		data.doodleMode = event.target.checked;
+		updateDoodleMode();
+		saveData();
+	});
+});
+$$("[data-shake-to-clear-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", async (event) => {
+		const turningOn = event.target.checked;
+		// A real click, so the exact moment enableShakeToClear() can ask iOS
+		// for its motion permission — deferring past this handler would make
+		// that request silently fail.
+		const active = turningOn ? await enableShakeToClear() : false;
+		if (!turningOn) disableShakeToClear();
+		data.shakeToClear = active;
+		updateShakeToClear();
+		saveData();
+	});
+});
+$$("[data-note-colors-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", (event) => {
+		data.noteColors = event.target.checked;
+		updateNoteColors();
+		saveData();
+	});
+});
+$$("[data-parent-gate-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", (event) => {
+		data.parentGate = event.target.checked;
+		updateParentGate();
+		updateParentGateLocks();
+		saveData();
+	});
+});
+$$("[data-edge-dead-zone-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", (event) => {
+		data.edgeDeadZone = event.target.checked;
+		updateEdgeDeadZone();
+		saveData();
+	});
+});
+$("#edgeDeadZoneSize").addEventListener("input", (event) => {
+	data.edgeDeadZoneSize = Number(event.target.value);
+	saveData();
+});
+$$("[data-palm-rejection-toggle]").forEach((toggle) => {
+	toggle.addEventListener("change", (event) => {
+		data.palmRejection = event.target.checked;
+		updatePalmRejection();
+		saveData();
+	});
+});
+$("#letterSize").addEventListener("input", (event) => {
+	data.letterSize = Number(event.target.value);
+	updateLetterSize();
+	saveData();
+});
+$("#fullscreenButton").addEventListener("click", async () => {
+	try {
+		await document.documentElement.requestFullscreen();
+		closePanel();
+	} catch {
+		/* Browser may deny fullscreen until another gesture. */
+	}
+});
+$("#fullscreenRecoveryButton").addEventListener("click", async () => {
+	try {
+		await document.documentElement.requestFullscreen();
+	} catch {
+		/* Stays visible if the browser denies it — the same tap tries again. */
+	}
+});
+$("#screenPinningButton").addEventListener("click", () => {
+	$("#screenPinningDialog").showModal();
+});
+$("#closeScreenPinningDialog").addEventListener("click", () => {
+	$("#screenPinningDialog").close();
+});
+$("#editProfile").addEventListener("click", () => {
+	$("#childName").value = data.profile;
+	$("#profileDialog").showModal();
+	$("#childName").focus();
+});
+$("#profileForm").addEventListener("submit", (event) => {
+	if (event.submitter?.value !== "save") return;
+	data.profile = $("#childName").value.trim();
+	$("#profileName").textContent = data.profile || t("unnamed");
+	saveData();
+});
+$("#playAgain").addEventListener("click", () => {
+	$("#endDialog").close();
+	startGame();
+});
+$("#goHomeButton").addEventListener("click", () => {
+	$("#endDialog").close();
+	window.scrollTo({ top: 0, behavior: "smooth" });
+});
+$("#shareButton").addEventListener("click", () => shareSessionResults());
+$("#endSessionButton").addEventListener("click", () => {
+	closePanel();
+	endGame();
+});
+$("#resetStats").addEventListener("click", () => {
+	if (!window.confirm(t("resetStatsConfirm"))) return;
+	const keep = {
+		profile: data.profile,
+		language: data.language,
+		theme: data.theme,
+		colorMode: data.colorMode,
+		duration: data.duration,
+		sound: data.sound,
+		vibration: data.vibration,
+		kaleidoscope: data.kaleidoscope,
+		doodleMode: data.doodleMode,
+		shakeToClear: data.shakeToClear,
+		noteColors: data.noteColors,
+		highContrast: data.highContrast,
+		parentGate: data.parentGate,
+		edgeDeadZone: data.edgeDeadZone,
+		edgeDeadZoneSize: data.edgeDeadZoneSize,
+		palmRejection: data.palmRejection,
+		letterSize: data.letterSize,
+	};
+	resetStats(keep);
+	saveData();
+	updateStats();
+});
+document.addEventListener("fullscreenchange", () => {
+	if (document.fullscreenElement) {
+		$("#fullscreenRecoveryButton").classList.add("hidden");
+		return;
+	}
+	closePanel();
+	// Only during an active session — the app never requests full screen on
+	// its own outside of one, so there's nothing to recover back into
+	// otherwise (the welcome screen's own button already covers that case).
+	if (state.playing) $("#fullscreenRecoveryButton").classList.remove("hidden");
+});
+
+/**
+ * Boots the UI from persisted settings: loads the language registry, falls
+ * back to defaults for language/theme values that no longer exist, applies
+ * every setting to the DOM, and starts the background shuffle.
+ */
+function initializeApp() {
+	loadLanguages();
+	applyAnimationSettings();
+	if (!languages[data.language]) data.language = Object.keys(languages)[0];
+	if (!themeIcons[data.theme]) data.theme = initialData.theme;
+	populateLanguageSelect();
+	setLanguage(data.language);
+	setTheme(data.theme);
+	setColorMode(data.colorMode);
+	updateHighContrast();
+	startBackgroundShuffle();
+	updateDuration();
+	updateSound();
+	updateVibration();
+	updateKaleidoscope();
+	updateDoodleMode();
+	updateShakeToClear();
+	updateNoteColors();
+	updateParentGate();
+	updateParentGateLocks();
+	updateEdgeDeadZone();
+	updatePalmRejection();
+	updateLetterSize();
+	updateStats();
+}
+
+linkManifest();
+registerServiceWorker(showUpdateBanner);
+if (shouldShowIosInstallTip()) showIosInstallTip(dismissIosInstallTip);
+initializeApp();

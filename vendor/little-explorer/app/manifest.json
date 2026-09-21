@@ -1,0 +1,13 @@
+{
+  "name": "Little Explorer's World",
+  "short_name": "Explorer",
+  "description": "Voice-guided educational games for ages 2-5: counting, colors, shapes, numbers, memory and music.",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#8fd5f7",
+  "theme_color": "#8fd5f7",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

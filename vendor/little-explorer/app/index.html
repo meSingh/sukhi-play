@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#8fd5f7">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>{n}'s World</title>
+<script>if (location.search.includes("test")) document.documentElement.dataset.test = "1";</script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="hub" class="screen">
+  <div id="map">
+    <!-- Islands and the trail between them are drawn by buildHub() from HUB_LAYOUT,
+         so the painted regions always sit under their world disc. -->
+    <svg id="mapBg" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <g id="mapRegions"></g>
+      <!-- The same road the world trail draws, at map scale: a soft dark edge under a
+           cream causeway. Non-scaling strokes, because the viewBox is stretched. -->
+      <polyline id="mapEdge" fill="none" stroke="#6b4f2a" stroke-opacity=".18"
+                stroke-width="21" stroke-linecap="round" stroke-linejoin="round"
+                vector-effect="non-scaling-stroke"/>
+      <polyline id="mapPath" fill="none" stroke="#fff3d8" stroke-opacity=".95"
+                stroke-width="14" stroke-linecap="round" stroke-linejoin="round"
+                vector-effect="non-scaling-stroke"/>
+    </svg>
+    <!-- Stepping stones, island scenery and the wandering sea creatures are DOM, not
+         SVG: a circle in that stretched viewBox would come out an ellipse. -->
+    <div id="mapDots"></div>
+    <div id="mapDeco"></div>
+    <div id="mapProps"></div>
+    <div class="sun">☀️</div>
+    <div class="cloud" style="top:7%;  animation-duration:44s;">☁️</div>
+    <div class="cloud" style="top:30%; animation-duration:60s; animation-delay:-28s;">☁️</div>
+    <div class="cloud" style="top:2%;  animation-duration:72s; animation-delay:-50s;">☁️</div>
+    <h1>🌈 {n}'s World 🌈</h1>
+    <div id="mapNodes"></div>
+    <div id="hubMascot" class="mascot"></div>
+    <div id="buddySpeech" class="hidden"></div>
+    <button id="questBar" aria-label="Rocket quest">
+      <span class="q-rocket">🚀</span>
+      <span class="q-slots" id="questSlots"></span>
+    </button>
+    <button class="corner-btn" id="bookBtn" aria-label="Sticker book">📒</button>
+    <button class="corner-btn" id="settingsBtn" aria-label="Grown-up settings">⚙️</button>
+  </div>
+</div>
+
+<div id="games" class="screen hidden">
+  <button class="round-btn" id="gamesHome" aria-label="Home">🏠</button>
+  <h1 id="gamesTitle"></h1>
+  <!-- A world is one long scrollable path; everything inside is drawn by worldtrail.js. -->
+  <div id="trailView">
+    <div id="trailCanvas">
+      <svg id="trailBg" xmlns="http://www.w3.org/2000/svg">
+        <!-- a soft dark edge under a cream road, so the path reads on any world colour -->
+        <polyline id="trailEdge" fill="none" stroke="#6b4f2a" stroke-opacity=".18"
+                  stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline id="trailPath" fill="none" stroke="#fff3d8" stroke-opacity=".95"
+                  stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+        <g id="trailDots"></g>
+      </svg>
+      <div id="trailDeco"></div>
+      <div id="gameNodes"></div>
+      <div id="trailBuddy" class="mascot"></div>
+    </div>
+  </div>
+</div>
+
+<div id="namescreen" class="screen hidden">
+  <div class="name-card">
+    <div class="mascot" id="nameMascot"></div>
+    <h2 data-i18n="name_title">Hi there! What's your name?</h2>
+    <input id="nameInput" type="text" maxlength="12" placeholder="Type a name…" data-i18n-ph="name_ph" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button id="nameStart" data-i18n="name_start">Let's play! 🎉</button>
+    <button id="nameSkip" data-i18n="name_skip">Skip for now</button>
+  </div>
+</div>
+
+<div id="charscreen" class="screen hidden">
+  <div class="char-card">
+    <h2 data-i18n="char_title">Pick your buddy!</h2>
+    <div class="char-grid" id="charGrid"></div>
+    <button id="charDone" data-i18n="char_done">Let's go! 🎉</button>
+  </div>
+</div>
+
+<div id="diffscreen" class="screen hidden">
+  <div class="name-card">
+    <div class="mascot" id="diffMascot"></div>
+    <h2 data-i18n="diff_title">Pick a level!</h2>
+    <div class="diff-grid" id="diffGrid">
+      <button class="diff-btn" data-d="easy"><span class="diff-emoji">🐤</span><span class="diff-name" data-i18n="diff_easy">Easy</span><small data-i18n="diff_easy_age">Ages 2-3</small></button>
+      <button class="diff-btn" data-d="med"><span class="diff-emoji">🐰</span><span class="diff-name" data-i18n="diff_med">Medium</span><small data-i18n="diff_med_age">Ages 3-4</small></button>
+      <button class="diff-btn" data-d="hard"><span class="diff-emoji">🦉</span><span class="diff-name" data-i18n="diff_hard">Hard</span><small data-i18n="diff_hard_age">Ages 4-5</small></button>
+    </div>
+  </div>
+</div>
+
+<div id="game" class="screen hidden">
+  <header>
+    <button class="round-btn" id="homeBtn" aria-label="Home">🏠</button>
+    <div id="instruction"></div>
+    <button class="round-btn" id="speakBtn" aria-label="Repeat">🔊</button>
+  </header>
+  <div id="playArea"></div>
+  <div id="progress"></div>
+  <div id="gameMascot" class="mascot"></div>
+</div>
+
+<div id="stickerbook" class="screen hidden">
+  <div id="bookTop">
+    <button class="round-btn" id="bookHome" aria-label="Home">🏠</button>
+    <div id="sceneBtns"></div>
+    <button class="round-btn" id="sceneClear" aria-label="Clear">🗑️</button>
+  </div>
+  <div id="stickerScene"></div>
+  <div id="stickerHint"></div>
+  <div id="stickerPalette"></div>
+</div>
+
+<div id="paint" class="screen hidden">
+  <div id="paintBar">
+    <button class="round-btn" id="paintHome" aria-label="Home">🏠</button>
+    <div id="swatches"></div>
+    <button class="round-btn" id="paintStamp" aria-label="Stamp">⭐</button>
+    <button class="round-btn" id="paintErase" aria-label="Eraser">🧽</button>
+    <button class="round-btn" id="paintClear" aria-label="Clear">🗑️</button>
+    <button class="round-btn" id="paintDone" aria-label="Done">✅</button>
+  </div>
+  <!-- Paint speaks its colour/stamp prompts through here. The CSS and the JS that
+       drive it both shipped; this element never did, so nextChallenge() threw on
+       every open and the guided half of Paint has never run. -->
+  <div id="paintInstruct" aria-live="polite"></div>
+  <div id="paintCanvasWrap"><canvas id="paintC"></canvas></div>
+</div>
+
+<div id="story" class="screen hidden">
+  <button class="round-btn" id="storyHome" aria-label="Home">🏠</button>
+  <button class="round-btn" id="storyRead" aria-label="Read aloud">🔊</button>
+  <div id="storyScene"></div>
+  <div class="story-nav">
+    <button class="round-btn" id="storyPrev" aria-label="Back">◀️</button>
+    <div id="storyDots"></div>
+    <button class="round-btn" id="storyNext" aria-label="Next">▶️</button>
+  </div>
+</div>
+
+<div id="dressup" class="screen hidden">
+  <div id="dressBar">
+    <button class="round-btn" id="dressHome" aria-label="Home">🏠</button>
+    <button class="round-btn" id="dressBg" aria-label="Background">🌈</button>
+    <button class="round-btn" id="dressShuffle" aria-label="Surprise">🎲</button>
+    <button class="round-btn" id="dressDone" aria-label="Done">✅</button>
+  </div>
+  <div id="dressStage">
+    <div id="dollWrap"></div>
+  </div>
+  <div id="closet">
+    <div id="closetTabs"></div>
+    <div id="closetTray"></div>
+  </div>
+</div>
+
+<div id="dashboard" class="screen hidden">
+  <button class="round-btn" id="dashHome" aria-label="Home">🏠</button>
+  <h2 data-i18n="dash_title">📊 Grown-up Progress</h2>
+  <div id="dashStats"></div>
+  <div id="dashList"></div>
+</div>
+
+<div id="settings" class="screen hidden">
+  <div class="settings-card">
+    <h2 data-i18n="settings_title">⚙️ Grown-up Settings</h2>
+    <div class="row">
+      <span data-i18n="settings_lang">Language</span>
+      <div class="seg" id="segLang">
+        <button data-l="en" data-i18n="lang_en">English</button>
+        <button data-l="es" data-i18n="lang_es">Español</button>
+        <button data-l="yue" data-i18n="lang_yue">廣東話</button>
+      </div>
+    </div>
+    <div class="row">
+      <span data-i18n="settings_diff">Difficulty</span>
+      <div class="seg" id="segDiff">
+        <button data-d="auto" data-i18n="diff_auto">Auto ⬆️</button>
+        <button data-d="easy" data-i18n="diff_easy">Easy</button>
+        <button data-d="med" data-i18n="diff_med">Medium</button>
+        <button data-d="hard" data-i18n="diff_hard">Hard</button>
+      </div>
+    </div>
+    <div class="row">
+      <span data-i18n="settings_voice">Talking voice</span>
+      <div class="seg" id="segVoice">
+        <button data-v="1" data-i18n="voice_on">On</button>
+        <button data-v="0" data-i18n="voice_off">Off</button>
+      </div>
+    </div>
+    <div class="row">
+      <span data-i18n="settings_music">Music</span>
+      <div class="seg" id="segMusic">
+        <button data-m="bouncy" data-i18n="music_bouncy">Bouncy</button>
+        <button data-m="calm" data-i18n="music_calm">Calm</button>
+        <button data-m="march" data-i18n="music_march">March</button>
+        <button data-m="off" data-i18n="music_off">Off</button>
+      </div>
+    </div>
+    <!-- Three rows, not one: six buttons never fit a phone-width row, and it kept the
+         destructive pair next to the harmless ones where a thumb could catch them. -->
+    <div class="closeRow">
+      <button id="setBuddy" data-i18n="settings_buddy">🧸 Buddy</button>
+      <button id="setName" data-i18n="settings_name">✏️ Name</button>
+      <button id="setDash" data-i18n="settings_progress">📊 Progress</button>
+    </div>
+    <div class="closeRow danger">
+      <button id="setReset" data-i18n="settings_reset">Reset stars</button>
+      <button id="setRestart" data-i18n="settings_restart">🔄 Start over</button>
+    </div>
+    <p class="settings-version" id="settingsVersion"></p>
+    <div class="closeRow done">
+      <button id="setDone" data-i18n="settings_done">Done</button>
+    </div>
+  </div>
+</div>
+
+<div id="celebrate" class="hidden">
+  <div class="big" id="celebText"></div>
+  <div id="celebMascot" class="mascot celebrate"></div>
+  <div class="sticker-reveal" id="celebSticker"></div>
+  <div class="sub" id="celebSub"></div>
+  <div class="btns">
+    <button id="celebLaunch" class="hidden">🚀 Blast off!</button>
+    <button id="celebBook">📒 Sticker book</button>
+    <button id="celebHome">🏠 World map</button>
+  </div>
+</div>
+
+<div id="rocketLaunch" class="hidden">
+  <div class="rl-text" id="rlText"></div>
+  <div class="rl-rocket" id="rlRocket">🚀</div>
+  <div class="rl-count" id="rlCount"></div>
+</div>
+
+<canvas id="fxC"></canvas>
+<canvas id="trailC"></canvas>
+<div id="wipe"></div>
+<button class="round-btn" id="musicBtn" aria-label="Music">🎵</button>
+
+<script src="js/core.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/games/snow.js"></script>
+<script src="js/games/ocean.js"></script>
+<script src="js/games/pizza.js"></script>
+<script src="js/games/bike.js"></script>
+<script src="js/games/pasta.js"></script>
+<script src="js/games/trace.js"></script>
+<script src="js/games/memory.js"></script>
+<script src="js/games/music.js"></script>
+<script src="js/games/whosays.js"></script>
+<script src="js/games/rocket.js"></script>
+<script src="js/games/cups.js"></script>
+<script src="js/games/sort.js"></script>
+<script src="js/games/dragon.js"></script>
+<script src="js/games/dino.js"></script>
+<script src="js/games/icecream.js"></script>
+<script src="js/games/pets.js"></script>
+<script src="js/games/hideseek.js"></script>
+<script src="js/games/nightday.js"></script>
+<script src="js/games/measure.js"></script>
+<script src="js/games/fuelup.js"></script>
+<script src="js/games/dolphin.js"></script>
+<script src="js/games/meerkat.js"></script>
+<script src="js/games/eggcatch.js"></script>
+<script src="js/games/hippo.js"></script>
+<script src="js/games/monkey.js"></script>
+<script src="js/games/runway.js"></script>
+<script src="js/games/feelings.js"></script>
+<script src="js/games/scavenger.js"></script>
+<script src="js/games/letternames.js"></script>
+<script src="js/games/senses.js"></script>
+<script src="js/games/paint.js"></script>
+<script src="js/games/story.js"></script>
+<script src="js/games/dressup.js"></script>
+<script src="js/worldtrail.js"></script>
+<script src="js/hub.js"></script>
+</body>
+</html>

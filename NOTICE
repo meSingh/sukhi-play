@@ -33,5 +33,16 @@ we made recorded in vendor/<name>/patch.mjs.
         Changed for this build: English only, the language toggle removed,
         the service worker removed, and asset paths made relative.
 
+    vendor/magic-smash
+        Magic Smash, copyright (c) 2026 Evandro Meneses, MIT licence.
+        https://github.com/MenesesEvandro/MagicSmash
+        Changed for this build: the Google Fonts stylesheet removed, and the
+        font stack extended so it falls back to the system face at once.
+
+    vendor/little-explorer
+        Little Explorer, copyright (c) 2026 pazarman, MIT licence.
+        https://github.com/pazarman/little-explorer
+        Unchanged.
+
 Neither the authors of these apps nor their projects are connected to Sukhi
 Play or endorse it.

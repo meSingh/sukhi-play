@@ -1,0 +1,3 @@
+{
+  "skip": ["tests", "e2e", "scripts", "node_modules", "docs", "sandbox"]
+}

@@ -30,10 +30,11 @@ function schemeOf (url) {
 function createPolicy () {
   let gate = createHostGate({ allow: [], deny: [] });
   let activeAppId = null;
-  // True while the open app is one that ships inside the download. It has no
-  // hosts to allow, so the ordinary allowlist would let nothing through -- and
-  // that is exactly right for everything except its own files.
-  let bundledActive = false;
+  // Set while the open app is one that ships inside the download: the id in
+  // its URL, which is NOT the catalog id. A catalog id is derived from the
+  // title a parent typed and renamed on collision, so comparing against it
+  // blocked an app whose tile had been given any other name.
+  let bundleId = null;
   let blockAds = true;
   // While probing a new site we want to SEE what it loads rather than cut it.
   // Known ad hosts are still refused -- there is no reason to pull adverts down
@@ -51,7 +52,7 @@ function createPolicy () {
       probing = true;
       blockAds = true;
       activeAppId = '__probe__';
-      bundledActive = false;
+      bundleId = null;
       gate = createHostGate({ allow: [], deny: [] });
       for (const key of Object.keys(counts)) counts[key] = 0;
       seen.allowed.clear();
@@ -79,7 +80,7 @@ function createPolicy () {
     },
     setApp (app) {
       activeAppId = app ? app.id : null;
-      bundledActive = Boolean(app && app.bundled);
+      bundleId = app && app.bundled ? bundled.idOf(app.url) : null;
       blockAds = app ? app.blockAds !== false : true;
       gate = createHostGate({
         allow: app ? app.allowHosts : [],
@@ -105,8 +106,9 @@ function createPolicy () {
     allowsUrl (url) {
       // A bundled app is confined to its own origin. Nothing else on this
       // scheme, and no web address, because it has no business on the network.
-      if (bundled.isBundledUrl(url)) return bundled.belongsTo(url, activeAppId);
-      if (bundledActive) return false;
+      if (bundled.isBundledUrl(url)) return bundled.belongsTo(url, bundleId);
+      // A bundled app has no business on the network at all.
+      if (bundleId) return false;
       return WEB_SCHEMES.has(schemeOf(url)) && this.verdict(hostFromUrl(url)) === 'allow';
     },
     tally (key) { if (key in counts) counts[key] += 1; }
@@ -127,7 +129,7 @@ function configureSession (ses, policy, { onBlocked } = {}) {
     // A bundled app reading its own files. Checked against the open app so one
     // bundled app can never pull another one's files into itself.
     if (scheme === `${bundled.SCHEME}:`) {
-      if (bundled.belongsTo(url, policy.activeAppId)) return callback({});
+      if (policy.allowsUrl(url)) return callback({});
       policy.tally('offlist');
       log('bundled', url, 'not this app');
       return callback({ cancel: true });

@@ -712,9 +712,14 @@ function renderSuggestions (list) {
     const meta = document.createElement('span');
     meta.className = 'card-meta';
     meta.textContent = sug.category;
-    meta.appendChild(sug.adSupported
-      ? tag(sug.blockAds === false ? 'ads showing' : 'ads filtered', 'lib-tag--ads')
-      : tag('no ads', 'lib-tag--free'));
+    // "no ads" is true of a bundled app but says the wrong thing: there is
+    // nowhere for an advert to come from, and the fact worth showing is that
+    // it needs no connection at all.
+    meta.appendChild(sug.bundled
+      ? tag('works offline', 'lib-tag--inside')
+      : sug.adSupported
+        ? tag(sug.blockAds === false ? 'ads showing' : 'ads filtered', 'lib-tag--ads')
+        : tag('no ads', 'lib-tag--free'));
 
     const blurb = document.createElement('span');
     blurb.className = 'card-blurb';
@@ -724,7 +729,14 @@ function renderSuggestions (list) {
     // should not have to open the form to find out which site this is.
     const addr = document.createElement('span');
     addr.className = 'card-addr';
-    try { addr.textContent = new URL(sug.url).hostname; } catch { addr.textContent = sug.url; }
+    if (sug.bundled) {
+      // A bundled app has no address worth printing; its id would just be a
+      // word with no meaning to anyone. Say where it came from instead.
+      addr.classList.add('card-addr--inside');
+      addr.textContent = sug.credit ? `Included \u00b7 ${sug.credit}` : 'Included with Sukhi Play';
+    } else {
+      try { addr.textContent = new URL(sug.url).hostname; } catch { addr.textContent = sug.url; }
+    }
 
     body.append(name, meta);
 
@@ -738,7 +750,24 @@ function renderSuggestions (list) {
     card.append(head, blurb, addr);
     // A suggestion is a starting point, not a decision: choosing one opens the
     // same form as anything else so every value can be changed first.
-    card.addEventListener('click', () => openForm('add', sug));
+    //
+    // Except a bundled app, which has nothing to decide. Its address, hosts
+    // and ad setting are all fixed by the fact that it is on this disk, so
+    // picking it just installs it.
+    card.addEventListener('click', async () => {
+      if (!sug.bundled) return openForm('add', sug);
+      card.disabled = true;
+      const r = await api.addSite({
+        title: sug.title, url: sug.url, shape: sug.shape, color: sug.color,
+        allowHosts: sug.allowHosts, denyHosts: [], blockAds: true,
+        notes: sug.notes, enabled: true
+      });
+      card.disabled = false;
+      if (!r || !r.ok) return showToast((r && r.message) || 'Could not add that.');
+      showToast(`${sug.title} added.`);
+      await loadLibrary();
+      showPortalTab('apps');
+    });
     wrap.appendChild(card);
   }
 }
@@ -774,6 +803,19 @@ function openForm (mode, entry) {
   del.dataset.armed = 'no';
   del.textContent = 'Delete this app';
   del.classList.remove('is-armed');
+  // A bundled app is files on this disk. Showing an address field, a host
+  // allowlist and an ad-filtering switch for one invites a parent to change
+  // settings that mean nothing, and to wonder why they cannot.
+  const inside = BUNDLED_URL.test(String(form.url || ''));
+  el('form-addr-field').hidden = inside;
+  el('form-ads-field').hidden = inside;
+  el('form-adv').hidden = inside;
+  el('form-inside').hidden = !inside;
+  if (inside) {
+    el('form-inside').textContent = form.notes ||
+      'This app is part of Sukhi Play. It works with no internet connection.';
+  }
+
   el('form-notice').hidden = true;
   el('form-found').hidden = true;
   el('form-progress').hidden = true;
@@ -888,11 +930,16 @@ function linesOf (value) {
     .filter(Boolean);
 }
 
+// An app that ships inside the download. It has no address to type and no
+// hosts to allow, so the checks that apply to a site do not apply to it.
+const BUNDLED_URL = /^sukhiplay:\/\/[a-z0-9][a-z0-9-]*\//;
+
 function validateForm () {
   const name = el('form-name').value.trim();
   const url = el('form-addr').value.trim();
   const hosts = linesOf(el('form-allow').value);
-  const ok = Boolean(name) && /^https?:\/\/.+\..+/.test(url) && hosts.length > 0;
+  const address = BUNDLED_URL.test(url) || (/^https?:\/\/.+\..+/.test(url) && hosts.length > 0);
+  const ok = Boolean(name) && address;
   el('form-save').disabled = !ok;
   return ok;
 }

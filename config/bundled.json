@@ -1,19 +1,47 @@
 {
-  "_comment": "Open-source apps that ship inside Sukhi Play. Each lives in vendor/<id>/app, built by vendor/<id>/build.sh from the commit in vendor/<id>/UPSTREAM. Credit and licence are shown to the parent and repeated in NOTICE.",
+  "_comment": "Open-source apps that ship inside Sukhi Play. Each lives in vendor/<dir>/app, rebuilt by scripts/vendor-app.mjs from the commit in vendor/<dir>/UPSTREAM. Shapes and colours must not collide with config/suggestions.json; a test checks. Credit and licence are shown to the parent and repeated in NOTICE.",
   "apps": [
     {
       "id": "colouring",
+      "dir": "kids-coloring",
       "title": "Colouring",
       "siteName": "Kids Coloring",
       "blurb": "Colour in animals, flowers and rockets, or just draw.",
       "category": "Creative",
-      "shape": "paint",
-      "color": "#ec4899",
+      "shape": "flower",
+      "color": "#f43f5e",
       "entry": "index.html",
       "credit": "Kids Coloring by oh-namgyu",
       "licence": "MIT",
-      "sourceUrl": "https://github.com/oh-namgyu/kids-coloring",
-      "dir": "kids-coloring"
+      "sourceUrl": "https://github.com/oh-namgyu/kids-coloring"
+    },
+    {
+      "id": "smash",
+      "dir": "magic-smash",
+      "title": "Keyboard",
+      "siteName": "Magic Smash",
+      "blurb": "Press any key and something happens.",
+      "category": "Play",
+      "shape": "bolt",
+      "color": "#8b5cf6",
+      "entry": "index.html",
+      "credit": "Magic Smash by Evandro Meneses",
+      "licence": "MIT",
+      "sourceUrl": "https://github.com/MenesesEvandro/MagicSmash"
+    },
+    {
+      "id": "explorer",
+      "dir": "little-explorer",
+      "title": "First Games",
+      "siteName": "Little Explorer",
+      "blurb": "Counting, colours, shapes and animals. No reading needed.",
+      "category": "Learning",
+      "shape": "heart",
+      "color": "#14b8a6",
+      "entry": "index.html",
+      "credit": "Little Explorer by pazarman",
+      "licence": "MIT",
+      "sourceUrl": "https://github.com/pazarman/little-explorer"
     }
   ]
 }

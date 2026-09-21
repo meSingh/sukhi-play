@@ -1161,6 +1161,9 @@ async function runBundledCheck () {
 
     // Installed the same way a parent installs it, from the catalogue entry,
     // so the check exercises the path that actually ships.
+    // Deliberately not passing an id: the catalog derives one from the title
+    // and renames on collision, and the app has to work when it does. This is
+    // how the mismatch between the catalog id and the bundle id was found.
     const added = await ipcCall('shell:add-site', {
       title: b.title, url: b.url, shape: b.shape, color: b.color,
       allowHosts: [b.id], denyHosts: [], blockAds: true

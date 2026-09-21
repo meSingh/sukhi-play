@@ -1,0 +1,27 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fd5f7"/>
+      <stop offset="1" stop-color="#c9efb0"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="url(#sky)"/>
+  <circle cx="420" cy="92" r="52" fill="#ffd23e"/>
+  <ellipse cx="120" cy="470" rx="240" ry="90" fill="#6dbb52"/>
+  <ellipse cx="430" cy="480" rx="220" ry="80" fill="#5caf45"/>
+  <!-- snowman mascot -->
+  <circle cx="256" cy="330" r="110" fill="#fff" stroke="#dbe9f2" stroke-width="6"/>
+  <circle cx="256" cy="180" r="78" fill="#fff" stroke="#dbe9f2" stroke-width="6"/>
+  <path d="M186 132 Q256 60 326 132 L326 150 Q256 120 186 150 Z" fill="#2f6fde"/>
+  <circle cx="256" cy="78" r="20" fill="#fff" stroke="#dbe9f2" stroke-width="4"/>
+  <circle cx="228" cy="168" r="10" fill="#26323a"/>
+  <circle cx="284" cy="168" r="10" fill="#26323a"/>
+  <polygon points="256,182 256,202 322,194" fill="#f07f13"/>
+  <path d="M226 218 Q256 240 286 218" stroke="#26323a" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M186 244 Q256 280 326 244 L326 270 Q256 306 186 270 Z" fill="#e63946"/>
+  <circle cx="256" cy="306" r="9" fill="#26323a"/>
+  <circle cx="256" cy="352" r="9" fill="#26323a"/>
+  <!-- stars -->
+  <text x="90" y="120" font-size="64">⭐</text>
+  <text x="370" y="420" font-size="64">⭐</text>
+</svg>
