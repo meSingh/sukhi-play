@@ -52,7 +52,7 @@ const entries = (data.suggestions as Entry[]).map((e) => {
 
 <Base
   title="The Sukhi Play catalogue"
-  description="Sites that work in Sukhi Play. Copy an address and the app sets the rest up. A compatibility list, not a recommendation."
+  description="Compatible sites you can add to Sukhi Play, and the apps that come with it. Copy an address and the app sets the rest up."
   page="catalogue">
 
   <main class="wrap">
@@ -101,8 +101,9 @@ const entries = (data.suggestions as Entry[]).map((e) => {
     </section>
 
     <div class="cat-head cat-head--sites">
-      <h2>Sites you can add</h2>
-      <p>Copy an address, paste it into the app, and it fills in the rest.</p>
+      <h2>Compatible sites you can add</h2>
+      <p>These are known to work. Copy an address, paste it into the app, and
+        it fills in the rest.</p>
     </div>
 
     <div class="cat-grid">
@@ -132,9 +133,9 @@ const entries = (data.suggestions as Entry[]).map((e) => {
     </div>
 
     <div class="cat-note">
-      <p><b>A compatibility list, not a recommendation.</b> Sukhi Play is not
-        connected to any of these sites, is not endorsed by them, and does not
-        check what they show. You choose what your child opens.</p>
+      <p>Sukhi Play is not connected to any of these sites and is not endorsed
+        by them. It does not check what they show, so what your child opens is
+        your choice — have a look yourself first.</p>
       <p>Run one of these sites and want it off this page?
         <a href={`${REPO}/issues`}>Open an issue</a> and it goes, no questions asked.</p>
     </div>

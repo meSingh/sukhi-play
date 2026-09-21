@@ -153,8 +153,13 @@ test('the catalogue page carries no third-party imagery and claims nothing', () 
   // Wrapped lines are still one sentence to a reader, so match on the text
   // rather than on where the editor happened to break it.
   const text = page.replace(/\s+/g, ' ');
-  assert.match(text, /compatibility list, not a recommendation/i);
+  // The four things the page has to say, checked one by one rather than by
+  // pinning a single sentence. The wording moved once already -- "compatible"
+  // is in the heading now -- and the substance is what has to survive that.
+  assert.match(text, /compatible sites/i, 'the list should be framed as compatibility');
   assert.match(text, /not connected to any of these sites/i);
+  assert.match(text, /not endorsed by them/i);
+  assert.match(text, /does not check what they show/i);
   // No logos, favicons or anything else loaded from somebody else's server.
   const external = [...page.matchAll(/(?:src|srcset)="(https?:[^"]+)"/g)].map((m) => m[1]);
   assert.deepEqual(external, [], `the page should load no remote images: ${external.join(', ')}`);
