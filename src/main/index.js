@@ -11,6 +11,7 @@ const catalogStore = require('./catalog');
 const security = require('./security');
 const shortcuts = require('./shortcuts');
 const gnome = require('./gnome');
+const startMenu = require('./startmenu');
 const probe = require('./probe');
 const library = require('./library');
 const { Shell, BAR_HEIGHT: BAR_HEIGHT_FALLBACK } = require('./windowing');
@@ -50,6 +51,10 @@ const COVER_PROBE = process.argv.includes('--cover-probe');
 // of assuming. The Windows key and Print Screen were never registered at all.
 const KEY_PROBE = process.argv.includes('--key-probe');
 
+// `--start-probe` presses the Windows key over the kiosk and reports whether
+// the Start menu was closed and the window came back to the front.
+const START_PROBE = process.argv.includes('--start-probe');
+
 const SHOTS_ARG = process.argv.find((a) => a.startsWith('--shots='));
 const SHOTS_DIR = SHOTS_ARG ? SHOTS_ARG.slice('--shots='.length) : null;
 
@@ -57,7 +62,8 @@ const SHOTS_DIR = SHOTS_ARG ? SHOTS_ARG.slice('--shots='.length) : null;
 // Installed builds are how most people run this, and on Windows an installed
 // app is a windowed program: its output usually never reaches the terminal it
 // was started from. A file can be attached to a bug report by anyone.
-const REPORT_NAME = DIAGNOSE ? 'diagnose' : COVER_PROBE ? 'cover-probe' : KEY_PROBE ? 'key-probe' : null;
+const REPORT_NAME = DIAGNOSE ? 'diagnose' : COVER_PROBE ? 'cover-probe' : KEY_PROBE ? 'key-probe'
+  : START_PROBE ? 'start-probe' : null;
 const reportLines = [];
 if (REPORT_NAME) {
   const log = console.log.bind(console);
@@ -220,6 +226,14 @@ function installFocusGuard (win) {
       return;
     }
     recentRefocuses.push(now);
+
+    // On Windows the Start menu sits above every app window and focus requests
+    // are refused, so the only thing that closes it is Escape.
+    if (process.platform === 'win32') {
+      startMenu.reclaim(win).then((result) => {
+        if (result && result !== 'already in front') console.log(`[start menu] ${result}`);
+      });
+    }
 
     setTimeout(() => {
       if (!win.isDestroyed() && !win.isFocused()) {
@@ -875,6 +889,50 @@ async function runKeyProbe () {
   app.exit(0);
 }
 
+async function runStartProbe () {
+  const win = shellApp.win;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const results = [];
+  const say = (k, v) => console.log(`  ${String(k).padEnd(34)} ${v}`);
+
+  console.log('\n  ===== does the Start menu get closed? =====\n');
+  say('platform', `${process.platform} ${process.arch}`);
+  if (process.platform !== 'win32') {
+    say('result', 'nothing to test: this only applies to Windows');
+  } else {
+    // Wait for PowerShell to compile the helper.
+    for (let i = 0; i < 60 && !startMenu.isReady(); i += 1) await wait(250);
+    say('helper', startMenu.isReady() ? 'ready' : 'DID NOT START');
+
+    win.show();
+    win.focus();
+    await wait(600);
+    say('in front before the key', await startMenu.foreground(win));
+
+    for (let round = 1; round <= 3; round += 1) {
+      await startMenu.tapWindowsKey(win);
+      await wait(250);
+      const opened = await startMenu.foreground(win);
+      await wait(1200);
+      const after = await startMenu.foreground(win);
+      say(`round ${round}: 250ms after the key`, opened);
+      say(`round ${round}: 1.5s after the key`, after);
+      results.push(after === 'self');
+      await wait(500);
+    }
+    say('result', results.every(Boolean)
+      ? 'PASS: the kiosk was back in front every time'
+      : 'FAIL: something else kept the foreground');
+  }
+  console.log('');
+
+  startMenu.stop();
+  try { shortcuts.releaseAll(); } catch { /* nothing held */ }
+  shellApp.allowQuit = true;
+  saveReport();
+  app.exit(0);
+}
+
 async function runCoverProbe () {
   const { screen } = require('electron');
   const win = shellApp.win;
@@ -1159,7 +1217,10 @@ app.whenReady().then(() => {
   });
 
   // If the lockdown is abandoned, the desktop gets its shortcuts back too.
-  shellApp.onReleaseLockdown = () => gnome.giveBack(paths.userData);
+  shellApp.onReleaseLockdown = () => {
+    startMenu.stop();
+    gnome.giveBack(paths.userData);
+  };
 
   const win = shellApp.create();
 
@@ -1248,6 +1309,11 @@ app.whenReady().then(() => {
   installFocusGuard(win);
   registerIpc();
 
+  if (process.platform === 'win32' && !IS_DEV && !CHECK_MODE && !PROBE_MODE &&
+      (shellApp.lockdownEnabled || START_PROBE)) {
+    startMenu.start();
+  }
+
   // Swallow F-keys, Mission Control, Cmd+Q/W/M and the rest at the OS level,
   // but only while this window is in front. Disabled in dev so the machine
   // stays usable while working on the app.
@@ -1273,6 +1339,11 @@ app.whenReady().then(() => {
 
   if (KEY_PROBE) {
     ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runKeyProbe(); }, 1500));
+    return;
+  }
+
+  if (START_PROBE) {
+    ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runStartProbe(); }, 2000));
     return;
   }
 
@@ -1310,7 +1381,7 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', (event) => {
-  if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || KEY_PROBE || SHOTS_DIR) return;
+  if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || KEY_PROBE || START_PROBE || SHOTS_DIR) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');
@@ -1327,6 +1398,7 @@ app.on('second-instance', () => {
 app.on('will-quit', () => {
   // Never leave the machine with keys held hostage after we exit.
   shortcuts.releaseAll();
+  startMenu.stop();
   if (paths.userData) gnome.giveBack(paths.userData);
 });
 

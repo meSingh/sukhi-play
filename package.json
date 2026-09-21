@@ -27,6 +27,7 @@
     "dist:linux:all": "npm run metainfo && electron-builder --linux AppImage deb snap --publish never",
     "cover-probe": "electron . --cover-probe",
     "key-probe": "electron . --key-probe",
+    "start-probe": "electron . --start-probe",
     "dist:mac:catalina": "electron-builder --config electron-builder.catalina.yml --mac --publish never",
     "dist:mac:all": "npm run dist:mac && npm run dist:mac:catalina"
   },
