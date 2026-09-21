@@ -37,6 +37,7 @@
         <span class="top-name">Sukhi&nbsp;Play</span>
       </div>
       <div class="top-actions">
+        <span id="top-time" class="clock-pill" hidden><span class="clock-dot"></span><b></b></span>
         <button id="parent-btn" class="top-btn" type="button">
           <svg class="top-icon" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="2.1"/>
@@ -157,6 +158,12 @@
 
   <!-- ============ the bar shown over a game ============ -->
   <header id="bar">
+    <!-- The app names itself while a child plays, so they can ask for it by
+         name instead of describing it. -->
+    <div class="bar-brand">
+      <img class="bar-mark" src="assets/mascot.png" alt="" width="512" height="512">
+      <span class="bar-name">Sukhi&nbsp;Play</span>
+    </div>
     <button id="home-btn" class="bar-btn bar-btn--home" type="button">
       <svg class="bar-icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M3 11.5 12 4l9 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -167,6 +174,7 @@
 
     <div class="bar-mid">
       <span id="bar-title"></span>
+      <span id="bar-time" class="clock-pill" hidden><span class="clock-dot"></span><b></b></span>
       <span id="bar-blocked" class="badge" hidden></span>
     </div>
 
@@ -188,6 +196,16 @@
   </header>
 
   <!-- ============ grown-ups only ============ -->
+  <!-- Play time is over. Nothing here works without a grown-up. -->
+  <section id="timeup" class="screen">
+    <div class="timeup-card">
+      <img class="timeup-mark" src="assets/mascot.png" alt="" width="512" height="512">
+      <h2>That is all for now</h2>
+      <p>Play time is over. A grown-up can start some more.</p>
+      <button id="timeup-gate" class="ghost-btn" type="button">Grown-ups</button>
+    </div>
+  </section>
+
   <section id="gate" class="screen">
     <div class="gate-card">
 
@@ -375,6 +393,32 @@
         </header>
 
         <div class="panel-body">
+          <!-- First thing a grown-up sees, and deliberately not another
+               row in a list: a limit nobody notices is a limit nobody sets. -->
+          <section class="sec sec--time" id="sec-time">
+            <div class="time-head">
+              <div class="time-titles">
+                <h3>Play time</h3>
+                <p id="time-note">Sessions are not limited.</p>
+              </div>
+              <button id="time-more" class="time-more" type="button">New session</button>
+            </div>
+            <div class="time-chips" id="time-chips" role="group" aria-label="Session length">
+              <button type="button" data-min="0">Off</button>
+              <button type="button" data-min="10">10 min</button>
+              <button type="button" data-min="15">15 min</button>
+              <button type="button" data-min="20">20 min</button>
+              <button type="button" data-min="30">30 min</button>
+              <button type="button" data-min="45">45 min</button>
+              <button type="button" data-min="60">1 hour</button>
+            </div>
+            <p class="sec-note">
+              When the time runs out your child sees a gentle stop screen and
+              nothing else opens. A grown-up hold starts another session.
+              Warnings come at five minutes and at one minute.
+            </p>
+          </section>
+
           <section class="sec">
             <h3 class="sec-head">
               <span>Your apps</span>

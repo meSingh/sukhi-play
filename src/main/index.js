@@ -12,6 +12,7 @@ const security = require('./security');
 const shortcuts = require('./shortcuts');
 const gnome = require('./gnome');
 const startMenu = require('./startmenu');
+const { createClock } = require('./playclock');
 const probe = require('./probe');
 const library = require('./library');
 const { Shell, BAR_HEIGHT: BAR_HEIGHT_FALLBACK } = require('./windowing');
@@ -54,6 +55,12 @@ const KEY_PROBE = process.argv.includes('--key-probe');
 // `--start-probe` presses the Windows key over the kiosk and reports whether
 // the Start menu was closed and the window came back to the front.
 const START_PROBE = process.argv.includes('--start-probe');
+
+// `--demo=DIR` records the app for the website: it drives the real screens and
+// writes a PNG per frame. No mock, no reconstruction, and a throwaway profile
+// so the recording never contains anyone's own list of sites.
+const DEMO_ARG = process.argv.find((a) => a.startsWith('--demo='));
+const DEMO_DIR = DEMO_ARG ? DEMO_ARG.slice('--demo='.length) : null;
 
 const SHOTS_ARG = process.argv.find((a) => a.startsWith('--shots='));
 const SHOTS_DIR = SHOTS_ARG ? SHOTS_ARG.slice('--shots='.length) : null;
@@ -110,6 +117,7 @@ app.commandLine.appendSwitch('disable-features', 'Translate,MediaRouter,Autofill
 app.enableSandbox();
 
 let shellApp = null;
+let playClock = null;
 let policy = null;
 let settings = null;
 let catalog = null;
@@ -291,6 +299,9 @@ function registerIpc () {
   }));
 
   ipcMain.handle('shell:launch', (_e, appId) => {
+    if (playClock.isTimeUp()) {
+      return { ok: false, message: 'Play time is over. Ask a grown-up.' };
+    }
     const entry = findApp(appId);
     if (!entry) return { ok: false, message: 'That is not on the list.' };
     console.log(`[launch] ${entry.id} -> ${entry.url}`);
@@ -298,6 +309,26 @@ function registerIpc () {
   });
 
   ipcMain.handle('shell:go-home', () => shellApp.goHome());
+
+  /** Another session. Only a parent past the gate can grant one. */
+  ipcMain.handle('shell:more-time', () => {
+    if (!isUnlocked()) return locked();
+    playClock.reset();
+    playClock.setActive(shellApp.mode === 'launcher' || shellApp.mode === 'playing');
+    shellApp.pushState();
+    console.log('[clock] a grown-up started a new session');
+    return { ok: true, clock: playClock.state() };
+  });
+
+  /** How long a session lasts. 0 switches the limit off. */
+  ipcMain.handle('shell:set-session-minutes', (_e, minutes) => {
+    if (!isUnlocked()) return locked();
+    settings = settingsStore.save(paths.userData, { sessionMinutes: minutes });
+    playClock.setLimit(settings.sessionMinutes);
+    shellApp.pushState();
+    console.log(`[clock] session limit is now ${settings.sessionMinutes || 'off'}`);
+    return { ok: true, sessionMinutes: settings.sessionMinutes, clock: playClock.state() };
+  });
 
   ipcMain.handle('shell:begin-onboarding', () => {
     // Setting the app up IS the grown-up task, and at this point there is
@@ -889,6 +920,131 @@ async function runKeyProbe () {
   app.exit(0);
 }
 
+/**
+ * Records the app doing the thing the website claims it does.
+ *
+ * The scenes are driven through the real interface: a real hold on the real
+ * button, the real clock running out. Only the waiting is skipped, by pausing
+ * the capture between scenes rather than by faking any state.
+ */
+async function runDemo () {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  fs.mkdirSync(DEMO_DIR, { recursive: true });
+
+  const js = (code) => shellApp.shellView.webContents.executeJavaScript(code);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  const w = Number(process.env.SUKHI_DEMO_W || 1280);
+  const h = Number(process.env.SUKHI_DEMO_H || 800);
+  shellApp.win.setBounds({ x: 40, y: 40, width: w, height: h });
+  shellApp.layout();
+  await sleep(1200);
+
+  let frame = 0;
+  let capturing = false;
+  let stopped = false;
+  const FPS = 10;
+
+  const loop = (async () => {
+    while (!stopped) {
+      const started = Date.now();
+      if (capturing) {
+        try {
+          const image = await shellApp.shellView.webContents.capturePage();
+          fs.writeFileSync(path.join(DEMO_DIR, `f${String(frame++).padStart(4, '0')}.png`),
+            image.toPNG());
+        } catch { /* a frame lost to a resize is not worth stopping for */ }
+      }
+      await sleep(Math.max(0, (1000 / FPS) - (Date.now() - started)));
+    }
+  })();
+
+  /** Records for `ms`, then stops the camera while the next scene is set up. */
+  const scene = async (label, ms, setup) => {
+    capturing = false;
+    if (setup) await setup();
+    await sleep(400);
+    capturing = true;
+    console.log(`[DEMO] ${label}`);
+    await sleep(ms);
+    capturing = false;
+  };
+
+  await scene('the tile screen, with the session running', 3200, async () => {
+    shellApp.closeGate();
+    shellApp.goHome();
+  });
+
+  // The clock is real: the profile this runs in is seeded with a one minute
+  // session, so this waits for it rather than pretending.
+  await scene('the last seconds', 2600, async () => {
+    while (!playClock.isTimeUp() && (playClock.state().leftSeconds || 0) > 6) {
+      await sleep(250);
+    }
+  });
+
+  await scene('time is up', 3000, async () => {
+    while (!playClock.isTimeUp()) await sleep(200);
+    await sleep(600);
+    // Says whether the stop screen actually reached the child's view. A
+    // recording that quietly missed it is worse than no recording.
+    const seen = await js(`(() => {
+      const el = document.getElementById('timeup');
+      const r = el.getBoundingClientRect();
+      return JSON.stringify({
+        classes: document.getElementById('app').className,
+        display: getComputedStyle(el).display,
+        size: Math.round(r.width) + 'x' + Math.round(r.height)
+      });
+    })()`);
+    console.log(`[DEMO] stop screen: ${seen}`);
+  });
+
+  await scene('a grown-up holds the button', 4200, async () => {
+    await js(`(() => { document.getElementById('timeup-gate').click(); return 1; })()`);
+    await sleep(700);
+  });
+  // The hold happens inside the recorded scene, so the ring fills on camera.
+  capturing = true;
+  await js(`(() => {
+    const b = document.getElementById('hold-btn');
+    b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    return 1;
+  })()`);
+  await sleep(3400);
+  await js(`(() => {
+    const b = document.getElementById('hold-btn');
+    b.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    return 1;
+  })()`);
+  await sleep(1400);
+  capturing = false;
+
+  await scene('the grown-up screen: play time first', 3600, async () => {
+    await js(`(() => {
+      const body = document.querySelector('#gate-step-form .panel-body') ||
+                   document.querySelector('.panel-body');
+      if (body) body.scrollTop = 0;
+      return 1;
+    })()`);
+  });
+
+  await scene('a new session, and back to playing', 3200, async () => {
+    await js(`(() => { document.getElementById('time-more').click(); return 1; })()`);
+    await sleep(900);
+    await js(`(() => { document.getElementById('lib-done').click(); return 1; })()`);
+  });
+
+  stopped = true;
+  await loop;
+  console.log(`[DEMO] wrote ${frame} frames to ${DEMO_DIR}`);
+
+  try { shortcuts.releaseAll(); } catch { /* nothing held */ }
+  shellApp.allowQuit = true;
+  app.exit(0);
+}
+
 async function runStartProbe () {
   const win = shellApp.win;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1196,6 +1352,23 @@ app.whenReady().then(() => {
     }
   });
 
+  // Ends the session after settings.sessionMinutes of play. Counted in the
+  // main process: a site the child is on shares the page's process, and a
+  // clock a game could stop is not a clock.
+  playClock = createClock({
+    limitMinutes: settings.sessionMinutes,
+    onWarn: (left) => {
+      const mins = Math.round(left / 60);
+      shellApp.toast(mins <= 1 ? 'One minute left' : `${mins} minutes left`);
+      shellApp.pushState();
+    },
+    onTimeUp: () => {
+      console.log('[clock] session time is up');
+      shellApp.goHome();
+      shellApp.pushState();
+    }
+  });
+
   shellApp = new Shell({
     policy,
     settings,
@@ -1213,8 +1386,14 @@ app.whenReady().then(() => {
     // COVER_PROBE deliberately absent: without the lockdown the window gets a
     // frame, and a framed window measures differently from the frameless one
     // the probe exists to measure.
-    noLockdown: DIAGNOSE || KEY_PROBE || Boolean(SHOTS_DIR)
+    noLockdown: DIAGNOSE || KEY_PROBE || Boolean(SHOTS_DIR) || Boolean(DEMO_DIR),
+    // The gate and the portal are the parent's time, not the child's.
+    onModeChange: (mode) => {
+      playClock.setActive(mode === 'launcher' || mode === 'playing');
+    }
   });
+
+  shellApp.clockState = () => playClock.state();
 
   // If the lockdown is abandoned, the desktop gets its shortcuts back too.
   shellApp.onReleaseLockdown = () => {
@@ -1309,6 +1488,23 @@ app.whenReady().then(() => {
   installFocusGuard(win);
   registerIpc();
 
+  // One tick a second, and a fresh state to the renderer while the last five
+  // minutes run down so the countdown in the bar stays honest.
+  if (!CHECK_MODE && !PROBE_MODE) {
+    let sinceSync = 0;
+    setInterval(() => {
+      playClock.tick();
+      const { limitSeconds, timeUp } = playClock.state();
+      // The renderer counts the seconds down on its own; these messages are
+      // what keeps its count honest. Often near the end, rarely before.
+      sinceSync += 1;
+      if (limitSeconds && !timeUp && sinceSync >= 20) {
+        sinceSync = 0;
+        shellApp.pushState();
+      }
+    }, 1000).unref();
+  }
+
   if (process.platform === 'win32' && !IS_DEV && !CHECK_MODE && !PROBE_MODE &&
       (shellApp.lockdownEnabled || START_PROBE)) {
     startMenu.start();
@@ -1339,6 +1535,11 @@ app.whenReady().then(() => {
 
   if (KEY_PROBE) {
     ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runKeyProbe(); }, 1500));
+    return;
+  }
+
+  if (DEMO_DIR) {
+    ipcMain.once('shell:renderer-ready', () => setTimeout(() => { runDemo(); }, 1600));
     return;
   }
 
@@ -1381,7 +1582,8 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', (event) => {
-  if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || KEY_PROBE || START_PROBE || SHOTS_DIR) return;
+  if (CHECK_MODE || PROBE_MODE || DIAGNOSE || COVER_PROBE || KEY_PROBE || START_PROBE ||
+      SHOTS_DIR || DEMO_DIR) return;
   if (shellApp && !shellApp.allowQuit) {
     event.preventDefault();
     shellApp.openGate('quit');

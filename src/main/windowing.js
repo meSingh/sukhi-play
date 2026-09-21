@@ -430,7 +430,10 @@ class Shell {
       activeAppTitle: this.activeApp ? this.activeApp.title : null,
       htmlFullscreen: this.htmlFullscreen,
       blocked: this.policy.totalBlocked,
-      counts: this.policy.counts
+      counts: this.policy.counts,
+      // Set by index.js when a session limit is running; null when there is
+      // no limit to report.
+      clock: typeof this.clockState === 'function' ? this.clockState() : null
     };
   }
 

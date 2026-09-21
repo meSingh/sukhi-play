@@ -26,6 +26,13 @@ every key and clicked every button on the screen.
   hold if someone in the house is old enough to work out the holding
 - Change anything you set up. The grown-up screen is behind the same hold
 
+**Play time, if you want it**
+
+Set a session to ten minutes or an hour, or leave it off. Your child sees a
+countdown in the bar and gets warnings at five minutes and at one minute. When
+it runs out, a gentle stop screen appears and nothing else opens until you hold
+the grown-up button again.
+
 **What you do as a grown-up**
 
 Type an address, or pick from a short list of suggestions. Sukhi Play opens the

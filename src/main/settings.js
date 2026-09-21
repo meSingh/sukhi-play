@@ -26,6 +26,10 @@ const DEFAULTS = {
   // Show the "blocked N things" counter in the top bar.
   showBlockCounter: true,
 
+  // Minutes of play before the app asks for a grown-up again. 0 means no
+  // limit. A session, not a day: see playclock.js.
+  sessionMinutes: 0,
+
   // Set once the grown-up has been walked through setting the app up. Until
   // then the first thing anyone sees is the walkthrough, not an empty screen.
   onboarded: false,
@@ -55,6 +59,9 @@ function coerce (raw) {
 
   // A hold of zero would make the gate no gate at all.
   out.holdSeconds = clampInt(raw.holdSeconds, 1, 15, DEFAULTS.holdSeconds);
+
+  // 0 switches the limit off. Four hours is past any point a limit is helping.
+  out.sessionMinutes = clampInt(raw.sessionMinutes, 0, 240, DEFAULTS.sessionMinutes);
 
   for (const key of ['kiosk', 'alwaysOnTop', 'fullscreenOnLaunch', 'refocusOnBlur',
                      'showBlockCounter', 'onboarded', 'borrowDesktopShortcuts']) {

@@ -155,7 +155,76 @@ function applyState (state) {
     badge.hidden = true;
   }
 
+  applyClock(state.clock);
+
   if (state.mode !== 'gate') resetGate();
+}
+
+/* ---------------- the play clock ---------------- */
+
+/**
+ * The countdown a child can watch, and the session controls a parent uses.
+ *
+ * Main owns the time and sends the state; this only counts the seconds down
+ * between those messages so the display does not sit still for half a minute.
+ * Every message from main resets it, so the two cannot drift apart.
+ */
+let clockLeft = null;
+let clockTimer = 0;
+
+function paintClock () {
+  const text = clockLeft === null ? '' : formatLeft(clockLeft);
+  for (const id of ['bar-time', 'top-time']) {
+    const pill = el(id);
+    if (!pill) continue;
+    pill.hidden = clockLeft === null;
+    if (clockLeft === null) continue;
+    pill.querySelector('b').textContent = text;
+    pill.classList.toggle('is-last', clockLeft <= 60);
+  }
+}
+
+function formatLeft (seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = String(seconds % 60).padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function applyClock (clock) {
+  const timeUp = Boolean(clock && clock.timeUp);
+  app.classList.toggle('is-timeup', timeUp);
+
+  clearInterval(clockTimer);
+  clockTimer = 0;
+
+  const limited = Boolean(clock && clock.limitSeconds);
+  clockLeft = limited && !timeUp ? Math.max(0, clock.leftSeconds || 0) : null;
+  paintClock();
+
+  if (clockLeft !== null) {
+    clockTimer = setInterval(() => {
+      if (clockLeft === null || clockLeft <= 0) return;
+      clockLeft -= 1;
+      paintClock();
+    }, 1000);
+  }
+
+  const note = el('time-note');
+  if (note && clock) {
+    note.textContent = !limited
+      ? 'Sessions are not limited.'
+      : timeUp
+        ? 'Time is up. Start a new session to carry on.'
+        : `${Math.ceil((clock.leftSeconds || 0) / 60)} minutes left in this session.`;
+  }
+  paintChips(clock ? Math.round((clock.limitSeconds || 0) / 60) : 0);
+}
+
+/** Marks which session length is the current one. */
+function paintChips (minutes) {
+  for (const chip of document.querySelectorAll('#time-chips button')) {
+    chip.classList.toggle('is-on', Number(chip.dataset.min) === minutes);
+  }
 }
 
 /* ---------------- the grown-up gate ---------------- */
@@ -1117,6 +1186,27 @@ function wire () {
   on('gate-cancel-pin', 'click', () => api.closeGate());
   on('add-new', 'click', () => openForm('address'));
 
+  on('timeup-gate', 'click', () => api.openGate('portal'));
+
+  for (const chip of document.querySelectorAll('#time-chips button')) {
+    chip.addEventListener('click', async () => {
+      const r = await api.setSessionMinutes(chip.dataset.min);
+      if (!r || !r.ok) return showToast((r && r.message) || 'Could not save that.');
+      config.settings.sessionMinutes = r.sessionMinutes;
+      applyClock(r.clock);
+      showToast(r.sessionMinutes
+        ? `Play stops after ${r.sessionMinutes} minutes.`
+        : 'Play time is not limited.');
+    });
+  }
+
+  on('time-more', 'click', async () => {
+    const r = await api.moreTime();
+    if (!r || !r.ok) return showToast((r && r.message) || 'Could not start one.');
+    applyClock(r.clock);
+    showToast('A new session has started.');
+  });
+
   on('form-close', 'click', closeForm);
   on('form-cancel', 'click', closeForm);
   on('form-save', 'click', saveForm);
@@ -1162,6 +1252,7 @@ async function boot () {
 
   el('version').textContent = `v${config.version}`;
   el('check-update').hidden = Boolean(config.storeBuild);
+  paintChips(config.settings.sessionMinutes || 0);
   el('hold-secs').textContent = String(config.settings.holdSeconds);
 
   // Hold the splash briefly so it reads as a loading screen rather than a blink.

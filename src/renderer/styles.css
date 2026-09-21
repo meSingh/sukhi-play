@@ -502,6 +502,86 @@ img, svg { -webkit-user-drag: none; }
 /* ---------------- grown-up screens ---------------- */
 /* Deliberately calmer than the child's screens: white, quiet, legible. */
 
+/* ---------------- play time is over ---------------- */
+
+/* Shown over whatever the child was doing, so the tiles cannot be reached.
+   The main process refuses to launch anything as well: this screen is the
+   polite half of the answer, not the enforcement. */
+#timeup {
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(23, 21, 58, .58);
+}
+#app.is-timeup #timeup { display: flex; }
+#app.is-timeup #bar { pointer-events: none; }
+
+.timeup-card {
+  width: min(460px, 100%);
+  padding: 38px;
+  border-radius: 32px;
+  background: var(--paper);
+  box-shadow: 0 30px 80px rgba(23, 21, 58, .45);
+  text-align: center;
+}
+.timeup-card h2 { margin: 10px 0 8px; font-size: 28px; font-weight: 900; }
+.timeup-card p { margin: 0 0 22px; font-size: 16.5px; color: var(--ink-soft); }
+.timeup-mark { width: 120px; height: 120px; }
+
+/* The countdown both bars show while a session is running. A child watching
+   it learns that the time is a thing in the world rather than a parent's
+   sudden decision, which is the whole point of showing it. */
+.clock-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0 16px; height: 40px;
+  border-radius: 999px;
+  background: #F0EEFB; color: var(--ink);
+  font-size: 18px; font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.clock-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--mint, #10D6A0);
+}
+.clock-pill.is-last { background: #FFE9E9; color: var(--danger); }
+.clock-pill.is-last .clock-dot { background: var(--danger); animation: clockblink 1s steps(1) infinite; }
+@keyframes clockblink { 50% { opacity: .25; } }
+
+/* The app names itself over a game. */
+.bar-brand { display: flex; align-items: center; gap: 10px; flex: none; }
+.bar-mark { width: 34px; height: 34px; }
+.bar-name { font-size: 16px; font-weight: 900; letter-spacing: -.2px; color: var(--ink); }
+
+/* ---------------- play time, in the grown-up panel ---------------- */
+
+.sec--time {
+  background: linear-gradient(180deg, #F3F0FF, #FBFAFF);
+  border: 2px solid #E2DCFB;
+  border-radius: 24px;
+  padding: 22px 24px;
+}
+.time-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.time-titles { flex: 1; min-width: 200px; }
+.time-head h3 { margin: 0; font-size: 21px; font-weight: 900; }
+.time-head p { margin: 2px 0 0; font-size: 14.5px; color: var(--ink-soft); font-weight: 700; }
+.time-more {
+  border: none; border-radius: 14px;
+  padding: 11px 18px;
+  background: var(--blue); color: #fff;
+  font: inherit; font-size: 15px; font-weight: 800; cursor: pointer;
+}
+.time-more:hover { filter: brightness(1.05); }
+
+.time-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 12px; }
+.time-chips button {
+  border: 2px solid #E2DFF5; border-radius: 999px;
+  padding: 9px 16px;
+  background: #fff; color: var(--ink-soft);
+  font: inherit; font-size: 15px; font-weight: 800; cursor: pointer;
+}
+.time-chips button:hover { border-color: var(--blue); color: var(--ink); }
+.time-chips button.is-on { background: var(--ink); border-color: var(--ink); color: #fff; }
+
 #gate {
   align-items: center;
   justify-content: center;

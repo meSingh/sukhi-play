@@ -1,7 +1,7 @@
 {
   "name": "sukhi-play",
   "productName": "Sukhi Play",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "A locked-down, ad-free kiosk browser that lets a small child open only the sites you choose.",
   "main": "src/main/index.js",
   "private": true,
@@ -21,6 +21,7 @@
     "probe": "electron . --probe=",
     "metainfo": "node scripts/make-metainfo.js",
     "diagnose": "electron . --diagnose",
+    "demo": "node scripts/demo.js",
     "shots": "node scripts/shots.js",
     "flathub:lint": "node scripts/flathub-lint.js",
     "dist:snap": "npm run metainfo && electron-builder --linux snap --publish never",

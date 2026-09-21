@@ -33,6 +33,8 @@
   </picture>
 </a>
 
+<img src="docs/assets/demo.gif" width="820" alt="The app running: a countdown in the bar, a one minute warning, the stop screen when play time is over, and a grown-up starting another session">
+
 <img src="docs/screenshots/01-launcher.png" width="820" alt="The tile screen: six large colourful buttons, one per site, with a Grown-ups and Close button in the bar above">
 
 </div>
@@ -277,6 +279,22 @@ what is behind it.
 
 A site that asks for fullscreen with its own button still gets it. The bar
 slides away and **Esc** brings it back.
+
+## Play time
+
+Set a session length at the top of the grown-up screen: ten minutes to an
+hour, or no limit. A countdown sits in the bar where your child can see it,
+warnings come at five minutes and at one, and when the time is up they get a
+stop screen and nothing else opens.
+
+Only the three second hold starts another session. The clock is counted in the
+main process, never in the page: a site your child is on shares that page's
+process, and a clock a game could stop is not a clock. The gate and the portal
+pause it, so setting up a new site does not spend your child's afternoon.
+
+It is a session, not a day. Nothing is stored between runs, because a stored
+daily total invites the question "what counts as a day", and answering it
+wrongly means telling a two-year-old their time is gone at breakfast.
 
 ## The grown-up gate
 

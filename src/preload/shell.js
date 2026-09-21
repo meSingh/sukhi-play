@@ -34,6 +34,12 @@ contextBridge.exposeInMainWorld('sukhi', {
   /** Submit a PIN, only used when gateMode is "pin". Resolves { ok, message }. */
   answerGate: (answer) => ipcRenderer.invoke('shell:answer-gate', String(answer)),
 
+  /** Grant another session after the play time ran out. Parent only. */
+  moreTime: () => ipcRenderer.invoke('shell:more-time'),
+
+  /** Set how long a session lasts, in minutes. 0 is no limit. Parent only. */
+  setSessionMinutes: (minutes) => ipcRenderer.invoke('shell:set-session-minutes', Number(minutes)),
+
   /** Wipe everything back to a first run. Relaunches the app. */
   resetEverything: () => ipcRenderer.invoke('shell:reset-everything'),
 
