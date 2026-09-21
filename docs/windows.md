@@ -64,14 +64,22 @@ keyboard shortcuts a child might hit: Alt+Tab, the function keys, Alt+F4, the
 browser shortcuts, and Print Screen. All of it is released the moment the app
 quits.
 
-**The Windows key is the exception.** Windows does not let an application take
-it, on its own or in almost any combination, so pressing it opens the Start
-menu over the kiosk, and on Windows 11 it stays there until someone presses Esc
-or clicks back on the app. The app does ask for focus back, but Windows refuses
-that request from an app in the background, and the Start menu is drawn above
-every application window regardless. Taking that key properly would mean a permanent change to the machine,
-which this app does not make. Running the app with `--key-probe` reports
-exactly which keys Windows hands over on your system.
+**The Windows key is the exception.** Windows does not let an application
+take it, on its own or in almost any combination, so pressing it opens the
+Start menu over the kiosk. Holding the key properly would mean a low-level
+keyboard hook or a registry change, and this app makes neither.
+
+Instead it does what you would do: it presses Escape. While the lockdown is on,
+a helper watches for the Start menu, Search and the quick settings panel,
+closes whichever one appeared and brings the kiosk back to the front, in about
+a quarter of a second. Your child sees a flash and nothing else. Any other
+window is left alone, so a dialog you opened never has keys sent into it.
+
+The helper is a PowerShell child process that starts with the lockdown and
+stops with the app. Nothing is installed and nothing on the machine is changed.
+Running the app with `--start-probe` presses the Windows key a few times and
+reports whether the menu was closed each time; `--key-probe` reports which keys
+Windows hands over on your system.
 
 To quit, press **Close** and hold the button for three seconds.
 

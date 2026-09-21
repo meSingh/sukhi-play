@@ -337,22 +337,26 @@ variants, `Cmd+Shift+3/4/5/6`). Released the moment the window loses focus.
   `Ctrl+Shift+Esc`. Left alone so the machine can always be recovered. Do not
   add these.
 
-**Not blocked, because Windows will not allow it:**
+**Held a different way, because Windows will not hand it over:**
 
-- **The Windows key**, on its own and in almost every combination. A bare
-  `Super` accelerator is rejected by Electron outright, and Windows refuses
-  `Super+D`, `Super+E`, `Super+R`, `Super+L`, `Super+Tab`, `Super+Shift+S` and
-  the rest when asked for them. Only `Super+V`, `Super+Plus` and `Super+-` are
-  handed over, and those are taken.
+- **The Windows key.** A bare `Super` accelerator is rejected by Electron
+  outright, and Windows refuses `Super+D`, `Super+E`, `Super+R`, `Super+L`,
+  `Super+Tab`, `Super+Shift+S` and the rest when asked for them. Only
+  `Super+V`, `Super+Plus` and `Super+-` are handed over, and those are taken.
 
-  So pressing the Windows key opens the Start menu over the kiosk. The app
-  asks for focus back after 120ms, but Windows 11 refuses a focus request
-  from a background app and draws the Start menu above every application
-  window, so the menu stays until Esc or a click on the app. Blocking it properly needs a
-  low-level keyboard hook or a registry scancode map, and both are permanent
-  changes to the machine that this project will not make.
+  So pressing it opens the Start menu over the kiosk, and asking for focus back
+  does nothing: Windows refuses a foreground request from a background process,
+  and Start is drawn above every application window regardless of always-on-top.
 
-  Run `npm run key-probe` to re-measure any of this.
+  What works is Escape. While the lockdown is on, a PowerShell helper watches
+  for the Start menu, Search and the quick settings panel, presses Escape on
+  whichever appeared and brings the window back to the front, measured at about
+  a quarter of a second. Any other foreground window is left alone, so keys are
+  never sent into a dialog. The helper starts with the lockdown and stops with
+  the app; nothing is installed and nothing on the machine is changed.
+
+  Run `npm run start-probe` to watch it happen, and `npm run key-probe` to
+  re-measure which keys this OS hands over.
 
 **On Linux the desktop's own shortcuts are borrowed, not blocked.** Alt+Tab and
 the Super key belong to GNOME rather than to any application, and under
