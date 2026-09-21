@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.12.0.schema.json
 
 PackageIdentifier: meSingh.SukhiPlay
-PackageVersion: 1.0.15
+PackageVersion: 1.0.16
 InstallerType: nullsoft
 Scope: user
 InstallModes:
@@ -13,7 +13,7 @@ UpgradeBehavior: install
 ReleaseDate: 2026-09-21
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/meSingh/sukhi-play/releases/download/v1.0.15/Sukhi-Play-Windows-Setup.exe
-    InstallerSha256: 9799169C44E4EBA64456AE7924ED12682A6F601B9A46DC1A18B70858B8DB5C76
+    InstallerUrl: https://github.com/meSingh/sukhi-play/releases/download/v1.0.16/Sukhi-Play-Windows-Setup.exe
+    InstallerSha256: 8B1DE5B7BE1E0D7E793C6662F93699320750A905986B654A4B607E0A488C71B9
 ManifestType: installer
 ManifestVersion: 1.12.0
