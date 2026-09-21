@@ -66,10 +66,22 @@ const entries = (data.suggestions as Entry[]).map((e) => {
          no connection, so putting them in the same grid with a Copy button
          would be offering to copy something that is already installed. -->
     <section class="cat-inside">
-      <div class="cat-head">
-        <h2>Already inside Sukhi Play</h2>
-        <p>These come with the app. They need no internet at all, so they work
-          on a train, in the car, and when the broadband is having a day.</p>
+      <div class="cat-head cat-head--badged">
+        <div>
+          <h2>Already inside Sukhi Play</h2>
+          <p>These come with the app. They need no internet at all, so they work
+            on a train, in the car, and when the broadband is having a day.</p>
+        </div>
+        <!-- One badge for the section rather than the same chip on all three:
+             it is true of every app here, so saying it once says it better. -->
+        <span class="offline-badge">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 19h.01M5 12.5a10 10 0 0 1 14 0M2 8.8a15 15 0 0 1 20 0M8.5 16a5 5 0 0 1 7 0"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M3 3l18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Works offline
+        </span>
       </div>
       <div class="inside-grid">
         {bundled.map((b) => (
@@ -80,7 +92,6 @@ const entries = (data.suggestions as Entry[]).map((e) => {
               <p>{b.blurb}</p>
               <div class="cat-chips">
                 <span class="chip">{b.category || 'Other'}</span>
-                <span class="chip chip--inside">Works offline</span>
               </div>
             </div>
             <a class="inside-credit" href={b.sourceUrl} rel="noopener">

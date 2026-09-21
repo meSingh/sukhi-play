@@ -574,7 +574,7 @@ function registerIpc () {
           id: s.id, title: s.title, siteName: s.siteName, blurb: s.blurb,
           url: s.url, shape: s.shape, color: s.color,
           category: s.category, adSupported: s.adSupported, blockAds: s.blockAds,
-          bundled: s.bundled, credit: s.credit,
+          bundled: s.bundled, credit: s.credit, licence: s.licence,
           notes: s.notes, allowHosts: s.allowHosts, denyHosts: s.denyHosts
         })),
       shapes: library.SHAPES,
@@ -1864,6 +1864,7 @@ function bundledSuggestions () {
     blockAds: true,
     bundled: true,
     credit: b.credit,
+    licence: b.licence,
     notes: b.credit ? `${b.credit} (${b.licence}). Included in Sukhi Play.` : '',
     allowHosts: [b.id],
     denyHosts: []

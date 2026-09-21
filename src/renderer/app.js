@@ -733,7 +733,12 @@ function renderSuggestions (list) {
       // A bundled app has no address worth printing; its id would just be a
       // word with no meaning to anyone. Say where it came from instead.
       addr.classList.add('card-addr--inside');
-      addr.textContent = sug.credit ? `Included \u00b7 ${sug.credit}` : 'Included with Sukhi Play';
+      // The same attribution the website carries: whose work it is, and under
+      // what licence. Somebody's name belongs next to their work in both
+      // places, not only in the one a stranger reads.
+      addr.textContent = sug.credit
+        ? `${sug.credit}${sug.licence ? ` \u00b7 ${sug.licence}` : ''}`
+        : 'Included with Sukhi Play';
     } else {
       try { addr.textContent = new URL(sug.url).hostname; } catch { addr.textContent = sug.url; }
     }
