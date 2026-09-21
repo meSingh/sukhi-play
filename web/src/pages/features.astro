@@ -123,11 +123,45 @@ const REST = [
         </div>
       </div>
 
-      <div class="feat-cta">
-        <h2>Ready when you are</h2>
-        <p>macOS, Windows and Linux. No account, no payment, no trial.</p>
-        <a class="big-dl" href="/download.html">Download Sukhi Play</a>
-      </div>
     </div>
+
+    <!-- Ink, not white. Nothing else on this site has a white panel, and one
+         at the bottom of the page read as an empty box rather than an ending. -->
+    <section class="closer">
+      <div class="wrap">
+        <h2>Ready when you are</h2>
+        <p>macOS, Windows and Linux. Free, no account, no payment, no trial.</p>
+        <a class="big-dl" href="/download.html">Download Sukhi Play</a>
+        <p class="closer-note">Open source, MIT licensed, and it works with no
+          internet once it is installed.</p>
+      </div>
+    </section>
   </main>
+
+  <!-- Full-size screenshots, for anyone who wants to read the actual screen. -->
+  <dialog class="shot-box" id="shot-box">
+    <button class="shot-close" type="button" aria-label="Close">&times;</button>
+    <img id="shot-box-img" src="" alt="">
+  </dialog>
 </Base>
+
+<script>
+  const box = document.getElementById('shot-box') as HTMLDialogElement | null;
+  const img = document.getElementById('shot-box-img') as HTMLImageElement | null;
+  if (box && img) {
+    document.querySelectorAll<HTMLButtonElement>('.feature-shot').forEach((b) => {
+      b.addEventListener('click', () => {
+        // The full-resolution original, not the 560px one on the page: the
+        // point of enlarging is to read the screen.
+        img.src = b.dataset.full ?? '';
+        img.alt = b.dataset.alt ?? '';
+        box.showModal();
+      });
+    });
+    const shut = () => box.close();
+    box.querySelector('.shot-close')?.addEventListener('click', shut);
+    // Clicking the backdrop is the other way everyone expects to close this.
+    box.addEventListener('click', (e) => { if (e.target === box) shut(); });
+    box.addEventListener('close', () => { img.src = ''; });
+  }
+</script>

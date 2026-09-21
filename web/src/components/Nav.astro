@@ -23,13 +23,12 @@ const LINKS = [
 // The platforms hang under the download button rather than sitting in the bar.
 // Four of them up front asked a parent to choose before they had a question.
 const DOWNLOADS = [
-  { href: '/download.html', key: 'download', label: 'All downloads', note: 'Every build, with checksums' },
   { href: '/macos.html', key: 'macos', label: 'macOS', note: 'Apple Silicon, Intel, older Macs' },
   { href: '/windows.html', key: 'windows', label: 'Windows', note: 'Installer or portable' },
   { href: '/linux.html', key: 'linux', label: 'Linux', note: 'AppImage, deb, Snap' }
 ];
 
-const inDownloads = DOWNLOADS.some((d) => d.key === page);
+const inDownloads = page === 'download' || DOWNLOADS.some((d) => d.key === page);
 ---
 
 <header class="top">

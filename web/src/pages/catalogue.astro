@@ -13,12 +13,24 @@ import Base from '../layouts/Base.astro';
 import { SHAPES } from '../shapes';
 import { REPO } from '../site';
 import data from '../../../config/suggestions.json';
+import bundledData from '../../../config/bundled.json';
 
 type Entry = {
   id: string; url: string; shape: string; color: string;
   title: string; siteName?: string; blurb?: string; notes?: string;
   category?: string; adSupported?: boolean; blockAds?: boolean; termsUrl?: string;
 };
+
+/** The apps that ship inside the download. No address to copy: they are there. */
+const bundled = (bundledData.apps as Array<{
+  id: string; title: string; siteName?: string; blurb?: string;
+  category?: string; shape: string; color: string;
+  credit: string; licence: string; sourceUrl: string;
+}>).map((b) => ({
+  ...b,
+  name: b.siteName || b.title,
+  art: SHAPES[b.shape] ?? SHAPES.star
+}));
 
 const entries = (data.suggestions as Entry[]).map((e) => {
   let host = e.url;
@@ -48,6 +60,43 @@ const entries = (data.suggestions as Entry[]).map((e) => {
       <h1>What you can add</h1>
       <p class="lede">Sites that work in Sukhi Play. Copy an address, paste it
         into the app, and it sets the rest up for you.</p>
+    </div>
+
+    <!-- Kept apart from the sites below. These need no address, no hosts and
+         no connection, so putting them in the same grid with a Copy button
+         would be offering to copy something that is already installed. -->
+    <section class="cat-inside">
+      <div class="cat-head">
+        <h2>Already inside Sukhi Play</h2>
+        <p>These come with the app. They need no internet at all, so they work
+          on a train, in the car, and when the broadband is having a day.</p>
+      </div>
+      <div class="inside-grid">
+        {bundled.map((b) => (
+          <article class="inside-card" style={`--art:${b.color}`}>
+            <span class="cat-art" aria-hidden="true"><svg viewBox="0 0 100 100" set:html={b.art} /></span>
+            <div class="inside-say">
+              <h3>{b.name}</h3>
+              <p>{b.blurb}</p>
+              <div class="cat-chips">
+                <span class="chip">{b.category || 'Other'}</span>
+                <span class="chip chip--inside">Works offline</span>
+              </div>
+            </div>
+            <a class="inside-credit" href={b.sourceUrl} rel="noopener">
+              {b.credit} &middot; {b.licence}
+            </a>
+          </article>
+        ))}
+      </div>
+      <p class="inside-note">Open source, included with credit and under their own
+        licences. Nothing here can reach the network, so there is nothing on them
+        to filter.</p>
+    </section>
+
+    <div class="cat-head cat-head--sites">
+      <h2>Sites you can add</h2>
+      <p>Copy an address, paste it into the app, and it fills in the rest.</p>
     </div>
 
     <div class="cat-grid">

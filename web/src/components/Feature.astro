@@ -22,10 +22,18 @@ const { title, shot, alt, flip = false, note } = Astro.props;
 ---
 
 <article class:list={['feature', flip && 'feature--flip']}>
-  <div class="feature-shot">
+  <button class="feature-shot" type="button"
+          data-full={shot.src} data-alt={alt} aria-label={`Enlarge: ${alt}`}>
     <Image src={shot} alt={alt} widths={[560, 900, 1400]}
            sizes="(max-width: 900px) 92vw, 560px" loading="lazy" />
-  </div>
+    <span class="shot-zoom" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M16 16l5 5M11 8v6M8 11h6" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </span>
+  </button>
   <div class="feature-say">
     <h2>{title}</h2>
     <slot />
