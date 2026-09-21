@@ -86,7 +86,10 @@ jobs:
         run: |
           set -euo pipefail
           src=packaging/flathub/com.msingh.sukhi.play.yml
-          out=/tmp/ci-manifest.yml
+          # Beside the original, not in /tmp: the manifest's `type: file`
+          # sources are relative to the directory it sits in, so a copy
+          # anywhere else cannot find sukhi-play.sh and friends.
+          out=packaging/flathub/ci-manifest.yml
           sed -E "s/^([[:space:]]*)tag: v[0-9].*/\1commit: ${GITHUB_SHA}/" "$src" > "$out"
           if ! grep -q "commit: ${GITHUB_SHA}" "$out"; then
             echo "::error::no git tag line found in $src to replace"
@@ -97,5 +100,5 @@ jobs:
       - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
         with:
           bundle: sukhi-play.flatpak
-          manifest-path: /tmp/ci-manifest.yml
+          manifest-path: packaging/flathub/ci-manifest.yml
           cache-key: flatpak-builder-${{ github.sha }}

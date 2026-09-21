@@ -8,6 +8,7 @@ const path = require('node:path');
 
 const bundled = require('../src/main/bundled');
 const { sanitizeApp } = require('../src/main/catalog');
+const { requireSecurity } = require('./helpers');
 
 const ROOT = path.join(__dirname, '..');
 
@@ -191,7 +192,9 @@ test('every bundled shape is one the app can actually draw', () => {
 });
 
 test('only a bundled app may save, and only a picture', () => {
-  const security = require('../src/main/security');
+  // Stubbed, not required directly: security.js pulls in electron at the top,
+  // and that throws in a plain Node process without the binary installed.
+  const security = requireSecurity();
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sukhi-saves-'));
   const policy = security.createPolicy();
   policy.setSaveDir(dir);

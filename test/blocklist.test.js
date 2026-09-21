@@ -46,12 +46,7 @@ test('probe mode never survives past the probe', () => {
   // If `probing` were left set, every host would be allowed for the child's
   // next session -- the allowlist is the primary defence, so this matters more
   // than any single blocked domain.
-  const Module = require('node:module');
-  const realLoad = Module._load;
-  Module._load = (req, ...rest) =>
-    req === 'electron' ? { shell: { openExternal: async () => {} } } : realLoad(req, ...rest);
-  const security = require('../src/main/security');
-  Module._load = realLoad;
+  const security = require('./helpers').requireSecurity();
 
   const policy = security.createPolicy();
   policy.setApp({ id: 'x', allowHosts: ['example.com'], denyHosts: [] });

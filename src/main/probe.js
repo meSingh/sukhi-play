@@ -2,7 +2,13 @@
 
 const path = require('node:path');
 const fs = require('node:fs');
-const { WebContentsView, net } = require('electron');
+// Required where it is used, not at the top. Three of the four things this
+// module exports are pure -- normalizeUrl, summarise, prettyTitle -- and the
+// tests that cover them have no business needing an Electron binary on disk
+// to run. Requiring electron outside Electron resolves that binary and throws
+// when it is missing, which is how a CI runner with a half-finished install
+// took out a test about string handling.
+const electron = () => require('electron');
 const { hostFromUrl, registrableDomain, normalizeHost } = require('./hosts');
 const blocklist = require('./blocklist');
 
@@ -23,6 +29,7 @@ async function probeSite ({ win, shellView, session, policy, url, seconds = PROB
   const target = normalizeUrl(url);
   if (!target) return { ok: false, message: 'That does not look like a web address.' };
 
+  const { WebContentsView } = electron();
   const view = new WebContentsView({
     webPreferences: {
       session,
