@@ -1,12 +1,13 @@
 ---
 /**
- * The features page, in two acts: what a child meets, and what a parent
- * decides. Within each, a grid of tiles that are deliberately not the same
- * size or the same kind -- a screenshot, a number, a sentence on a colour --
- * so the important things are big and the small ones stay small.
+ * A tour of the real screens, in the order a parent meets them.
+ *
+ * The homepage is the pitch: abstractions, a demo you can press, a mascot.
+ * This page is the reference, and its job is to show the actual application
+ * large enough to read, with the parts worth noticing pointed at.
  */
 import Base from '../layouts/Base.astro';
-import Tile from '../components/Tile.astro';
+import Screen from '../components/Screen.astro';
 import { REPO } from '../site';
 
 import launcher from '../images/01-launcher.png';
@@ -15,117 +16,118 @@ import addApp from '../images/03-add-an-app.png';
 import closing from '../images/05-closing-needs-a-grownup.png';
 
 const REST = [
-  ['No favicons, no logos', 'Every tile is a shape and a colour we drew. Nothing is fetched from the sites you add.'],
-  ['Keyboard shortcuts held', 'Alt+Tab, Alt+F4, Command+Q, Print Screen. The Windows key is the one exception, and we say so.'],
-  ['No downloads', 'A site cannot write a file. The one thing that can is a bundled app saving your child’s picture.'],
-  ['It sets itself up', 'The first run picks a few sites with you and asks how you want to get back in.'],
-  ['Free and open source', 'MIT licensed. Every line is public, including the parts that decide what your child can reach.'],
-  ['Works on your machine', 'macOS, Windows and Linux. No account, no payment, no trial.']
+  ['No favicons, no logos', 'Every picture on a tile is a shape and a colour we drew. Nothing is fetched from the sites you add, so nothing on your child’s screen is theirs to change.'],
+  ['Keyboard shortcuts held down', 'Alt+Tab, Alt+F4, Command+Q, Print Screen and the rest are caught while the window has focus. The Windows key is the one exception, and we say so on the Windows page rather than hoping you do not notice.'],
+  ['No downloads, no popups, no new windows', 'A site cannot open a window, start a download, or ask for your camera. The one thing that may write a file is a bundled app saving a picture your child drew.'],
+  ['Nothing is sent anywhere', 'No sign-in, no analytics, no telemetry, no crash reporting. The only request Sukhi Play makes on its own is checking for a newer version, and only when you press the button.'],
+  ['Free, and open source', 'MIT licensed. Every line is public, including the parts that decide what your child can reach.']
 ];
 ---
 
 <Base
   title="Everything Sukhi Play does"
-  description="A locked screen, a play-time limit that ends by itself, adverts filtered, apps that work with no internet, and a grown-up gate a three-year-old cannot pass. Free and open source."
+  description="A tour of every screen: the locked play zone, the grown-up screen behind a real gate, play time that ends by itself, and adding any site by its address."
   page="features">
 
   <main>
     <div class="wrap">
-      <div class="hero hero--page">
+      <header class="hero hero--page f-hero">
+        <p class="f-kicker">A look at every screen</p>
         <h1>Hand it over.<br><em>Keep your work.</em></h1>
-        <p class="lede">Two screens, really: the one your child gets, and the
-          one only you can reach. Here is everything on both.</p>
-      </div>
+        <p class="lede">Four screens, and only one of them is your child’s.
+          Here is each, at a size you can actually read.</p>
+      </header>
     </div>
 
-    <!-- Act one. -->
-    <section class="act">
+    <Screen
+      title="The play zone"
+      lede="What your child sees, every time. It fills the display and there is no way out of it."
+      shot={launcher}
+      alt="The Sukhi Play tile screen: six large coloured tiles, each a site a parent added, with a grown-ups button in the corner."
+      pins={[
+        { x: 30, y: 5, what: 'No address bar, and nothing to type into', side: 'right' },
+        { x: 85.5, y: 5, what: 'The only way to the grown-up screen', side: 'left' },
+        { x: 50, y: 62, what: 'Only the sites you added, as big soft buttons', side: 'right' }
+      ]}>
+      <p>No new tab, no back button out of it, and no link that leads anywhere
+        you did not allow. A child who taps everything finds only these tiles.</p>
+    </Screen>
+
+    <Screen
+      title="The grown-up screen"
+      lede="Everything you decide, in one place your child cannot open."
+      tone="ink"
+      shot={portal}
+      alt="The grown-up screen, with tabs for play time, installed apps, the catalogue and settings, showing six installed apps with on-off switches."
+      pins={[
+        { x: 15, y: 13.5, what: 'Play time, apps, catalogue, settings', side: 'right' },
+        { x: 28, y: 33, what: 'Hide an app without deleting it', side: 'right' },
+        { x: 18, y: 62, what: 'Sites whose terms ask us not to filter say so', side: 'right' },
+        { x: 91, y: 5, what: 'Quitting is here, not hidden in a menu', side: 'left' }
+      ]}>
+      <p>Getting in means holding a button for three seconds — or answering a
+        small sum, if your child ever works the hold out.</p>
+    </Screen>
+
+    <!-- The gate is a behaviour, not a screen, so it is shown rather than
+         photographed: the same button the homepage lets you try. -->
+    <section class="gate-band">
       <div class="wrap">
-        <header class="act-head">
-          <span class="act-num">01</span>
-          <h2>What your child gets</h2>
-          <p>A screen with no way out of it, and nothing on it you did not put there.</p>
-        </header>
-
-        <div class="bento">
-          <Tile title="Only what you chose" span={2} tall shot={launcher}
-                alt="The Sukhi Play tile screen: six large coloured tiles, each a site a parent added."
-                tone="paper">
-            <p>Full screen, no address bar, no new tab, no back button out of
-              it. A child who taps everything finds only these tiles.</p>
-          </Tile>
-
-          <Tile title="Adverts and trackers, refused" span={2} tone="mint"
-                stat="1,284" statNote="cut in one afternoon">
-            <p>Blocked before they load, on every site you add.</p>
-          </Tile>
-
-          <Tile title="Apps that need no internet" tone="violet" stat="3">
-            <p>A colouring book, a keyboard playground and first games, inside
-              the download.</p>
-          </Tile>
-
-          <Tile title="Nothing is sent anywhere" tone="cyan" stat="0"
-                statNote="accounts, trackers, reports">
-            <p>No sign-in, no analytics, nothing phoning home.</p>
-          </Tile>
-
-          <Tile title="Then it stops by itself" span={2} tall shot={closing}
-                alt="The screen shown when play time is over, offering to ask a grown-up for more."
-                tone="paper">
-            <p>No argument, because it was never your decision in the moment.
-              The countdown only appears in the last thirty seconds, so there
-              is nothing to watch or bargain with.</p>
-          </Tile>
+        <div class="gate-band-in">
+          <div class="gate-say">
+            <h2>Little fingers tap.<br><em>Grown-ups hold.</em></h2>
+            <p>A quick tap does nothing at all — which is every tap a small
+              child makes. Three full seconds of steady pressure is a different
+              motion, and it is the one thing standing between your child and
+              the rest of your laptop.</p>
+            <p class="gate-note">Prefer a sum? Switch it in settings and the
+              hold stops working entirely.</p>
+          </div>
+          <div class="gate-try">
+            <button class="try-ring" id="try-hold" type="button" aria-label="Press and hold">
+              <svg class="try-prog" viewBox="0 0 120 120" aria-hidden="true">
+                <circle cx="60" cy="60" r="54" class="try-track"/>
+                <circle cx="60" cy="60" r="54" class="try-fill"/>
+              </svg>
+              <span class="try-label" id="try-label">Hold</span>
+            </button>
+            <p class="try-hint" id="try-hint">Try it — press and keep pressing.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Act two, on ink, so the two halves are visibly different places. -->
-    <section class="act act--dark">
-      <div class="wrap">
-        <header class="act-head">
-          <span class="act-num">02</span>
-          <h2>What only you can reach</h2>
-          <p>Behind a gate a three-year-old does not get through.</p>
-        </header>
+    <Screen
+      title="When play time is up"
+      lede="It ends by itself, so it was never your decision in the moment."
+      shot={closing}
+      alt="The screen shown when play time is over: a card reading That is all for now, with a button to ask for more time and a quieter one for grown-ups to close the app."
+      pins={[
+        { x: 50, y: 58, what: 'Your child can ask; only you can answer', side: 'right' },
+        { x: 50, y: 66, what: 'And a way out that is always there', side: 'right' }
+      ]}>
+      <p>Set the session length once and it starts again every time the app
+        opens. The countdown only appears in the last thirty seconds, so there
+        is nothing to watch or bargain with. Grant fifteen minutes, an hour or
+        the rest of the day when it runs out — your usual limit does not move.</p>
+    </Screen>
 
-        <div class="bento">
-          <Tile title="The grown-up screen" span={2} tall shot={portal}
-                alt="The grown-up screen, with tabs for play time, installed apps, the catalogue and settings."
-                tone="paper">
-            <p>Play time, the apps, the catalogue and every setting, in one
-              place your child cannot open.</p>
-          </Tile>
+    <Screen
+      title="Adding a site"
+      lede="Paste an address. Sukhi Play works out the rest and shows you before it saves."
+      tone="ink"
+      shot={addApp}
+      alt="The add-an-app form, with a name, a picture, a colour, an address and a switch for filtering adverts."
+      pins={[
+        { x: 42, y: 40, what: 'Pick a shape and a colour — never a favicon', side: 'right' },
+        { x: 48, y: 68, what: 'The address, and the hosts it needs, found for you', side: 'right' },
+        { x: 30, y: 82, what: 'Advert filtering, on unless you say otherwise', side: 'right' }
+      ]}>
+      <p>Or start from <a href="/catalogue/">the catalogue</a>: sites already
+        set up, and three apps that come with the download and need no internet
+        at all.</p>
+    </Screen>
 
-          <Tile title="Hold it for three seconds" span={2} tone="ink">
-            <span class="hold-demo" aria-hidden="true">
-              <span class="hold-ring"><b>Hold</b></span>
-            </span>
-            <p>Quick taps do nothing at all. If your child ever works the hold
-              out, swap it for a small sum instead.</p>
-          </Tile>
-
-          <Tile title="Set the session once" span={2} tone="ink"
-                stat="20" statNote="minutes, every time it opens">
-            <p>A standing rule, not a decision you make again each time. When
-              it runs out you can grant fifteen minutes, an hour, or the rest
-              of the day — and your usual limit stays where it is.</p>
-          </Tile>
-
-          <Tile title="Add any site by its address" span={2} tall shot={addApp}
-                alt="The add-an-app form, with a name, a picture, a colour and an address."
-                tone="paper">
-            <p>Paste an address. Sukhi Play loads it, works out which hosts it
-              needs, and suggests a name and a picture — change any of it
-              before you save. Or start from <a href="/catalogue/">the
-              catalogue</a>.</p>
-          </Tile>
-        </div>
-      </div>
-    </section>
-
-    <!-- The short ones, as a quiet run rather than a third grid. -->
     <section class="wrap rest">
       <h2>And the rest</h2>
       <ul class="rest-list">
@@ -153,13 +155,12 @@ const REST = [
 </Base>
 
 <script>
+  /* Enlarging a screen, because a picture of a screen is worth reading. */
   const box = document.getElementById('shot-box') as HTMLDialogElement | null;
   const img = document.getElementById('shot-box-img') as HTMLImageElement | null;
   if (box && img) {
-    document.querySelectorAll<HTMLButtonElement>('.bt-shot').forEach((b) => {
+    document.querySelectorAll<HTMLButtonElement>('.screen-shot').forEach((b) => {
       b.addEventListener('click', () => {
-        // The full-resolution original, not the one sized for the tile: the
-        // point of enlarging a picture of a screen is to read the screen.
         img.src = b.dataset.full ?? '';
         img.alt = b.dataset.alt ?? '';
         box.showModal();
@@ -169,5 +170,72 @@ const REST = [
     box.querySelector('.shot-close')?.addEventListener('click', shut);
     box.addEventListener('click', (e) => { if (e.target === box) shut(); });
     box.addEventListener('close', () => { img.src = ''; });
+  }
+
+  /* The real hold, on the page, at the real three seconds. Claiming a child
+     cannot do it and then not letting a parent try would be a weaker claim. */
+  const HOLD = 3000;
+  const LEN = 339.3;                       // circumference of r=54
+  const btn = document.getElementById('try-hold');
+  const fill = document.querySelector<SVGCircleElement>('.try-fill');
+  const label = document.getElementById('try-label');
+  const hint = document.getElementById('try-hint');
+
+  if (btn && fill && label && hint && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let started = 0, raf = 0, level = 0, holding = false, done = false;
+    const paint = (v: number) => {
+      level = Math.max(0, Math.min(1, v));
+      fill.style.strokeDashoffset = String(LEN * (1 - level));
+    };
+    paint(0);
+
+    const tick = () => {
+      if (!holding) return;
+      paint((performance.now() - started) / HOLD);
+      if (level >= 1) {
+        holding = true; done = true;
+        btn.classList.add('is-open');
+        label.textContent = 'Open';
+        hint.textContent = 'That is the whole gate. Three seconds, every time.';
+        return;
+      }
+      hint.textContent = 'Keep holding…';
+      raf = requestAnimationFrame(tick);
+    };
+    const drain = () => {
+      cancelAnimationFrame(raf);
+      const from = level, t0 = performance.now();
+      const back = () => {
+        const p = Math.max(0, from - (performance.now() - t0) / 420);
+        paint(p);
+        if (p > 0) requestAnimationFrame(back);
+      };
+      requestAnimationFrame(back);
+    };
+    const down = (e: Event) => {
+      if (done) return;
+      e.preventDefault();
+      holding = true;
+      cancelAnimationFrame(raf);
+      started = performance.now() - level * HOLD;
+      raf = requestAnimationFrame(tick);
+    };
+    const up = () => {
+      if (!holding || done) return;
+      holding = false;
+      hint.textContent = 'Let go too soon. That is the point.';
+      drain();
+    };
+    btn.addEventListener('pointerdown', down);
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach((t) => btn.addEventListener(t, up));
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
+    btn.addEventListener('keydown', (e) => {
+      const k = e as KeyboardEvent;
+      if ((k.key === ' ' || k.key === 'Enter') && !k.repeat) down(e);
+    });
+    btn.addEventListener('keyup', (e) => {
+      const k = e as KeyboardEvent;
+      if (k.key === ' ' || k.key === 'Enter') up();
+    });
   }
 </script>
