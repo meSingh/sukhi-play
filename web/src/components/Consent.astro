@@ -1,0 +1,102 @@
+---
+/**
+ * The cookie banner, and the only thing that loads Google Analytics.
+ *
+ * GA4 sets cookies, so under the ePrivacy Directive a visitor in the EU or UK
+ * has to agree before it runs -- not after, and not by scrolling. So nothing
+ * is fetched from Google until somebody presses Yes. That undercounts, which
+ * is the correct trade for a site whose whole claim is that it does not watch
+ * anyone.
+ *
+ * Three ways this stays quiet without asking at all:
+ *   - Do Not Track and Global Privacy Control are treated as a No already
+ *     given. Asking somebody who has set those is asking them to repeat
+ *     themselves.
+ *   - A previous answer, either way, is remembered and not asked again.
+ *   - Without JavaScript nothing loads and no banner appears, which is the
+ *     right outcome in both directions.
+ */
+import { GA_ID } from '../site';
+---
+
+<div class="consent" id="consent" hidden role="dialog" aria-live="polite"
+     aria-labelledby="consent-title">
+  <div class="consent-say">
+    <b id="consent-title">May we count this visit?</b>
+    <p>Google Analytics, for visitor numbers and which pages get read. No
+      advertising, and nothing is shared with anyone. Sukhi Play itself never
+      sends anything anywhere &mdash; this is only the website.
+      <a href="/privacy/">What it collects</a>.</p>
+  </div>
+  <div class="consent-do">
+    <button type="button" id="consent-no" class="consent-btn">No thanks</button>
+    <button type="button" id="consent-yes" class="consent-btn consent-btn--yes">Yes, that&rsquo;s fine</button>
+  </div>
+</div>
+
+<script is:inline define:vars={{ GA_ID }}>
+  (function () {
+    var KEY = 'sukhi-analytics';
+    var banner = document.getElementById('consent');
+    if (!banner) return;
+
+    function stored() {
+      try { return localStorage.getItem(KEY); } catch (e) { return null; }
+    }
+    function remember(value) {
+      try { localStorage.setItem(KEY, value); } catch (e) { /* private mode */ }
+    }
+
+    function load() {
+      if (window.__ga) return;
+      window.__ga = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+      document.head.appendChild(s);
+
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { window.dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('js', new Date());
+      // No advertising signals, and IPs truncated before they are stored.
+      gtag('config', GA_ID, {
+        anonymize_ip: true,
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false
+      });
+    }
+
+    function close() { banner.hidden = true; }
+
+    // A stated preference is an answer. Do not ask again in other words.
+    var dnt = navigator.doNotTrack === '1' || window.doNotTrack === '1' ||
+              navigator.globalPrivacyControl === true;
+
+    var answer = stored();
+    if (answer === 'yes') { load(); return; }
+    if (answer === 'no' || dnt) return;
+
+    // Shown late so it never competes with the page arriving.
+    var show = function () { banner.hidden = false; };
+    if ('requestIdleCallback' in window) requestIdleCallback(show, { timeout: 2000 });
+    else setTimeout(show, 1200);
+
+    document.getElementById('consent-yes').addEventListener('click', function () {
+      remember('yes'); close(); load();
+    });
+    document.getElementById('consent-no').addEventListener('click', function () {
+      remember('no'); close();
+    });
+
+    // The footer link, so a decision can be taken back.
+    document.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('[data-consent-reopen]');
+      if (!t) return;
+      e.preventDefault();
+      try { localStorage.removeItem(KEY); } catch (err) { /* private mode */ }
+      banner.hidden = false;
+      banner.scrollIntoView({ block: 'nearest' });
+    });
+  })();
+</script>

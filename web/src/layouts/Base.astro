@@ -9,6 +9,7 @@
  */
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Consent from '../components/Consent.astro';
 import { REPO, SITE } from '../site';
 import '../styles/site.css';
 
@@ -84,5 +85,6 @@ const app = {
   <Nav page={page} />
   <div id="main"><slot /></div>
   <Footer />
+  <Consent />
 </body>
 </html>

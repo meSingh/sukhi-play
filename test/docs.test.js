@@ -357,3 +357,68 @@ test('robots.txt points at a sitemap that exists and lists real pages', () => {
     assert.ok(!/\.html$/.test(rel), `the sitemap lists the redirect stub ${url}`);
   }
 });
+
+test('no page reaches Google before somebody agrees to it', () => {
+  for (const page of builtPages()) {
+    const html = fs.readFileSync(page.file, 'utf8');
+
+    // A script tag, a preconnect or a dns-prefetch would all contact Google
+    // on load, which is the thing consent is supposed to gate.
+    const eager = [
+      /<script[^>]+src="[^"]*(?:googletagmanager|google-analytics)/i,
+      /<link[^>]+(?:preconnect|dns-prefetch|preload)[^>]*google/i,
+      /<img[^>]+src="[^"]*google/i
+    ];
+    for (const re of eager) {
+      assert.equal(re.test(html), false,
+        `${page.name} contacts Google before consent: ${(html.match(re) || [])[0]}`);
+    }
+
+    // The id may appear only inside the banner's own script, which runs it
+    // after a click and never before.
+    const idHits = (html.match(/G-[A-Z0-9]{8,}/g) || []).length;
+    if (idHits) {
+      assert.ok(html.includes('sukhi-analytics'),
+        `${page.name} names a GA id outside the consent gate`);
+    }
+  }
+});
+
+test('the banner offers a real choice and remembers it', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'docs', 'index.html'), 'utf8');
+
+  assert.ok(html.includes('id="consent-yes"') && html.includes('id="consent-no"'),
+    'the banner must offer both answers');
+  // Consent that was nudged is not consent, so refusing must be as easy as
+  // agreeing: same element, same weight, no hidden link.
+  assert.match(html, /id="consent-no"[^>]*class="consent-btn"/,
+    'the refuse button must be an ordinary button');
+
+  // A stated preference is an answer already given.
+  assert.ok(html.includes('doNotTrack') && html.includes('globalPrivacyControl'),
+    'Do Not Track and Global Privacy Control must be honoured without asking');
+
+  // The answer lives in the visitor's own browser, not in a cookie.
+  assert.ok(html.includes('localStorage'), 'the choice should be stored locally');
+  assert.ok(!/document\.cookie/.test(html), 'the banner must not set a cookie of its own');
+});
+
+test('the privacy page says what is collected, and can be reached', () => {
+  const root = path.join(__dirname, '..', 'docs');
+  const file = path.join(root, 'privacy', 'index.html');
+  assert.ok(fs.existsSync(file), 'there is no privacy page');
+
+  const text = fs.readFileSync(file, 'utf8').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+  for (const claim of [
+    /sends nothing anywhere/i,          // the application
+    /Google Analytics/i,                // named, not implied
+    /Do Not Track/i,
+    /localStorage/i
+  ]) {
+    assert.match(text, claim, `the privacy page does not mention ${claim}`);
+  }
+
+  // Reachable from anywhere, or nobody reads it.
+  const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  assert.ok(home.includes('href="/privacy/"'), 'the footer should link the privacy page');
+});

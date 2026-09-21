@@ -1,0 +1,63 @@
+---
+/**
+ * What the website collects, and what the application does not.
+ *
+ * Kept short and specific. A privacy page that lists categories of data
+ * "such as" other data is a page that has decided not to tell you.
+ */
+import Base from '../layouts/Base.astro';
+import { REPO } from '../site';
+---
+
+<Base
+  title="Privacy — Sukhi Play"
+  description="The Sukhi Play application sends nothing anywhere. The website counts visits with Google Analytics, but only if you agree first."
+  page="privacy">
+
+  <main class="wrap doc" style="padding: 44px 0 80px;">
+    <h1>Privacy</h1>
+    <p class="doc-summary">Two different things: the application you install,
+      and this website. They behave differently, and it is worth being exact
+      about which is which.</p>
+
+    <div class="doc-body">
+      <h2>The application</h2>
+      <p><strong>It sends nothing anywhere.</strong> There is no account, no
+        sign-in, no analytics, no telemetry and no crash reporting. Nothing
+        about what your child does leaves the computer. The list of sites, the
+        play-time limit and every setting live in a file on your own disk.</p>
+      <p>It makes exactly one request of its own accord: when you press
+        <em>Check for updates</em>, it asks GitHub whether a newer release
+        exists. Nothing is sent with that request beyond what any HTTP request
+        carries, and it happens only when you press the button.</p>
+      <p>Websites you add are ordinary websites. What they collect is between
+        you and them, which is why every entry in the catalogue links to that
+        site&rsquo;s own terms.</p>
+
+      <h2>This website</h2>
+      <p>If you agreed to it, this site uses <strong>Google Analytics 4</strong>
+        to count visits and see which pages get read. If you did not, or have
+        not been asked, or have Do Not Track or Global Privacy Control switched
+        on, nothing is loaded from Google at all &mdash; not the script, not a
+        cookie, not a request.</p>
+      <p>When it is on, it records the usual: a page address, a rough location
+        from a truncated IP, a browser and device type, and which site sent you
+        here. Advertising features and ad personalisation are switched off, so
+        nothing is used to build a profile or target anything at you.</p>
+      <p>Your answer is remembered in your own browser, in
+        <code>localStorage</code>, not in a cookie sent to anyone.
+        <a href="#" data-consent-reopen>Change your mind</a> whenever you like.</p>
+
+      <h2>Hosting</h2>
+      <p>The site is static files served by GitHub Pages, and downloads come
+        from GitHub Releases. GitHub keeps its own server logs of requests to
+        both, which this project does not control and cannot see. Their
+        <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+           rel="nofollow noopener">privacy statement</a> covers that.</p>
+
+      <h2>Asking</h2>
+      <p>If something here is unclear or wrong, <a href={`${REPO}/issues`}>open
+        an issue</a> and it gets fixed on this page.</p>
+    </div>
+  </main>
+</Base>
