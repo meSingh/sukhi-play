@@ -1,24 +1,34 @@
 ---
 /**
- * The cookie banner, and the only thing that loads Google Analytics.
+ * Analytics, and the two different ways it is allowed to start.
  *
- * GA4 sets cookies, so under the ePrivacy Directive a visitor in the EU or UK
- * has to agree before it runs -- not after, and not by scrolling. So nothing
- * is fetched from Google until somebody presses Yes. That undercounts, which
- * is the correct trade for a site whose whole claim is that it does not watch
- * anyone.
+ * Opt-out everywhere it is lawful, opt-in where it is not.
  *
- * Three ways this stays quiet without asking at all:
- *   - Do Not Track and Global Privacy Control are treated as a No already
- *     given. Asking somebody who has set those is asking them to repeat
- *     themselves.
- *   - A previous answer, either way, is remembered and not asked again.
- *   - Without JavaScript nothing loads and no banner appears, which is the
- *     right outcome in both directions.
+ * The EU and EEA require prior consent for any non-essential cookie
+ * (ePrivacy Directive, Article 5(3)), and the UK's statistical-purposes
+ * exemption, new in February 2026, does not reach Google Analytics because GA
+ * sends the data to a third party. So in Europe nothing is fetched from Google
+ * until somebody presses Yes.
+ *
+ * Everywhere else, analytics starts on and a quiet notice says so with a
+ * switch to turn it off. That is the majority of this site's readers, which is
+ * the point -- but it is a legal line, not a preference, so it is drawn by
+ * where the visitor is rather than by which answer we would prefer.
+ *
+ * Region comes from the browser's own time zone. No geo-IP lookup, because
+ * asking a third party where somebody lives in order to decide how carefully
+ * to treat their privacy would be an odd way to start. It errs towards asking:
+ * a reader outside Europe whose clock says Europe gets the banner, which
+ * costs them a click and costs us nothing.
+ *
+ * Do Not Track and Global Privacy Control are honoured everywhere, in both
+ * modes. Those are a stated preference, and a jurisdiction that happens to
+ * permit ignoring them is not a reason to.
  */
 import { GA_ID } from '../site';
 ---
 
+<!-- Europe: nothing runs until this is answered. -->
 <div class="consent" id="consent" hidden role="dialog" aria-live="polite"
      aria-labelledby="consent-title">
   <div class="consent-say">
@@ -34,18 +44,26 @@ import { GA_ID } from '../site';
   </div>
 </div>
 
+<!-- Everywhere else: it is already running, and here is the off switch. -->
+<div class="notice" id="notice" hidden role="status">
+  <p>We count visits with Google Analytics. No advertising, nothing shared.
+    <a href="/privacy/">More</a></p>
+  <div class="notice-do">
+    <button type="button" id="notice-off" class="consent-btn">Turn it off</button>
+    <button type="button" id="notice-ok" class="consent-btn consent-btn--yes">Got it</button>
+  </div>
+</div>
+
 <script is:inline define:vars={{ GA_ID }}>
   (function () {
     var KEY = 'sukhi-analytics';
-    var banner = document.getElementById('consent');
-    if (!banner) return;
+    var SEEN = 'sukhi-analytics-seen';
+    var ask = document.getElementById('consent');
+    var tell = document.getElementById('notice');
+    if (!ask || !tell) return;
 
-    function stored() {
-      try { return localStorage.getItem(KEY); } catch (e) { return null; }
-    }
-    function remember(value) {
-      try { localStorage.setItem(KEY, value); } catch (e) { /* private mode */ }
-    }
+    function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* private mode */ } }
 
     function load() {
       if (window.__ga) return;
@@ -59,7 +77,6 @@ import { GA_ID } from '../site';
       function gtag() { window.dataLayer.push(arguments); }
       window.gtag = gtag;
       gtag('js', new Date());
-      // No advertising signals, and IPs truncated before they are stored.
       gtag('config', GA_ID, {
         anonymize_ip: true,
         allow_google_signals: false,
@@ -67,36 +84,77 @@ import { GA_ID } from '../site';
       });
     }
 
-    function close() { banner.hidden = true; }
+    function unload() {
+      // Clear what GA already set, so "off" means off rather than "off from
+      // now on". GA's cookies are _ga and _ga_<id>, on this host and its dot
+      // form, which is where it writes them.
+      var host = location.hostname;
+      ['_ga', '_ga_' + GA_ID.replace('G-', ''), '_gid'].forEach(function (name) {
+        [host, '.' + host, ''].forEach(function (d) {
+          document.cookie = name + '=; Max-Age=0; path=/' + (d ? '; domain=' + d : '');
+        });
+      });
+      window['ga-disable-' + GA_ID] = true;
+    }
 
-    // A stated preference is an answer. Do not ask again in other words.
-    var dnt = navigator.doNotTrack === '1' || window.doNotTrack === '1' ||
-              navigator.globalPrivacyControl === true;
+    // A stated preference, honoured in both modes and in every region.
+    var refused = navigator.doNotTrack === '1' || window.doNotTrack === '1' ||
+                  navigator.globalPrivacyControl === true;
 
-    var answer = stored();
+    // Where prior consent is required: the EU and EEA, the UK, Switzerland.
+    // Read off the browser's own clock, and deliberately generous.
+    function mustAsk() {
+      var tz = '';
+      try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { return true; }
+      if (tz.indexOf('Europe/') === 0) return true;
+      return [
+        'Atlantic/Canary', 'Atlantic/Madeira', 'Atlantic/Azores', 'Atlantic/Reykjavik',
+        'Atlantic/Faroe', 'Asia/Nicosia', 'Asia/Famagusta', 'Indian/Mayotte',
+        'Indian/Reunion', 'America/Martinique', 'America/Guadeloupe', 'America/Cayenne'
+      ].indexOf(tz) !== -1;
+    }
+
+    var answer = get(KEY);
+    if (answer === 'no' || refused) { unload(); return; }
     if (answer === 'yes') { load(); return; }
-    if (answer === 'no' || dnt) return;
 
-    // Shown late so it never competes with the page arriving.
-    var show = function () { banner.hidden = false; };
-    if ('requestIdleCallback' in window) requestIdleCallback(show, { timeout: 2000 });
-    else setTimeout(show, 1200);
+    var show = function (el) {
+      var go = function () { el.hidden = false; };
+      if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 2000 });
+      else setTimeout(go, 1200);
+    };
+
+    if (mustAsk()) {
+      show(ask);
+    } else {
+      // Lawful to start, so it starts. The notice is shown once, because a
+      // banner that returns on every visit is a banner people learn not to read.
+      load();
+      if (!get(SEEN)) show(tell);
+    }
 
     document.getElementById('consent-yes').addEventListener('click', function () {
-      remember('yes'); close(); load();
+      set(KEY, 'yes'); ask.hidden = true; load();
     });
     document.getElementById('consent-no').addEventListener('click', function () {
-      remember('no'); close();
+      set(KEY, 'no'); ask.hidden = true; unload();
+    });
+    document.getElementById('notice-ok').addEventListener('click', function () {
+      set(SEEN, '1'); tell.hidden = true;
+    });
+    document.getElementById('notice-off').addEventListener('click', function () {
+      set(KEY, 'no'); set(SEEN, '1'); tell.hidden = true; unload();
     });
 
-    // The footer link, so a decision can be taken back.
+    // The footer and the privacy page, so a decision can always be revisited.
     document.addEventListener('click', function (e) {
       var t = e.target.closest && e.target.closest('[data-consent-reopen]');
       if (!t) return;
       e.preventDefault();
-      try { localStorage.removeItem(KEY); } catch (err) { /* private mode */ }
-      banner.hidden = false;
-      banner.scrollIntoView({ block: 'nearest' });
+      try { localStorage.removeItem(KEY); localStorage.removeItem(SEEN); } catch (err) { /* private mode */ }
+      var el = mustAsk() ? ask : tell;
+      el.hidden = false;
+      el.scrollIntoView({ block: 'nearest' });
     });
   })();
 </script>

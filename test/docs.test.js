@@ -384,6 +384,57 @@ test('no page reaches Google before somebody agrees to it', () => {
   }
 });
 
+test('prior consent is required exactly where the law requires it', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'docs', 'index.html'), 'utf8');
+
+  // The region test runs in the page, so lift it out and run it here rather
+  // than trusting a reading of it. Time zones, because a geo-IP lookup means
+  // telling a third party where somebody lives in order to decide how
+  // carefully to treat their privacy.
+  const fn = html.match(/function mustAsk\(\) \{[\s\S]*?\n    \}/);
+  assert.ok(fn, 'the region test is missing from the page');
+  // eslint-disable-next-line no-new-func
+  const mustAsk = new Function('Intl', `${fn[0]}; return mustAsk;`);
+
+  const ask = (tz) => mustAsk({
+    DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: tz }) })
+  })();
+
+  // The EU and EEA, the UK and Switzerland all require opt-in. The UK's
+  // statistical-purposes exemption of February 2026 does not reach Google
+  // Analytics, because that sends the data to a third party.
+  for (const tz of [
+    'Europe/London', 'Europe/Dublin', 'Europe/Berlin', 'Europe/Paris',
+    'Europe/Madrid', 'Europe/Rome', 'Europe/Warsaw', 'Europe/Stockholm',
+    'Europe/Zurich', 'Europe/Oslo', 'Atlantic/Reykjavik', 'Atlantic/Canary',
+    'Asia/Nicosia', 'America/Martinique'
+  ]) {
+    assert.equal(ask(tz), true, `${tz} must be asked first`);
+  }
+
+  // Everywhere else may start and offer an opt-out.
+  for (const tz of [
+    'America/New_York', 'America/Los_Angeles', 'America/Sao_Paulo',
+    'Asia/Calcutta', 'Asia/Kolkata', 'Asia/Tokyo', 'Australia/Sydney',
+    'Africa/Lagos', 'Pacific/Auckland'
+  ]) {
+    assert.equal(ask(tz), false, `${tz} should not need prior consent`);
+  }
+
+  // A browser that will not say errs towards asking, which costs a click.
+  assert.equal(ask(''), false, 'an empty zone falls through to the list');
+  assert.equal(mustAsk({ DateTimeFormat: () => { throw new Error('no Intl'); } })(), true,
+    'a browser that refuses to answer should be asked');
+});
+
+test('turning analytics off clears what it already set', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'docs', 'index.html'), 'utf8');
+  // "Off" has to mean off, not "off from now on": GA's existing cookies go,
+  // and its own disable flag is set for the rest of the page's life.
+  assert.match(html, /Max-Age=0/, 'opting out must expire the cookies GA set');
+  assert.match(html, /ga-disable-/, "opting out must set GA's disable flag");
+});
+
 test('the banner offers a real choice and remembers it', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'docs', 'index.html'), 'utf8');
 
@@ -398,9 +449,19 @@ test('the banner offers a real choice and remembers it', () => {
   assert.ok(html.includes('doNotTrack') && html.includes('globalPrivacyControl'),
     'Do Not Track and Global Privacy Control must be honoured without asking');
 
-  // The answer lives in the visitor's own browser, not in a cookie.
+  // The answer lives in the visitor's own browser, not in a cookie -- so the
+  // consent mechanism itself never needs consent.
   assert.ok(html.includes('localStorage'), 'the choice should be stored locally');
-  assert.ok(!/document\.cookie/.test(html), 'the banner must not set a cookie of its own');
+
+  // It does touch document.cookie, but only to expire GA's. Every write must
+  // be a deletion; one that sets a real value would be a tracking cookie
+  // smuggled in by the thing meant to prevent them.
+  const writes = [...html.matchAll(/document\.cookie\s*=\s*([^;]+;)/g)].map((m) => m[0]);
+  for (const w of writes) {
+    assert.match(w, /=\s*'?\s*$|=[^=]*\+\s*'=;/,
+      `the banner writes a cookie with a value: ${w}`);
+  }
+  assert.ok(html.includes('Max-Age=0'), 'cookie writes should be expiries');
 });
 
 test('the privacy page says what is collected, and can be reached', () => {
