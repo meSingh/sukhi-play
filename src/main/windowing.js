@@ -60,7 +60,6 @@ class Shell {
 
     this.mode = 'boot';          // boot | launcher | playing | gate
     this.activeApp = null;
-    this.htmlFullscreen = false;
     this.allowQuit = false;
     // Replaced by measureBar() once the shell has loaded.
     this.barHeight = BAR_HEIGHT;
@@ -402,7 +401,9 @@ class Shell {
         this.gameView.setBounds({ x: 0, y: BAR, width, height: Math.max(0, height - BAR) });
         return;
       }
-      const bar = this.htmlFullscreen ? 0 : BAR;
+      // Always BAR. There is no case where the child should be looking at a
+      // screen with no way off it.
+      const bar = BAR;
       this.shellView.setBounds({ x: 0, y: 0, width, height: bar });
       this.gameView.setBounds({ x: 0, y: bar, width, height: Math.max(0, height - bar) });
       return;
@@ -436,7 +437,6 @@ class Shell {
       gateIntent: this.gateIntent || null,
       activeAppId: this.activeApp ? this.activeApp.id : null,
       activeAppTitle: this.activeApp ? this.activeApp.title : null,
-      htmlFullscreen: this.htmlFullscreen,
       // True between pressing a tile and the page being ready, with enough
       // about the app to show whose tile is opening.
       loading: Boolean(this.loading),
@@ -513,19 +513,21 @@ class Shell {
     contents.on('did-navigate-in-page', focusGame);
     this.focusGame = focusGame;
 
-    // A game asking for real fullscreen gets it, and the bar gets out of the way.
+    // Fullscreen is refused at the permission handler, but a page can still
+    // reach it by other routes -- a <video> going fullscreen, an older API,
+    // a gesture Chromium treats as pre-authorised. If one gets through, put it
+    // straight back, because the bar it covers is the child's only way out.
     contents.on('enter-html-full-screen', () => {
       if (!isCurrent()) return;
-      this.htmlFullscreen = true;
+      console.log('[window] a page went fullscreen; putting it back');
+      contents.executeJavaScript('document.exitFullscreen && document.exitFullscreen()')
+        .catch(() => { /* the page went away */ });
       this.layout();
-      this.pushState();
       focusGame();
     });
     contents.on('leave-html-full-screen', () => {
       if (!isCurrent()) return;
-      this.htmlFullscreen = false;
       this.layout();
-      this.pushState();
       focusGame();
     });
 
@@ -630,7 +632,6 @@ class Shell {
     clearTimeout(this.loadingTimer);
     this.activeApp = null;
     this.policy.clear();
-    this.htmlFullscreen = false;
     this.setMode('launcher');
     return { ok: true };
   }

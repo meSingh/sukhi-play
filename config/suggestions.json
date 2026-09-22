@@ -194,19 +194,24 @@
       "blockAds": true,
       "adSupported": false,
       "category": "Creative",
-      "notes": "Music experiments you play with by touching and dragging. Made by Google Creative Lab, no advertising.",
+      "notes": "Spectrogram, Voice Spinner and Sound Waves listen through the microphone, so this profile is allowed to use it. Nothing is recorded or sent anywhere \u2014 the sound is drawn on screen and thrown away. The camera is never available, to this or to any other site.",
       "allowHosts": [
         "chromeexperiments.com",
         "appspot.com",
         "googleapis.com",
-        "gstatic.com"
+        "gstatic.com",
+        "firebaseio.com",
+        "tambien.github.io"
       ],
       "denyHosts": [],
       "termsUrl": "https://www.google.com/intl/en/policies/terms/",
       "termsChecked": "2026-09-21",
       "siteName": "Chrome Music Lab",
       "blurb": "Draw a song and hear it play back.",
-      "hostsChecked": "2026-09-21"
+      "hostsChecked": "2026-09-21",
+      "permissions": [
+        "microphone"
+      ]
     }
   ]
 }

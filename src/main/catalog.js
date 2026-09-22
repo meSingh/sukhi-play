@@ -6,6 +6,12 @@ const path = require('node:path');
 const SHAPES = new Set(['star', 'rocket', 'ball', 'blocks', 'note', 'leaf', 'drop', 'bolt',
                         'heart', 'cloud', 'moon', 'flower', 'fish', 'book', 'paint', 'car']);
 const HEX = /^#[0-9a-fA-F]{6}$/;
+
+// The only capabilities an app may be given. A microphone is here because some
+// music sites listen to you sing; a camera is deliberately not, and neither is
+// location, notifications or anything else that would tell a website something
+// about the child using it.
+const GRANTABLE = new Set(['microphone']);
 // Kept in step with bundled.js. Required here rather than imported, because
 // catalog.js is loaded by tests that never start Electron.
 const BUNDLED_SCHEME = 'sukhiplay';
@@ -41,6 +47,13 @@ function sanitizeApp (raw, index) {
     ? raw.denyHosts.filter((h) => typeof h === 'string' && h.trim()).map((h) => h.trim())
     : [];
 
+  // Capabilities this one app may ask the browser for. An allowlist rather
+  // than free text: a typo should leave a site without a microphone, not hand
+  // it something nobody meant to give it.
+  const permissions = Array.isArray(raw.permissions)
+    ? raw.permissions.filter((x) => GRANTABLE.has(x))
+    : [];
+
   return {
     id,
     title,
@@ -58,6 +71,9 @@ function sanitizeApp (raw, index) {
     // child -- no other sites, no popups, no wandering off -- while the site
     // is left to run exactly as its operator intended.
     blockAds: raw.blockAds !== false,
+    // Only ever what is listed here. Note the absence of a camera: no site a
+    // small child opens has a reason to see them.
+    permissions,
     notes: typeof raw.notes === 'string' ? raw.notes.trim() : ''
   };
 }

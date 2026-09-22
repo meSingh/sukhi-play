@@ -36,7 +36,7 @@ const ALWAYS_BLOCKED = new Set([
 const GAME_SAFE = new Set([
   'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
   ' ', 'Spacebar', 'Enter', 'Tab', 'Backspace', 'Delete',
-  'Escape',                // needed to leave a game's own fullscreen
+  'Escape',                // a normal game key; nothing here uses it to escape
   'Home', 'End', 'PageUp', 'PageDown'
 ]);
 

@@ -32,8 +32,15 @@ function pickExtension (item) {
 const INTERNAL_SCHEMES = new Set(['data:', 'blob:', 'about:', 'filesystem:']);
 const WEB_SCHEMES = new Set(['http:', 'https:', 'ws:', 'wss:']);
 
-// The only two capabilities a game legitimately needs.
-const ALLOWED_PERMISSIONS = new Set(['fullscreen', 'pointerLock']);
+// What any app may have without being asked for.
+//
+// Fullscreen used to be here, and it was the wrong call. A page that goes
+// fullscreen covers the top bar, which is the only thing on screen telling a
+// child how to get back -- the Back button and the grown-up button both
+// disappear under the game. Escape gets you out, but a three-year-old does not
+// know that, and a way out only an adult can find is not a way out. So the bar
+// stays, always, and a page asking for the whole screen is refused.
+const ALLOWED_PERMISSIONS = new Set(['pointerLock']);
 
 function schemeOf (url) {
   try {
@@ -55,6 +62,9 @@ function createPolicy () {
   // title a parent typed and renamed on collision, so comparing against it
   // blocked an app whose tile had been given any other name.
   let bundleId = null;
+  // Extra capabilities this one app may ask for, on top of ALLOWED_PERMISSIONS.
+  // Empty for everything that has not been given one deliberately.
+  let extraPermissions = new Set();
   // Where a bundled app's pictures go. Set once at start-up.
   let saveDir = null;
   let blockAds = true;
@@ -104,6 +114,8 @@ function createPolicy () {
       activeAppId = app ? app.id : null;
       bundleId = app && app.bundled ? bundled.idOf(app.url) : null;
       blockAds = app ? app.blockAds !== false : true;
+      extraPermissions = new Set(
+        Array.isArray(app && app.permissions) ? app.permissions : []);
       gate = createHostGate({
         allow: app ? app.allowHosts : [],
         deny: app ? app.denyHosts : []
@@ -124,6 +136,29 @@ function createPolicy () {
     // exactly one place that decides whether a host is permitted. Reading the
     // gate directly here meant navigation and request filtering could disagree
     // with each other during a probe.
+    /**
+     * Whether the app that is open may have this capability.
+     *
+     * Chromium asks under more than one name depending on how the page asked:
+     * getUserMedia arrives as 'media', the older path as 'audioCapture'. Both
+     * mean a microphone, so both are answered by the same entry.
+     */
+    allowsPermission (permission, details) {
+      if (ALLOWED_PERMISSIONS.has(permission)) return true;
+      if (!extraPermissions.size) return false;
+      if (permission === 'media' || permission === 'audioCapture') {
+        if (!extraPermissions.has('microphone')) return false;
+        // 'media' is one permission covering microphone AND camera, and the
+        // page says which it wants in mediaTypes. Granting the pair because
+        // the microphone was asked for would hand a child's webcam to a
+        // website. Audio only, and only when we can see that is all it wants.
+        const types = details && details.mediaTypes;
+        if (Array.isArray(types)) return types.length > 0 && types.every((t) => t === 'audio');
+        return permission === 'audioCapture';
+      }
+      return extraPermissions.has(permission);
+    },
+    get permissions () { return [...extraPermissions]; },
     allowsHost (host) { return this.verdict(host) === 'allow'; },
     allowsUrl (url) {
       // A bundled app is confined to its own origin. Nothing else on this
@@ -233,13 +268,21 @@ function configureSession (ses, policy, { onBlocked, onSaved } = {}) {
   }
 
   // --- capabilities ---
-  ses.setPermissionRequestHandler((contents, permission, callback) => {
-    const granted = ALLOWED_PERMISSIONS.has(permission);
-    if (!granted) console.log(`[perm] denied: ${permission}`);
+  // A capability is granted only where the app's own entry asked for it, so
+  // "the music site may use the microphone" never becomes "any site may".
+  // Video is never granted: nothing here has a reason to watch a child.
+  ses.setPermissionRequestHandler((contents, permission, callback, details) => {
+    const granted = policy.allowsPermission(permission, details);
+    console.log(granted
+      ? `[perm] granted to this app: ${permission}`
+      : `[perm] denied: ${permission}`);
     callback(granted);
   });
 
-  ses.setPermissionCheckHandler((contents, permission) => ALLOWED_PERMISSIONS.has(permission));
+  // The check handler has no mediaTypes to inspect, so it can only say whether
+  // the app has been given the microphone at all; the request handler above is
+  // where audio-only is actually enforced.
+  ses.setPermissionCheckHandler((contents, permission) => policy.allowsPermission(permission));
 
   // Hardware pickers: refuse by handing back an empty selection.
   ses.setDevicePermissionHandler(() => false);
