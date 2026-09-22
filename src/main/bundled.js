@@ -122,6 +122,11 @@ function clean (raw, vendorDir, ourDir = vendorDir) {
     credit: String(raw.credit || '').trim(),
     licence: String(raw.licence || '').trim(),
     sourceUrl: String(raw.sourceUrl || '').trim(),
+    // Made by Sukhi Play rather than vendored from somebody else. The grown-up
+    // screen marks these as official, so a parent can tell at a glance which
+    // apps come from the same people as the app itself. The same literal-true
+    // test as the root above, so the badge and the folder can never disagree.
+    official: raw.ours === true,
     url: `${SCHEME}://${id}/${entry}`
   };
 }

@@ -41,7 +41,7 @@ These are ours. They can be changed.
   keyboard, and reversible — nothing a three-year-old presses should leave them
   somewhere they cannot get back from.
 - **Credit is kept.** Where an app is derived from someone else's, the source is
-  named in its README, its licence, and on its own About screen.
+  named in its README, and its licence travels with it in NOTICE.
 
 ## Mounting one inside Sukhi Play
 

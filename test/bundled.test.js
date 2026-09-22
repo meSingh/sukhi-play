@@ -298,3 +298,31 @@ test('every app the shipped manifest names is on disk, in the root it claims', (
       `${app.id} should be at ${root}/${app.dir}/app/`);
   }
 });
+
+// --- official ----------------------------------------------------------------
+//
+// The grown-up screen marks our own apps as official. The mark says "made by
+// Sukhi Play, no adverts, no tracking", so it must only ever follow from the
+// manifest's own flag, and never from anything a parent can type.
+
+test('official follows ours: true, and nothing else', () => {
+  const vendor = fakeVendor({ thing: { 'index.html': '<p>theirs</p>' } });
+  const ours = fakeVendor({ thing: { 'index.html': '<p>ours</p>' } });
+  const one = (flag) => bundled.load(
+    manifest([{ id: 'thing', dir: 'thing', ...(flag === undefined ? {} : { ours: flag }) }]),
+    vendor, ours)[0];
+
+  assert.equal(one(true).official, true);
+  for (const flag of [undefined, false, 'true', 1, {}]) {
+    assert.equal(one(flag).official, false, `${JSON.stringify(flag)} must not make an app official`);
+  }
+});
+
+test('in the shipped manifest, only our own apps are official', () => {
+  const list = bundled.load(
+    path.join(ROOT, 'config', 'bundled.json'),
+    path.join(ROOT, 'vendor'),
+    path.join(ROOT, 'apps'));
+  const official = list.filter((a) => a.official).map((a) => a.id);
+  assert.deepEqual(official, ['colouring']);
+});

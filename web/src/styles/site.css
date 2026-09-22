@@ -1471,18 +1471,21 @@ footer.foot a:hover { color: var(--ink); }
   background: linear-gradient(135deg, var(--wash-amber) 0%, var(--base) 70%);
   box-shadow: var(--drop);
 }
+/* The same mark the grown-up screen puts on this app: ink, a shield, and who
+   made it. */
 .cat-first-tag {
-  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px;
-  font-size: 12.5px; font-weight: 900; letter-spacing: .8px; text-transform: uppercase;
-  color: var(--ink-soft);
+  display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px;
+  padding: 5px 13px 5px 9px; border-radius: 999px;
+  background: var(--ink); color: var(--paper);
+  font-size: 12.5px; font-weight: 900; letter-spacing: .5px; text-transform: uppercase;
 }
-.cat-first-pip { width: 9px; height: 9px; border-radius: 50%; background: var(--art, var(--coral)); }
+.cat-first-tag svg { width: 15px; height: 15px; color: var(--mint); }
 .cat-first-name { display: flex; align-items: center; gap: 14px; }
 .cat-first-name img { border-radius: 16px; }
 .cat-first-name h2 { margin: 0; }
 .cat-first-line { margin: 12px 0 0; font-size: 17px; color: var(--ink-soft); }
 .cat-first-go { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0 0; }
-.cat-first-credit { margin: 16px 0 0; font-size: 13.5px; color: var(--ink-faint); }
+.cat-first-promise { margin: 16px 0 0; font-size: 14px; font-weight: 800; color: #0B7A5C; }
 .cat-first-shot img {
   display: block; width: 100%; height: auto;
   border-radius: 16px; box-shadow: var(--drop-lift);
@@ -1672,30 +1675,6 @@ footer.foot a:hover { color: var(--ink); }
   height: auto;
   border-radius: 26px;
   box-shadow: 0 26px 50px rgba(23, 21, 58, .20);
-}
-
-/* The credit. A card with a dashed frame, set apart by its edge rather than by
-   weight: it names where this came from and says thank you, and that is all. */
-.co-from { padding-block: 24px 88px; }
-.co-from-card {
-  text-align: center;
-  padding: 26px 30px;
-  border: 2px dashed rgba(23, 21, 58, .14);
-  border-radius: var(--radius);
-  background: var(--paper);
-}
-.co-from-card .kicker { color: var(--ink-faint); margin-bottom: 8px; }
-.co-from-card p { margin: 0; font-size: 17px; color: var(--ink-soft); line-height: 1.6; }
-.co-from-card a { font-weight: 800; }
-.co-thanks {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 2px 12px;
-  border-radius: 999px;
-  background: var(--wash-amber);
-  color: var(--ink);
-  font-weight: 900;
-  white-space: nowrap;
 }
 
 /* Home-screen steps: three short lines, one per kind of device. */

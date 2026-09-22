@@ -499,6 +499,7 @@ async function loadObSuggestions () {
     const meta = document.createElement('span');
     meta.className = 'card-meta';
     meta.textContent = sug.category;
+    if (sug.official) meta.appendChild(officialBadge());
     meta.appendChild(sug.adSupported
       ? tag('has ads', 'lib-tag--ads')
       : tag('no ads', 'lib-tag--free'));
@@ -573,6 +574,29 @@ function tag (text, cls) {
   return t;
 }
 
+/**
+ * The badge on an app Sukhi Play made itself.
+ *
+ * It answers the question a parent has about an app they did not choose: who
+ * made this, and is it safe. Official, a shield, and the two promises that
+ * matter most -- no adverts, no tracking -- in words rather than in a tooltip,
+ * because a tooltip is not there on a touch screen.
+ */
+function officialBadge () {
+  const b = document.createElement('span');
+  b.className = 'lib-official';
+  b.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.2 2.6 3.3v4.1c0 3.3 2.3 6.2 5.4 7.4 3.1-1.2 5.4-4.1 5.4-7.4V3.3z" fill="currentColor"/><path d="m5.4 8 1.8 1.8 3.4-3.6" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  b.append('Official');
+  b.title = 'Made by Sukhi Play. No adverts, no tracking.';
+  return b;
+}
+
+/** The line under an official app's name, where other apps show an address. */
+// Non-breaking inside each phrase, so a narrow card wraps between them and
+// never leaves "No" at the end of one line and "tracking" on the next.
+const OFFICIAL_LINE = ['By Sukhi Play', 'No ads', 'No tracking']
+  .map((p) => p.replace(/ /g, '\u00a0')).join(' · ');
+
 let catalogue = { mine: [], suggestions: [], shapes: [], colors: [] };
 
 async function loadLibrary () {
@@ -634,7 +658,9 @@ function renderMine (mine) {
     const top = document.createElement('div');
     top.className = 'app-top';
 
-    if (!entry.blockAds) {
+    if (entry.official) {
+      top.appendChild(officialBadge());
+    } else if (!entry.blockAds) {
       const flag = document.createElement('span');
       flag.className = 'app-flag';
       flag.textContent = 'Ads showing';
@@ -657,7 +683,12 @@ function renderMine (mine) {
 
     const host = document.createElement('div');
     host.className = 'app-host';
-    try { host.textContent = new URL(entry.url).hostname; } catch { host.textContent = entry.url; }
+    if (entry.official) {
+      host.classList.add('app-host--official');
+      host.textContent = OFFICIAL_LINE;
+    } else {
+      try { host.textContent = new URL(entry.url).hostname; } catch { host.textContent = entry.url; }
+    }
 
     const state = document.createElement('div');
     state.className = 'app-state';
@@ -744,6 +775,7 @@ function renderSuggestions (list) {
     const meta = document.createElement('span');
     meta.className = 'card-meta';
     meta.textContent = sug.category;
+    if (sug.official) meta.appendChild(officialBadge());
     // "no ads" is true of a bundled app but says the wrong thing: there is
     // nowhere for an advert to come from, and the fact worth showing is that
     // it needs no connection at all.
@@ -765,11 +797,17 @@ function renderSuggestions (list) {
       // A bundled app has no address worth printing; its id would just be a
       // word with no meaning to anyone. Say where it came from instead.
       addr.classList.add('card-addr--inside');
+      if (sug.official) addr.classList.add('card-addr--official');
       // The same attribution the website carries: whose work it is. The
       // licence is not here -- a parent choosing an app for their child has no
       // use for "MIT", and the notice that actually matters legally lives in
       // NOTICE and in vendor/<app>/LICENSE, where it travels with the code.
-      addr.textContent = sug.credit || 'Included with Sukhi Play';
+      //
+      // Except for our own. The catalogue is where a parent decides what to
+      // put in front of their child, and for an app made here the thing worth
+      // saying is who made it and what it will never do. Where it came from
+      // is said on its own page and in NOTICE; it is not a reason to choose it.
+      addr.textContent = sug.official ? OFFICIAL_LINE : (sug.credit || 'Included with Sukhi Play');
     } else {
       try { addr.textContent = new URL(sug.url).hostname; } catch { addr.textContent = sug.url; }
     }

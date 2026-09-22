@@ -1879,3 +1879,38 @@ img, svg { -webkit-user-drag: none; }
 @media (prefers-reduced-motion: reduce) {
   .loading-badge, .loading-dots i { animation: none; }
 }
+
+/* Official: an app Sukhi Play made itself. Ink rather than a pastel, so it
+   reads as a mark of who made it rather than as one more category chip. */
+.lib-official {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px 3px 6px;
+  border-radius: 999px;
+  background: #17153A;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: .3px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.lib-official svg { width: 13px; height: 13px; color: #10D6A0; flex: none; }
+.card-meta .lib-official { margin-right: 6px; vertical-align: middle; }
+.app-top .lib-official { align-self: center; }
+/* Green, and allowed to wrap: on an installed-app card this sits where an
+   address would, and an address is short enough to cut off with an ellipsis.
+   A promise is not -- "No tr..." is worse than saying nothing. */
+.card-addr--official,
+.portal-panel .app-host--official,
+.app-host--official {
+  color: #0B7A5C;
+  font-weight: 800;
+  white-space: normal;
+  text-overflow: clip;
+  line-height: 1.35;
+}
+/* Centred on the installed card, like the address it replaces; left on the
+   catalogue card, like the addresses beside it. */
+.app-host--official { text-align: center; }

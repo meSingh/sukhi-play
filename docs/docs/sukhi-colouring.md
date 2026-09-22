@@ -61,9 +61,3 @@ one tap. The steps, in case you would rather do it yourself:
 
 It then opens full screen like any other app, and keeps working without
 internet once it has been opened once.
-
-## Where it came from
-
-Sukhi Colouring is derived from the original work of
-[Kids Coloring by oh-namgyu](https://github.com/oh-namgyu/kids-coloring).
-Thank you.

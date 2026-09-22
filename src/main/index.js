@@ -584,6 +584,9 @@ function registerIpc () {
       mine: catalog.apps.map((a) => ({
         id: a.id, title: a.title, url: a.url, shape: a.shape, color: a.color,
         enabled: a.enabled, blockAds: a.blockAds, bundled: a.bundled,
+        // Looked up rather than stored: the parent's catalog file is theirs to
+        // edit, and "official" must not be something a text editor can grant.
+        official: isOfficial(a.url),
         allowHosts: a.allowHosts, denyHosts: a.denyHosts, notes: a.notes
       })),
       // Ones already set up are dropped rather than greyed out -- a suggestion
@@ -596,7 +599,7 @@ function registerIpc () {
           id: s.id, title: s.title, siteName: s.siteName, blurb: s.blurb,
           url: s.url, shape: s.shape, color: s.color,
           category: s.category, adSupported: s.adSupported, blockAds: s.blockAds,
-          bundled: s.bundled, credit: s.credit, licence: s.licence,
+          bundled: s.bundled, official: isOfficial(s.url), credit: s.credit, licence: s.licence,
           notes: s.notes, allowHosts: s.allowHosts, denyHosts: s.denyHosts
         })),
       shapes: library.SHAPES,
@@ -1949,6 +1952,11 @@ protocol.registerSchemesAsPrivileged([{
  * and pretending otherwise would put a "no adverts" badge on something that
  * has nowhere to serve one from.
  */
+/** True for an app Sukhi Play made itself and ships in the download. */
+function isOfficial (url) {
+  return bundledApps.some((b) => b.official && b.url === url);
+}
+
 function bundledSuggestions () {
   return bundledApps.map((b) => ({
     id: b.id,
@@ -1964,7 +1972,9 @@ function bundledSuggestions () {
     bundled: true,
     credit: b.credit,
     licence: b.licence,
-    notes: b.credit ? `${b.credit} (${b.licence}). Included in Sukhi Play.` : '',
+    notes: b.official
+      ? 'Made by Sukhi Play. No adverts, no tracking, and it needs no connection.'
+      : (b.credit ? `${b.credit} (${b.licence}). Included in Sukhi Play.` : ''),
     allowHosts: [b.id],
     denyHosts: []
   }));
