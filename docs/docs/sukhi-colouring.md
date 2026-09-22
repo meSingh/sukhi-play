@@ -46,7 +46,12 @@ at the end of the tools, out of the way of the ones a child uses most.
 ## On a phone or tablet
 
 It works the same on a small screen, with the tools along the top and the
-colours along the bottom. To keep it on the home screen:
+colours along the bottom.
+
+To keep it on the home screen, press **Add to home screen** in the app: the
+phone with an arrow in it, next to the cog. It shows the steps for the device
+you are on, and in Chrome or Edge it has an **Install** button that does it in
+one tap. The steps, in case you would rather do it yourself:
 
 - **iPhone and iPad:** open it in Safari, tap **Share**, then
   **Add to Home Screen**.
