@@ -508,3 +508,45 @@ test('the cookie choice can still be reopened once it has been answered', () => 
     }
   }
 });
+
+test('nothing sharing an element with .wrap shorthands away its gutter', () => {
+  // .wrap is the only thing holding the page off the edge of a phone, and it
+  // does it with padding-inline. Any class set on the same element that uses
+  // the `padding:` shorthand silently resets that to whatever its own second
+  // value is -- usually 0 -- and the text goes edge to edge. This is what
+  // `.docs-shell { padding: 44px 0 80px }` did to the whole manual.
+  const root = path.join(__dirname, '..', 'docs');
+  const css = fs.readdirSync(path.join(root, 'build'))
+    .filter((f) => f.endsWith('.css'))
+    .map((f) => fs.readFileSync(path.join(root, 'build', f), 'utf8'))
+    .join('\n');
+
+  const pages = [];
+  (function walk (dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith('.html')) pages.push(p);
+    }
+  })(root);
+
+  const companions = new Set();
+  for (const page of pages) {
+    const html = fs.readFileSync(page, 'utf8');
+    for (const m of html.matchAll(/class="([^"]*\bwrap\b[^"]*)"/g)) {
+      for (const cls of m[1].split(/\s+/)) if (cls && cls !== 'wrap') companions.add(cls);
+    }
+  }
+  assert.ok(companions.size, 'no element combines another class with .wrap');
+
+  for (const cls of companions) {
+    // The rule for the bare class, as the minifier writes it.
+    const rule = css.match(new RegExp(`(?:^|[,}])\\.${cls}\\{([^}]*)\\}`));
+    if (!rule) continue;
+    const shorthand = rule[1].match(/(?:^|;)padding:([^;]*)/);
+    if (!shorthand) continue;
+    assert.strictEqual(shorthand[1].trim().split(/\s+/).length, 1,
+      `.${cls} shares an element with .wrap and shorthands padding ` +
+      `(${shorthand[1].trim()}), which wipes out the page gutter`);
+  }
+});

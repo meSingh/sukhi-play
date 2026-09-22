@@ -1273,7 +1273,11 @@ footer.foot a:hover { color: var(--ink); }
 .docs-card span { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
 
 /* A page of the manual: contents down the side, prose in a readable measure. */
-.docs-shell { display: grid; grid-template-columns: 236px 1fr; gap: 56px; padding: 44px 0 80px; align-items: start; }
+/* padding-block, not the `padding: 44px 0 80px` shorthand this used to
+   carry: the shorthand also set padding-inline to 0, which wiped out
+   .wrap's 24px gutter. On anything narrower than 1000px the manual then
+   ran edge to edge, which on a phone means the text touches the bezel. */
+.docs-shell { display: grid; grid-template-columns: 236px 1fr; gap: 56px; padding-block: 44px 80px; align-items: start; }
 
 .docs-nav { position: sticky; top: 24px; font-size: 15px; }
 .docs-nav section { margin-bottom: 22px; }
