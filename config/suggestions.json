@@ -212,6 +212,33 @@
       "permissions": [
         "microphone"
       ]
+    },
+    {
+      "id": "youtubekids",
+      "title": "YouTube Kids",
+      "url": "https://www.youtubekids.com/",
+      "shape": "drop",
+      "color": "#ef4444",
+      "blockAds": false,
+      "adSupported": true,
+      "category": "Video",
+      "notes": "Carries advertising, and ad filtering is OFF for this profile on purpose: Google's terms forbid interfering with how the service runs, and this is the one entry whose operator is known to act on that. The kiosk still stops your child leaving the site. Set up the profile and the age setting inside YouTube Kids itself first \u2014 this app cannot do that for you. Not youtube.com, which is a different site and not suitable for a small child.",
+      "allowHosts": [
+        "youtubekids.com",
+        "youtube.com",
+        "googlevideo.com",
+        "ytimg.com",
+        "ggpht.com",
+        "googleusercontent.com",
+        "googleapis.com",
+        "google.com",
+        "gstatic.com"
+      ],
+      "denyHosts": [],
+      "termsUrl": "https://www.youtube.com/t/terms",
+      "termsChecked": "2026-09-22",
+      "siteName": "YouTube Kids",
+      "blurb": "Videos picked for small children, with a grown-up's profile settings."
     }
   ]
 }
