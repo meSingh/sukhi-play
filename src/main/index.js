@@ -135,6 +135,28 @@ Menu.setApplicationMenu(null);
 
 // Chromium-level hardening, applied before anything loads.
 app.commandLine.appendSwitch('disable-features', 'Translate,MediaRouter,AutofillServerCommunication');
+
+// Let WebGL fall back to software when there is no usable GPU.
+//
+// Scratch refuses to open without WebGL and says so in as many words, and the
+// snap is a machine where WebGL can go missing: its runtime is the
+// gnome-3-28-1804 platform, Mesa cannot find a driver there, and the GPU
+// process exits during initialisation. With no GPU process a page's
+// getContext('webgl') returns null, which is exactly what Scratch reported.
+// Chromium's answer to that is SwiftShader, and from Chromium 125 it will not
+// use it for WebGL unless asked.
+//
+// "unsafe" is Chromium's word for a larger attack surface than a GPU driver,
+// not for anything unsound. It only applies where the alternative is no WebGL
+// at all; hardware is still preferred wherever it works.
+//
+// Not proven on the machine that failed -- on macOS this Electron already
+// permits software WebGL, so the switch changes nothing there and the failure
+// cannot be reproduced. `--diagnose` now prints the GPU state and the result
+// of a real context attempt, which settles it in one command on the machine
+// that is actually broken.
+app.commandLine.appendSwitch('enable-unsafe-swiftshader');
+
 app.enableSandbox();
 
 let shellApp = null;
@@ -1757,6 +1779,30 @@ async function runDiagnose () {
   say('shortcut capture', shortcuts.sessionCanHoldKeys().session +
       (shortcuts.sessionCanHoldKeys().ok ? ' (works)' : ' (CANNOT intercept)'));
   say('gnome borrowing', gnome.available() ? 'available' : 'not a gnome session');
+
+  // Scratch and anything else built on a canvas refuses to start without
+  // WebGL, and the usual reason is not the site -- it is that this machine
+  // never gave the browser a GL context. Chromium's own view of the GPU and a
+  // real context attempt from a page, because the two can disagree.
+  const gpu = app.getGPUFeatureStatus();
+  say('gpu: webgl', gpu.webgl || '(unknown)');
+  say('gpu: compositing', gpu.gpu_compositing || '(unknown)');
+  say('gpu: rasterization', gpu.rasterization || '(unknown)');
+  try {
+    const gl = await wc.executeJavaScript(`(() => {
+      try {
+        const c = document.createElement('canvas');
+        const g = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (!g) return 'NO CONTEXT -- Scratch and similar will refuse to open';
+        const d = g.getExtension('WEBGL_debug_renderer_info');
+        return g.getParameter(g.VERSION) + ' | ' +
+               (d ? g.getParameter(d.UNMASKED_RENDERER_WEBGL) : g.getParameter(g.RENDERER));
+      } catch (e) { return 'THREW: ' + e.message; }
+    })()`);
+    say('webgl in a page', gl);
+  } catch (err) {
+    say('webgl in a page', `could not ask: ${err.message}`);
+  }
 
   say('display bounds', JSON.stringify(display.bounds));
   say('display workArea', JSON.stringify(display.workArea));

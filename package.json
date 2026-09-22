@@ -17,7 +17,7 @@
     "dist:linux": "npm run metainfo && electron-builder --linux --publish never",
     "check": "electron . --check",
     "test": "node --test",
-    "lint": "node -e \"for (const f of require('fs').readdirSync('src/main')) if (f.endsWith('.js')) require('child_process').execSync(`node --check src/main/${f}`); console.log('ok')\"",
+    "lint": "node -e \"const fs=require('fs'),cp=require('child_process');for(const f of fs.readdirSync('src/main'))if(f.endsWith('.js'))cp.execSync('node --check src/main/'+f);console.log('ok')\"",
     "probe": "electron . --probe=",
     "metainfo": "node scripts/make-metainfo.js",
     "diagnose": "electron . --diagnose",
