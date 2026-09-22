@@ -1,0 +1,107 @@
+name: Publish the snap
+
+# Pushes a new snap revision to the store without cutting a release.
+#
+# The release workflow is the normal route and it publishes everything at
+# once: GitHub release, assets, checksums, snap. That is right when the
+# application has changed. It is the wrong tool for a packaging fix, where the
+# application is byte-for-byte what was already released and only the snap was
+# built wrongly -- re-running it would replace the release assets and their
+# published checksums for no reason.
+#
+# So this builds the snap alone, proves it starts, and uploads it. The version
+# string does not change; the store gets a new revision of the same version,
+# which is exactly what a revision is for.
+#
+# Run it from the Actions tab. It refuses to upload a snap it could not start.
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Store channel to release into'
+        required: true
+        default: stable
+        type: choice
+        options: [stable, candidate, beta, edge]
+
+jobs:
+  publish:
+    name: Build, prove it starts, upload
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Packaging tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends fakeroot dpkg xvfb
+          sudo snap install snapcraft --classic
+
+      - name: Install
+        run: npm ci
+
+      - name: Build the snap
+        run: npm run dist:snap
+
+      - name: It has to start before it goes anywhere
+        run: |
+          set -e
+          snap=$(find dist -name '*.snap' -print -quit)
+          if [ -z "$snap" ]; then
+            echo "::error::no .snap was produced"
+            exit 1
+          fi
+          echo "built $snap"
+          sudo snap install --dangerous "$snap"
+
+          echo "--- snap root ---"
+          ls -la /snap/sukhi-play/current/
+
+          # command.sh exec's these. 2.0.1 shipped without them.
+          for f in desktop-init.sh desktop-common.sh desktop-gnome-specific.sh; do
+            if [ ! -x "/snap/sukhi-play/current/$f" ]; then
+              echo "::error::/$f is missing; command.sh would exit 127"
+              exit 1
+            fi
+          done
+          if ls /snap/sukhi-play/current/*.tar >/dev/null 2>&1; then
+            echo "::error::an unextracted template tarball is inside the snap"
+            exit 1
+          fi
+
+          set +e
+          timeout 90 xvfb-run -a snap run sukhi-play --diagnose 2>&1 | tee /tmp/run.log
+          code=${PIPESTATUS[0]}
+          set -e
+          echo "exit=$code"
+          # --diagnose quits on its own; 124 is the timeout kill, which still
+          # means it opened a window and stayed up.
+          if [ "$code" != "0" ] && [ "$code" != "124" ]; then
+            echo "::error::the snap does not start (exit $code); not uploading"
+            exit 1
+          fi
+          if ! grep -q 'launcher is on screen' /tmp/run.log; then
+            echo "::error::the snap started but never drew the launcher; not uploading"
+            exit 1
+          fi
+          echo "the snap starts"
+
+      - name: Upload to the store
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: |
+          if [ -z "$SNAPCRAFT_STORE_CREDENTIALS" ]; then
+            echo "::error::SNAPCRAFT_STORE_CREDENTIALS is not set"
+            exit 1
+          fi
+          snap=$(find dist -name '*.snap' -print -quit)
+          snapcraft upload --release=${{ inputs.channel }} "$snap"
+
+      - name: What the store has now
+        run: snapcraft status sukhi-play || true
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
