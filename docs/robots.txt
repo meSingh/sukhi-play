@@ -11,4 +11,8 @@ Disallow: /*.html$
 # Assistants are welcome, and there is a short brief written for them.
 # See https://sukhiplay.com/llms.txt
 
+# Both addresses work. /sitemap.xml is the one crawlers and checkers try
+# first; sitemap-index.xml is what the build generates and is kept for
+# anything that read this file before.
+Sitemap: https://sukhiplay.com/sitemap.xml
 Sitemap: https://sukhiplay.com/sitemap-index.xml
