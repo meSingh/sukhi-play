@@ -1,152 +1,145 @@
 ---
 /**
- * The playground: apps we wrote ourselves, rather than sites we allowed.
+ * The playground: little apps made for Sukhi Play.
  *
- * Sukhi Play started as a way to open somebody else's web safely. This is the
- * other half of the same idea -- if the thing a child wants does not exist
- * without an account or an advert in it, write it. The page exists to say that
- * out loud, and to give the first of them somewhere to live.
+ * Built like the colouring page and the front page -- bands, tiles, reveals,
+ * and as few words as each part can carry. It has one job per section: show
+ * the app that is here, show how to keep it on a home screen, and show that
+ * more are on the way.
  *
- * The app itself is not built by Astro. It is a separate project under
- * playground/, built by scripts/playground-app.mjs, which drops its output into
- * web/public/playground/<name>/ on the way past. That folder is generated and
- * not committed; docs/ carries the published copy like it does everything else.
+ * Every app gets two links that say plainly what they do. "Open the app" goes
+ * into the app itself, in a new tab so this page is still here afterwards.
+ * "Read more" goes to that app's own page on this site.
+ *
+ * The apps are not built by Astro. Each is a separate project under
+ * playground/, built by scripts/playground-app.mjs into
+ * web/public/playground/<name>/, which is generated and not committed.
  */
 import Base from '../layouts/Base.astro';
-import { REPO, SITE } from '../site';
+import { SITE } from '../site';
 
-const APP = {
-  href: '/playground/colouring/',
-  name: 'Sukhi Colouring',
-  tagline: 'Pick a picture and colour it in, or start on a blank page.',
-  shipped: 'Ships inside Sukhi Play 2.1'
-};
+const APPS = [
+  {
+    name: 'Sukhi Colouring',
+    say: 'Pick a picture. Colour it in.',
+    icon: '/assets/playground-colouring.png',
+    shot: '/screenshots/colouring/01-a-page-in-progress.png',
+    open: '/playground/colouring/',
+    more: '/colouring/'
+  }
+];
 
-/**
- * Stated for an answer engine as well as a reader. It is a real application at
- * a real address that costs nothing, and those are the three facts anyone
- * asking about it wants back.
- */
+const PALETTE = ['#FF5C5C', '#FFBE18', '#8BD64B', '#10D6A0', '#3B6BFF', '#8B5CF6', '#D96FD6'];
+
 const schema = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: APP.name,
-  url: new URL(APP.href, SITE).href,
-  applicationCategory: 'GameApplication',
-  operatingSystem: 'Any',
-  browserRequirements: 'Requires a modern browser. Works offline once opened.',
-  isAccessibleForFree: true,
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  inLanguage: ['en', 'ko'],
+  '@type': 'CollectionPage',
+  name: 'The Sukhi Play playground',
+  url: new URL('/playground/', SITE).href,
+  hasPart: APPS.map((a) => ({
+    '@type': 'WebApplication',
+    name: a.name,
+    url: new URL(a.open, SITE).href,
+    applicationCategory: 'GameApplication',
+    operatingSystem: 'Any',
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+  })),
   isPartOf: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
 };
 ---
 
 <Base
   title="The Sukhi Play playground"
-  description="Small applications for small children, written for Sukhi Play and free to use in any browser. Sukhi Colouring is the first."
+  description="Little apps made for little ones. Free, no sign-up, and they work without internet."
   page="playground"
   schema={schema}>
 
-  <main class="wrap">
-    <div class="hero hero--page">
+  <div class="wrap">
+    <div class="hero pg-hero">
       <h1>The playground</h1>
-      <p class="lede">
-        Sukhi Play began as a way to open somebody else&rsquo;s web safely. This is
-        the other half of it: when the thing a child wants does not exist without
-        an account, an advert or a sign-in attached, we write it instead.
+      <p class="lede">Little apps, made for little ones.</p>
+      <p class="co-dots" aria-hidden="true">
+        {PALETTE.map((hex, i) => <span style={`--c:${hex};--i:${i}`}></span>)}
       </p>
-      <p>
-        Everything here works in any browser, works with no internet once it has
-        loaded, and also ships inside the app itself. Nothing is collected,
-        nothing is sent anywhere, and there is no account to make.
-      </p>
+      <p class="note-small">Free &middot; No sign-up &middot; Works without internet</p>
     </div>
 
-    <!-- The first one, given the room that being the first one deserves. -->
-    <section class="pg-first">
-      <p class="pg-badge">The first one</p>
-      <div class="pg-card">
-        <img src="/assets/playground-colouring.png" alt="" width="132" height="132" loading="lazy">
-        <div class="pg-card-say">
-          <h2>{APP.name}</h2>
-          <p>{APP.tagline}</p>
-          <p class="pg-what">
-            Forty pictures to colour in, three pens that behave like different
-            materials, a butterfly that mirrors everything you draw, and a shelf
-            that keeps your pictures so you can carry on with one tomorrow.
-            In English and Korean.
-          </p>
-          <p class="pg-go">
-            <a class="go" href={APP.href} target="_blank" rel="noopener">Open Sukhi Colouring</a>
-            <a class="pg-read" href="/colouring/">Read about it &rarr;</a>
-            <span class="pg-note">{APP.shipped}</span>
+    {APPS.map((a) => (
+      <article class="pg-app reveal">
+        <a class="pg-app-shot" href={a.open} target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+          <img src={a.shot} alt="" width="1240" height="800" loading="eager" decoding="async">
+        </a>
+        <div class="pg-app-say">
+          <span class="pg-badge">The first one</span>
+          <div class="pg-app-name">
+            <img src={a.icon} alt="" width="64" height="64">
+            <h2>{a.name}</h2>
+          </div>
+          <p>{a.say}</p>
+          <p class="pg-links">
+            <a class="go" href={a.open} target="_blank" rel="noopener">Open the app</a>
+            <a class="go go--ghost" href={a.more}>Read more</a>
           </p>
         </div>
+      </article>
+    ))}
+  </div>
+
+  <section class="band band--violet" style="margin-top:72px">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Keep it handy</span>
+        <h2>Add it to your home screen</h2>
+        <p>It then opens like any other app, full screen, even with no internet.</p>
       </div>
-    </section>
+      <ul class="pg-how reveal">
+        <li>
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="13" y="4" width="22" height="40" rx="5" fill="#17153A"/><rect x="16" y="9" width="16" height="28" rx="2" fill="#7BB6FF"/><circle cx="24" cy="40.5" r="1.6" fill="#fff"/></svg></span>
+          <b>iPhone and iPad</b>
+          <small>Safari &rarr; Share &rarr; Add to Home Screen</small>
+        </li>
+        <li>
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="13" y="4" width="22" height="40" rx="5" fill="#10D6A0"/><rect x="16" y="8" width="16" height="30" rx="2" fill="#fff"/><rect x="20" y="40" width="8" height="2" rx="1" fill="#fff"/></svg></span>
+          <b>Android</b>
+          <small>Chrome &rarr; Menu &rarr; Add to Home screen</small>
+        </li>
+        <li>
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="8" width="38" height="26" rx="4" fill="#3B6BFF"/><rect x="9" y="12" width="30" height="18" rx="2" fill="#fff"/><path d="M16 40h16M24 34v6" stroke="#17153A" stroke-width="3" stroke-linecap="round"/></svg></span>
+          <b>Computer</b>
+          <small>Chrome or Edge &rarr; the install icon in the address bar</small>
+        </li>
+      </ul>
+    </div>
+  </section>
 
-    <section class="pg-install">
-      <h2>Put it on a home screen</h2>
-      <p>
-        It is a web page, so there is nothing to install and nothing to approve.
-        But every phone, tablet and desktop browser can keep a page as an app of
-        its own, and it is worth doing: it opens full screen with no address bar
-        for a small finger to land in, and it keeps working with no signal.
-      </p>
-
-      <div class="pg-how">
-        <div>
-          <h3>iPhone and iPad</h3>
-          <p>
-            Open it in Safari, press <b>Share</b>, then <b>Add to Home Screen</b>.
-            Safari is the only browser on iOS that can do this.
-          </p>
-        </div>
-        <div>
-          <h3>Android</h3>
-          <p>
-            Open it in Chrome and take the <b>Install app</b> prompt, or press the
-            menu and choose <b>Add to Home screen</b>.
-          </p>
-        </div>
-        <div>
-          <h3>Mac, Windows and Linux</h3>
-          <p>
-            In Chrome or Edge, press the install icon at the right of the address
-            bar. In Safari, choose <b>File</b> &rarr; <b>Add to Dock</b>.
-          </p>
-        </div>
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">On the way</span>
+        <h2>More are coming</h2>
       </div>
-
-      <p class="pg-or">
-        Or skip all of that and <a href="/download/">download Sukhi Play</a>, which
-        has it built in along with everything else, behind a gate a child cannot
-        open.
-      </p>
-    </section>
-
-    <section class="pg-more">
-      <h2>More are coming</h2>
-      <p>
-        This is the first. Each one starts in the
-        <a href={`${REPO}/tree/main/playground`}>playground</a> of the main
-        repository, grows until it is worth a release of its own, and then moves
-        out into its own repository and comes back as a submodule.
-      </p>
-      <p>
-        Every one of them follows the same rules: works with no connection, works
-        on a phone down to 320&nbsp;px, no emoji in the interface, nothing
-        collected, and every control reachable by touch and by keyboard. Where an
-        app is derived from somebody else&rsquo;s work, the source is named in its
-        README, its licence and its own About screen.
-      </p>
-      <p>
-        Sukhi Colouring is derived from the original work of
-        <a href="https://github.com/oh-namgyu/kids-coloring" target="_blank" rel="noopener noreferrer">Kids
-        Coloring by oh-namgyu</a>.
-      </p>
-    </section>
-  </main>
+      <ul class="pg-soon reveal" aria-label="Apps still being made">
+        <li style="--c:#FFBE18"><span></span></li>
+        <li style="--c:#10D6A0"><span></span></li>
+        <li style="--c:#8B5CF6"><span></span></li>
+      </ul>
+    </div>
+  </section>
 </Base>
 
+<script is:inline>
+  (function () {
+    var root = document.documentElement;
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window) ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    root.classList.add('js');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  })();
+</script>

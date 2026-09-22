@@ -13,9 +13,9 @@
  * explaining: "Pick up where they left off", not "Keeps the page, not a
  * picture of it".
  *
- * "Where it came from" is set on ink rather than on a wash, so the credit
- * stands apart instead of reading like small print. It says one thing: this is
- * derived from the original work it names.
+ * "Where it came from" is one quiet card: this is derived from the original
+ * work it names, and thank you. It is set apart by its frame rather than by
+ * shouting, and says nothing else.
  *
  * Links that leave this page -- into the app, or out to the original project --
  * open in a new tab, so the page is still there to come back to.
@@ -208,31 +208,19 @@ const schema = {
     </div>
   </section>
 
-  <section class="band band--ink co-from">
+  <section class="co-from">
     <div class="wrap wrap--narrow">
-      <div class="reveal">
-        <span class="kicker co-from-kicker">Where it came from</span>
-        <p class="co-quote">
-          Sukhi Colouring is derived from the original work of
+      <div class="co-from-card reveal">
+        <span class="kicker">Where it came from</span>
+        <p>
+          Derived from the original work of
           <a href="https://github.com/oh-namgyu/kids-coloring" target="_blank" rel="noopener noreferrer">Kids&nbsp;Coloring by oh&#8209;namgyu</a>.
+          <span class="co-thanks">Thank you <span aria-hidden="true">🙏</span></span>
         </p>
-        <p class="co-from-say">Shared under the MIT licence, with thanks.</p>
       </div>
     </div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <div class="section-head reveal">
-        <span class="kicker">Ready when they are</span>
-        <h2>Nothing to install. Just open it.</h2>
-        <p class="co-go co-go--end">
-          <a class="go go--big" href={APP} target="_blank" rel="noopener">Start colouring</a>
-          <a class="co-more" href="/download/">It also comes built into Sukhi Play &rarr;</a>
-        </p>
-      </div>
-    </div>
-  </section>
 </Base>
 
 <script is:inline>

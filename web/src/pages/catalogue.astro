@@ -76,29 +76,28 @@ const entries = (data.suggestions as Entry[]).map((e) => {
          more than a badge. -->
     {ours.map((b) => (
       <section class="cat-first" style={`--art:${b.color}`}>
-        <div class="cat-first-tag">
-          <span class="cat-first-pip" aria-hidden="true"></span>
-          The first app built for Sukhi Play
-        </div>
-        <div class="cat-first-body">
-          <img src="/assets/playground-colouring.png" alt="" width="112" height="112" loading="lazy">
-          <div>
-            <h2>{b.name}</h2>
-            <p class="cat-first-say">{b.blurb}</p>
-            <p class="cat-first-what">
-              Made for Sukhi Play and built right in. It also works in any
-              browser, free, with no sign-up and no internet needed.
-            </p>
-            <p class="cat-first-go">
-              <a class="go" href="/playground/colouring/" target="_blank" rel="noopener">Open it in your browser</a>
-              <a class="cat-first-more" href="/colouring/">What is in it</a>
-            </p>
-            <p class="cat-first-credit">
-              Derived from the original work of
-              <a href={b.sourceUrl} target="_blank" rel="noopener noreferrer">Kids Coloring by oh-namgyu</a>.
-            </p>
+        <div class="cat-first-say">
+          <div class="cat-first-tag">
+            <span class="cat-first-pip" aria-hidden="true"></span>
+            Made for Sukhi Play
           </div>
+          <div class="cat-first-name">
+            <img src="/assets/playground-colouring.png" alt="" width="64" height="64" loading="lazy">
+            <h2>{b.name}</h2>
+          </div>
+          <p class="cat-first-line">{b.blurb}</p>
+          <p class="cat-first-go">
+            <a class="go" href="/playground/colouring/" target="_blank" rel="noopener">Open the app</a>
+            <a class="go go--ghost" href="/colouring/">Read more</a>
+          </p>
+          <p class="cat-first-credit">
+            Derived from the original work of
+            <a href={b.sourceUrl} target="_blank" rel="noopener noreferrer">Kids&nbsp;Coloring by oh&#8209;namgyu</a>.
+          </p>
         </div>
+        <a class="cat-first-shot" href="/colouring/" tabindex="-1" aria-hidden="true">
+          <img src="/screenshots/colouring/01-a-page-in-progress.png" alt="" width="1240" height="800" loading="lazy" decoding="async">
+        </a>
       </section>
     ))}
 

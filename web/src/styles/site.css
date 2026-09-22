@@ -1461,99 +1461,101 @@ footer.foot a:hover { color: var(--ink); }
 .go:active { transform: translateY(1px); box-shadow: var(--drop); }
 
 .cat-first {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 32px;
+  align-items: center;
   margin: 0 0 40px;
-  padding: 26px 28px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: linear-gradient(180deg, var(--base) 0%, var(--paper) 62%);
-}
-.cat-first-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: .7px;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-}
-.cat-first-pip {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--art, var(--coral));
-}
-.cat-first-body { display: flex; gap: 26px; align-items: flex-start; }
-.cat-first-body img { flex: 0 0 auto; border-radius: var(--radius); }
-.cat-first-body h2 { margin: 0 0 6px; }
-.cat-first-say { margin: 0 0 10px; font-weight: 700; }
-.cat-first-what { margin: 0; color: var(--ink-soft); }
-.cat-first-go {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin: 20px 0 0;
-}
-.cat-first-more { font-weight: 800; }
-.cat-first-credit { margin: 16px 0 0; font-size: 14px; color: var(--ink-faint); }
-
-/* --- the playground page --- */
-.pg-badge {
-  display: inline-block;
-  margin: 0 0 12px;
-  padding: 5px 13px;
-  border-radius: 999px;
-  background: var(--wash-amber);
-  color: var(--ink);
-  font-size: 12.5px;
-  font-weight: 900;
-  letter-spacing: .7px;
-  text-transform: uppercase;
-}
-.pg-card {
-  display: flex;
-  gap: 28px;
-  align-items: flex-start;
   padding: 28px;
-  border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--paper);
+  background: linear-gradient(135deg, var(--wash-amber) 0%, var(--base) 70%);
   box-shadow: var(--drop);
 }
-.pg-card img { flex: 0 0 auto; border-radius: var(--radius); }
-.pg-card h2 { margin: 0 0 6px; }
-.pg-card-say > p { margin: 0 0 10px; }
-.pg-what { color: var(--ink-soft); }
-.pg-go { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 20px 0 0 !important; }
-.pg-read { font-weight: 800; }
-.pg-note { font-size: 14px; color: var(--ink-faint); font-weight: 700; }
+.cat-first-tag {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  font-size: 12.5px; font-weight: 900; letter-spacing: .8px; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.cat-first-pip { width: 9px; height: 9px; border-radius: 50%; background: var(--art, var(--coral)); }
+.cat-first-name { display: flex; align-items: center; gap: 14px; }
+.cat-first-name img { border-radius: 16px; }
+.cat-first-name h2 { margin: 0; }
+.cat-first-line { margin: 12px 0 0; font-size: 17px; color: var(--ink-soft); }
+.cat-first-go { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0 0; }
+.cat-first-credit { margin: 16px 0 0; font-size: 13.5px; color: var(--ink-faint); }
+.cat-first-shot img {
+  display: block; width: 100%; height: auto;
+  border-radius: 16px; box-shadow: var(--drop-lift);
+  transition: transform .25s var(--spring);
+}
+.cat-first-shot:hover img { transform: translateY(-4px) rotate(-.6deg); }
 
-.pg-install, .pg-more { margin-top: 56px; }
-.pg-how {
+/* --- the playground page --- */
+.pg-hero { text-align: center; }
+.pg-app {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 22px;
-  margin: 24px 0;
-}
-.pg-how > div {
-  padding: 18px 20px;
-  border-radius: 16px;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 40px;
+  align-items: center;
+  margin-top: 36px;
+  padding: 26px;
+  border-radius: 30px;
   background: var(--paper);
-  border: 1px solid var(--line);
+  box-shadow: var(--drop-lift);
 }
-.pg-how h3 { margin: 0 0 6px; font-size: 16px; }
-.pg-how p { margin: 0; color: var(--ink-soft); }
-.pg-or { color: var(--ink-soft); }
+.pg-app-shot img {
+  display: block; width: 100%; height: auto; border-radius: 18px;
+  transition: transform .25s var(--spring);
+}
+.pg-app-shot:hover img { transform: scale(1.015); }
+.pg-badge {
+  display: inline-block; margin-bottom: 14px; padding: 5px 13px; border-radius: 999px;
+  background: var(--wash-amber); color: var(--ink);
+  font-size: 12.5px; font-weight: 900; letter-spacing: .7px; text-transform: uppercase;
+}
+.pg-app-name { display: flex; align-items: center; gap: 14px; }
+.pg-app-name img { border-radius: 16px; }
+.pg-app-name h2 { margin: 0; }
+.pg-app-say > p { margin: 12px 0 0; font-size: 18px; color: var(--ink-soft); }
+.pg-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px !important; }
+
+.pg-how {
+  list-style: none; padding: 0; margin: 0 auto; max-width: 900px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+}
+.pg-how li {
+  background: var(--paper); border-radius: 20px; padding: 24px 20px;
+  text-align: center; box-shadow: var(--drop);
+}
+.pg-how .co-art svg { width: 46px; height: 46px; }
+.pg-how b { display: block; margin: 10px 0 4px; font-size: 17px; }
+.pg-how small { color: var(--ink-soft); font-size: 14px; }
+
+/* Placeholders for what is still being made: shapes, not promises. */
+.pg-soon {
+  list-style: none; padding: 0; margin: 0 auto; max-width: 720px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+}
+.pg-soon li {
+  aspect-ratio: 1;
+  display: grid; place-items: center;
+  border: 2px dashed rgba(23, 21, 58, .16);
+  border-radius: 26px;
+}
+.pg-soon span {
+  width: 38%; aspect-ratio: 1; border-radius: 30%;
+  background: var(--c); opacity: .5;
+  animation: bob 5s ease-in-out infinite;
+}
+.pg-soon li:nth-child(2) span { animation-delay: -1.6s; border-radius: 50%; }
+.pg-soon li:nth-child(3) span { animation-delay: -3.2s; }
 
 /* The icon beside two lines of text is a column of single words on a phone. */
-@media (max-width: 640px) {
-  .cat-first { padding: 20px; }
-  .cat-first-body { flex-direction: column; gap: 16px; }
-  .cat-first-body img { width: 84px; height: 84px; }
-  .pg-card { flex-direction: column; gap: 18px; padding: 20px; }
-  .pg-card img { width: 96px; height: 96px; }
+@media (max-width: 760px) {
+  .cat-first, .pg-app { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 18px; }
+  .cat-first-shot { order: -1; }
+  .pg-how, .pg-soon { grid-template-columns: minmax(0, 1fr); max-width: 360px; }
+  .pg-soon { grid-template-columns: repeat(3, 1fr); max-width: none; }
 }
 
 /* ------------------------------------------------- Sukhi Colouring's page */
@@ -1601,6 +1603,9 @@ footer.foot a:hover { color: var(--ink); }
   transition: transform .15s var(--spring), box-shadow .15s;
 }
 .go--big { padding: 16px 34px; font-size: 18px; border-radius: 18px; }
+/* The quieter of two choices: goes somewhere to read, not into the app. */
+.go--ghost { background: var(--paper); color: var(--blue); box-shadow: inset 0 0 0 2px var(--blue); }
+.go--ghost:hover, .go--ghost:active { box-shadow: inset 0 0 0 2px var(--blue); }
 .go:hover { transform: translateY(-2px); box-shadow: var(--drop-lift); }
 .go:active { transform: translateY(1px); box-shadow: var(--drop); }
 
@@ -1669,20 +1674,29 @@ footer.foot a:hover { color: var(--ink); }
   box-shadow: 0 26px 50px rgba(23, 21, 58, .20);
 }
 
-/* The credit, on ink. Set apart from everything else on the page on purpose:
-   it is the reason this app exists, and a credit that looks like the rest
-   reads like small print. */
-.co-from { text-align: center; }
-.co-from-kicker { color: var(--yellow); }
-.co-quote {
-  margin: 0 auto 14px;
-  max-width: 30ch;
-  font-size: clamp(22px, 3.4vw, 32px);
-  font-weight: 800;
-  line-height: 1.32;
+/* The credit. A card with a dashed frame, set apart by its edge rather than by
+   weight: it names where this came from and says thank you, and that is all. */
+.co-from { padding-block: 24px 88px; }
+.co-from-card {
+  text-align: center;
+  padding: 26px 30px;
+  border: 2px dashed rgba(23, 21, 58, .14);
+  border-radius: var(--radius);
+  background: var(--paper);
 }
-.co-quote a { color: var(--yellow); text-underline-offset: 4px; }
-.co-from-say { margin: 0; color: rgba(244, 242, 255, .7); font-size: 16px; }
+.co-from-card .kicker { color: var(--ink-faint); margin-bottom: 8px; }
+.co-from-card p { margin: 0; font-size: 17px; color: var(--ink-soft); line-height: 1.6; }
+.co-from-card a { font-weight: 800; }
+.co-thanks {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--wash-amber);
+  color: var(--ink);
+  font-weight: 900;
+  white-space: nowrap;
+}
 
 /* Home-screen steps: three short lines, one per kind of device. */
 .co-steps-title { margin: 26px 0 12px; font-size: 17px; }
