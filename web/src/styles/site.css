@@ -1367,6 +1367,20 @@ footer.foot a:hover { color: var(--ink); }
 .faq-more { display: inline-block; margin-top: 12px; font-size: 15px; font-weight: 800; text-decoration: none; }
 .faq-end { margin-top: 36px; font-size: 16px; color: var(--ink-soft); }
 
+/* ---------------- the page that isn't there ---------------- */
+
+/* Borrows .docs-card for the four ways out, because a dead end is not the
+   place to introduce a new pattern. */
+.lost { padding-bottom: 80px; }
+.lost-ways { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 28px; }
+.lost-end { margin-top: 32px; font-size: 16px; line-height: 1.6; color: var(--ink-soft); }
+
+/* Below the base rule, not in the docs block above it, or source order
+   decides this and the two columns stay. */
+@media (max-width: 620px) {
+  .lost-ways { grid-template-columns: 1fr; }
+}
+
 /* ---------------- the cookie banner ---------------- */
 
 /* Nothing loads from Google until this is answered, so it has to be visible

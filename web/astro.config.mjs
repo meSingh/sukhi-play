@@ -20,7 +20,8 @@ export default defineConfig({
     sitemap({
       // The .html files are redirect stubs for the addresses the site used to
       // have. Listing them would ask a crawler to index a meta-refresh.
-      filter: (page) => !/\/[a-z-]+\.html$/.test(page),
+      // The 404 is not an address, it is what happens when there isn't one.
+      filter: (page) => !/\/[a-z-]+\.html$/.test(page) && !/\/404\/?$/.test(page),
       changefreq: 'weekly',
       lastmod: new Date()
     })

@@ -550,3 +550,55 @@ test('nothing sharing an element with .wrap shorthands away its gutter', () => {
       `(${shorthand[1].trim()}), which wipes out the page gutter`);
   }
 });
+
+test('every internal link on every page resolves to something', () => {
+  // The nav test above covers the header. This covers the other few hundred
+  // links, and it resolves relative hrefs the way a browser does -- against
+  // the directory the page is served from. That is what caught
+  // /download/ linking to `macos.html`, which resolves to
+  // /download/macos.html and has never existed.
+  const root = path.join(__dirname, '..', 'docs');
+  const pages = [];
+  (function walk (dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith('.html')) pages.push(p);
+    }
+  })(root);
+
+  const broken = [];
+  for (const page of pages) {
+    // The directory a browser resolves relative links against.
+    const base = path.dirname(page);
+    const html = fs.readFileSync(page, 'utf8');
+    for (const m of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
+      const raw = m[1];
+      if (/^(https?:|mailto:|tel:|data:|#|\/\/)/.test(raw)) continue;
+      const target = raw.split(/[?#]/)[0];
+      if (!target) continue;
+      const from = target.startsWith('/') ? path.join(root, target) : path.join(base, target);
+      if (fs.existsSync(from) && fs.statSync(from).isFile()) continue;
+      if (fs.existsSync(path.join(from, 'index.html'))) continue;
+      broken.push(`${path.relative(root, page)} -> ${raw}`);
+    }
+  }
+  assert.deepStrictEqual(broken, [], `dead links:\n  ${broken.join('\n  ')}`);
+});
+
+test('the site serves its own 404 rather than GitHub\'s', () => {
+  const root = path.join(__dirname, '..', 'docs');
+  const file = path.join(root, '404.html');
+  // GitHub Pages serves /404.html for anything it cannot match. It has to be
+  // that exact path -- a directory build of /404/ is never reached.
+  assert.ok(fs.existsSync(file), 'docs/404.html is missing, so GitHub serves its own');
+
+  const html = fs.readFileSync(file, 'utf8');
+  assert.match(html, /name="robots" content="noindex/,
+    'the 404 should not be indexed');
+  assert.match(html, /<header class="top">/, 'the 404 should carry the site header');
+  assert.match(html, /href="\/download\/"/, 'the 404 should offer a way back');
+
+  const sitemap = fs.readFileSync(path.join(root, 'sitemap-0.xml'), 'utf8');
+  assert.doesNotMatch(sitemap, /404/, 'the 404 should not be in the sitemap');
+});

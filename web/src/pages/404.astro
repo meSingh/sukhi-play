@@ -1,0 +1,52 @@
+---
+/**
+ * The page for an address that isn't here.
+ *
+ * GitHub Pages serves /404.html for anything it cannot match, so this replaces
+ * GitHub's own 404 -- which is a black page with a unicorn and no way back to
+ * this site. It is built like any other page, so it carries the same header,
+ * footer and stylesheet.
+ *
+ * noindex, because a search engine should not keep a copy of this. It is the
+ * one page on the site that deliberately says nothing.
+ */
+import Base from '../layouts/Base.astro';
+import { REPO } from '../site';
+
+const WAYS = [
+  { href: '/download/', title: 'Download', text: 'Every build, for macOS, Windows and Linux.' },
+  { href: '/docs/', title: 'Documentation', text: 'How it installs, what it blocks, what it cannot do.' },
+  { href: '/catalogue/', title: 'Catalogue', text: 'What is already inside, and what you can add.' },
+  { href: '/faq/', title: 'Questions', text: 'Short answers to the things people ask.' }
+];
+---
+
+<Base
+  title="Page not found — Sukhi Play"
+  description="That address is not on this site. Here is the way back to the download, the manual and the catalogue."
+  page="404"
+  noindex>
+
+  <main class="wrap wrap--narrow lost">
+    <header class="hero hero--page">
+      <p class="f-kicker">Nothing here</p>
+      <h1>That page has wandered off</h1>
+      <p class="lede">The address you followed is not on this site. It may have
+        moved, or it may never have existed. Either way, nothing is broken on
+        your end.</p>
+    </header>
+
+    <div class="lost-ways">
+      {WAYS.map((w) => (
+        <a class="docs-card" href={w.href}>
+          <b>{w.title}</b>
+          <span>{w.text}</span>
+        </a>
+      ))}
+    </div>
+
+    <p class="lost-end">Followed a link from somewhere on this site to get
+      here? That is a bug worth knowing about &mdash;
+      <a href={`${REPO}/issues/new`}>say so in an issue</a>.</p>
+  </main>
+</Base>

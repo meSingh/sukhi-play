@@ -21,8 +21,10 @@ interface Props {
   image?: string;
   /** Extra JSON-LD for this page, on top of the site-wide graph. */
   schema?: Record<string, unknown>;
+  /** Keeps a page out of search results. Only the 404 wants this. */
+  noindex?: boolean;
 }
-const { title, description, page, image = '/social-preview.png', schema } = Astro.props;
+const { title, description, page, image = '/social-preview.png', schema, noindex } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE);
 const social = new URL(image, Astro.site ?? SITE);
@@ -57,7 +59,9 @@ const app = {
   <link rel="canonical" href={canonical}>
   <link rel="icon" href="/assets/sukhi-icon.png">
   <meta name="theme-color" content="#FFF7EC">
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="robots" content={noindex
+    ? 'noindex, follow'
+    : 'index, follow, max-image-preview:large, max-snippet:-1'}>
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Sukhi Play">
