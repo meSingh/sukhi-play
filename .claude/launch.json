@@ -15,7 +15,7 @@
       "port": 8765
     },
     {
-      "name": "coloring",
+      "name": "colouring",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "--yes",
@@ -25,7 +25,7 @@
         "--strictPort"
       ],
       "port": 5177,
-      "cwd": "playground/coloring"
+      "cwd": "playground/colouring"
     }
   ]
 }
