@@ -7,7 +7,10 @@
   <summary>Let a small child open only the sites you choose</summary>
 
   <metadata_license>MIT</metadata_license>
-  <project_license>MIT</project_license>
+  <!-- Not an SPDX licence, so AppStream's own form for one: a pointer to
+       the terms. metadata_license stays MIT; it covers this file, not the app,
+       and Flathub requires it to be permissive. -->
+  <project_license>LicenseRef-proprietary=https://sukhiplay.com/licence/</project_license>
 
   <developer id="com.msingh">
     <name>Mandeep Singh</name>

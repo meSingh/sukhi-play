@@ -149,7 +149,7 @@ COPPA and the GDPR.
 ## No warranty
 
 Sukhi Play is provided "as is", without warranty of any kind, as set out in the
-[MIT License](LICENSE).
+[Sukhi Play Personal Use Licence](LICENSE).
 
 **This software is not a substitute for adult supervision.** It reduces what a
 small child can reach; it does not make a computer childproof. Web content can

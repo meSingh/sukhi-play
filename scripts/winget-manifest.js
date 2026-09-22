@@ -87,8 +87,8 @@ PublisherUrl: https://www.msingh.com
 PublisherSupportUrl: ${REPO}/issues
 PackageName: Sukhi Play
 PackageUrl: https://sukhiplay.com/
-License: MIT
-LicenseUrl: ${REPO}/blob/main/LICENSE
+License: Sukhi Play Personal Use Licence 1.0 (free for personal use)
+LicenseUrl: https://sukhiplay.com/licence/
 Copyright: Copyright (c) 2026 Mandeep Singh
 ShortDescription: A locked-down browser that opens only the websites a grown-up chose.
 Description: |-

@@ -12,11 +12,11 @@ import { REPO } from '../site';
 const FAQ: Array<{ q: string; a: string; more?: { href: string; label: string } }> = [
   {
     q: 'What is Sukhi Play?',
-    a: 'Sukhi Play is a free, open-source kiosk browser for a small child. It fills the screen with big tiles for the websites you chose, and nothing else opens: there is no address bar, no new tabs, no downloads, and no way back to the desktop without an adult. It runs on macOS, Windows and Linux.'
+    a: 'Sukhi Play is a free kiosk browser for a small child. It fills the screen with big tiles for the websites you chose, and nothing else opens: there is no address bar, no new tabs, no downloads, and no way back to the desktop without an adult. It runs on macOS, Windows and Linux.'
   },
   {
     q: 'How much does it cost?',
-    a: 'Nothing. There is no paid tier, no subscription, no trial and no account to create. It is MIT licensed and the whole source is public.',
+    a: 'Nothing. There is no paid tier, no subscription, no trial and no account to create. It is free for individuals and families, and the whole source is public.',
     more: { href: '/download/', label: 'Download it' }
   },
   {
@@ -40,7 +40,7 @@ const FAQ: Array<{ q: string; a: string; more?: { href: string; label: string } 
   },
   {
     q: 'Does it work without an internet connection?',
-    a: 'Partly. Three open-source apps ship inside the download — a colouring book, a keyboard playground and a set of first games — and those work with no connection at all. Websites you add naturally need one.',
+    a: 'Partly. Three apps ship inside the download — Sukhi Colouring, a keyboard playground and a set of first games — and those work with no connection at all. Websites you add naturally need one.',
     more: { href: '/catalogue/', label: 'What is included' }
   },
   {
@@ -53,9 +53,14 @@ const FAQ: Array<{ q: string; a: string; more?: { href: string; label: string } 
     more: { href: '/docs/limits/', label: 'The honest list' }
   },
   {
-    q: 'Is it open source?',
-    a: 'Yes, under the MIT licence. Every line is public, including the parts that decide what your child can reach, so you do not have to take any of this on trust.',
+    q: 'Can I see the code?',
+    a: 'Yes. Every line is public, including the parts that decide what your child can reach, so you do not have to take any of this on trust.',
     more: { href: REPO, label: 'Read the code' }
+  },
+  {
+    q: 'Can I use it at a school, a nursery or a business?',
+    a: 'No. Sukhi Play is free for individuals and families to use, change and share at home, and never for commercial use or for use by any organisation, schools and nurseries included. Versions up to and including 2.0.2 were released under the MIT licence and remain under it.',
+    more: { href: '/licence/', label: 'Read the licence' }
   }
 ];
 

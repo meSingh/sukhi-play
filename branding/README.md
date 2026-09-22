@@ -2,12 +2,14 @@
 
 ## Licensing: read this before forking
 
-The **code** in this repository is MIT licensed. The **artwork is not.**
+The **code** in this repository is under the
+[Sukhi Play Personal Use Licence](../LICENSE): free for individuals and
+families, never for commercial use. The **artwork is not covered at all.**
 
 | Asset | Licence |
 | --- | --- |
-| `branding/cutout-*.png`, `branding/sukhi-icon.png`, `build/icon.png`, `build/icons/*.png`, `src/renderer/assets/mascot.png` | © Mandeep Singh. **All rights reserved.** Not covered by the MIT licence. |
-| `branding/generate-mascot.py` and the placeholder it draws | MIT, like the rest of the code |
+| `branding/cutout-*.png`, `branding/sukhi-icon.png`, `build/icon.png`, `build/icons/*.png`, `src/renderer/assets/mascot.png`, and the Sukhi Colouring artwork (`apps/colouring/app/*.png`, `apps/colouring/app/assets/sukhi-*.png`) | © Mandeep Singh. **All rights reserved.** Not covered by the code's licence. |
+| `branding/generate-mascot.py` and the placeholder it draws | Under the code's licence, like the rest of it |
 
 The Sukhi character is a personal character belonging to Mandeep Singh. It
 is included here because this is his application. **If you fork this project and
@@ -52,8 +54,8 @@ They are fractions of the sheet's width and height: `(left, top, right, bottom)`
 
 ## Replacing the artwork in a fork
 
-Run the placeholder generator, which draws a neutral MIT-licensed mascot from
-plain geometric shapes:
+Run the placeholder generator, which draws a neutral mascot from plain
+geometric shapes:
 
 ```bash
 pip install Pillow

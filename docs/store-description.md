@@ -60,9 +60,9 @@ a setup walkthrough, not a list of someone else's recommendations.
 - On a Wayland session the desktop, not the application, decides who receives a
   key press, so some system shortcuts stay with the desktop there too.
 
-**Free, open source, and not connected to anything**
+**Free for families, and not connected to anything**
 
-Sukhi Play is MIT licensed and the full source is on GitHub. There is no
+Sukhi Play is free for personal and family use, and the full source is on GitHub. There is no
 account to create, no telemetry, no analytics and no advertising of its own.
 Your child's list of approved sites is a plain file on your own computer and is
 never uploaded.

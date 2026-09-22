@@ -616,3 +616,31 @@ test('the site serves its own 404 rather than GitHub\'s', () => {
   const sitemap = fs.readFileSync(path.join(root, 'sitemap-0.xml'), 'utf8');
   assert.doesNotMatch(sitemap, /404/, 'the 404 should not be in the sitemap');
 });
+
+// --- the licence ---------------------------------------------------------------
+//
+// One set of terms, stated in several places a person or a tool might look:
+// the file itself, the page the file points at, the package metadata, the
+// Debian copyright file and the licence shipped beside Sukhi Colouring. They
+// must all say the same thing, and the page must be the file, not a retyping.
+
+test('the licence says the same thing everywhere it is stated', () => {
+  const root = path.join(__dirname, '..');
+  const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
+  const licence = read('LICENSE');
+  const id = 'LicenseRef-Sukhi-Play-Personal-Use-1.0';
+
+  assert.match(licence, /^# Sukhi Play Personal Use Licence 1\.0/);
+  assert.equal(JSON.parse(read('package.json')).license, id);
+  assert.ok(read('build/linux/copyright').includes(`License: ${id}`),
+    'the .deb copyright file names a different licence');
+  assert.equal(read('apps/colouring/LICENSE'), licence,
+    'the licence shipped with Sukhi Colouring has drifted from the root one');
+
+  // The page is built from the file. Every heading in the terms must be on it.
+  const page = read('docs/licence/index.html');
+  for (const [, heading] of licence.matchAll(/^## (.+)$/gm)) {
+    assert.ok(page.includes(heading), `the licence page is missing "${heading}"`);
+  }
+  assert.ok(page.includes('The only permitted purpose is personal use by an individual'));
+});

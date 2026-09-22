@@ -120,8 +120,27 @@ happened, and anything the terminal printed if you ran it from source.
 
 For anything security-related, see [SECURITY.md](SECURITY.md) instead.
 
-## Licence
+## Licence and your contribution
 
-Contributions are accepted under the [MIT Licence](LICENSE). Note that the
-character artwork is **not** MIT, so see [branding/README.md](branding/README.md)
-before touching anything in `branding/` or `build/`.
+Sukhi Play is free for individuals and families to use, change and share,
+and never for commercial use. The terms are the
+[Sukhi Play Personal Use Licence](LICENSE).
+
+Improvements are very welcome, and the way they reach everyone is by coming
+back here. So, by submitting a contribution -- a pull request, a patch, or code
+or artwork attached to an issue -- you:
+
+1. confirm it is your own work, or that you have the right to submit it;
+2. grant Mandeep Singh a perpetual, worldwide, non-exclusive, royalty-free,
+   irrevocable licence to use, copy, change, distribute, sublicense and
+   relicense your contribution, under any terms, including terms other than
+   this project's licence; and
+3. agree that it may be included in Sukhi Play and its apps without further
+   permission or payment.
+
+You keep the copyright in what you wrote. If you would rather not agree to
+this, say so before you send anything and it will not be merged.
+
+The Sukhi character artwork is not covered by the licence at all, so see
+[branding/README.md](branding/README.md) before touching anything in
+`branding/` or `build/`.

@@ -10,7 +10,7 @@
 
 [![CI](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml/badge.svg)](https://github.com/meSingh/sukhi-play/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/meSingh/sukhi-play?sort=semver)](https://github.com/meSingh/sukhi-play/releases/latest)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Licence: personal use](https://img.shields.io/badge/licence-personal%20use%20only-blue.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://github.com/meSingh/sukhi-play/releases/latest)
 [![Snap Store](https://snapcraft.io/sukhi-play/badge.svg)](https://snapcraft.io/sukhi-play)
 
@@ -500,11 +500,22 @@ named calls.
 
 ## Licence
 
-Code is [MIT](LICENSE). **The Sukhi character artwork is not**, and the terms
-for it are in [NOTICE](NOTICE). It belongs to
-Mandeep Singh. If you fork this and ship your own builds, replace it first;
-`python3 branding/generate-mascot.py` swaps in an MIT placeholder. See
-[branding/README.md](branding/README.md).
+The code is free for **individuals and families** to use, change and share,
+and **never for commercial use**. That means no selling it, no adverts, no
+using it inside a product or service, and no use by organisations, schools
+included. The terms are the [Sukhi Play Personal Use Licence](LICENSE).
+
+Versions up to and including 2.0.2 were released under the MIT licence and
+remain under it.
+
+Improvements are welcome, and the way they reach everyone is by coming back
+here. [CONTRIBUTING.md](CONTRIBUTING.md) has the short terms that come with a
+contribution.
+
+**The Sukhi character artwork is not covered by the licence at all**, and the
+terms for it are in [NOTICE](NOTICE). It belongs to Mandeep Singh. If you make
+your own builds, replace it first; `python3 branding/generate-mascot.py` swaps
+in a placeholder. See [branding/README.md](branding/README.md).
 
 If it saved you an afternoon, you can
 [buy me a coffee](https://www.buymeacoffee.com/msingh). Entirely optional, and

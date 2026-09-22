@@ -1,0 +1,56 @@
+---
+/**
+ * The licence, at the address the licence itself gives: sukhiplay.com/licence.
+ *
+ * Rendered from LICENSE at the root of the repository, at build time, so there
+ * is exactly one copy of the terms. A second copy typed into this page would be
+ * two documents that must agree, and the one that drifts is always the one
+ * somebody is reading.
+ *
+ * Above the terms, three lines in plain words for a parent, who should not
+ * have to read a licence to find out that they are allowed to use it.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createMarkdownProcessor } from '@astrojs/markdown-remark';
+import Base from '../layouts/Base.astro';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const text = fs.readFileSync(path.resolve(here, '../../../LICENSE'), 'utf8');
+
+// The file's own heading and address are for the file. This page has its own.
+const body = text
+  .replace(/^# .*\n/, '')
+  .replace(/^<https:\/\/sukhiplay\.com\/licence\/>\n/m, '');
+
+const md = await createMarkdownProcessor();
+const { code } = await md.render(body);
+---
+
+<Base
+  title="The Sukhi Play licence"
+  description="Sukhi Play and Sukhi Colouring are free for individuals and families to use, change and share, and never for commercial use."
+  page="licence">
+
+  <main class="wrap wrap--narrow licence">
+    <header class="hero hero--page">
+      <h1>The licence</h1>
+      <p class="lede">Sukhi Play Personal Use Licence 1.0</p>
+    </header>
+
+    <ul class="licence-plain">
+      <li class="yes"><b>Free for you and your family.</b> Use it, change it, and share it with other families, free of charge.</li>
+      <li class="no"><b>Never commercial.</b> No selling it, no adverts, no using it in a product or service.</li>
+      <li class="no"><b>Not for organisations.</b> Not for businesses, schools, nurseries, charities or any other organisation.</li>
+    </ul>
+    <p class="licence-note">
+      It covers Sukhi Play and Sukhi Colouring from 2.1 on. Versions up to and
+      including 2.0.2 were released under the MIT licence and remain under it.
+      The names and the Sukhi character artwork are not covered at all.
+      Improvements are welcome: <a href="https://github.com/meSingh/sukhi-play/blob/main/CONTRIBUTING.md">send them back</a>.
+    </p>
+
+    <article class="licence-text" set:html={code} />
+  </main>
+</Base>

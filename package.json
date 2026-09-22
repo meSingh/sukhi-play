@@ -5,7 +5,7 @@
   "description": "A locked-down, ad-free kiosk browser that lets a small child open only the sites you choose.",
   "main": "src/main/index.js",
   "private": true,
-  "license": "MIT",
+  "license": "LicenseRef-Sukhi-Play-Personal-Use-1.0",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",

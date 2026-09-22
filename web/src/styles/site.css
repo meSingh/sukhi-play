@@ -1810,3 +1810,44 @@ footer.foot a:hover { color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .news-new, .news-dots i { animation: none; }
 }
+
+/* ------------------------------------------------------- the licence page */
+/* Three plain lines a parent can read in a glance, then the terms themselves. */
+.licence-plain { list-style: none; padding: 0; margin: 0 0 18px; display: grid; gap: 12px; }
+.licence-plain li {
+  position: relative;
+  padding: 16px 18px 16px 54px;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--drop);
+  color: var(--ink-soft);
+}
+.licence-plain li::before {
+  content: '';
+  position: absolute; left: 18px; top: 50%;
+  width: 24px; height: 24px; margin-top: -12px;
+  border-radius: 50%;
+  background: var(--mint) no-repeat center / 14px
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3.5 8.5 3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.licence-plain li.no::before {
+  background-color: var(--coral);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4.5 4.5 7 7m0-7-7 7' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.licence-plain b { color: var(--ink); }
+.licence-note { color: var(--ink-soft); font-size: 15px; margin: 0 0 40px; }
+.licence-text {
+  padding: 30px 34px;
+  border-radius: var(--radius);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+.licence-text h2 { font-size: 18px; margin: 28px 0 8px; color: var(--ink); }
+.licence-text h2:first-child { margin-top: 0; }
+.licence-text blockquote { margin: 10px 0; padding: 10px 14px; border-radius: 10px; background: var(--base); }
+.licence-text code { font-size: .9em; }
+.licence-text hr { border: 0; border-top: 1px solid var(--line); margin: 28px 0 16px; }
+@media (max-width: 560px) { .licence-text { padding: 20px; } }

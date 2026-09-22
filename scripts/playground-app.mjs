@@ -92,6 +92,12 @@ function build (name) {
   copyTree(dist, shipped);
   copyTree(dist, path.join(SERVED, name));
 
+  // The licence travels with what ships, next to app/, where the packager and
+  // the tests expect it. Copied rather than written here, so it can never say
+  // something different from the one in the app's own repository.
+  const licence = path.join(source, 'LICENSE');
+  if (fs.existsSync(licence)) fs.copyFileSync(licence, path.join(SHIPPED, name, 'LICENSE'));
+
   const { files, bytes } = count(shipped);
   console.log(`${name}: ${files} files, ${(bytes / 1024).toFixed(0)} kB`);
   console.log(`  ships from   apps/${name}/app/`);

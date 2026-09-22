@@ -40,7 +40,10 @@ const buildXml = (desktopId) => `<?xml version="1.0" encoding="UTF-8"?>
   <summary>Let a small child open only the sites you choose</summary>
 
   <metadata_license>MIT</metadata_license>
-  <project_license>MIT</project_license>
+  <!-- Not an SPDX licence, so AppStream's own form for one: a pointer to
+       the terms. metadata_license stays MIT; it covers this file, not the app,
+       and Flathub requires it to be permissive. -->
+  <project_license>LicenseRef-proprietary=https://sukhiplay.com/licence/</project_license>
 
   <developer id="com.msingh">
     <name>Mandeep Singh</name>
@@ -168,29 +171,19 @@ Source: https://github.com/meSingh/sukhi-play
 
 Files: *
 Copyright: ${year} Mandeep Singh
-License: MIT
+License: LicenseRef-Sukhi-Play-Personal-Use-1.0
 
-License: MIT
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
+License: LicenseRef-Sukhi-Play-Personal-Use-1.0
+ Free for an individual to use, change and share for their own and their
+ family's personal use, and never for any commercial purpose or for use by
+ or on behalf of any organisation. The full terms are at
+ https://sukhiplay.com/licence/ and in LICENSE in the source repository.
  .
- The above copyright notice and this permission notice shall be included in all
- copies or substantial portions of the Software.
- .
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- SOFTWARE.
+ THE SOFTWARE COMES AS IS, WITHOUT ANY WARRANTY OR CONDITION, AS FAR AS THE
+ LAW ALLOWS.
 
 Comment: The Sukhi character artwork bundled with this package is the personal
- property of the copyright holder and is not covered by the MIT licence above.
+ property of the copyright holder and is not covered by the licence above.
  See the LICENCE file in the upstream repository for the list of files and the
  terms that apply to them.
 `;
