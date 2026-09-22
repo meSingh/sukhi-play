@@ -25,15 +25,16 @@
     "demo": "node scripts/demo.js",
     "shots": "node scripts/shots.js",
     "flathub:lint": "node scripts/flathub-lint.js",
-    "dist:snap": "npm run metainfo && electron-builder --linux snap --publish never",
-    "dist:linux:all": "npm run metainfo && electron-builder --linux AppImage deb snap --publish never",
+    "dist:snap": "npm run metainfo && npm run snap-template && electron-builder --linux snap --publish never",
+    "dist:linux:all": "npm run metainfo && npm run snap-template && electron-builder --linux AppImage deb snap --publish never",
     "cover-probe": "electron . --cover-probe",
     "key-probe": "electron . --key-probe",
     "start-probe": "electron . --start-probe",
     "dist:mac:catalina": "electron-builder --config electron-builder.catalina.yml --mac --publish never",
     "dist:mac:all": "npm run dist:mac && npm run dist:mac:catalina",
     "site": "npm --prefix web run build",
-    "site:dev": "npm --prefix web run dev"
+    "site:dev": "npm --prefix web run dev",
+    "snap-template": "node scripts/snap-template.js"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

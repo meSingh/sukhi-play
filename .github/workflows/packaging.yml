@@ -176,6 +176,55 @@ jobs:
           fi
           echo "snap metadata looks sane"
 
+      # Everything above checks that a snap was produced and that its metadata
+      # reads correctly. None of that notices a snap that cannot start, which
+      # is what shipped in 2.0.1: the launcher scripts were missing and bash
+      # exited 127 before Electron ran. So install it and run it.
+      - name: The snap must actually start
+        run: |
+          set -e
+          snap=$(find dist -name '*.snap' -print -quit)
+          sudo snap install --dangerous "$snap"
+
+          echo "--- what is at the snap root ---"
+          ls /snap/sukhi-play/current/
+
+          # command.sh exec's these three. A packed template leaves none of
+          # them behind, and the failure is invisible until somebody installs it.
+          for f in desktop-init.sh desktop-common.sh desktop-gnome-specific.sh; do
+            if [ ! -x "/snap/sukhi-play/current/$f" ]; then
+              echo "::error::/$f is missing from the snap; command.sh will exit 127"
+              exit 1
+            fi
+          done
+
+          # The template arriving whole rather than unpacked is the specific
+          # way this broke, and it leaves its own fingerprint.
+          if ls /snap/sukhi-play/current/*.tar >/dev/null 2>&1; then
+            echo "::error::an unextracted template tarball is inside the snap"
+            exit 1
+          fi
+
+          sudo apt-get install -y -qq xvfb
+          set +e
+          timeout 90 xvfb-run -a snap run sukhi-play --diagnose 2>&1 | tee /tmp/snap-run.log
+          code=${PIPESTATUS[0]}
+          set -e
+          echo "exit=$code"
+
+          # --diagnose prints where the window landed and quits, so a healthy
+          # run ends on its own. A timeout kill (124) means it got far enough
+          # to open a window and stay up, which is still a pass for "it starts".
+          if [ "$code" != "0" ] && [ "$code" != "124" ]; then
+            echo "::error::the snap failed to start (exit $code)"
+            exit 1
+          fi
+          if grep -qE 'No such file or directory|error while loading shared libraries' /tmp/snap-run.log; then
+            echo "::error::the snap started but could not find something it needs"
+            exit 1
+          fi
+          echo "the snap starts"
+
       - name: The deb must carry its metainfo and copyright
         run: |
           set -e
