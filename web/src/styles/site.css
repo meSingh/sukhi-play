@@ -1558,78 +1558,145 @@ footer.foot a:hover { color: var(--ink); }
 
 /* ------------------------------------------------- Sukhi Colouring's page */
 /*
- * The screenshots are captured at the size a laptop shows and set here at half
- * that, which is what makes them sharp on a retina screen. They alternate
- * sides down the page so the eye has somewhere to go.
+ * Built from the front page's parts -- bands, kickers, reveals -- so the two
+ * feel like one site. The screenshots are captured at the size a laptop shows
+ * and set at half that, which is what keeps them sharp on a retina screen.
  */
 .co-hero { text-align: center; }
-.co-icon { border-radius: 24px; margin-bottom: 14px; }
-.co-go {
+.co-mark { display: block; margin: 0 auto 18px; border-radius: 26px; }
+.co-hero h1 { margin-bottom: 8px; }
+.co-hero .lede { font-size: 21px; }
+
+/* The app's own twenty colours, arriving one after another. Decorative, and
+   marked aria-hidden, because it says nothing a screen reader needs. */
+.co-dots {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 22px;
-  flex-wrap: wrap;
-  margin: 26px 0 14px;
+  gap: 10px;
+  margin: 26px 0 30px;
 }
-.co-more { font-weight: 800; }
-.co-facts { color: var(--ink-faint); font-weight: 700; font-size: 14.5px; }
+.co-dots span {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: var(--drop);
+  animation: pop .5s var(--spring) both;
+  animation-delay: calc(var(--i) * .055s);
+}
+@keyframes pop {
+  from { transform: scale(0) translateY(10px); opacity: 0; }
+}
 
+.go {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: 14px;
+  background: var(--blue);
+  color: var(--paper);
+  font-weight: 900;
+  font-size: 15.5px;
+  text-decoration: none;
+  box-shadow: var(--drop);
+  transition: transform .15s var(--spring), box-shadow .15s;
+}
+.go--big { padding: 16px 34px; font-size: 18px; border-radius: 18px; }
+.go:hover { transform: translateY(-2px); box-shadow: var(--drop-lift); }
+.go:active { transform: translateY(1px); box-shadow: var(--drop); }
+
+.co-go { display: flex; justify-content: center; align-items: center; gap: 22px; flex-wrap: wrap; margin: 0 0 14px; }
+.co-go--end { margin-top: 28px; }
+.co-more { font-weight: 800; }
+
+.co-device { padding: 10px; border-radius: 26px; }
+.co-device img { display: block; width: 100%; height: auto; border-radius: 18px; }
+
+/* The kit. One tile per thing, art first, two short lines under it. */
+.co-kit {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 940px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.co-kit li {
+  background: var(--paper);
+  border-radius: 20px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: var(--drop);
+  border-top: 4px solid var(--c);
+  transition: transform .2s var(--spring), box-shadow .2s;
+}
+.co-kit li:hover { transform: translateY(-4px); box-shadow: var(--drop-lift); }
+.co-kit .co-art { display: block; margin-bottom: 12px; }
+.co-kit .co-art svg { width: 46px; height: 46px; }
+.co-kit b { display: block; font-size: 17px; margin-bottom: 4px; }
+.co-kit small { color: var(--ink-soft); font-size: 14px; line-height: 1.45; display: block; }
+
+/* A screenshot and a sentence, alternating sides. */
 .co-shot {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: 38px;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+  gap: 44px;
   align-items: center;
-  margin-top: 60px;
 }
-.co-shot--flip > .co-shot-say { order: 2; }
+.co-shot + .co-shot { margin-top: 72px; }
+.co-shot--flip > div { order: 2; }
 .co-shot h2 { margin: 0 0 10px; }
-.co-shot p { margin: 0; color: var(--ink-soft); font-size: 17px; }
+.co-shot p { margin: 0; color: var(--ink-soft); font-size: 17.5px; }
 .co-shot img {
   width: 100%;
   height: auto;
   border-radius: 18px;
-  border: 1px solid var(--line);
-  box-shadow: var(--drop);
-}
-
-.co-features { margin-top: 72px; }
-.co-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 22px;
-  margin-top: 24px;
-}
-.co-feature {
-  padding: 22px 24px;
-  border-radius: 18px;
-  background: var(--paper);
-  border: 1px solid var(--line);
-}
-.co-feature h3 { margin: 0 0 8px; font-size: 17px; }
-.co-feature p { margin: 0; color: var(--ink-soft); }
-
-.co-phone {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 48px;
-  align-items: center;
-  margin-top: 72px;
-}
-.co-phone img {
-  width: 100%;
-  height: auto;
-  border-radius: 28px;
-  border: 1px solid var(--line);
   box-shadow: var(--drop-lift);
 }
 
-.co-quiet, .co-credit { margin-top: 64px; }
-.co-quiet p, .co-credit p { color: var(--ink-soft); max-width: 70ch; }
+.co-phone {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 52px;
+  align-items: center;
+}
+.co-phone h2 { margin: 0 0 10px; }
+.co-phone p { color: var(--ink-soft); font-size: 17px; }
+.co-phone img {
+  width: 100%;
+  height: auto;
+  border-radius: 26px;
+  box-shadow: 0 26px 50px rgba(23, 21, 58, .20);
+}
 
-/* One column, and the picture after the words it belongs to. */
+/* The credit, on ink. Set apart from everything else on the page on purpose:
+   it is the reason this app exists, and a credit that looks like the rest
+   reads like small print. */
+.co-from { text-align: center; }
+.co-from-kicker { color: var(--yellow); }
+.co-quote { margin: 0 0 22px; padding: 0; border: 0; }
+.co-quote p {
+  margin: 0;
+  font-size: clamp(22px, 3.4vw, 32px);
+  font-weight: 800;
+  line-height: 1.32;
+}
+.co-quote a { color: var(--yellow); text-underline-offset: 4px; }
+.co-quote-b { margin-top: 10px !important; color: var(--mint); }
+.co-from-say {
+  margin: 0 auto;
+  max-width: 62ch;
+  color: rgba(244, 242, 255, .76);
+  font-size: 16px;
+}
+
 @media (max-width: 860px) {
-  .co-shot, .co-phone { grid-template-columns: minmax(0, 1fr); gap: 22px; }
-  .co-shot--flip > .co-shot-say { order: 0; }
-  .co-phone img { max-width: 320px; justify-self: center; }
+  .co-kit { grid-template-columns: repeat(2, 1fr); }
+  .co-shot, .co-phone { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .co-shot--flip > div { order: 0; }
+  .co-phone img { max-width: 300px; justify-self: center; }
+}
+@media (max-width: 520px) {
+  .co-kit { grid-template-columns: 1fr; }
+  .co-dots span { width: 18px; height: 18px; }
 }
