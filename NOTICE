@@ -28,11 +28,9 @@ by scripts/playground-app.mjs. They are MIT licensed like the rest of this
 project.
 
     apps/colouring
-        Sukhi Colouring, part of this project.
-        A derived work: the idea, the shape of it and the sound it makes come
-        from Kids Coloring, copyright (c) 2026 oh-namgyu, MIT licence,
-        https://github.com/oh-namgyu/kids-coloring. None of the code does.
-        It replaced the vendored build of that app in Sukhi Play 2.1.
+        Sukhi Colouring, derived from the original work of Kids Coloring,
+        copyright (c) 2026 oh-namgyu, MIT licence.
+        https://github.com/oh-namgyu/kids-coloring
 
 Everybody else's live under vendor/<name>/, included under their own licences
 and unmodified except where noted, with the upstream licence in

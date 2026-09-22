@@ -86,19 +86,16 @@ const entries = (data.suggestions as Entry[]).map((e) => {
             <h2>{b.name}</h2>
             <p class="cat-first-say">{b.blurb}</p>
             <p class="cat-first-what">
-              Ours, not somebody else&rsquo;s: written for this app, shipped inside
-              it, and free to open in any browser. It is the first of a
-              playground that will grow &mdash; when a thing a child wants does
-              not exist without an account or an advert attached, we write it.
+              Made for Sukhi Play and built right in. It also works in any
+              browser, free, with no sign-up and no internet needed.
             </p>
             <p class="cat-first-go">
-              <a class="go" href="/playground/colouring/">Open it in your browser</a>
+              <a class="go" href="/playground/colouring/" target="_blank" rel="noopener">Open it in your browser</a>
               <a class="cat-first-more" href="/colouring/">What is in it</a>
             </p>
             <p class="cat-first-credit">
-              A derived work: the idea and the sound it makes come from
-              <a href={b.sourceUrl} rel="noopener">Kids Coloring by oh-namgyu</a>
-              ({b.licence}). None of the code does.
+              Derived from the original work of
+              <a href={b.sourceUrl} target="_blank" rel="noopener noreferrer">Kids Coloring by oh-namgyu</a>.
             </p>
           </div>
         </div>
