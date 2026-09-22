@@ -1434,3 +1434,123 @@ footer.foot a:hover { color: var(--ink); }
 .notice-do { display: flex; gap: 8px; }
 .notice .consent-btn { padding: 8px 14px; font-size: 13.5px; }
 @media (prefers-reduced-motion: reduce) { .notice { animation: none; } }
+
+/* ------------------------------------------- the playground, and its first */
+/*
+ * Sukhi Colouring: a section on the catalogue rather than a card in the grid,
+ * and a page of its own at /playground/. Warm rather than loud -- it is a
+ * statement about what this project is now doing, not an advert.
+ */
+
+/* The one action worth pressing on either page. There was no general button
+   on this site before: every call to action so far has been the download,
+   which has its own. */
+.go {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: 14px;
+  background: var(--blue);
+  color: var(--paper);
+  font-weight: 900;
+  font-size: 15.5px;
+  text-decoration: none;
+  box-shadow: var(--drop);
+  transition: transform .15s var(--spring), box-shadow .15s;
+}
+.go:hover { transform: translateY(-2px); box-shadow: var(--drop-lift); }
+.go:active { transform: translateY(1px); box-shadow: var(--drop); }
+
+.cat-first {
+  margin: 0 0 40px;
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--base) 0%, var(--paper) 62%);
+}
+.cat-first-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.cat-first-pip {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--art, var(--coral));
+}
+.cat-first-body { display: flex; gap: 26px; align-items: flex-start; }
+.cat-first-body img { flex: 0 0 auto; border-radius: var(--radius); }
+.cat-first-body h2 { margin: 0 0 6px; }
+.cat-first-say { margin: 0 0 10px; font-weight: 700; }
+.cat-first-what { margin: 0; color: var(--ink-soft); }
+.cat-first-go {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 20px 0 0;
+}
+.cat-first-more { font-weight: 800; }
+.cat-first-credit { margin: 16px 0 0; font-size: 14px; color: var(--ink-faint); }
+
+/* --- the playground page --- */
+.pg-badge {
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: var(--wash-amber);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 900;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+}
+.pg-card {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--drop);
+}
+.pg-card img { flex: 0 0 auto; border-radius: var(--radius); }
+.pg-card h2 { margin: 0 0 6px; }
+.pg-card-say > p { margin: 0 0 10px; }
+.pg-what { color: var(--ink-soft); }
+.pg-go { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 20px 0 0 !important; }
+.pg-note { font-size: 14px; color: var(--ink-faint); font-weight: 700; }
+
+.pg-install, .pg-more { margin-top: 56px; }
+.pg-how {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+  margin: 24px 0;
+}
+.pg-how > div {
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.pg-how h3 { margin: 0 0 6px; font-size: 16px; }
+.pg-how p { margin: 0; color: var(--ink-soft); }
+.pg-or { color: var(--ink-soft); }
+
+/* The icon beside two lines of text is a column of single words on a phone. */
+@media (max-width: 640px) {
+  .cat-first { padding: 20px; }
+  .cat-first-body { flex-direction: column; gap: 16px; }
+  .cat-first-body img { width: 84px; height: 84px; }
+  .pg-card { flex-direction: column; gap: 18px; padding: 20px; }
+  .pg-card img { width: 96px; height: 96px; }
+}

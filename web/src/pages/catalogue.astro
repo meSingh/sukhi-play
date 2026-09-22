@@ -24,13 +24,20 @@ type Entry = {
 /** The apps that ship inside the download. No address to copy: they are there. */
 const bundled = (bundledData.apps as Array<{
   id: string; title: string; siteName?: string; blurb?: string;
-  category?: string; shape: string; color: string;
+  category?: string; shape: string; color: string; ours?: boolean;
   credit: string; licence: string; sourceUrl: string;
 }>).map((b) => ({
   ...b,
   name: b.siteName || b.title,
   art: SHAPES[b.shape] ?? SHAPES.star
 }));
+
+// Ours is read out of the same manifest as the rest rather than written here,
+// so a second one added to config/bundled.json arrives on this page on its own.
+// It gets its own section because the sentence above the others -- other
+// people's open-source work, credited to them -- is not true of it.
+const ours = bundled.filter((b) => b.ours === true);
+const theirs = bundled.filter((b) => b.ours !== true);
 
 const entries = (data.suggestions as Entry[]).map((e) => {
   let host = e.url;
@@ -62,13 +69,49 @@ const entries = (data.suggestions as Entry[]).map((e) => {
         into the app, and it sets the rest up for you.</p>
     </div>
 
+    <!-- Ours, given its own section rather than a chip in the grid below. The
+         sentence over that grid -- other people's open-source work, credited
+         to them -- is the one thing that is not true of this, and being the
+         first app written for Sukhi Play rather than allowed into it is worth
+         more than a badge. -->
+    {ours.map((b) => (
+      <section class="cat-first" style={`--art:${b.color}`}>
+        <div class="cat-first-tag">
+          <span class="cat-first-pip" aria-hidden="true"></span>
+          The first app built for Sukhi Play
+        </div>
+        <div class="cat-first-body">
+          <img src="/assets/playground-colouring.png" alt="" width="112" height="112" loading="lazy">
+          <div>
+            <h2>{b.name}</h2>
+            <p class="cat-first-say">{b.blurb}</p>
+            <p class="cat-first-what">
+              Ours, not somebody else&rsquo;s: written for this app, shipped inside
+              it, and free to open in any browser. It is the first of a
+              playground that will grow &mdash; when a thing a child wants does
+              not exist without an account or an advert attached, we write it.
+            </p>
+            <p class="cat-first-go">
+              <a class="go" href="/playground/colouring/">Open it in your browser</a>
+              <a class="cat-first-more" href="/playground/">About the playground</a>
+            </p>
+            <p class="cat-first-credit">
+              A derived work: the idea and the sound it makes come from
+              <a href={b.sourceUrl} rel="noopener">Kids Coloring by oh-namgyu</a>
+              ({b.licence}). None of the code does.
+            </p>
+          </div>
+        </div>
+      </section>
+    ))}
+
     <!-- Kept apart from the sites below. These need no address, no hosts and
          no connection, so putting them in the same grid with a Copy button
          would be offering to copy something that is already installed. -->
     <section class="cat-inside">
       <div class="cat-head cat-head--badged">
         <div>
-          <h2>Already inside Sukhi Play</h2>
+          <h2>Also inside Sukhi Play</h2>
           <p>These come with the app. They need no internet at all, so they work
             on a train, in the car, and when the broadband is having a day.</p>
         </div>
@@ -84,7 +127,7 @@ const entries = (data.suggestions as Entry[]).map((e) => {
         </span>
       </div>
       <div class="inside-grid">
-        {bundled.map((b) => (
+        {theirs.map((b) => (
           <article class="inside-card" style={`--art:${b.color}`}>
             <span class="cat-art" aria-hidden="true"><svg viewBox="0 0 100 100" set:html={b.art} /></span>
             <div class="inside-say">

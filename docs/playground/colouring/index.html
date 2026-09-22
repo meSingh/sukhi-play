@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- viewport-fit=cover so the page reaches the edges of a phone, and the
+       layout keeps its own clearance from the notch and the home bar. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#FFF7EC">
+  <meta name="description" content="A colouring book for small children. Put pictures on the page, move them about, and colour them in. No account, nothing collected, works with no internet.">
+  <title>Sukhi Colouring</title>
+  <link rel="icon" type="image/png" href="./favicon-64.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+
+  <!-- Installable: a parent can add this to a home screen and it opens as an
+       app, with no browser furniture and no address bar for a small finger to
+       land in. The manifest carries the name, the icons and the colours;
+       public/sw.js is what makes it work with no connection. -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- iOS reads its own spelling of the same thing, and is the reason the
+       apple-touch-icon above is a separate file. -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Colouring">
+  <script type="module" crossorigin src="./assets/index-iXNC5a5M.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/style-CMejBfSW.css">
+</head>
+<body>
+  <!-- Rendered by src/main.ts. The markup lives there so there is one place
+       that decides what is on screen, rather than two that must agree. -->
+  <div id="app" aria-live="polite"></div>
+  <noscript>
+    <p style="padding:24px;font:16px system-ui">This colouring book needs JavaScript switched on.</p>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,152 @@
+---
+/**
+ * The playground: apps we wrote ourselves, rather than sites we allowed.
+ *
+ * Sukhi Play started as a way to open somebody else's web safely. This is the
+ * other half of the same idea -- if the thing a child wants does not exist
+ * without an account or an advert in it, write it. The page exists to say that
+ * out loud, and to give the first of them somewhere to live.
+ *
+ * The app itself is not built by Astro. It is a separate project under
+ * playground/, built by scripts/playground-app.mjs, which drops its output into
+ * web/public/playground/<name>/ on the way past. That folder is generated and
+ * not committed; docs/ carries the published copy like it does everything else.
+ */
+import Base from '../layouts/Base.astro';
+import { REPO, SITE } from '../site';
+
+const APP = {
+  href: '/playground/colouring/',
+  name: 'Sukhi Colouring',
+  tagline: 'Pick a picture and colour it in, or start on a blank page.',
+  shipped: 'Ships inside Sukhi Play 2.1'
+};
+
+/**
+ * Stated for an answer engine as well as a reader. It is a real application at
+ * a real address that costs nothing, and those are the three facts anyone
+ * asking about it wants back.
+ */
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: APP.name,
+  url: new URL(APP.href, SITE).href,
+  applicationCategory: 'GameApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires a modern browser. Works offline once opened.',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  inLanguage: ['en', 'ko'],
+  isPartOf: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
+};
+---
+
+<Base
+  title="The Sukhi Play playground"
+  description="Small applications for small children, written for Sukhi Play and free to use in any browser. Sukhi Colouring is the first."
+  page="playground"
+  schema={schema}>
+
+  <main class="wrap">
+    <div class="hero hero--page">
+      <h1>The playground</h1>
+      <p class="lede">
+        Sukhi Play began as a way to open somebody else&rsquo;s web safely. This is
+        the other half of it: when the thing a child wants does not exist without
+        an account, an advert or a sign-in attached, we write it instead.
+      </p>
+      <p>
+        Everything here works in any browser, works with no internet once it has
+        loaded, and also ships inside the app itself. Nothing is collected,
+        nothing is sent anywhere, and there is no account to make.
+      </p>
+    </div>
+
+    <!-- The first one, given the room that being the first one deserves. -->
+    <section class="pg-first">
+      <p class="pg-badge">The first one</p>
+      <div class="pg-card">
+        <img src="/assets/playground-colouring.png" alt="" width="132" height="132" loading="lazy">
+        <div class="pg-card-say">
+          <h2>{APP.name}</h2>
+          <p>{APP.tagline}</p>
+          <p class="pg-what">
+            Forty pictures to colour in, three pens that behave like different
+            materials, a butterfly that mirrors everything you draw, and a shelf
+            that keeps your pictures so you can carry on with one tomorrow.
+            In English and Korean.
+          </p>
+          <p class="pg-go">
+            <a class="go" href={APP.href}>Open Sukhi Colouring</a>
+            <span class="pg-note">{APP.shipped}</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pg-install">
+      <h2>Put it on a home screen</h2>
+      <p>
+        It is a web page, so there is nothing to install and nothing to approve.
+        But every phone, tablet and desktop browser can keep a page as an app of
+        its own, and it is worth doing: it opens full screen with no address bar
+        for a small finger to land in, and it keeps working with no signal.
+      </p>
+
+      <div class="pg-how">
+        <div>
+          <h3>iPhone and iPad</h3>
+          <p>
+            Open it in Safari, press <b>Share</b>, then <b>Add to Home Screen</b>.
+            Safari is the only browser on iOS that can do this.
+          </p>
+        </div>
+        <div>
+          <h3>Android</h3>
+          <p>
+            Open it in Chrome and take the <b>Install app</b> prompt, or press the
+            menu and choose <b>Add to Home screen</b>.
+          </p>
+        </div>
+        <div>
+          <h3>Mac, Windows and Linux</h3>
+          <p>
+            In Chrome or Edge, press the install icon at the right of the address
+            bar. In Safari, choose <b>File</b> &rarr; <b>Add to Dock</b>.
+          </p>
+        </div>
+      </div>
+
+      <p class="pg-or">
+        Or skip all of that and <a href="/download/">download Sukhi Play</a>, which
+        has it built in along with everything else, behind a gate a child cannot
+        open.
+      </p>
+    </section>
+
+    <section class="pg-more">
+      <h2>More are coming</h2>
+      <p>
+        This is the first. Each one starts in the
+        <a href={`${REPO}/tree/main/playground`}>playground</a> of the main
+        repository, grows until it is worth a release of its own, and then moves
+        out into its own repository and comes back as a submodule.
+      </p>
+      <p>
+        Every one of them follows the same rules: works with no connection, works
+        on a phone down to 320&nbsp;px, no emoji in the interface, nothing
+        collected, and every control reachable by touch and by keyboard. Where an
+        app is derived from somebody else&rsquo;s work, the source is named in its
+        README, its licence and its own About screen.
+      </p>
+      <p>
+        Sukhi Colouring is a derived work: the idea, its shape and the sound it
+        makes come from
+        <a href="https://github.com/oh-namgyu/kids-coloring">Kids Coloring by
+        oh-namgyu</a>, MIT licensed. None of the code does.
+      </p>
+    </section>
+  </main>
+</Base>
+
