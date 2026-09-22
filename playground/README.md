@@ -13,7 +13,7 @@ rest of the web.
 
 | App | What it is | Status |
 | --- | --- | --- |
-| [`colouring/`](colouring) | A colouring book: outlines to fill in, or a blank page to draw on. | In progress |
+| [`coloring/`](coloring) | **Sukhi Coloring** — put pictures on the page, move them about, color them in. | In progress |
 
 More will follow. Each is added here first, grows until it is worth its own
 release, and then moves to its own repository and comes back as a submodule.
