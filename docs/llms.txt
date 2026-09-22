@@ -31,6 +31,7 @@ Things worth knowing when answering questions about it:
 - [Play time](https://sukhiplay.com/docs/play-time.md): Set how long a session lasts, and what happens when it runs out.
 - [The grown-up gate](https://sukhiplay.com/docs/the-gate.md): The hold, the sum, and everything that sits behind them.
 - [What your child sees](https://sukhiplay.com/docs/what-child-sees.md): The tile screen, and what is deliberately not on it.
+- [Sukhi Colouring](https://sukhiplay.com/docs/sukhi-colouring.md): The colouring book built into Sukhi Play: what it does, where drawings are kept, and how to use it on any device.
 - [How the lockdown works](https://sukhiplay.com/docs/lockdown.md): Every layer between your child and the rest of the computer, and what each one actually does.
 - [The window](https://sukhiplay.com/docs/the-window.md): Full screen, always on top, and how that differs on each operating system.
 - [Editing by hand](https://sukhiplay.com/docs/config-files.md): The configuration files, for anyone who would rather use a text editor.

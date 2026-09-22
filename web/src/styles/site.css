@@ -1748,3 +1748,81 @@ footer.foot a:hover { color: var(--ink); }
   .co-kit, .co-safe { grid-template-columns: 1fr; }
   .co-dots span { width: 18px; height: 18px; }
 }
+
+/* ------------------------------------------ the launch, on the front page */
+/*
+ * Sukhi Colouring's arrival, near the bottom of the front page. A warm card
+ * with the screenshot tipped slightly, as if just put down, and a "New" pill
+ * that pulses gently so the eye finds it.
+ */
+.launch { padding-block: 40px 24px; }
+.launch-card {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 40px;
+  align-items: center;
+  padding: 36px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, var(--wash-amber) 0%, var(--wash-violet) 100%);
+  box-shadow: var(--drop);
+  overflow: hidden;
+}
+.launch-new {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--coral);
+  color: var(--paper);
+  font-size: 12.5px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  animation: launch-pulse 2.4s ease-in-out infinite;
+}
+@keyframes launch-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 92, 92, .45); }
+  50% { box-shadow: 0 0 0 9px rgba(255, 92, 92, 0); }
+}
+.launch-name { display: flex; align-items: center; gap: 14px; }
+.launch-name img { border-radius: 16px; flex: none; }
+.launch-name h2 { margin: 0; }
+.launch-say > p { margin: 12px 0 0; font-size: 18px; color: var(--ink-soft); }
+.launch-say > .launch-facts { font-size: 14px; font-weight: 700; color: var(--ink-faint); }
+.launch-go { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px !important; }
+
+.launch-shot { position: relative; display: block; }
+.launch-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  box-shadow: var(--drop-lift);
+  transform: rotate(1.6deg);
+  transition: transform .3s var(--spring);
+}
+.launch-shot:hover img { transform: rotate(0deg) translateY(-4px); }
+.launch-dots {
+  position: absolute;
+  left: -10px;
+  bottom: -14px;
+  display: flex;
+  gap: 8px;
+}
+.launch-dots i {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: var(--drop);
+  animation: bob 5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -.8s);
+}
+
+@media (max-width: 760px) {
+  .launch-card { grid-template-columns: minmax(0, 1fr); gap: 26px; padding: 22px; }
+  .launch-shot { order: -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .launch-new, .launch-dots i { animation: none; }
+}
