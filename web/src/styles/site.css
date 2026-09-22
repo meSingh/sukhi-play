@@ -1527,6 +1527,7 @@ footer.foot a:hover { color: var(--ink); }
 .pg-card-say > p { margin: 0 0 10px; }
 .pg-what { color: var(--ink-soft); }
 .pg-go { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 20px 0 0 !important; }
+.pg-read { font-weight: 800; }
 .pg-note { font-size: 14px; color: var(--ink-faint); font-weight: 700; }
 
 .pg-install, .pg-more { margin-top: 56px; }
@@ -1553,4 +1554,82 @@ footer.foot a:hover { color: var(--ink); }
   .cat-first-body img { width: 84px; height: 84px; }
   .pg-card { flex-direction: column; gap: 18px; padding: 20px; }
   .pg-card img { width: 96px; height: 96px; }
+}
+
+/* ------------------------------------------------- Sukhi Colouring's page */
+/*
+ * The screenshots are captured at the size a laptop shows and set here at half
+ * that, which is what makes them sharp on a retina screen. They alternate
+ * sides down the page so the eye has somewhere to go.
+ */
+.co-hero { text-align: center; }
+.co-icon { border-radius: 24px; margin-bottom: 14px; }
+.co-go {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin: 26px 0 14px;
+}
+.co-more { font-weight: 800; }
+.co-facts { color: var(--ink-faint); font-weight: 700; font-size: 14.5px; }
+
+.co-shot {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 38px;
+  align-items: center;
+  margin-top: 60px;
+}
+.co-shot--flip > .co-shot-say { order: 2; }
+.co-shot h2 { margin: 0 0 10px; }
+.co-shot p { margin: 0; color: var(--ink-soft); font-size: 17px; }
+.co-shot img {
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  box-shadow: var(--drop);
+}
+
+.co-features { margin-top: 72px; }
+.co-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 22px;
+  margin-top: 24px;
+}
+.co-feature {
+  padding: 22px 24px;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.co-feature h3 { margin: 0 0 8px; font-size: 17px; }
+.co-feature p { margin: 0; color: var(--ink-soft); }
+
+.co-phone {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 48px;
+  align-items: center;
+  margin-top: 72px;
+}
+.co-phone img {
+  width: 100%;
+  height: auto;
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  box-shadow: var(--drop-lift);
+}
+
+.co-quiet, .co-credit { margin-top: 64px; }
+.co-quiet p, .co-credit p { color: var(--ink-soft); max-width: 70ch; }
+
+/* One column, and the picture after the words it belongs to. */
+@media (max-width: 860px) {
+  .co-shot, .co-phone { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .co-shot--flip > .co-shot-say { order: 0; }
+  .co-phone img { max-width: 320px; justify-self: center; }
 }

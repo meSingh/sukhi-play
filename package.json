@@ -35,7 +35,8 @@
     "site": "npm run playground && npm --prefix web run build",
     "site:dev": "npm run playground && npm --prefix web run dev",
     "snap-template": "node scripts/snap-template.js",
-    "playground": "node scripts/playground-app.mjs --all"
+    "playground": "node scripts/playground-app.mjs --all",
+    "shots:colouring": "electron scripts/colouring-shots.js"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

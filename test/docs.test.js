@@ -17,14 +17,28 @@ const manifest = JSON.parse(fs.readFileSync(path.join(SHOTS, 'captions.json'), '
  * Clean URLs mean a page is <name>/index.html, and the <name>.html files beside
  * them are one-line redirects for the addresses the site used to have. Reading
  * those as pages finds no navigation and no catalogue.
+ *
+ * Some redirects are directories too, now: Astro writes one per entry in its
+ * `redirects` config, at <name>/index.html, indistinguishable from a page by
+ * its path. So the test is what the file says rather than where it sits -- a
+ * meta refresh is a redirect, whoever wrote it and wherever it landed.
+ *
+ * Only the top level. Below it are the playground applications, which this
+ * site hosts but did not write: /playground/colouring/ is Sukhi Colouring, and
+ * it has no business carrying this site's navigation, canonical or JSON-LD.
  */
+function isRedirect (file) {
+  return /http-equiv=["']?refresh/i.test(fs.readFileSync(file, 'utf8'));
+}
+
 function builtPages () {
   const docs = path.join(__dirname, '..', 'docs');
   const out = [{ name: 'index.html', file: path.join(docs, 'index.html') }];
   for (const entry of fs.readdirSync(docs, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
     const file = path.join(docs, entry.name, 'index.html');
-    if (fs.existsSync(file)) out.push({ name: `${entry.name}/index.html`, file });
+    if (!fs.existsSync(file) || isRedirect(file)) continue;
+    out.push({ name: `${entry.name}/index.html`, file });
   }
   return out;
 }

@@ -1,0 +1,184 @@
+---
+/**
+ * Sukhi Colouring's own page: what it is, what is in it, and how to keep it.
+ *
+ * Distinct from the two pages either side of it. /playground/ is about the
+ * idea -- that we write these now rather than only allowing other people's --
+ * and lists them. /playground/colouring/ is the application itself. This is the
+ * one that describes the thing in enough detail for somebody to decide whether
+ * they want it, which is the job the front page does for Sukhi Play.
+ *
+ * Every screenshot is the real application, driven into that state and
+ * captured by scripts/colouring-shots.js. Nothing here is a mock-up.
+ */
+import Base from '../layouts/Base.astro';
+import { SITE } from '../site';
+
+const APP = '/playground/colouring/';
+
+const SHOTS = [
+  {
+    src: '/screenshots/colouring/01-a-page-in-progress.png',
+    w: 1240, h: 800,
+    title: 'A page being coloured in',
+    say: 'One picture, as big as the page will take. Colours down the left where a hand rests, everything else down the right.'
+  },
+  {
+    src: '/screenshots/colouring/02-forty-pictures.png',
+    w: 1240, h: 800,
+    title: 'Forty pictures to start from',
+    say: 'Animals, things that go, the garden, the sky. Or close it and draw on the blank page instead.'
+  },
+  {
+    src: '/screenshots/colouring/03-the-shelf.png',
+    w: 1240, h: 800,
+    title: 'A shelf that keeps their work',
+    say: 'Not a picture of the page: the page itself. Open one tomorrow and carry on from where they left it.'
+  }
+];
+
+const FEATURES = [
+  {
+    title: 'Three pens that feel different',
+    say: 'A pencil that feathers, a crayon that skips and leaves the paper showing through, and a rainbow that changes colour as it travels. Each one sounds different too.'
+  },
+  {
+    title: 'Fill, for the parts that should be solid',
+    say: 'Tap inside a shape and it fills to the lines. A two-year-old who cannot yet stay inside them still gets a coloured-in cat.'
+  },
+  {
+    title: 'A butterfly that mirrors',
+    say: 'Turn it on and everything drawn on one side appears on the other. It is the single most popular thing in the app with the child it was built for.'
+  },
+  {
+    title: 'Twenty colours and three widths',
+    say: 'Enough to choose from, few enough to see all at once. No colour picker, no sliders, no menus.'
+  },
+  {
+    title: 'Back, forward, and start again',
+    say: 'Nothing a small hand does is permanent. Start again asks first, and clears the page behind a fade so it is something you watch rather than something you find.'
+  },
+  {
+    title: 'English and Korean',
+    say: 'Both are complete, including the picture names. The language lives behind the settings cog, not on the main screen where a child would press it.'
+  }
+];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Sukhi Colouring',
+  url: new URL(APP, SITE).href,
+  description: 'A colouring book for small children. Forty pictures, three pens, fill, a mirror and a shelf that keeps their work. Free, no account, works offline.',
+  applicationCategory: 'GameApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires a modern browser. Works offline once opened.',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  inLanguage: ['en', 'ko'],
+  screenshot: SHOTS.map((s) => new URL(s.src, SITE).href),
+  isPartOf: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
+};
+---
+
+<Base
+  title="Sukhi Colouring, a colouring book for small children"
+  description="Forty pictures, three pens that feel like different materials, fill, a butterfly that mirrors, and a shelf that keeps their work. Free, no account, works with no internet."
+  page="colouring"
+  image="/screenshots/colouring/01-a-page-in-progress.png"
+  schema={schema}>
+
+  <main class="wrap">
+    <div class="hero hero--page co-hero">
+      <img class="co-icon" src="/assets/playground-colouring.png" alt="" width="104" height="104">
+      <h1>Sukhi Colouring</h1>
+      <p class="lede">
+        Pick a picture and colour it in, or start on a blank page. Forty
+        outlines, three pens that behave like different materials, and a shelf
+        that keeps what they made so they can carry on tomorrow.
+      </p>
+      <p class="co-go">
+        <a class="go" href={APP}>Open it in your browser</a>
+        <a class="co-more" href="/playground/">It is part of the playground &rarr;</a>
+      </p>
+      <p class="co-facts">
+        Free &middot; no account &middot; nothing collected &middot; works with no internet
+      </p>
+    </div>
+
+    {SHOTS.map((shot, i) => (
+      <section class:list={['co-shot', i % 2 === 1 && 'co-shot--flip']}>
+        <div class="co-shot-say">
+          <h2>{shot.title}</h2>
+          <p>{shot.say}</p>
+        </div>
+        <img src={shot.src} alt={shot.title} width={shot.w} height={shot.h} loading="lazy" decoding="async">
+      </section>
+    ))}
+
+    <section class="co-features">
+      <h2>What is in it</h2>
+      <div class="co-grid">
+        {FEATURES.map((f) => (
+          <div class="co-feature">
+            <h3>{f.title}</h3>
+            <p>{f.say}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="co-phone">
+      <div class="co-phone-say">
+        <h2>It is the same app on a phone</h2>
+        <p>
+          Not a cut-down version: the same pictures, the same pens, the same
+          shelf. The rails fold into strips along the top and bottom, the page
+          takes everything in between, and every control stays a size a small
+          hand can hit. It works down to 320&nbsp;px.
+        </p>
+        <p>
+          A parent can keep it on the home screen, where it opens full screen
+          with no address bar for a small finger to land in, and keeps working
+          with no signal. <a href="/playground/">The playground page</a> has the
+          three lines of instructions for each platform.
+        </p>
+      </div>
+      <img src="/screenshots/colouring/04-on-a-phone.png" alt="Sukhi Colouring on a phone"
+           width="402" height="844" loading="lazy" decoding="async">
+    </section>
+
+    <section class="co-quiet">
+      <h2>What it does not do</h2>
+      <p>
+        There is no account and nothing to sign in to. Nothing a child makes
+        leaves their own machine: the shelf is stored in the browser, and there
+        is no server on the other end of it to store anything anywhere else.
+        There is no advertising, no analytics inside the app, no links out, and
+        no way to wander from this page to any other.
+      </p>
+      <p>
+        It also ships inside <a href="/download/">Sukhi Play</a> itself, where it
+        sits behind a gate a child cannot open, alongside everything else you
+        chose for them.
+      </p>
+    </section>
+
+    <section class="co-credit">
+      <h2>Where it came from</h2>
+      <p>
+        Sukhi Colouring is a derived work. The idea, the shape of it and the
+        sound it makes come from
+        <a href="https://github.com/oh-namgyu/kids-coloring" rel="noopener">Kids
+        Coloring by oh-namgyu</a>, MIT licensed, which Sukhi Play bundled for its
+        first two years. None of the code does &mdash; this was written from
+        nothing, which is what made it possible to add a blank page, a shelf, a
+        second language and a layout that works on a phone.
+      </p>
+      <p>
+        It is the first app built for Sukhi Play rather than allowed into it.
+        <a href="/playground/">More are coming</a>.
+      </p>
+    </section>
+  </main>
+</Base>

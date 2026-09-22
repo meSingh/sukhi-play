@@ -26,7 +26,8 @@ export default defineConfig({
    * site used to have.
    */
   redirects: {
-    '/playground/coloring': '/playground/colouring/'
+    '/playground/coloring': '/playground/colouring/',
+    '/coloring': '/colouring/'
   },
 
   // A sitemap needs `site` above to know what the addresses are.
@@ -38,8 +39,8 @@ export default defineConfig({
       filter: (page) =>
         !/\/[a-z-]+\.html$/.test(page) &&
         !/\/404\/?$/.test(page) &&
-        // The misspelling above is a redirect, not an address.
-        !/\/playground\/coloring\/?$/.test(page),
+        // The misspellings above are redirects, not addresses.
+        !/\/(playground\/)?coloring\/?$/.test(page),
       changefreq: 'weekly',
       lastmod: new Date()
     })
