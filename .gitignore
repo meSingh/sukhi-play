@@ -15,3 +15,8 @@ dist-legacy*/
 # The Astro site's dependencies. The built output in docs/ is committed.
 web/node_modules/
 web/.astro/
+
+# Playground apps are their own repositories, mounted here as submodules once
+# each one has a remote. Until then they live here untracked, so a `git add -A`
+# in this repo cannot swallow a project that is meant to stand on its own.
+playground/*/

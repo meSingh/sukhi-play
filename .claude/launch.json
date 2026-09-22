@@ -5,8 +5,27 @@
     {
       "name": "site",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "docs"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8765",
+        "--directory",
+        "docs"
+      ],
       "port": 8765
+    },
+    {
+      "name": "colouring",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "vite",
+        "--port",
+        "5177",
+        "--strictPort"
+      ],
+      "port": 5177,
+      "cwd": "playground/colouring"
     }
   ]
 }
