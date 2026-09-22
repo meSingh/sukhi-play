@@ -13,8 +13,11 @@ artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 files:
   - src/**/*
   - config/**/*
-  # The open-source apps that ship inside the download. Only the built output:
-  # the patch and build scripts beside it are for rebuilding, not for running.
+  # The apps that ship inside the download. Only the built output: the patch
+  # and build scripts beside it are for rebuilding, not for running.
+  # Ours under apps/, everybody else's under vendor/.
+  - apps/*/app/**/*
+  - apps/*/LICENSE
   - vendor/*/app/**/*
   - vendor/*/LICENSE
   - vendor/*/UPSTREAM

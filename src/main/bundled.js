@@ -6,12 +6,17 @@ const path = require('node:path');
 /**
  * Apps that ship inside Sukhi Play and never touch the network.
  *
- * These are other people's open-source work, vendored under `vendor/`, each
- * with its licence and the commit it was built from. They exist for two
- * reasons: a child on a train or in a house with no broadband still has
- * something to open, and there is nothing on the other end of them -- no
- * adverts to filter, no terms to read, no host that could serve something
- * different tomorrow.
+ * Two kinds, from two places. Other people's open-source work is vendored
+ * under `vendor/`, each with its licence and the commit it was built from.
+ * Ours is built out of `playground/` and lands under `apps/`; a manifest entry
+ * says which by setting `ours`. Nothing else about them differs -- same
+ * scheme, same isolation, same refusal to touch the network -- and the split
+ * exists so that `vendor/` keeps meaning what it says.
+ *
+ * They exist for two reasons: a child on a train or in a house with no
+ * broadband still has something to open, and there is nothing on the other end
+ * of them -- no adverts to filter, no terms to read, no host that could serve
+ * something different tomorrow.
  *
  * They are served over a scheme of our own rather than file:. A file: page has
  * an opaque origin, so localStorage throws and anything that wants a real
@@ -51,7 +56,7 @@ const TYPES = new Map(Object.entries({
  * A manifest entry whose files are missing is dropped rather than shown: a
  * tile that opens nothing is worse than a tile that is not there.
  */
-function load (manifestPath, vendorDir) {
+function load (manifestPath, vendorDir, ourDir = vendorDir) {
   let raw;
   try {
     raw = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
@@ -65,7 +70,7 @@ function load (manifestPath, vendorDir) {
   const seen = new Set();
 
   for (const entry of list) {
-    const app = clean(entry, vendorDir);
+    const app = clean(entry, vendorDir, ourDir);
     if (!app) continue;
     if (seen.has(app.id)) {
       console.warn(`[bundled] duplicate id ignored: ${app.id}`);
@@ -77,7 +82,7 @@ function load (manifestPath, vendorDir) {
   return out;
 }
 
-function clean (raw, vendorDir) {
+function clean (raw, vendorDir, ourDir = vendorDir) {
   if (!raw || typeof raw !== 'object') return null;
 
   // The id becomes a hostname, so it may only hold what a hostname may hold.
@@ -94,7 +99,10 @@ function clean (raw, vendorDir) {
     console.warn(`[bundled] refused a folder name: ${raw.dir}`);
     return null;
   }
-  const dir = path.join(vendorDir, folder, 'app');
+  // Ours or somebody else's. Two fixed roots chosen by a boolean, rather than
+  // a path out of the manifest: the folder name is checked above and cannot
+  // climb, and there is nowhere else a bundled app is ever allowed to live.
+  const dir = path.join(raw.ours === true ? ourDir : vendorDir, folder, 'app');
   const entry = typeof raw.entry === 'string' && raw.entry.trim() ? raw.entry.trim() : 'index.html';
   if (!fs.existsSync(path.join(dir, entry))) {
     console.warn(`[bundled] ${id} is in the manifest but not on disk; skipping`);

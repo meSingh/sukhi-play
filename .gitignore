@@ -20,3 +20,7 @@ web/.astro/
 # each one has a remote. Until then they live here untracked, so a `git add -A`
 # in this repo cannot swallow a project that is meant to stand on its own.
 playground/*/
+
+# The playground apps the site serves are copied here by
+# scripts/playground-app.mjs. The published copy is the one in docs/.
+web/public/playground/

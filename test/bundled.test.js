@@ -240,3 +240,61 @@ test('only a bundled app may save, and only a picture', () => {
   }
   assert.equal(names.size, 3, 'each save gets its own file');
 });
+
+// --- ours vs somebody else's -----------------------------------------------
+//
+// Two roots, picked by a boolean on the manifest entry. The folder name is
+// already checked against a pattern that cannot climb, so the point of these
+// is that the boolean chooses a root and cannot become one.
+
+test('ours: true reads from the apps root, not the vendor one', () => {
+  const vendor = fakeVendor({ colouring: { 'index.html': '<p>theirs</p>' } });
+  const ours = fakeVendor({ colouring: { 'index.html': '<p>ours</p>' } });
+
+  const [app] = bundled.load(
+    manifest([{ id: 'colouring', dir: 'colouring', ours: true, title: 'Colouring' }]),
+    vendor, ours);
+
+  assert.ok(app, 'the entry should have loaded');
+  assert.ok(app.dir.startsWith(ours), `expected ${app.dir} under the apps root`);
+  assert.equal(fs.readFileSync(path.join(app.dir, 'index.html'), 'utf8'), '<p>ours</p>');
+});
+
+test('without the flag, nothing changes: the vendor root is still the root', () => {
+  const vendor = fakeVendor({ thing: { 'index.html': '<p>theirs</p>' } });
+  const ours = fakeVendor({ thing: { 'index.html': '<p>ours</p>' } });
+
+  const [app] = bundled.load(manifest([{ id: 'thing', dir: 'thing' }]), vendor, ours);
+  assert.ok(app.dir.startsWith(vendor), 'an entry with no flag must stay vendored');
+
+  // And an omitted third argument must behave exactly as it did before it existed.
+  const [same] = bundled.load(manifest([{ id: 'thing', dir: 'thing' }]), vendor);
+  assert.equal(same.dir, app.dir);
+});
+
+test('only a literal true switches roots; anything truthy-ish does not', () => {
+  const vendor = fakeVendor({ thing: { 'index.html': '<p>theirs</p>' } });
+  const ours = fakeVendor({ thing: { 'index.html': '<p>ours</p>' } });
+
+  for (const flag of ['true', 1, {}, ['yes']]) {
+    const [app] = bundled.load(manifest([{ id: 'thing', dir: 'thing', ours: flag }]), vendor, ours);
+    assert.ok(app.dir.startsWith(vendor), `${JSON.stringify(flag)} must not choose a root`);
+  }
+});
+
+test('every app the shipped manifest names is on disk, in the root it claims', () => {
+  const list = bundled.load(
+    path.join(ROOT, 'config', 'bundled.json'),
+    path.join(ROOT, 'vendor'),
+    path.join(ROOT, 'apps'));
+  const named = require(path.join(ROOT, 'config', 'bundled.json')).apps;
+
+  assert.equal(list.length, named.length,
+    'an app in the manifest was dropped: its files are missing');
+  for (const app of named) {
+    const root = app.ours === true ? 'apps' : 'vendor';
+    assert.ok(
+      fs.existsSync(path.join(ROOT, root, app.dir, 'app', app.entry || 'index.html')),
+      `${app.id} should be at ${root}/${app.dir}/app/`);
+  }
+});

@@ -1,17 +1,18 @@
 {
-  "_comment": "Open-source apps that ship inside Sukhi Play. Each lives in vendor/<dir>/app, rebuilt by scripts/vendor-app.mjs from the commit in vendor/<dir>/UPSTREAM. Shapes and colours must not collide with config/suggestions.json; a test checks. Credit and licence are shown to the parent and repeated in NOTICE.",
+  "_comment": "Apps that ship inside Sukhi Play. Ours are built out of playground/<dir> by scripts/playground-app.mjs and live in apps/<dir>/app, marked with \"ours\": true. Everybody else's lives in vendor/<dir>/app, rebuilt by scripts/vendor-app.mjs from the commit in vendor/<dir>/UPSTREAM. Shapes and colours must not collide with config/suggestions.json; a test checks. Credit and licence are shown to the parent and repeated in NOTICE.",
   "apps": [
     {
       "id": "colouring",
-      "dir": "kids-coloring",
+      "dir": "colouring",
+      "ours": true,
       "title": "Colouring",
-      "siteName": "Kids Coloring",
-      "blurb": "Colour in animals, flowers and rockets, or just draw.",
+      "siteName": "Sukhi Colouring",
+      "blurb": "Pick a picture and colour it in, or start on a blank page.",
       "category": "Creative",
       "shape": "flower",
       "color": "#f43f5e",
       "entry": "index.html",
-      "credit": "Kids Coloring by oh-namgyu",
+      "credit": "Sukhi Colouring, after Kids Coloring by oh-namgyu",
       "licence": "MIT",
       "sourceUrl": "https://github.com/oh-namgyu/kids-coloring"
     },

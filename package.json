@@ -32,9 +32,10 @@
     "start-probe": "electron . --start-probe",
     "dist:mac:catalina": "electron-builder --config electron-builder.catalina.yml --mac --publish never",
     "dist:mac:all": "npm run dist:mac && npm run dist:mac:catalina",
-    "site": "npm --prefix web run build",
-    "site:dev": "npm --prefix web run dev",
-    "snap-template": "node scripts/snap-template.js"
+    "site": "npm run playground && npm --prefix web run build",
+    "site:dev": "npm run playground && npm --prefix web run dev",
+    "snap-template": "node scripts/snap-template.js",
+    "playground": "node scripts/playground-app.mjs --all"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

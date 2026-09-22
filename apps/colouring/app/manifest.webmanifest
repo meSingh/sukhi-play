@@ -1,0 +1,22 @@
+{
+  "name": "Sukhi Colouring",
+  "short_name": "Colouring",
+  "description": "A colouring book for small children. Put pictures on the page and colour them in. Nothing is collected, nothing is sent anywhere, and it works with no internet.",
+  "id": "./",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
+  "background_color": "#FFF7EC",
+  "theme_color": "#FFF7EC",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "entertainment", "kids"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

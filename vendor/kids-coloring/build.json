@@ -1,5 +1,0 @@
-{
-  "install": true,
-  "build": "build",
-  "out": "dist"
-}

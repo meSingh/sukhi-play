@@ -1994,7 +1994,8 @@ app.whenReady().then(() => {
   // Apps that live inside the download. No network, nothing to filter.
   bundledApps = bundled.load(
     path.join(__dirname, '..', '..', 'config', 'bundled.json'),
-    path.join(__dirname, '..', '..', 'vendor'));
+    path.join(__dirname, '..', '..', 'vendor'),
+    path.join(__dirname, '..', '..', 'apps'));
 
   console.log(`[boot] ${catalog.apps.length} apps from ${catalog.source} catalog, ` +
               `${suggestions.length} suggestions available`);
