@@ -15,6 +15,56 @@
  * has already refused those at a level the page cannot argue with.
  */
 
+const { contextBridge } = require('electron');
+
+/**
+ * Answers a page's request for the whole screen with a prompt "no".
+ *
+ * Sukhi Play refuses fullscreen on purpose -- it would cover the top bar, the
+ * one thing telling a child how to get back. The refusal happens in the main
+ * process, but Electron never answers a denied fullscreen request: the page's
+ * requestFullscreen() promise stays pending for ever. A page that awaits it
+ * before carrying on is then stuck. Magic Smash's Start playing button did
+ * exactly that -- it waits for fullscreen, then starts -- so the button did
+ * nothing, while a key press, which does not ask, started the game.
+ *
+ * So the request is refused here, in the page's own world and before its
+ * scripts run, with the rejection the Fullscreen API specifies. Every page that
+ * handles a refusal carries on, and fullscreenEnabled reads false so a
+ * well-behaved page does not offer a full screen button at all. The main
+ * process still denies the permission behind this, for any frame this cannot
+ * reach.
+ */
+function refuseFullscreen () {
+  try {
+    contextBridge.executeInMainWorld({
+      func: () => {
+        const refuse = function () {
+          return Promise.reject(new TypeError('Full screen is not available here.'));
+        };
+        // The older prefixed forms return nothing rather than a promise.
+        const refuseQuietly = function () {};
+        if ('requestFullscreen' in Element.prototype) {
+          Element.prototype.requestFullscreen = refuse;
+        }
+        for (const name of ['webkitRequestFullscreen', 'webkitRequestFullScreen']) {
+          if (name in Element.prototype) Element.prototype[name] = refuseQuietly;
+        }
+        for (const name of ['fullscreenEnabled', 'webkitFullscreenEnabled']) {
+          try {
+            Object.defineProperty(Document.prototype, name, { get: () => false, configurable: true });
+          } catch { /* not every engine lets this be redefined; the refusal still holds */ }
+        }
+      }
+    });
+  } catch {
+    // Without the bridge the main process's denial still applies; the page
+    // just waits on its own promise, as it did before this existed.
+  }
+}
+
+refuseFullscreen();
+
 const COSMETIC_SELECTORS = [
   'iframe[src*="doubleclick"]', 'iframe[src*="googlesyndication"]',
   'iframe[src*="/ads/"]', 'iframe[id^="google_ads"]', 'iframe[id^="aswift"]',
