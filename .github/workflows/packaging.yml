@@ -186,16 +186,18 @@ jobs:
           snap=$(find dist -name '*.snap' -print -quit)
           sudo snap install --dangerous "$snap"
 
-          # Attach what a Snap Store install gets on its own. Installing a
-          # local file with --dangerous neither fetches nor connects the
-          # default providers, so without this the test ran a configuration no
-          # real user has: an empty gnome-platform, no Mesa drivers, and a wall
-          # of MESA/ANGLE/EGL errors while Chromium gave up on the GPU process
-          # and fell back to software.
+          # Attach what a Snap Store install gets on its own. snapd fetches the
+          # default providers even for a local --dangerous install, but does not
+          # connect an unasserted snap's content plugs to them, so without this
+          # the test ran a configuration no real user has: an empty
+          # gnome-platform, no Mesa drivers, and a wall of MESA/ANGLE/EGL errors
+          # while Chromium gave up on the GPU process and fell back to software.
+          # The install is a no-op when snapd already fetched them.
           sudo snap install gnome-3-28-1804 gtk-common-themes
-          sudo snap connect sukhi-play:gnome-3-28-1804 gnome-3-28-1804
+          sudo snap connect sukhi-play:gnome-3-28-1804 gnome-3-28-1804:gnome-3-28-1804
+          # gtk-common-themes offers several theme slots, so each is named.
           for plug in gtk-3-themes icon-themes sound-themes; do
-            sudo snap connect "sukhi-play:$plug" gtk-common-themes
+            sudo snap connect "sukhi-play:$plug" "gtk-common-themes:$plug"
           done
           # The content mounts live inside the snap's own namespace, so check
           # the connections rather than looking in /snap/.../gnome-platform.
