@@ -39,12 +39,15 @@
 
 ---
 
-> **2.0 is out.** Three apps now ship inside the download -- a colouring book,
-> a keyboard playground and first games -- so a fresh install works before the
-> wifi does. Play time can be extended by fifteen minutes, an hour or the rest
-> of the day without moving your usual limit. The grown-up side is a proper
-> screen with tabs, a sum can replace the hold entirely, favicons are gone, and
-> there is a new site at **[sukhiplay.com](https://sukhiplay.com/)**.
+> **2.1 is out.** The colouring book is now **Sukhi Colouring**, the first app
+> made for Sukhi Play rather than borrowed: forty pictures, three pens, a
+> mirror, and a shelf that keeps your child's pictures so they can carry on
+> tomorrow. It is marked Official in the grown-up screen, and it also runs in
+> any browser at **[sukhiplay.com/colouring](https://sukhiplay.com/colouring/)**.
+> The Back button stays on screen in full screen, Chrome Music Lab's Shared
+> Piano can use the microphone, and YouTube Kids is back in the catalogue.
+> From 2.1 Sukhi Play is free for individuals and families and never for
+> commercial use; see [Licence](#licence).
 > [Full notes](https://github.com/meSingh/sukhi-play/releases/latest).
 
 My three-year-old wants to play games. He also clicks every button on the
