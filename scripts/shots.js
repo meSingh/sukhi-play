@@ -25,8 +25,15 @@ const { seedProfile, electronBin, ROOT } = require('./seed-profile');
 const OUT = path.join(ROOT, 'web', 'public', 'screenshots');
 const SEED_IDS = ['poki', 'pbskids', 'scratch', 'toytheater', 'natgeokids', 'musiclab'];
 
+// Sukhi Colouring is installed as a fresh download installs it, so the
+// launcher shows its tile and the grown-up screen shows its Official badge.
+// Only that one: the other two offline apps stay uninstalled, so the
+// catalogue shot still has apps that need no internet to show.
+const SHIPPED = require(path.join(ROOT, 'config', 'catalog.json')).apps
+  .filter((a) => a.id === 'colouring');
+
 function seededProfile () {
-  return seedProfile({ prefix: 'sukhi-shot-seeded-', ids: SEED_IDS });
+  return seedProfile({ prefix: 'sukhi-shot-seeded-', ids: SEED_IDS, extraApps: SHIPPED });
 }
 
 function run (label, profile) {
