@@ -19,6 +19,9 @@ web/.astro/
 # Playground apps are their own repositories, mounted here as submodules once
 # each one has a remote. Until then they live here untracked, so a `git add -A`
 # in this repo cannot swallow a project that is meant to stand on its own.
+# Apps under playground/ live here untracked until they have a remote of their
+# own, then come back as submodules (see playground/README.md). A submodule is
+# tracked in spite of this rule, so it only ever catches the untracked ones.
 playground/*/
 
 # The playground apps the site serves are copied here by

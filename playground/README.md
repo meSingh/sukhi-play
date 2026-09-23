@@ -13,7 +13,7 @@ rest of the web.
 
 | App | What it is | Status |
 | --- | --- | --- |
-| [`colouring/`](colouring) | **Sukhi Colouring** — put pictures on the page, move them about, colour them in. | In progress |
+| [`colouring/`](https://github.com/meSingh/sukhi-colouring) | **Sukhi Colouring** — pick a picture and colour it in, or start on a blank page. | Released, and a submodule here |
 
 More will follow. Each is added here first, grows until it is worth its own
 release, and then moves to its own repository and comes back as a submodule.
@@ -47,11 +47,21 @@ These are ours. They can be changed.
 
 Until an app has a remote it lives here untracked — the parent repository
 ignores `playground/*/` so it cannot be swallowed by a `git add -A`. Once it has
-one:
+one, it comes back as a submodule. The `-f` is because of that same ignore rule:
 
 ```bash
-git submodule add https://github.com/<org>/<app>.git playground/<app>
+git submodule add -f https://github.com/<org>/<app>.git playground/<app>
 ```
+
+To work on one after cloning Sukhi Play:
+
+```bash
+git submodule update --init playground/<app>
+```
+
+Nobody needs the submodule to build a release. What ships is the built copy
+committed under `apps/<app>/app/`, and `scripts/playground-app.mjs` falls back
+to it when the source is not checked out.
 
 The Sukhi Play build then treats it the way it treats any bundled app: build the
 app, copy its output, serve it over the private `sukhiplay://` scheme with no

@@ -1,0 +1,3 @@
+[submodule "playground/colouring"]
+	path = playground/colouring
+	url = https://github.com/meSingh/sukhi-colouring.git
