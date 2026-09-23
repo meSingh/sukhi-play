@@ -186,6 +186,26 @@ jobs:
           snap=$(find dist -name '*.snap' -print -quit)
           sudo snap install --dangerous "$snap"
 
+          # Attach what a Snap Store install gets on its own. Installing a
+          # local file with --dangerous neither fetches nor connects the
+          # default providers, so without this the test ran a configuration no
+          # real user has: an empty gnome-platform, no Mesa drivers, and a wall
+          # of MESA/ANGLE/EGL errors while Chromium gave up on the GPU process
+          # and fell back to software.
+          sudo snap install gnome-3-28-1804 gtk-common-themes
+          sudo snap connect sukhi-play:gnome-3-28-1804 gnome-3-28-1804
+          for plug in gtk-3-themes icon-themes sound-themes; do
+            sudo snap connect "sukhi-play:$plug" gtk-common-themes
+          done
+          # The content mounts live inside the snap's own namespace, so check
+          # the connections rather than looking in /snap/.../gnome-platform.
+          snap connections sukhi-play | tee /tmp/snap-connections.txt
+          # A connected plug lists its slot; an unconnected one lists "-".
+          if ! grep -qE 'sukhi-play:gnome-3-28-1804[[:space:]]+gnome-3-28-1804' /tmp/snap-connections.txt; then
+            echo "::error::the GNOME platform did not connect"
+            exit 1
+          fi
+
           echo "--- what is at the snap root ---"
           ls /snap/sukhi-play/current/
 
@@ -223,7 +243,16 @@ jobs:
             echo "::error::the snap started but could not find something it needs"
             exit 1
           fi
-          echo "the snap starts"
+          # A page must get a WebGL context. This runner has no GPU, so it is
+          # the worst case a family's machine can present, and it is what
+          # Scratch needs before it will open at all. --diagnose asks a real
+          # page for a context and prints what it got.
+          if ! grep -qE 'webgl in a page +WebGL' /tmp/snap-run.log; then
+            echo "::error::a page inside the snap could not get a WebGL context"
+            grep -E 'webgl' /tmp/snap-run.log || true
+            exit 1
+          fi
+          echo "the snap starts, and a page gets WebGL"
 
       - name: The deb must carry its metainfo and copyright
         run: |
