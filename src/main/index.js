@@ -2012,6 +2012,9 @@ app.whenReady().then(() => {
   console.log(`[boot] config folder: ${paths.userData}`);
 
   policy = security.createPolicy();
+  // The capabilities a checked site was given travel with the site, not with
+  // whatever copy of it a parent's catalog happens to hold.
+  policy.setVetted(suggestions);
   security.installGlobalHardening(app, () => policy);
 
   const kidSession = session.fromPartition(SESSION_PARTITION);

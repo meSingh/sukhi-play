@@ -42,6 +42,14 @@ const WEB_SCHEMES = new Set(['http:', 'https:', 'ws:', 'wss:']);
 // stays, always, and a page asking for the whole screen is refused.
 const ALLOWED_PERMISSIONS = new Set(['pointerLock']);
 
+function hostOf (url) {
+  try {
+    return new URL(url).hostname.toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
 function schemeOf (url) {
   try {
     return new URL(url).protocol;
@@ -65,6 +73,9 @@ function createPolicy () {
   // Extra capabilities this one app may ask for, on top of ALLOWED_PERMISSIONS.
   // Empty for everything that has not been given one deliberately.
   let extraPermissions = new Set();
+  // Sites that have been checked and given a capability on purpose, keyed by
+  // host: the ones in config/suggestions.json with a `permissions` list.
+  let vetted = new Map();
   // Where a bundled app's pictures go. Set once at start-up.
   let saveDir = null;
   let blockAds = true;
@@ -114,8 +125,18 @@ function createPolicy () {
       activeAppId = app ? app.id : null;
       bundleId = app && app.bundled ? bundled.idOf(app.url) : null;
       blockAds = app ? app.blockAds !== false : true;
-      extraPermissions = new Set(
-        Array.isArray(app && app.permissions) ? app.permissions : []);
+      // What this app may ask for: anything its own entry lists, plus what
+      // the checked site it points at was given. The second half is the one
+      // that matters. A parent's catalog is built by copying fields from a
+      // suggestion, and `permissions` was never one of the fields copied, so a
+      // Music tile added from the catalogue arrived without the microphone
+      // its notes promised -- and every page that asked was told no. Looking
+      // it up by host at launch also mends tiles added before this existed,
+      // without anyone having to remove and re-add them.
+      extraPermissions = new Set([
+        ...(Array.isArray(app && app.permissions) ? app.permissions : []),
+        ...(vetted.get(hostOf(app && app.url)) || [])
+      ]);
       gate = createHostGate({
         allow: app ? app.allowHosts : [],
         deny: app ? app.denyHosts : []
@@ -125,6 +146,19 @@ function createPolicy () {
       seen.blocked.clear();
     },
     clear () { this.setApp(null); },
+    /**
+     * The checked sites and what each was given. Only the host is kept, so a
+     * tile pointed at one page of a site -- one Music Lab experiment, say --
+     * gets what the site was given.
+     */
+    setVetted (sites) {
+      vetted = new Map();
+      for (const site of Array.isArray(sites) ? sites : []) {
+        const host = hostOf(site && site.url);
+        const perms = Array.isArray(site && site.permissions) ? site.permissions : [];
+        if (host && perms.length) vetted.set(host, perms);
+      }
+    },
     verdict (host) {
       const v = gate.verdict(host);
       // Everything real is permitted during a probe, so the recorded list is

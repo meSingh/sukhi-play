@@ -68,3 +68,47 @@ test('the catalog only carries capabilities it recognises', () => {
     'the camera is not grantable at all');
   assert.deepEqual(read(undefined).permissions, []);
 });
+
+// --- the microphone reaching a tile a parent actually made ---------------------
+//
+// 2.1 shipped with Music Lab's microphone in the catalogue and working in the
+// policy, and still every experiment that listened was told no: the grown-up
+// screen copies a suggestion into the parent's catalog field by field, and
+// `permissions` was never one of the fields. The grant is now looked up from
+// the checked site at launch, by host.
+
+const SITES = require('../config/suggestions.json').suggestions;
+
+test('a Music tile saved without the permissions field still gets the microphone', () => {
+  const policy = requireSecurity().createPolicy();
+  policy.setVetted(SITES);
+  // Exactly what a parent's catalog holds after adding Music from the catalogue.
+  policy.setApp({ id: 'music', url: 'https://musiclab.chromeexperiments.com/', allowHosts: ['chromeexperiments.com'], denyHosts: [] });
+  assert.equal(policy.allowsPermission('media', { mediaTypes: ['audio'] }), true,
+    'Spectrogram and Voice Spinner are told the microphone is refused');
+  assert.equal(policy.allowsPermission('audioCapture'), true);
+});
+
+test('a tile pointed at one experiment gets what the site was given', () => {
+  const policy = requireSecurity().createPolicy();
+  policy.setVetted(SITES);
+  policy.setApp({ id: 'spectrogram', url: 'https://musiclab.chromeexperiments.com/Spectrogram/', allowHosts: ['chromeexperiments.com'], denyHosts: [] });
+  assert.equal(policy.allowsPermission('media', { mediaTypes: ['audio'] }), true);
+});
+
+test('the camera stays refused, even to the site given the microphone', () => {
+  const policy = requireSecurity().createPolicy();
+  policy.setVetted(SITES);
+  policy.setApp({ id: 'music', url: 'https://musiclab.chromeexperiments.com/', allowHosts: [], denyHosts: [] });
+  assert.equal(policy.allowsPermission('media', { mediaTypes: ['video'] }), false);
+  assert.equal(policy.allowsPermission('media', { mediaTypes: ['audio', 'video'] }), false);
+});
+
+test('no other site picks the microphone up from the catalogue', () => {
+  const policy = requireSecurity().createPolicy();
+  policy.setVetted(SITES);
+  for (const url of ['https://poki.com/', 'https://chromeexperiments.com/', 'https://evil-musiclab.chromeexperiments.com.example/']) {
+    policy.setApp({ id: 'x', url, allowHosts: [], denyHosts: [] });
+    assert.equal(policy.allowsPermission('media', { mediaTypes: ['audio'] }), false, `${url} must not hear the child`);
+  }
+});
