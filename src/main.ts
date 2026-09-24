@@ -28,6 +28,7 @@ import { VEHICLES, type Vehicle } from './vehicles';
 import { ICONS, piece as pieceIcon, VEHICLE } from './icons';
 import * as store from './store';
 import { install } from './install';
+import { ground, track as drawTrack } from './draw';
 
 const LABEL: Record<Kind, string> = {
   straight: 'Straight track', curve: 'Curved track', station: 'Station', bridge: 'Bridge', tunnel: 'Tunnel',
@@ -358,7 +359,8 @@ function openTracks (): void {
     const T = Math.min(cv.width / t.cols, cv.height / t.rows);
     const ctx = cv.getContext('2d')!;
     ctx.translate((cv.width - T * t.cols) / 2, (cv.height - T * t.rows) / 2);
-    import('./draw').then(({ ground, track }) => { ground(ctx, t, T); track(ctx, t, T, new Map(), new Map()); });
+    ground(ctx, t, T);
+    drawTrack(ctx, t, T, new Map(), new Map());
   });
   const close = (): void => { d.close(); d.remove(); };
   d.querySelector('.close')!.addEventListener('click', close);
