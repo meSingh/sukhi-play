@@ -28,15 +28,15 @@
  * which this does not touch; clearing the cache costs a download, not a make.
  */
 
-/* Bumping this drops every previous cache on the next activation. */
+/* Bumping this drops every previous cache on the next activation. install.ts
+   fills the same cache with the pictures, so it names it too. */
 const CACHE = 'jazz-studio-v1';
 
 /**
  * The shell, as far as it can be known without the build writing this file.
- * The hashed script and stylesheet are not listed because their names change
- * every build; they arrive in the cache on first visit instead, which is one
- * load earlier than it needs to be for anyone who installs before going
- * offline.
+ * The hashed script, stylesheet and pictures are not listed because their
+ * names change every build; the page puts them in the cache itself, the
+ * first time this worker is running (install.ts).
  */
 const SHELL = [
   './',
@@ -45,7 +45,8 @@ const SHELL = [
   './favicon.png',
   './apple-touch-icon.png',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './brand-mark.png'
 ];
 
 self.addEventListener('install', (event) => {
