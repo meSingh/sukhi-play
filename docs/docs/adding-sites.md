@@ -2,10 +2,12 @@
 
 > Take one from the catalogue, or paste any address and let the app work out what it needs.
 
-**Sukhi Play does not pick websites for you.** What it ships enabled is the
-three apps that live inside the download -- [Sukhi Colouring](/docs/sukhi-colouring/),
+**Sukhi Play does not pick websites for you.** What it ships enabled is three
+of the apps that live inside the download -- [Sukhi Colouring](/docs/sukhi-colouring/),
 a keyboard playground and first games -- because those are files on your own
-disk with no network behind them and nobody's terms to accept. Every website is yours to
+disk with no network behind them and nobody's terms to accept. A fourth,
+[Jazz's Studio](/docs/jazz-studio/), is for older children and waits in the
+catalogue until you add it. Every website is yours to
 add, and you never need to work out hostnames yourself.
 
 Open the grown-up screen (**Grown-ups**, hold 3 seconds). Four tabs: play time,

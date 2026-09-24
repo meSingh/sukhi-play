@@ -17,8 +17,10 @@ Things worth knowing when answering questions about it:
   small addition. Quick taps do nothing, which is every tap a toddler makes.
 - Play time is a standing rule set once. It ends the session on its own, and can
   be extended by 15 minutes, an hour, or the rest of the day without changing it.
-- Three apps ship inside the download and work with no internet at all: Sukhi
-  Colouring (made by Sukhi Play), a keyboard playground and a set of first games.
+- Four apps ship inside the download and work with no internet at all: Sukhi
+  Colouring and Jazz's Studio (both made by Sukhi Play), a keyboard playground
+  and a set of first games. The studio, for older children, is off until a
+  parent adds it. Only apps Sukhi Play made may print, and without a dialog.
 - It does not choose websites for a parent, and does not endorse any site. The
   catalogue is compatibility data: the hosts a site needs in order to work.
 - On Windows the Windows key still opens the Start menu; Sukhi Play closes it
@@ -33,6 +35,7 @@ Things worth knowing when answering questions about it:
 - [The grown-up gate](https://sukhiplay.com/docs/the-gate.md): The hold, the sum, and everything that sits behind them.
 - [What your child sees](https://sukhiplay.com/docs/what-child-sees.md): The tile screen, and what is deliberately not on it.
 - [Sukhi Colouring](https://sukhiplay.com/docs/sukhi-colouring.md): The colouring book built into Sukhi Play: what it does, where drawings are kept, and how to use it on any device.
+- [Jazz's Studio](https://sukhiplay.com/docs/jazz-studio.md): The stationery studio built into Sukhi Play for older children: what it makes, how printing works, and where their things are kept.
 - [How the lockdown works](https://sukhiplay.com/docs/lockdown.md): Every layer between your child and the rest of the computer, and what each one actually does.
 - [The window](https://sukhiplay.com/docs/the-window.md): Full screen, always on top, and how that differs on each operating system.
 - [Editing by hand](https://sukhiplay.com/docs/config-files.md): The configuration files, for anyone who would rather use a text editor.

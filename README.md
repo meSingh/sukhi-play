@@ -39,15 +39,14 @@
 
 ---
 
-> **2.1 is out.** The colouring book is now **Sukhi Colouring**, the first app
-> made for Sukhi Play rather than borrowed: forty pictures, three pens, a
-> mirror, and a shelf that keeps your child's pictures so they can carry on
-> tomorrow. It is marked Official in the grown-up screen, and it also runs in
-> any browser at **[sukhiplay.com/colouring](https://sukhiplay.com/colouring/)**.
-> The Back button stays on screen in full screen, Chrome Music Lab's Shared
-> Piano can use the microphone, and YouTube Kids is back in the catalogue.
-> From 2.1 Sukhi Play is free for individuals and families and never for
-> commercial use; see [Licence](#licence).
+> **2.2 is out.** **Jazz's Studio** joins the playground: a stationery studio
+> for older children, made for a ten-year-old called Jazz. Stickers, labels,
+> diaries, planners, wraps for boxes and cartons, a brand of their own and
+> secret codes, printed at home. It comes in the download switched off, so a
+> parent adds it from the catalogue, and it also runs in any browser at
+> **[sukhiplay.com/studio](https://sukhiplay.com/studio/)**. Our own apps now
+> print straight to the default printer with no print window, and no page can
+> open a file browser or a print window any more.
 > [Full notes](https://github.com/meSingh/sukhi-play/releases/latest).
 
 My three-year-old wants to play games. He also clicks every button on the
@@ -136,9 +135,11 @@ takes you to the grown-up screen, with no hunting through files.
 ## Adding and removing sites
 
 **Sukhi Play does not pick websites for you.** What it ships enabled is the
-three apps that live inside the download -- a colouring book, a keyboard
-playground and first games -- because those are files on your own disk with no
-network behind them and nobody's terms to accept. Every website is yours to
+three of the apps that live inside the download -- a colouring book, a
+keyboard playground and first games -- because those are files on your own
+disk with no network behind them and nobody's terms to accept. A fourth,
+Jazz's Studio, is for older children and waits in the catalogue until you add
+it. Every website is yours to
 add, and you never need to work out hostnames yourself.
 
 Open the grown-up screen (**Grown-ups**, hold 3 seconds). Four tabs: play time,
