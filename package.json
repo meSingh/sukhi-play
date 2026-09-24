@@ -1,0 +1,18 @@
+{
+  "name": "sukhi-railway",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sukhi's Railway: build a track, press go, and watch Sukhi drive it. For small children. Works offline and inside Sukhi Play.",
+  "license": "LicenseRef-Sukhi-Play-Personal-Use-1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5180",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^8.3.0"
+  }
+}
