@@ -1,3 +1,6 @@
 [submodule "playground/colouring"]
 	path = playground/colouring
 	url = https://github.com/meSingh/sukhi-colouring.git
+[submodule "playground/studio"]
+	path = playground/studio
+	url = https://github.com/meSingh/jazz-studio.git
