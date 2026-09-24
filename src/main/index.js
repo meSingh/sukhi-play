@@ -17,6 +17,7 @@ const probe = require('./probe');
 const library = require('./library');
 const { Shell, BAR_HEIGHT: BAR_HEIGHT_FALLBACK } = require('./windowing');
 const bundled = require('./bundled');
+const printing = require('./printing');
 
 const RELEASES_URL = 'https://github.com/meSingh/sukhi-play/releases/latest';
 
@@ -2019,6 +2020,16 @@ app.whenReady().then(() => {
 
   const kidSession = session.fromPartition(SESSION_PARTITION);
   bundled.serve(kidSession.protocol, bundledApps);
+
+  // window.print() from a page arrives here instead of opening the print
+  // dialog. Our own apps print on the default printer; everyone else is told
+  // no. See printing.js.
+  const printFor = printing.createPrinter({ apps: () => bundledApps, belongsTo: bundled.belongsTo });
+  ipcMain.handle('guest:print', async (e) => {
+    const result = await printFor(e.sender);
+    console.log(result.ok ? `[print] ${result.app}: sent to the printer` : `[print] refused: ${result.reason}`);
+    return result;
+  });
 
   // Where a bundled app's pictures land. The system Pictures folder, so a
   // parent finds them without being told where to look; userData if there is

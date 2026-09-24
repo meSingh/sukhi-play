@@ -15,7 +15,7 @@
  * has already refused those at a level the page cannot argue with.
  */
 
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 /**
  * Answers a page's request for the whole screen with a prompt "no".
@@ -64,6 +64,80 @@ function refuseFullscreen () {
 }
 
 refuseFullscreen();
+
+/**
+ * No file pickers. An <input type="file"> opens the operating system's file
+ * browser, which is a way out of the kiosk and into the parent's files: the
+ * same reason downloads never open a save dialog (see security.js). Every
+ * page's file inputs are refused before they open, and the newer
+ * showOpenFilePicker family rejects the way the spec says a cancelled one
+ * does. The main process has no hook for the chooser, so this is the only
+ * place it can be stopped.
+ */
+function refuseFilePickers () {
+  try {
+    contextBridge.executeInMainWorld({
+      func: () => {
+        const isFile = (el) => el instanceof HTMLInputElement && el.type === 'file';
+        // Capture, on the window, so it runs before the page's own handlers
+        // and catches a click that reached the input through its <label>.
+        window.addEventListener('click', (e) => {
+          if (isFile(e.target)) e.preventDefault();
+        }, true);
+        const showPicker = HTMLInputElement.prototype.showPicker;
+        if (showPicker) {
+          HTMLInputElement.prototype.showPicker = function () {
+            if (isFile(this)) throw new DOMException('File pickers are not available here.', 'NotAllowedError');
+            return showPicker.call(this);
+          };
+        }
+        const abort = () => Promise.reject(new DOMException('File pickers are not available here.', 'AbortError'));
+        for (const name of ['showOpenFilePicker', 'showSaveFilePicker', 'showDirectoryPicker']) {
+          if (name in window) window[name] = abort;
+        }
+      }
+    });
+  } catch { /* nothing to refuse without the bridge */ }
+}
+
+refuseFilePickers();
+
+/**
+ * Printing, without the print dialog.
+ *
+ * The system print dialog is another way out: Save as PDF opens a file
+ * browser, and on a Mac "Open in Preview" opens another application. So a
+ * page's window.print() never reaches it. The main process decides instead:
+ * a website is refused, and an app Sukhi Play made itself -- Jazz's Studio,
+ * whose whole point is printing -- goes straight to the default printer.
+ *
+ * The page then gets a "sukhiplay:print" event saying whether it printed, so
+ * an app can tell a child the page is on its way, or that the printer needs a
+ * grown-up. A page that does not listen loses nothing.
+ */
+function routePrinting () {
+  try {
+    contextBridge.exposeInMainWorld('__sukhiPrint', () => ipcRenderer.invoke('guest:print'));
+    contextBridge.executeInMainWorld({
+      func: () => {
+        const send = window.__sukhiPrint;
+        window.print = function () {
+          send().then((result) => {
+            window.dispatchEvent(new CustomEvent('sukhiplay:print', { detail: result }));
+          }, () => {
+            window.dispatchEvent(new CustomEvent('sukhiplay:print', { detail: { ok: false, reason: 'failed' } }));
+          });
+        };
+      }
+    });
+  } catch {
+    // Without the bridge window.print() falls through to Electron's own dialog.
+    // The bridge is part of every Electron this ships with; this is a guard,
+    // not a path anybody takes.
+  }
+}
+
+routePrinting();
 
 const COSMETIC_SELECTORS = [
   'iframe[src*="doubleclick"]', 'iframe[src*="googlesyndication"]',
