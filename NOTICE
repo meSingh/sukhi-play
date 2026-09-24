@@ -1,9 +1,10 @@
-NOTICE: the Sukhi character artwork
-==================================
+NOTICE: the character artwork
+=============================
 
 The Sukhi Play Personal Use Licence in LICENSE covers the source code of
-Sukhi Play. It does not cover the Sukhi character artwork, which is the
-personal property of Mandeep Singh. That is:
+Sukhi Play. It does not cover the character artwork, Sukhi's and Jazz's,
+which is the personal property of Mandeep Singh. Jazz's character is a
+likeness of a real child. That is:
 
     branding/cutout-*.png
     branding/sukhi-icon.png
@@ -13,14 +14,20 @@ personal property of Mandeep Singh. That is:
     apps/colouring/app/assets/sukhi-*.png
     apps/colouring/app/*.png
     web/public/assets/playground-colouring.png
+    apps/studio/app/assets/*.webp
+    apps/studio/app/*.png
+    web/public/assets/playground-studio.png
+    web/public/assets/studio-hello.webp
+    web/public/screenshots/studio/*.png
 
 Versions of Sukhi Play up to and including 2.0.2 were released under the MIT
 licence and remain under it.
 
 Those files are (c) 2026 Mandeep Singh, all rights reserved. If you fork
 this project and distribute your own builds, replace them first. Running
-`python3 branding/generate-mascot.py` overwrites them with placeholder
-artwork. See branding/README.md.
+`python3 branding/generate-mascot.py` overwrites Sukhi's with placeholder
+artwork; Jazz's Studio has no placeholder, so leave it out of your build
+instead. See branding/README.md.
 
 
 Apps bundled with Sukhi Play
@@ -37,6 +44,10 @@ Licence, like the rest of this project.
         Sukhi Colouring, derived from the original work of Kids Coloring,
         copyright (c) 2026 oh-namgyu, MIT licence.
         https://github.com/oh-namgyu/kids-coloring
+
+    apps/studio
+        Jazz's Studio, made for Sukhi Play.
+        https://github.com/meSingh/jazz-studio
 
 Everybody else's live under vendor/<name>/, included under their own licences
 and unmodified except where noted, with the upstream licence in

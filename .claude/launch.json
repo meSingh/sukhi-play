@@ -26,6 +26,19 @@
       ],
       "port": 5177,
       "cwd": "playground/colouring"
+    },
+    {
+      "name": "studio",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "vite",
+        "--port",
+        "5178",
+        "--strictPort"
+      ],
+      "port": 5178,
+      "cwd": "playground/studio"
     }
   ]
 }

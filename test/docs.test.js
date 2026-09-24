@@ -621,7 +621,7 @@ test('the site serves its own 404 rather than GitHub\'s', () => {
 //
 // One set of terms, stated in several places a person or a tool might look:
 // the file itself, the page the file points at, the package metadata, the
-// Debian copyright file and the licence shipped beside Sukhi Colouring. They
+// Debian copyright file and the licences shipped beside our own apps. They
 // must all say the same thing, and the page must be the file, not a retyping.
 
 test('the licence says the same thing everywhere it is stated', () => {
@@ -636,6 +636,8 @@ test('the licence says the same thing everywhere it is stated', () => {
     'the .deb copyright file names a different licence');
   assert.equal(read('apps/colouring/LICENSE'), licence,
     'the licence shipped with Sukhi Colouring has drifted from the root one');
+  assert.equal(read('apps/studio/LICENSE'), licence,
+    "the licence shipped with Jazz's Studio has drifted from the root one");
 
   // The page is built from the file. Every heading in the terms must be on it.
   const page = read('docs/licence/index.html');

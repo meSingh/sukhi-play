@@ -324,5 +324,5 @@ test('in the shipped manifest, only our own apps are official', () => {
     path.join(ROOT, 'vendor'),
     path.join(ROOT, 'apps'));
   const official = list.filter((a) => a.official).map((a) => a.id);
-  assert.deepEqual(official, ['colouring']);
+  assert.deepEqual(official, ['colouring', 'studio']);
 });

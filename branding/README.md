@@ -8,7 +8,7 @@ families, never for commercial use. The **artwork is not covered at all.**
 
 | Asset | Licence |
 | --- | --- |
-| `branding/cutout-*.png`, `branding/sukhi-icon.png`, `build/icon.png`, `build/icons/*.png`, `src/renderer/assets/mascot.png`, and the Sukhi Colouring artwork (`apps/colouring/app/*.png`, `apps/colouring/app/assets/sukhi-*.png`) | © Mandeep Singh. **All rights reserved.** Not covered by the code's licence. |
+| `branding/cutout-*.png`, `branding/sukhi-icon.png`, `build/icon.png`, `build/icons/*.png`, `src/renderer/assets/mascot.png`, the Sukhi Colouring artwork (`apps/colouring/app/*.png`, `apps/colouring/app/assets/sukhi-*.png`), and Jazz's character in Jazz's Studio (`apps/studio/app/assets/*.webp`, `apps/studio/app/*.png`, `web/public/assets/playground-studio.png`, `web/public/assets/studio-hello.webp`, `web/public/screenshots/studio/`), a likeness of a real child | © Mandeep Singh. **All rights reserved.** Not covered by the code's licence. |
 | `branding/generate-mascot.py` and the placeholder it draws | Under the code's licence, like the rest of it |
 
 The Sukhi character is a personal character belonging to Mandeep Singh. It

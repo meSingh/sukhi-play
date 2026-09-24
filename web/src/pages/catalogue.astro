@@ -37,6 +37,18 @@ const bundled = (bundledData.apps as Array<{
 // It gets its own section because the sentence above the others -- other
 // people's open-source work, credited to them -- is not true of it.
 const ours = bundled.filter((b) => b.ours === true);
+
+/** Where each of ours lives on this site: its icon, the app, its page, a picture of it. */
+const PAGES: Record<string, { icon: string; open: string; more: string; shot: string }> = {
+  colouring: {
+    icon: '/assets/playground-colouring.png', open: '/playground/colouring/', more: '/colouring/',
+    shot: '/screenshots/colouring/01-a-page-in-progress.png'
+  },
+  studio: {
+    icon: '/assets/playground-studio.png', open: '/playground/studio/', more: '/studio/',
+    shot: '/screenshots/studio/01-hello.png'
+  }
+};
 const theirs = bundled.filter((b) => b.ours !== true);
 
 const entries = (data.suggestions as Entry[]).map((e) => {
@@ -82,18 +94,18 @@ const entries = (data.suggestions as Entry[]).map((e) => {
             Official &middot; by Sukhi Play
           </div>
           <div class="cat-first-name">
-            <img src="/assets/playground-colouring.png" alt="" width="64" height="64" loading="lazy">
+            <img src={PAGES[b.id]?.icon} alt="" width="64" height="64" loading="lazy">
             <h2>{b.name}</h2>
           </div>
           <p class="cat-first-line">{b.blurb}</p>
           <p class="cat-first-go">
-            <a class="go" href="/playground/colouring/" target="_blank" rel="noopener">Open the app</a>
-            <a class="go go--ghost" href="/colouring/">Read more</a>
+            <a class="go" href={PAGES[b.id]?.open} target="_blank" rel="noopener">Open the app</a>
+            <a class="go go--ghost" href={PAGES[b.id]?.more}>Read more</a>
           </p>
           <p class="cat-first-promise">No ads &middot; No tracking &middot; Works offline</p>
         </div>
-        <a class="cat-first-shot" href="/colouring/" tabindex="-1" aria-hidden="true">
-          <img src="/screenshots/colouring/01-a-page-in-progress.png" alt="" width="1240" height="800" loading="lazy" decoding="async">
+        <a class="cat-first-shot" href={PAGES[b.id]?.more} tabindex="-1" aria-hidden="true">
+          <img src={PAGES[b.id]?.shot} alt="" width="1240" height="800" loading="lazy" decoding="async">
         </a>
       </section>
     ))}

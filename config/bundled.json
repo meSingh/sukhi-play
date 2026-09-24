@@ -17,6 +17,21 @@
       "sourceUrl": "https://github.com/oh-namgyu/kids-coloring"
     },
     {
+      "id": "studio",
+      "dir": "studio",
+      "ours": true,
+      "title": "Studio",
+      "siteName": "Jazz's Studio",
+      "blurb": "Design and print stickers, labels, diaries and more. For older children.",
+      "category": "Creative",
+      "shape": "moon",
+      "color": "#6366f1",
+      "entry": "index.html",
+      "credit": "Made for Sukhi Play",
+      "licence": "Sukhi Play Personal Use Licence",
+      "sourceUrl": "https://github.com/meSingh/jazz-studio"
+    },
+    {
       "id": "smash",
       "dir": "magic-smash",
       "title": "Keyboard",

@@ -14,6 +14,7 @@ rest of the web.
 | App | What it is | Status |
 | --- | --- | --- |
 | [`colouring/`](https://github.com/meSingh/sukhi-colouring) | **Sukhi Colouring** — pick a picture and colour it in, or start on a blank page. | Released, and a submodule here |
+| [`studio/`](https://github.com/meSingh/jazz-studio) | **Jazz's Studio** — design and print stationery, make things from boxes, a brand of your own. For older children. | Released, and a submodule here |
 
 More will follow. Each is added here first, grows until it is worth its own
 release, and then moves to its own repository and comes back as a submodule.

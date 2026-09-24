@@ -1,0 +1,282 @@
+---
+/**
+ * Jazz's Studio's own page.
+ *
+ * Built like the colouring page: bands, tiles, reveals, the screenshots doing
+ * the explaining, and headings a parent reads once and understands. It is for
+ * older children than Sukhi Colouring, and says so near the top, so a parent
+ * of a three-year-old knows before they scroll.
+ *
+ * Honest about whose it is. It was made for one girl, with her character in
+ * it, and other children are welcome: they can put their own name on
+ * everything, but the character is Jazz. That is said plainly rather than
+ * left for a child to discover.
+ *
+ * Links into the studio open in a new tab. Every screenshot is the real app,
+ * captured by scripts/studio-shots.js.
+ */
+import Base from '../layouts/Base.astro';
+import { SITE } from '../site';
+
+const APP = '/playground/studio/';
+
+/** The studio's own dark-first colours, as the page's confetti. */
+const PALETTE = ['#4F8CFF', '#FFC857', '#3DDC84', '#2EC4B6', '#FF7A3D', '#7C5CFF', '#C8F560'];
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: "Jazz's Studio",
+  url: new URL(APP, SITE).href,
+  description: 'Design and print stickers, labels, diaries, planners and more, make things from boxes, and play with secret codes. Free, no account, works offline.',
+  applicationCategory: 'DesignApplication',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires a modern browser. Works offline once opened.',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  inLanguage: 'en-GB',
+  screenshot: [
+    new URL('/screenshots/studio/01-hello.png', SITE).href,
+    new URL('/screenshots/studio/02-me-stickers.png', SITE).href,
+    new URL('/screenshots/studio/04-make-from-a-box.png', SITE).href
+  ],
+  isPartOf: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
+};
+---
+
+<Base
+  title="Jazz's Studio, design it, print it, make it yours"
+  description="Stickers, labels, diaries, planners, wraps for boxes and a brand of their own, printed at home. Free, no sign-up, and it works without internet."
+  page="studio"
+  image="/screenshots/studio/01-hello.png"
+  schema={schema}>
+
+  <div class="wrap">
+    <div class="hero co-hero">
+      <img class="co-mark bob" src="/assets/playground-studio.png" alt="" width="112" height="112">
+      <h1>Jazz's&nbsp;Studio</h1>
+      <p class="lede">Design it. Print it. Make it yours.</p>
+
+      <p class="co-dots" aria-hidden="true">
+        {PALETTE.map((hex, i) => (
+          <span style={`--c:${hex};--i:${i}`}></span>
+        ))}
+      </p>
+
+      <p class="co-go">
+        <a class="go go--big" href={APP} target="_blank" rel="noopener">Open the studio</a>
+      </p>
+      <p class="note-small">For ages 7 and up &middot; Free &middot; No sign-up &middot; Works without internet</p>
+    </div>
+
+    <div class="device co-device reveal">
+      <img src="/screenshots/studio/01-hello.png"
+           alt="Jazz's character waving next to the words Hi Jazz, above six tiles: Stationery, Make from a box, My brand, Play, My makes and Make it yours"
+           width="1240" height="800" fetchpriority="high" decoding="async">
+    </div>
+    <p class="note-small">What your child will see.</p>
+  </div>
+
+  <section class="band" style="margin-top:72px">
+    <div class="wrap">
+      <div class="st-story reveal">
+        <img src="/assets/studio-hello.webp" alt="Jazz's character, a girl with long dark hair in a green shirt, waving" width="900" height="838" loading="lazy" decoding="async">
+        <div>
+          <span class="kicker">Where it came from</span>
+          <h2>Made for one girl. Yours can play too.</h2>
+          <p>Her little brother got Sukhi Play. Jazz, who is ten and loves stationery,
+            wanted something of her own. So this is hers: her character, her colours,
+            and a printer at the end of it.</p>
+          <p>Your child can use every part of it and put their own name on everything.
+            The character is Jazz.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">What they can make</span>
+        <h2>A whole stationery shop, printed at home</h2>
+      </div>
+
+      <ul class="co-kit reveal">
+        <li style="--c:#4F8CFF">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="17" cy="17" r="10" fill="#4F8CFF"/><circle cx="17" cy="17" r="6" fill="#fff"/><rect x="26" y="26" width="16" height="16" rx="4" fill="#FFC857"/><path d="M29 9l3 6 6 1-4.5 4 1 6-5.5-3" fill="#3DDC84"/></svg></span>
+          <b>Stickers and labels</b><small>With their name, their pattern, and a face on them</small>
+        </li>
+        <li style="--c:#FFC857">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="6" width="28" height="36" rx="4" fill="#17153A"/><rect x="14" y="10" width="20" height="4" rx="2" fill="#FFC857"/><path d="M15 21h18M15 27h18M15 33h12" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+          <b>A diary that looks like theirs</b><small>A cover with their name on it, and pages with a mood row</small>
+        </li>
+        <li style="--c:#3DDC84">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="8" width="36" height="32" rx="4" fill="#fff" stroke="#17153A" stroke-width="2.4"/><path d="M6 17h36M18 8v32M30 8v32" stroke="#3DDC84" stroke-width="2.4"/></svg></span>
+          <b>Planners and to-do lists</b><small>A week at a glance, and boxes to tick</small>
+        </li>
+        <li style="--c:#FF7A3D">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="12" rx="11" ry="4" fill="#A87D4B"/><path d="M13 12v24a11 4 0 0 0 22 0V12" fill="#C99A62"/><path d="M13 24a11 4 0 0 0 22 0" fill="none" stroke="#FF7A3D" stroke-width="3"/></svg></span>
+          <b>Make from a box</b><small>Wraps that fit a toilet roll or a cereal box, with the steps</small>
+        </li>
+        <li style="--c:#7C5CFF">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18" fill="#7C5CFF"/><circle cx="24" cy="24" r="10" fill="#FFC857"/><circle cx="24" cy="24" r="14" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="3 2.4"/></svg></span>
+          <b>Their own brand</b><small>A logo, business cards and logo stickers</small>
+        </li>
+        <li style="--c:#2EC4B6">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 12h10v10H8zM30 12v10h10M8 30l5 8 5-8M30 30h10v10" fill="none" stroke="#2EC4B6" stroke-width="3" stroke-linejoin="round"/><circle cx="35" cy="17" r="1.8" fill="#17153A"/></svg></span>
+          <b>Secret codes and more</b><small>Notes only a friend can read, name posters, story ideas and a doodle pad</small>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="co-shot reveal">
+        <div>
+          <span class="kicker">Stickers</span>
+          <h2>Stickers with a face on them</h2>
+          <p>A sheet of twenty, in six poses. Print them on sticker paper and cut along the dotted lines.</p>
+        </div>
+        <img src="/screenshots/studio/02-me-stickers.png"
+             alt="The stationery room making a sheet of round stickers of Jazz's character in different poses"
+             width="1240" height="800" loading="lazy" decoding="async">
+      </div>
+
+      <div class="co-shot co-shot--flip reveal">
+        <div>
+          <span class="kicker">Make from a box</span>
+          <h2>Turn the recycling into something</h2>
+          <p>Measure a toilet roll, print a wrap that fits it, and it is a pencil pot. A drawing shows exactly what to measure.</p>
+        </div>
+        <img src="/screenshots/studio/04-make-from-a-box.png"
+             alt="Make from a box: a drawing of a toilet roll showing what to measure, and a printed wrap that says Pens"
+             width="1240" height="800" loading="lazy" decoding="async">
+      </div>
+
+      <div class="co-shot reveal">
+        <div>
+          <span class="kicker">My brand</span>
+          <h2>Their own logo, on everything</h2>
+          <p>Four styles to choose from. It goes on the diary cover, the letter paper and a set of business cards.</p>
+        </div>
+        <img src="/screenshots/studio/05-my-brand.png"
+             alt="My brand: a round badge logo reading Jazz Studio, and a sheet of business cards"
+             width="1240" height="800" loading="lazy" decoding="async">
+      </div>
+
+      <div class="co-shot co-shot--flip reveal">
+        <div>
+          <span class="kicker">Colours</span>
+          <h2>Their colours, right where they are working</h2>
+          <p>Twelve colour sets, dark ones first, and any colour besides. Try one and the sheet changes on the spot.</p>
+        </div>
+        <img src="/screenshots/studio/03-diary-cover.png"
+             alt="A diary cover reading Jazz's Diary, with the colour strip above it"
+             width="1240" height="800" loading="lazy" decoding="async">
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--mint">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Printing</span>
+        <h2>Comes out the right size</h2>
+        <p>Everything is drawn on A4, to the millimetre.</p>
+      </div>
+      <ul class="pg-how reveal">
+        <li>
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 18V6h20v12" fill="#fff" stroke="#17153A" stroke-width="2.4"/><rect x="6" y="18" width="36" height="16" rx="4" fill="#3B6BFF"/><path d="M14 28h20v14H14z" fill="#fff" stroke="#17153A" stroke-width="2.4"/></svg></span>
+          <b>Print at actual size</b>
+          <small>Not "fit to page", so a wrap goes round the thing it was measured for</small>
+        </li>
+        <li>
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="18" width="40" height="12" rx="2" fill="#FFBE18"/><path d="M10 18v6M16 18v4M22 18v6M28 18v4M34 18v6M40 18v4" stroke="#17153A" stroke-width="2"/></svg></span>
+          <b>Check with a ruler</b>
+          <small>A line on the page should measure 5 cm. If it does not, the printer shrank it</small>
+        </li>
+        <li>
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="7" width="30" height="36" rx="6" fill="#10D6A0"/><rect x="14" y="13" width="20" height="20" rx="3" fill="#fff"/><path d="M19 23l4 4 7-8" fill="none" stroke="#10D6A0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <b>Inside Sukhi Play</b>
+          <small>Pages go straight to your printer, with no print window a child could wander off through</small>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="co-phone reveal">
+        <div>
+          <span class="kicker">Phones and tablets</span>
+          <h2>Take it anywhere</h2>
+          <p>The same studio on a small screen. Keep it on the home screen and it opens like an app, with no internet.</p>
+
+          <h3 class="co-steps-title">Add it to your home screen</h3>
+          <ul class="co-steps">
+            <li><b>iPhone and iPad</b> Open it in Safari, tap Share, then Add to Home Screen.</li>
+            <li><b>Android</b> Open it in Chrome, tap the menu, then Add to Home screen.</li>
+            <li><b>Computer</b> In Chrome or Edge, click the install icon in the address bar.</li>
+          </ul>
+        </div>
+        <img src="/screenshots/studio/08-on-a-phone.png"
+             alt="Jazz's Studio on a phone: the greeting at the top and the six rooms as tiles below"
+             width="402" height="844" loading="lazy" decoding="async">
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--violet">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Safe for them</span>
+        <h2>No sign-ups. No ads. Nothing shared.</h2>
+      </div>
+
+      <ul class="co-safe reveal">
+        <li style="--c:#3B6BFF">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="17" r="8" fill="#3B6BFF"/><path d="M9 41c1.5-8 7.5-12 15-12s13.5 4 15 12z" fill="#7BB6FF"/><path d="M8 8l32 32" stroke="#FF5C5C" stroke-width="4" stroke-linecap="round"/></svg></span>
+          <b>No account</b><small>No email, no password, nothing to sign up for</small>
+        </li>
+        <li style="--c:#FF5C5C">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="11" width="36" height="26" rx="5" fill="#FFBE18"/><path d="M15 29l4-11 4 11M16.5 25h5M28 18v11h3a4 4 0 0 0 0-8h-3" fill="none" stroke="#17153A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 8l32 32" stroke="#FF5C5C" stroke-width="4" stroke-linecap="round"/></svg></span>
+          <b>No ads</b><small>No adverts, no pop-ups, nothing to buy</small>
+        </li>
+        <li style="--c:#10D6A0">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="7" width="30" height="36" rx="6" fill="#10D6A0"/><rect x="14" y="13" width="20" height="20" rx="3" fill="#fff"/><path d="M19 23l4 4 7-8" fill="none" stroke="#10D6A0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <b>Stays on your device</b><small>Their makes and doodles are kept here and never uploaded</small>
+        </li>
+        <li style="--c:#FFBE18">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 19a23 23 0 0 1 32 0M13.5 25a15 15 0 0 1 21 0M19 31a7 7 0 0 1 10 0" fill="none" stroke="#FFBE18" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="37" r="3" fill="#17153A"/><path d="M8 8l32 32" stroke="#FF5C5C" stroke-width="4" stroke-linecap="round"/></svg></span>
+          <b>Works offline</b><small>Once it has opened, no internet needed</small>
+        </li>
+        <li style="--c:#D96FD6">
+          <span class="co-art"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="17" fill="#D96FD6"/><text x="24" y="31" text-anchor="middle" font-size="20" font-weight="900" fill="#fff" font-family="system-ui, sans-serif">0</text></svg></span>
+          <b>Completely free</b><small>No trial, no subscription, no catch</small>
+        </li>
+      </ul>
+
+      <p class="co-go co-go--end">
+        <a class="go go--big" href={APP} target="_blank" rel="noopener">Open the studio</a>
+        <a class="go go--ghost" href="/playground/">See the playground</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<script is:inline>
+  (function () {
+    var root = document.documentElement;
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window) ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    root.classList.add('js');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  })();
+</script>
