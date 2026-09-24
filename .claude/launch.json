@@ -39,6 +39,20 @@
       ],
       "port": 5178,
       "cwd": "playground/studio"
+    },
+    {
+      "name": "studio-build",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "vite",
+        "preview",
+        "--port",
+        "5179",
+        "--strictPort"
+      ],
+      "port": 5179,
+      "cwd": "playground/studio"
     }
   ]
 }

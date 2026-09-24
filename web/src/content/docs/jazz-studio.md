@@ -21,24 +21,33 @@ if you like, their own character in place of Jazz's.
 
 ## What your child can do
 
-- **Stationery:** stickers with Jazz's face, pattern stickers, name labels,
-  bookmarks, a diary cover and diary pages, a week planner, to-do lists, gift
-  tags, door signs and letter paper.
+- **Stationery:** in five groups: stickers (of their character, or in their
+  pattern), a diary cover and pages, name labels and gift tags, a week planner
+  and to-do lists, and bookmarks and door signs. Each sheet keeps its own
+  colours, lettering and pattern.
 - **Make from a box:** pick a pencil pot, desk tidy, notebook cover or treasure
   box, measure the tube or box, and print a wrap that fits it, with the steps.
 - **My brand:** a logo in four styles, business cards and logo stickers.
 - **Play:** a poster of their name, secret messages in a real code with a key
   for a friend, story ideas that go straight onto a diary page, and a doodle
   pad.
-- **My makes:** a shelf of the things they made.
-- **Make it yours:** their name, colours, lettering and favourite pattern. The
-  colours are also on a strip above the preview in every tool.
+- **My makes:** their prints, kept to print again, and a shelf of the things
+  they made.
+- **Make it yours:** their character and name, and the look of the studio: its
+  colours, lettering and background. Start again is a tab of its own, and asks
+  first.
 
 ## Printing
 
-Every sheet is drawn on A4 to the millimetre. In a browser, print at **actual
-size**, not "fit to page". Most sheets have a line that should measure exactly
-5 cm, so a ruler can check.
+Every sheet is drawn on A4 to the millimetre, and prints on one page. In a
+browser, print wraps for **Make from a box** at **actual size**, not "fit to
+page", so they fit the thing they were measured for; each wrap has a line that
+should measure exactly 5 cm, so a ruler can check.
+
+On an **iPad**, Safari prints the page's address and the date at the top and
+bottom and always prints a little smaller than actual size, so the sheet is
+fitted into what is left. That is fine for stickers and planners; for a wrap,
+measure the 5 cm line.
 
 **Inside Sukhi Play there is no print window.** A print window can save to a
 file or open another program, both ways out of the locked screen, so Sukhi
@@ -65,12 +74,22 @@ device.
 Inside Sukhi Play no page may open a file browser, so there a grown-up copies
 the picture and presses **Ctrl+V** (**Cmd+V** on a Mac) in Make it yours.
 
+## Prints to use again
+
+After something is printed, the studio asks whether to keep it in **My makes**
+and what to call it; there is also a **Keep in My makes** button beside Print.
+It keeps the print's settings, not a picture of it: which sheet, the words,
+which character, and its colours, lettering and pattern. **Open** puts the
+tool back exactly as it was, to print again or change something first. A kept
+print keeps its colours even if the studio's change later.
+
 ## Photos and their things
 
-**My makes** keeps each thing's name and a note, and a photo in a browser on a
-phone or tablet. Inside Sukhi Play the photo is left out, because choosing one
-means opening the computer's file browser, which Sukhi Play never shows a
-child. Doodles from the doodle pad keep their picture everywhere.
+**My makes** also keeps each thing they made: its name, a note, and a photo.
+In a browser a photo can be taken or chosen. Inside Sukhi Play, which never
+opens a file browser, a grown-up copies a photo and presses **Ctrl+V**
+(**Cmd+V** on a Mac) on My makes, or drags one onto the photo box. Doodles
+from the doodle pad keep their picture everywhere.
 
 Everything is kept **on that device only**: nothing is uploaded, and there is
 no account. Clearing the browser's data for the site, or using a private
