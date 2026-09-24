@@ -60,15 +60,25 @@ function serve () {
   });
 }
 
+/**
+ * Jazz's studio, as every shot starts: welcomed already (a new studio opens
+ * on the welcome, which has a shot of its own), her name, and her and her
+ * brother both in the character list.
+ */
+const JAZZ = { 'jazz-studio-look': { welcomed: true, name: 'Jazz', sets: { jazz: true, sukhi: true }, pose: 'hello' } };
+
 /** Each shot: the file name, the room, and what the studio should remember first. */
 const SHOTS = [
   { name: '01-hello', hash: '#/', state: {} },
-  { name: '02-me-stickers', hash: '#/stationery/sticker-sheets', state: { 'jazz-studio-stationery': { kind: 'faces', me: true, pose: 'mix', words: { faces: 'Jazz' } } } },
+  { name: '02-me-stickers', hash: '#/stationery/sticker-sheets', state: { 'jazz-studio-stationery': { kind: 'faces', me: true, pose: ['hello', 'sukhi-grin', 'wink', 'sukhi-laughing'], words: {}, extra: { faces: { names: '1' } } } } },
   { name: '03-diary-cover', hash: '#/stationery/diary-set', state: { 'jazz-studio-stationery': { kind: 'cover', me: true, pose: 'portrait', words: {} } } },
-  { name: '04-make-from-a-box', hash: '#/box', state: { 'jazz-studio-box': { project: 'pencil-pot', width: 15.5, height: 10, tab: true, words: 'Pens', me: true } } },
-  { name: '05-my-brand', hash: '#/brand', state: { 'jazz-studio-brand-bench': { kind: 'cards', me: true, pose: 'portrait', words: {} } } },
+  { name: '04-make-from-a-box', hash: '#/box', state: { 'jazz-studio-box': { project: 'pencil-pot', width: 15.5, height: 10, tab: true, words: 'Pens', me: true, pose: ['portrait', 'sukhi-grin'], names: { sukhi: 'Crayons' } } } },
+  { name: '05-my-brand', hash: '#/brand', state: { 'jazz-studio-brand-bench': { kind: 'cards', me: true, pose: 'portrait', words: {}, who: 'jazz' } } },
   { name: '06-secret-codes', hash: '#/play/secret', state: { 'jazz-studio-secret': { message: 'Meet me at the treehouse after school' } } },
   { name: '07-make-it-yours', hash: '#/yours', state: {} },
+  { name: '10-welcome', hash: '#/', state: {}, fresh: true },
+  { name: '11-invite-cards', hash: '#/play/invite', state: { 'jazz-studio-invite': { words: '', pose: 'hello', from: null } } },
+  { name: '12-story-page', hash: '#/play/sparks', state: { 'jazz-studio-story': { mode: 'story', who: '@sukhi', what: 'finds a secret door', where: 'on the moon', question: 'What makes a really good friend?', title: 'The moon door' } } },
   // Kept prints live in IndexedDB, so this one keeps a few first (see KEEP).
   { name: '09-my-prints', hash: '#/makes', state: {}, keep: true },
   { name: '08-on-a-phone', hash: '#/', state: {}, phone: true }
@@ -95,10 +105,11 @@ app.whenReady().then(async () => {
   const win = new BrowserWindow({ show: false, ...DESKTOP, useContentSize: true });
   fs.mkdirSync(OUT, { recursive: true });
 
-  const load = async (hash, state) => {
+  const load = async (hash, state, fresh = false) => {
     await win.loadURL(base);
+    const all = fresh ? state : { ...JAZZ, ...state };
     await win.webContents.executeJavaScript(
-      `localStorage.clear(); ${Object.entries(state).map(([k, v]) => `localStorage.setItem(${JSON.stringify(k)}, ${JSON.stringify(JSON.stringify(v))});`).join('')}`
+      `localStorage.clear(); ${Object.entries(all).map(([k, v]) => `localStorage.setItem(${JSON.stringify(k)}, ${JSON.stringify(JSON.stringify(v))});`).join('')}`
     );
     // A query string makes this a new document. Only the hash changing would
     // keep the page, and the page read its remembered choices when it loaded.
@@ -116,7 +127,7 @@ app.whenReady().then(async () => {
         );
       }
     }
-    await load(shot.hash, shot.state);
+    await load(shot.hash, shot.state, shot.fresh);
     // Every image decoded and the tiles' entrance animation finished.
     await win.webContents.executeJavaScript(
       'Promise.all([...document.images].map((i) => i.decode().catch(() => {}))).then(() => new Promise((r) => setTimeout(r, 1400)))'

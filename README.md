@@ -39,16 +39,15 @@
 
 ---
 
-> **2.2 is out.** **Jazz's Studio** joins the playground: a stationery studio
-> for older children, made for a ten-year-old called Jazz. Stickers, labels,
-> diaries, planners, wraps for boxes and cartons, a brand of their own and
-> secret codes, printed at home and kept to print again, with Jazz's character
-> or your child's own. It
-> comes in the download switched off, so a parent adds it from the catalogue,
-> and it also runs in any browser at
-> **[sukhiplay.com/studio](https://sukhiplay.com/studio/)**. Our own apps now
-> print straight to the default printer with no print window, and no page can
-> open a file browser or a print window any more.
+> **2.3 is out.** **Jazz's Studio** grows up: it greets each child by name and
+> asks who their character is, Jazz's little brother Sukhi joins her, and
+> families add their own people, each with their own pictures, name and
+> brand. Stickers, labels and tags take everyone at once, each with their own
+> name; business cards and logo stickers are redesigned; and there are invite
+> cards with a code to scan, and story pages to write and draw. It comes in the
+> download switched off, so a parent adds it from the catalogue, and it also
+> runs in any browser at
+> **[sukhiplay.com/studio](https://sukhiplay.com/studio/)**.
 > [Full notes](https://github.com/meSingh/sukhi-play/releases/latest).
 
 My three-year-old wants to play games. He also clicks every button on the
