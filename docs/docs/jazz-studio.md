@@ -4,8 +4,8 @@
 
 Jazz's Studio is the second app in the [playground](/playground/), and the
 first for older children, about seven and up. It was made for Jazz, who is
-ten, and your child can use all of it: they can put their own name on
-everything, but the character in it is Jazz.
+ten, and your child can use all of it, with their own name on everything and,
+if you like, their own character in place of Jazz's.
 
 ## Where to find it
 
@@ -45,6 +45,22 @@ printer did not answer. Two presses a few seconds apart print once.
 
 Only apps Sukhi Play made itself can print. A website that tries to print is
 refused.
+
+## Their own character
+
+In **Make it yours**, **Add a character** takes a picture of a character on one
+plain colour, cuts the background out on the device, and finds the face so
+stickers and labels frame it. Add as many as you like: once you have added
+any, they are the character list, and a box keeps Jazz's there too. Each one
+can be renamed, nudged if the face is framed badly, or removed.
+
+The studio has a **For grown-ups** guide that walks through making one from a
+photo with Google Gemini, with the prompts that made Jazz's. When you use
+Gemini the photo goes to Google; nothing you add to the studio leaves the
+device.
+
+Inside Sukhi Play no page may open a file browser, so there a grown-up copies
+the picture and presses **Ctrl+V** (**Cmd+V** on a Mac) in Make it yours.
 
 ## Photos and their things
 

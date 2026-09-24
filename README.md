@@ -42,8 +42,9 @@
 > **2.2 is out.** **Jazz's Studio** joins the playground: a stationery studio
 > for older children, made for a ten-year-old called Jazz. Stickers, labels,
 > diaries, planners, wraps for boxes and cartons, a brand of their own and
-> secret codes, printed at home. It comes in the download switched off, so a
-> parent adds it from the catalogue, and it also runs in any browser at
+> secret codes, printed at home, with Jazz's character or your child's own. It
+> comes in the download switched off, so a parent adds it from the catalogue,
+> and it also runs in any browser at
 > **[sukhiplay.com/studio](https://sukhiplay.com/studio/)**. Our own apps now
 > print straight to the default printer with no print window, and no page can
 > open a file browser or a print window any more.
