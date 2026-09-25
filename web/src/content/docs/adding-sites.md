@@ -54,7 +54,8 @@ everything else: name, picture, colour, address, allowed hosts and ad filtering,
 with Delete at the bottom.
 
 <div align="center">
-<img src="/screenshots/02-parent-portal.png" width="760" alt="The grown-up screen: tabs for play time, installed apps, the catalogue and settings, with a card and an on/off switch for each app">
+<picture><source type="image/webp" srcset="/img/screenshots/02-parent-portal-800.webp 800w, /img/screenshots/02-parent-portal-1240.webp 1240w, /img/screenshots/02-parent-portal-1400.webp 1400w" sizes="(min-width: 800px) 760px, 94vw">
+<img src="/screenshots/02-parent-portal.png" width="760" height="486" loading="lazy" alt="The grown-up screen: tabs for play time, installed apps, the catalogue and settings, with a card and an on/off switch for each app"></picture>
 </div>
 
 ### Leaving a site as its operator intended

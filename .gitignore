@@ -27,3 +27,10 @@ playground/*/
 # The playground apps the site serves are copied here by
 # scripts/playground-app.mjs. The published copy is the one in docs/.
 web/public/playground/
+
+# The WebP copies of the site's pictures, made by web/scripts/images.mjs before
+# each build. The published copies are the ones in docs/img/.
+web/public/img/
+
+# Lighthouse CI reports (see lighthouserc.json).
+.lighthouseci/

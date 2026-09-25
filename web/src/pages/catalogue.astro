@@ -67,6 +67,7 @@ const entries = (data.suggestions as Entry[]).map((e) => {
       : { text: 'No adverts', cls: 'chip--free' }
   };
 });
+import Img from '../components/Img.astro';
 ---
 
 <Base
@@ -94,7 +95,7 @@ const entries = (data.suggestions as Entry[]).map((e) => {
             Official &middot; by Sukhi Play
           </div>
           <div class="cat-first-name">
-            <img src={PAGES[b.id]?.icon} alt="" width="64" height="64" loading="lazy">
+            <Img src={PAGES[b.id]?.icon} alt="" width="64" height="64" loading="lazy" sizes="64px" />
             <h2>{b.name}</h2>
           </div>
           <p class="cat-first-line">{b.blurb}</p>
@@ -105,7 +106,7 @@ const entries = (data.suggestions as Entry[]).map((e) => {
           <p class="cat-first-promise">No ads &middot; No tracking &middot; Works offline</p>
         </div>
         <a class="cat-first-shot" href={PAGES[b.id]?.more} tabindex="-1" aria-hidden="true">
-          <img src={PAGES[b.id]?.shot} alt="" width="1240" height="800" loading="lazy" decoding="async">
+          <Img src={PAGES[b.id]?.shot} alt="" width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
         </a>
       </section>
     ))}

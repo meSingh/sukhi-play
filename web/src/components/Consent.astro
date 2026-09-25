@@ -29,13 +29,14 @@ import { GA_ID } from '../site';
 ---
 
 <!-- Europe: nothing runs until this is answered. -->
-<div class="consent" id="consent" hidden role="dialog" aria-live="polite"
+<div class="consent" id="consent" data-no-track hidden role="dialog" aria-live="polite"
      aria-labelledby="consent-title">
   <div class="consent-say">
     <b id="consent-title">May we count this visit?</b>
-    <p>Google Analytics, for visitor numbers and which pages get read. No
-      advertising, and nothing is shared with anyone. Sukhi Play itself never
-      sends anything anywhere &mdash; this is only the website.
+    <p>Google Analytics, for visitor numbers, which pages get read and which
+      buttons get pressed. No advertising, and nothing is shared with anyone.
+      Sukhi Play itself never sends anything anywhere &mdash; this is only the
+      website.
       <a href="/privacy/">What it collects</a>.</p>
   </div>
   <div class="consent-do">
@@ -45,7 +46,7 @@ import { GA_ID } from '../site';
 </div>
 
 <!-- Everywhere else: it is already running, and here is the off switch. -->
-<div class="notice" id="notice" hidden role="status">
+<div class="notice" id="notice" data-no-track hidden role="status">
   <p>We count visits with Google Analytics. No advertising, nothing shared.
     <a href="/privacy/">More</a></p>
   <div class="notice-do">

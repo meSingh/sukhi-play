@@ -34,10 +34,11 @@ const COLUMNS = [
     ]
   }
 ];
+import Img from '../components/Img.astro';
 ---
 
 <section class="madeby">
-  <img class="bob" src="/assets/cutout-proud.png" alt="" width="92" height="92" loading="lazy">
+  <Img class="bob" src="/assets/cutout-proud.png" alt="" width="92" height="92" loading="lazy" sizes="92px" />
   <p class="love">Made with <span class="heart" aria-label="love">&#9829;</span> by
     <a href="https://www.msingh.com">Mandeep Singh</a>,<br>for his cheeky little Sukhraj.</p>
   <p class="story">It began with a three-year-old who pressed every key and clicked
@@ -49,7 +50,7 @@ const COLUMNS = [
     <div class="foot-grid">
       <div class="foot-brand">
         <a class="foot-mark" href="/">
-          <img src="/assets/sukhi-icon.png" alt="" width="34" height="34">Sukhi Play
+          <Img src="/assets/sukhi-icon.png" alt="" width="34" height="34" sizes="34px" />Sukhi Play
         </a>
         <p>A locked-down browser that opens only what a grown-up chose.
           Free for every family, with every line of code public, and it asks for nothing.</p>
@@ -67,7 +68,7 @@ const COLUMNS = [
 
     <div class="foot-end">
       <span>&copy; 2026 Mandeep Singh &middot; <a href="/licence/">Free for personal use</a>, Sukhi artwork excluded</span>
-      <a href="/privacy/" data-consent-reopen>Cookie choice</a>
+      <a href="/privacy/" data-consent-reopen data-no-track>Cookie choice</a>
     </div>
   </div>
 </footer>

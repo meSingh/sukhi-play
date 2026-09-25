@@ -30,10 +30,11 @@ const DOWNLOADS = [
 ];
 
 const inDownloads = page === 'download' || DOWNLOADS.some((d) => d.key === page);
+import Img from '../components/Img.astro';
 ---
 
 <header class="top">
-  <a class="brand" href="/"><img src="/assets/sukhi-icon.png" alt="" width="38" height="38">Sukhi Play</a>
+  <a class="brand" href="/"><Img src="/assets/sukhi-icon.png" alt="" width="38" height="38" sizes="38px" />Sukhi Play</a>
 
   <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
     <span></span><span></span><span></span>
@@ -41,7 +42,7 @@ const inDownloads = page === 'download' || DOWNLOADS.some((d) => d.key === page)
 
   <nav id="site-nav" tabindex="-1">
     <div class="nav-head">
-      <img src="/assets/sukhi-icon.png" alt="" width="34" height="34">Sukhi Play
+      <Img src="/assets/sukhi-icon.png" alt="" width="34" height="34" sizes="34px" />Sukhi Play
       <button class="menu-close" type="button" aria-label="Close menu">&times;</button>
     </div>
 
@@ -58,7 +59,7 @@ const inDownloads = page === 'download' || DOWNLOADS.some((d) => d.key === page)
          because that is what a button marked Download should do, and a caret
          for people who already know which machine they are on. -->
     <div class:list={['nav-dl', inDownloads && 'is-current']}>
-      <a class="nav-cta" href="/download/">
+      <a class="nav-cta" href="/download/" data-track="Download">
         <span>Download</span>
         <span class="nav-cta-sub">Free, no account</span>
       </a>

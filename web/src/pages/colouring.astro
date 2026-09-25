@@ -49,6 +49,7 @@ const schema = {
   ],
   isPartOf: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
 };
+import Img from '../components/Img.astro';
 ---
 
 <Base
@@ -60,7 +61,7 @@ const schema = {
 
   <div class="wrap">
     <div class="hero co-hero">
-      <img class="co-mark bob" src="/assets/playground-colouring.png" alt="" width="112" height="112">
+      <Img class="co-mark bob" src="/assets/playground-colouring.png" alt="" width="112" height="112" sizes="112px" />
       <h1>Sukhi&nbsp;Colouring</h1>
       <p class="lede">Pick a picture. Colour it in.</p>
 
@@ -77,9 +78,9 @@ const schema = {
     </div>
 
     <div class="device co-device reveal">
-      <img src="/screenshots/colouring/01-a-page-in-progress.png"
+      <Img src="/screenshots/colouring/01-a-page-in-progress.png"
            alt="A tortoise picture with its shell coloured in, colours down the left and the tools down the right"
-           width="1240" height="800" fetchpriority="high" decoding="async">
+           width="1240" height="800" fetchpriority="high" decoding="async" sizes="(min-width: 1100px) 1040px, 94vw" />
     </div>
     <p class="note-small">What your child will see.</p>
   </div>
@@ -128,9 +129,9 @@ const schema = {
           <h2>Forty pictures to choose from</h2>
           <p>Animals, cars, flowers and more. Or start with a blank page.</p>
         </div>
-        <img src="/screenshots/colouring/02-forty-pictures.png"
+        <Img src="/screenshots/colouring/02-forty-pictures.png"
              alt="The picture chooser, a grid of animals, vehicles and other drawings"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
 
       <div class="co-shot co-shot--flip reveal">
@@ -139,9 +140,9 @@ const schema = {
           <h2>Pick up where they left off</h2>
           <p>Save a picture and open it again later, exactly as they left it.</p>
         </div>
-        <img src="/screenshots/colouring/03-the-shelf.png"
+        <Img src="/screenshots/colouring/03-the-shelf.png"
              alt="Three saved pictures, a kite, a car and a tree, each with a download and a delete button"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
     </div>
   </section>
@@ -162,9 +163,9 @@ const schema = {
           </ul>
           <p class="co-steps-after">Or press <b>Add to home screen</b> inside the app for the steps on your device. It then opens like any other app, full screen, even with no internet.</p>
         </div>
-        <img src="/screenshots/colouring/04-on-a-phone.png"
+        <Img src="/screenshots/colouring/04-on-a-phone.png"
              alt="Sukhi Colouring on a phone: tools along the top, the picture in the middle, colours along the bottom"
-             width="402" height="844" loading="lazy" decoding="async">
+             width="402" height="844" loading="lazy" decoding="async" sizes="(min-width: 900px) 300px, 80vw" />
       </div>
     </div>
   </section>

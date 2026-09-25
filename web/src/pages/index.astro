@@ -4,13 +4,14 @@
  * markup; the header, footer and stylesheet now come from the layout.
  */
 import Base from '../layouts/Base.astro';
+import Img from '../components/Img.astro';
 ---
 
 <Base title="Sukhi Play, a locked-down browser for a small child" description="Hand a child the laptop without handing over your work. Sukhi Play locks the screen to the websites you chose. Free for families, with every line of code public, for macOS, Windows and Linux." page="index">
 <main>
   <div class="wrap">
     <div class="hero">
-      <img class="mark bob" src="/assets/cutout-proud.png" alt="" width="104" height="104">
+      <Img class="mark bob" src="/assets/cutout-proud.png" alt="" width="104" height="104" sizes="104px" />
       <h1 class="rotator">
         <span class="sr-only">Hand over the laptop, keep your work. Sukhi Play keeps a small child inside the websites you chose.</span>
       <span class="sizer" aria-hidden="true">Hand over the laptop.<br>Keep your work.</span>
@@ -51,11 +52,14 @@ import Base from '../layouts/Base.astro';
     <p class="note-small">Free &middot; No account &middot; Code you can read</p>
 
     <div class="device reveal">
-      <picture>
-        <source srcset="/assets/demo.webp" type="image/webp">
-        <img src="/assets/demo.gif" width="1280" height="768" loading="lazy"
-             alt="The app running: a child picking a tile and playing, adverts being counted as they are blocked, the one minute warning, the screen that stops play time, a grown-up holding the button for three seconds, and choosing to grant fifteen more minutes">
-      </picture>
+      <!-- A video rather than the animated WebP it is cut from: a sixth of the
+           size. It starts when it scrolls into view, and not at all for anyone
+           who has asked for less motion (they get the controls instead). -->
+      <video class="demo" muted loop playsinline preload="none" width="960" height="576"
+             poster="/img/assets/demo-poster-960.webp" aria-label="The app running: a child picking a tile and playing, adverts being counted as they are blocked, the one minute warning, the screen that stops play time, a grown-up holding the button for three seconds, and choosing to grant fifteen more minutes">
+        <source src="/assets/demo.webm" type="video/webm">
+        <source src="/assets/demo.mp4" type="video/mp4">
+      </video>
     </div>
     <p class="note-small">The real app, recorded start to finish. Nothing here is a mock-up.
       The site being played is a small demo page of ours, so no one else’s work is used to advertise this.</p>
@@ -96,7 +100,7 @@ import Base from '../layouts/Base.astro';
 
         <div class="stage" aria-hidden="true">
           <span class="blob a"></span><span class="blob b"></span><span class="blob c"></span>
-          <div class="appbar"><img src="/assets/sukhi-icon.png" alt="">Sukhi Play<span class="chip">Grown-ups</span><span class="chip">Close</span></div>
+          <div class="appbar"><Img src="/assets/sukhi-icon.png" alt="" sizes="40px" />Sukhi Play<span class="chip">Grown-ups</span><span class="chip">Close</span></div>
           <div class="launch"><h4>What do you want to do?</h4><div class="grid"><div class="tile" style="background:#2F48B8"><span class="face"><svg viewBox="0 0 24 24" fill="#2F48B8"><g transform="scale(.24)"><path d="M50 6c14 14 20 30 20 46v12H30V52c0-16 6-32 20-46Z"/><path d="M30 56 14 74l14-2 4 12Z"/><path d="M70 56l16 18-14-2-4 12Z"/><circle cx="50" cy="44" r="9" fill="rgba(0,0,0,.3)"/></g></svg></span>Poki</div></div></div>
           <div class="scrim">
             <div class="dialog">
@@ -168,7 +172,7 @@ import Base from '../layouts/Base.astro';
       </div>
       <div class="reveal d1" style="padding-inline:24px">
         <div class="gate-card">
-          <img src="/assets/cutout-proud.png" alt="" width="70" height="70" loading="lazy">
+          <Img src="/assets/cutout-proud.png" alt="" width="70" height="70" loading="lazy" sizes="70px" />
           <div class="t">Grown-ups only</div>
           <p class="h" aria-live="polite">Press and hold for 3 seconds.</p>
           <button class="hold" type="button" aria-label="Press and hold for three seconds"><span class="ring"></span><span class="fill"></span><span class="lbl">Hold</span></button>
@@ -239,7 +243,7 @@ import Base from '../layouts/Base.astro';
         <div class="news-say">
           <span class="news-new">New</span>
           <div class="news-name">
-            <img src="/assets/playground-studio.png" alt="" width="64" height="64" loading="lazy">
+            <Img src="/assets/playground-studio.png" alt="" width="64" height="64" loading="lazy" sizes="64px" />
             <h2>Introducing Jazz's&nbsp;Studio</h2>
           </div>
           <p>For the bigger ones. Design stickers, labels, diaries and more, and print them at home.</p>
@@ -250,7 +254,7 @@ import Base from '../layouts/Base.astro';
           </p>
         </div>
         <a class="news-shot" href="/studio/" tabindex="-1" aria-hidden="true">
-          <img src="/screenshots/studio/01-hello.png" alt="" width="1240" height="800" loading="lazy" decoding="async">
+          <Img src="/screenshots/studio/01-hello.png" alt="" width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
           <span class="news-dots">
             <i style="--c:#4F8CFF;--i:0"></i><i style="--c:#FFC857;--i:1"></i><i style="--c:#3DDC84;--i:2"></i><i style="--c:#FF7A3D;--i:3"></i><i style="--c:#7C5CFF;--i:4"></i>
           </span>
@@ -313,6 +317,21 @@ import Base from '../layouts/Base.astro';
     : /Win/i.test(plat + ua) ? 'win'
     : /Linux|X11|CrOS/i.test(plat + ua) ? 'linux' : null;
   window.SUKHI_OS = os;
+
+  // The demo plays while it is on screen, unless motion is turned down.
+  var demo = document.querySelector('video.demo');
+  if (demo) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+      demo.controls = true;
+    } else {
+      new IntersectionObserver(function (seen) {
+        // A play cut short by scrolling away is not a refusal; only a browser
+        // that will not autoplay at all gets the controls.
+        if (seen[0].isIntersecting) demo.play().catch(function (e) { if (e && e.name === 'NotAllowedError') demo.controls = true; });
+        else demo.pause();
+      }, { rootMargin: '200px' }).observe(demo);
+    }
+  }
 
   // Phone menu: the nav slides in from the side instead of wrapping.
   var menuBtn = document.querySelector('.menu-btn');

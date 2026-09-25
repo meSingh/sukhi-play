@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 """Turns the demo's PNG frames into the files the website and README use.
 
-Two formats, because they are read in different places. The website gets an
-animated WebP, which is a fraction of the size at the same quality. The README
-gets a GIF, because that is what renders everywhere GitHub is read, including
-in the mobile apps and in Store listings that accept an animation at all.
+Formats for the places they are read. The website plays a video, WebM with an
+MP4 fallback, which is a sixth of the animated WebP's size at the same quality.
+The README gets a GIF, because that is what renders everywhere GitHub is read,
+including in the mobile apps and in Store listings that accept an animation at
+all. The animated WebP is kept as the master the videos are cut from.
 
-Pillow only. ffmpeg is not assumed to be installed: this has to run on the
-machine the app is built on, not just on a machine set up for video work.
+Pillow only for the images. ffmpeg is not assumed to be installed: this has to
+run on the machine the app is built on, not just on a machine set up for video
+work. Without it the videos are left as they were, and it says so.
 """
 import sys
 import os
 import glob
+import shutil
+import subprocess
+import tempfile
 from PIL import Image
 
 FPS = 10
@@ -99,7 +104,24 @@ def main():
     still = os.path.join(out_dir, "demo-poster.png")
     frames[round(len(frames) * 0.22)].save(still, optimize=True)
 
-    for path in (webp, gif, still):
+    made = [webp, gif, still]
+    if shutil.which("ffmpeg"):
+        with tempfile.TemporaryDirectory() as tmp:
+            for i, f in enumerate(frames):
+                f.save(os.path.join(tmp, f"f{i:04d}.png"))
+            src = ["-framerate", str(FPS), "-i", os.path.join(tmp, "f%04d.png"),
+                   "-vf", "fps=25,format=yuv420p", "-an"]
+            mp4 = os.path.join(out_dir, "demo.mp4")
+            webm = os.path.join(out_dir, "demo.webm")
+            subprocess.run(["ffmpeg", "-v", "error", "-y", *src, "-c:v", "libx264", "-preset", "veryslow",
+                            "-crf", "26", "-tune", "animation", "-movflags", "+faststart", mp4], check=True)
+            subprocess.run(["ffmpeg", "-v", "error", "-y", *src, "-c:v", "libvpx-vp9", "-b:v", "0",
+                            "-crf", "38", "-row-mt", "1", webm], check=True)
+            made += [mp4, webm]
+    else:
+        print("[demo] no ffmpeg: demo.mp4 and demo.webm are left as they were")
+
+    for path in made:
         print(f"[demo] {os.path.basename(path)}  {os.path.getsize(path) / 1e6:.1f} MB")
 
 

@@ -10,6 +10,7 @@
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Consent from '../components/Consent.astro';
+import Track from '../components/Track.astro';
 import { REPO, SITE } from '../site';
 import '../styles/site.css';
 
@@ -57,7 +58,8 @@ const app = {
   <title>{title}</title>
   <meta name="description" content={description}>
   <link rel="canonical" href={canonical}>
-  <link rel="icon" href="/assets/sukhi-icon.png">
+  <link rel="icon" href="/img/favicon-64.png" sizes="64x64" type="image/png">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
   <meta name="theme-color" content="#FFF7EC">
   <meta name="robots" content={noindex
     ? 'noindex, follow'
@@ -90,5 +92,6 @@ const app = {
   <div id="main"><slot /></div>
   <Footer />
   <Consent />
+  <Track />
 </body>
 </html>

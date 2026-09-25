@@ -57,6 +57,7 @@ const schema = {
   })),
   isPartOf: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
 };
+import Img from '../components/Img.astro';
 ---
 
 <Base
@@ -78,12 +79,12 @@ const schema = {
     {APPS.map((a) => (
       <article class="pg-app reveal">
         <a class="pg-app-shot" href={a.open} target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
-          <img src={a.shot} alt="" width="1240" height="800" loading="eager" decoding="async">
+          <Img src={a.shot} alt="" width="1240" height="800" loading="eager" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
         </a>
         <div class="pg-app-say">
           <span class="pg-badge">{a.badge}</span>
           <div class="pg-app-name">
-            <img src={a.icon} alt="" width="64" height="64">
+            <Img src={a.icon} alt="" width="64" height="64" sizes="64px" />
             <h2>{a.name}</h2>
           </div>
           <p>{a.say}</p>

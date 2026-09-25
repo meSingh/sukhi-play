@@ -1,0 +1,38 @@
+---
+/**
+ * A picture from public/, served as WebP at the size the screen needs.
+ *
+ * Write it the way an <img> is written, with the original's address:
+ *
+ *   <Img src="/screenshots/studio/01-hello.png" alt="..." sizes="(min-width: 900px) 560px, 92vw" />
+ *
+ * The browser gets a srcset of the copies scripts/images.mjs made, picks the
+ * smallest that fills the space, and falls back to the original PNG if it
+ * cannot show WebP. `sizes` says how wide it is drawn; without it the browser
+ * assumes the full width of the window, which is right for a hero and
+ * wasteful for an icon, so an icon should say so.
+ *
+ * <picture> is display: contents (site.css), so any rule written for the
+ * <img> itself, grid placement included, still applies. That is also why the
+ * markup below is on one line: whitespace inside it would be laid out as text.
+ */
+import { join } from 'node:path';
+import sharp from 'sharp';
+import { copyPath, widthsFor } from '../images.mjs';
+
+interface Props {
+  src: string;
+  alt: string;
+  sizes?: string;
+  width?: number | string;
+  height?: number | string;
+  loading?: 'lazy' | 'eager';
+  [attr: string]: unknown;
+}
+
+const { src, alt, sizes = '100vw', width, height, ...rest } = Astro.props;
+const meta = await sharp(join(process.cwd(), 'public', src), { animated: true }).metadata();
+const natural = { w: meta.width ?? 0, h: meta.pageHeight ?? meta.height ?? 0 };
+const srcset = widthsFor(natural.w).map((w) => `${copyPath(src, w)} ${w}w`).join(', ');
+---
+<picture><source type="image/webp" srcset={srcset} sizes={sizes} /><img src={src} alt={alt} width={width ?? natural.w} height={height ?? natural.h} {...rest} /></picture>

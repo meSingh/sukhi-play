@@ -3,7 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "images": "node scripts/images.mjs",
+    "predev": "node scripts/images.mjs",
     "dev": "astro dev",
+    "prebuild": "node scripts/images.mjs",
     "build": "astro build",
     "preview": "astro preview"
   },

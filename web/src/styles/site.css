@@ -9,6 +9,12 @@
  * Light only, on purpose. The app's own world is warm and bright and the site
  * matches it; a dark variant made the screenshots sit in a hole. */
 
+/* Img.astro wraps each picture in <picture>; it takes no part in layout, so
+   rules written for the <img> (grid placement included) still apply. Its
+   <source> would otherwise become a grid item of its own and take a cell. */
+picture { display: contents; }
+picture source { display: none; }
+
 :root {
   --base:        #FFF7EC;
   --wash-amber:  #FFE9B8;
@@ -216,7 +222,8 @@ th { font-weight: 800; color: var(--ink-soft); font-size: 13.5px; text-transform
   background: var(--ink);
   box-shadow: 0 30px 60px rgba(23, 21, 58, .22);
 }
-.device img { display: block; width: 100%; height: auto; border-radius: 20px; }
+.device img, .device video { display: block; width: 100%; height: auto; border-radius: 20px; }
+.device video { aspect-ratio: 960 / 576; background: #FFF7EC; }
 
 /* ================= what they cannot reach ================= */
 

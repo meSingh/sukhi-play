@@ -1,0 +1,133 @@
+---
+/**
+ * What gets pressed, for the few visitors who let Analytics run.
+ *
+ * One listener on the page, so a new button is counted without anyone
+ * remembering to wire it up. Each press becomes an event with a group (is it a
+ * download, a playground app, a link to GitHub), the words on the button, and
+ * the part of the page it sits in. Nothing about the visitor is added: no
+ * name, no address, nothing typed.
+ *
+ * It sends nothing unless Consent.astro has loaded Analytics, which only
+ * happens with the visitor's agreement (or, outside Europe, until they turn it
+ * off). Without that, window.gtag does not exist and every call here is a
+ * no-op.
+ *
+ * The events, and what to set up in Analytics to read them, are described in
+ * web/ANALYTICS.md.
+ */
+---
+
+<script is:inline>
+(function () {
+  function send(name, params) {
+    if (typeof window.gtag !== 'function') return;
+    window.gtag('event', name, params);
+  }
+
+  var clean = function (s, n) { return (s || '').replace(/\s+/g, ' ').trim().slice(0, n || 100); };
+
+  // The words a visitor would use for it: its own label, else its bold title
+  // (the platform cards have one), else everything it says.
+  function label(el) {
+    var b = el.querySelector('b');
+    return clean(el.getAttribute('data-track') || el.getAttribute('aria-label') ||
+      (b && b.textContent) || el.innerText || el.textContent || el.title);
+  }
+
+  // Where on the page it was: a named region if it has one, otherwise the
+  // heading it sits under. Anything above the first subheading is the hero.
+  function section(el) {
+    var named = el.closest('[data-section]');
+    if (named) return named.getAttribute('data-section');
+    if (el.closest('.nav-dl-menu')) return 'header download menu';
+    if (el.closest('header.top')) return 'header';
+    if (el.closest('.docs-nav, .docsnav')) return 'docs menu';
+    if (el.closest('.madeby')) return 'made by';
+    if (el.closest('footer')) return 'footer';
+    if (el.closest('.getting')) return 'download countdown';
+    var heads = document.querySelectorAll('#main h1, #main h2');
+    var under = null;
+    for (var i = 0; i < heads.length; i++) {
+      if (heads[i].compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) under = heads[i];
+    }
+    if (!under || under.tagName === 'H1') return 'hero';
+    return clean(under.getAttribute('data-section') || under.textContent, 60);
+  }
+
+  // Which machine a release file is for, from its name.
+  function file(name) {
+    var n = name.toLowerCase();
+    var platform = /macos/.test(n) ? 'macos' : /windows/.test(n) ? 'windows' : /linux|\.deb$|appimage/.test(n) ? 'linux' : 'other';
+    var variant = /catalina/.test(n) ? 'catalina' : /applesilicon/.test(n) ? 'apple-silicon' : /intel/.test(n) ? 'intel'
+      : /setup/.test(n) ? 'installer' : /portable/.test(n) ? 'portable' : /\.deb$/.test(n) ? 'deb'
+      : /appimage/.test(n) ? 'appimage' : n.split('.').pop();
+    return { platform: platform, variant: variant, file_name: name };
+  }
+  var PLATFORMS = { macos: 1, windows: 1, linux: 1 };
+
+  // Turns a link into an event name and its parameters.
+  function link(a) {
+    var url;
+    try { url = new URL(a.href, location.href); } catch (e) { return null; }
+    var here = url.origin === location.origin;
+    var path = url.pathname;
+    var seg = path.split('/').filter(Boolean);
+
+    if (url.hostname === 'github.com' && /\/releases\/(latest\/)?download\//.test(path)) {
+      var f = file(seg[seg.length - 1]);
+      if (f.platform === 'other') return ['ui_click', { link_group: 'checksums', file_name: f.file_name }];
+      return ['download_start', Object.assign(f, { link_group: 'download', method: 'link' })];
+    }
+    if (url.hostname === 'snapcraft.io') return ['download_click', { link_group: 'store', platform: 'linux', variant: 'snap' }];
+    if (/(^|\.)microsoft\.com$/.test(url.hostname)) return ['download_click', { link_group: 'store', platform: 'windows', variant: 'store' }];
+    if (here && PLATFORMS[seg[0]] && seg.length === 1) {
+      var get = url.searchParams.get('get');
+      return ['download_click', { link_group: 'download', platform: seg[0], variant: get || 'choose' }];
+    }
+    if (here && seg[0] === 'download' && seg.length === 1) return ['download_click', { link_group: 'download', platform: 'any', variant: 'choose' }];
+    if (here && seg[0] === 'playground' && seg[1]) return ['open_app', { link_group: 'playground', app: seg[1] }];
+    if (!here) return ['ui_click', { link_group: url.hostname === 'github.com' ? 'github' : 'outbound', link_domain: url.hostname }];
+    if (path === location.pathname && url.hash) return ['ui_click', { link_group: 'same page' }];
+    if (a.closest('header.top')) return ['ui_click', { link_group: 'nav' }];
+    if (a.closest('footer')) return ['ui_click', { link_group: 'footer' }];
+    if (seg[0] === 'docs') return ['ui_click', { link_group: 'docs' }];
+    return ['ui_click', { link_group: 'page link' }];
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest && e.target.closest('a[href], button, summary');
+    if (!el || el.closest('[data-no-track]')) return;
+
+    var ev;
+    if (el.tagName === 'A') ev = link(el);
+    else if (el.tagName === 'SUMMARY') ev = ['ui_click', { link_group: 'question', open: el.parentElement.open ? 'closed' : 'opened' }];
+    else ev = ['ui_click', { link_group: 'control' }];
+    if (!ev) return;
+
+    var p = ev[1];
+    p.link_text = label(el);
+    p.section = section(el);
+    if (el.tagName === 'A') p.link_url = el.href.split('?')[0].slice(0, 100);
+    // The home page marks the card for the visitor's own computer.
+    var yours = el.querySelector('.yours');
+    if (yours) p.recommended = yours.hidden ? 'no' : 'yes';
+    send(ev[0], p);
+  }, true);
+
+  /**
+   * For the platform pages' countdown, which starts a download by itself
+   * rather than through a link. from_path is the page on this site the visitor
+   * chose it on, so a download can be traced back to the button that began it.
+   */
+  window.sukhiDownload = function (what, key, url, method) {
+    var from = '(direct)';
+    try { var r = new URL(document.referrer); if (r.origin === location.origin) from = r.pathname; } catch (e) { /* no referrer */ }
+    var f = file(url.split('/').pop());
+    send(what === 'cancel' ? 'download_cancel' : 'download_start', {
+      link_group: 'download', method: method, section: 'download countdown',
+      platform: f.platform, variant: key, file_name: f.file_name, from_path: from
+    });
+  };
+})();
+</script>

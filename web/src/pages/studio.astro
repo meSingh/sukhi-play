@@ -41,6 +41,7 @@ const schema = {
   ],
   isPartOf: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
 };
+import Img from '../components/Img.astro';
 ---
 
 <Base
@@ -52,7 +53,7 @@ const schema = {
 
   <div class="wrap">
     <div class="hero co-hero">
-      <img class="co-mark bob" src="/assets/playground-studio.png" alt="" width="112" height="112">
+      <Img class="co-mark bob" src="/assets/playground-studio.png" alt="" width="112" height="112" sizes="112px" />
       <h1>Jazz's&nbsp;Studio</h1>
       <p class="lede">Design it. Print it. Make it yours.</p>
 
@@ -69,9 +70,9 @@ const schema = {
     </div>
 
     <div class="device co-device reveal">
-      <img src="/screenshots/studio/01-hello.png"
+      <Img src="/screenshots/studio/01-hello.png"
            alt="Jazz's character waving next to the words Hi Jazz, above six tiles: Stationery, Make from a box, My brand, Play, My makes and Make it yours"
-           width="1240" height="800" fetchpriority="high" decoding="async">
+           width="1240" height="800" fetchpriority="high" decoding="async" sizes="(min-width: 1100px) 1040px, 94vw" />
     </div>
     <p class="note-small">What your child will see.</p>
   </div>
@@ -79,7 +80,7 @@ const schema = {
   <section class="band" style="margin-top:72px">
     <div class="wrap">
       <div class="st-story reveal">
-        <img src="/assets/studio-hello.webp" alt="Jazz's character, a girl with long dark hair in a green shirt, waving" width="900" height="838" loading="lazy" decoding="async">
+        <Img src="/assets/studio-hello.webp" alt="Jazz's character, a girl with long dark hair in a green shirt, waving" width="900" height="838" loading="lazy" decoding="async" sizes="(max-width: 700px) 220px, 360px" />
         <div>
           <span class="kicker">Where it came from</span>
           <h2>Made for one girl. Yours can play too.</h2>
@@ -138,9 +139,9 @@ const schema = {
           <h2>Everyone on them, each with their own name</h2>
           <p>Tick whoever goes on: Jazz, her brother Sukhi, a friend. Each one gets their own name under their face, changed right there on the sheet.</p>
         </div>
-        <img src="/screenshots/studio/02-me-stickers.png"
+        <Img src="/screenshots/studio/02-me-stickers.png"
              alt="Me stickers of Jazz and Sukhi in turn, each with their name underneath, and the Who is on it picker"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
 
       <div class="co-shot co-shot--flip reveal">
@@ -149,9 +150,9 @@ const schema = {
           <h2>Turn the recycling into something</h2>
           <p>Measure a toilet roll, print a wrap that fits it, and it is a pencil pot. A drawing shows exactly what to measure, and two to a sheet can be for two people.</p>
         </div>
-        <img src="/screenshots/studio/04-make-from-a-box.png"
+        <Img src="/screenshots/studio/04-make-from-a-box.png"
              alt="Make from a box: a drawing of a toilet roll showing what to measure, and a printed wrap that says Pens"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
 
       <div class="co-shot reveal">
@@ -160,9 +161,9 @@ const schema = {
           <h2>A logo for everyone, on everything</h2>
           <p>Each person has a brand: a badge, a stamp, a ribbon or a tag, with their picture. It goes on their diary, on business cards, and on logo stickers cut out round its shape.</p>
         </div>
-        <img src="/screenshots/studio/05-my-brand.png"
+        <Img src="/screenshots/studio/05-my-brand.png"
              alt="My brand: choosing whose brand, a round badge logo reading Jazz Studio, and a sheet of business cards"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
 
       <div class="co-shot co-shot--flip reveal">
@@ -171,9 +172,9 @@ const schema = {
           <h2>Their colours, right where they are working</h2>
           <p>Twelve colour sets, dark ones first, and any colour besides. Try one and the sheet changes on the spot, and only that sheet: each one keeps its own.</p>
         </div>
-        <img src="/screenshots/studio/03-diary-cover.png"
+        <Img src="/screenshots/studio/03-diary-cover.png"
              alt="A diary cover reading Jazz's Diary, with the colour strip above it"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
 
       <div class="co-shot reveal">
@@ -182,9 +183,9 @@ const schema = {
           <h2>It asks their name, and who they are</h2>
           <p>Two quick questions when it first opens: their name, so it says hello to them, and their character, Jazz, Sukhi, or one of their own. Both can be skipped and changed later.</p>
         </div>
-        <img src="/screenshots/studio/10-welcome.png"
+        <Img src="/screenshots/studio/10-welcome.png"
              alt="The welcome: Welcome to the studio, with a box for their name and a Next button"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
 
       <div class="co-shot co-shot--flip reveal">
@@ -193,9 +194,9 @@ const schema = {
           <h2>Their family and friends, too</h2>
           <p>Add a character and it asks who it is. Each person has their own pictures, their own name on everything, and can be switched off without losing them.</p>
         </div>
-        <img src="/screenshots/studio/07-make-it-yours.png"
+        <Img src="/screenshots/studio/07-make-it-yours.png"
              alt="Character and name: Jazz and Sukhi switched on at the top, and Jazz's pictures with an Add a picture tile"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
 
       <div class="co-shot reveal">
@@ -204,9 +205,9 @@ const schema = {
           <h2>Tickets for their friends</h2>
           <p>Eight cards to cut out and hand round, each with a code a phone camera opens the studio from. The code is made on the device, with their character in the middle of it.</p>
         </div>
-        <img src="/screenshots/studio/11-invite-cards.png"
+        <Img src="/screenshots/studio/11-invite-cards.png"
              alt="Invite a friend: a sheet of ticket-shaped cards, each with a QR code and You're invited"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
 
       <div class="co-shot co-shot--flip reveal">
@@ -215,9 +216,9 @@ const schema = {
           <h2>A story to write and draw</h2>
           <p>Who, what happens and where, chosen or spun: Sukhi finds a secret door on the moon. It prints as a page with a box to draw in, the hero already standing in it, and lines to write on.</p>
         </div>
-        <img src="/screenshots/studio/12-story-page.png"
+        <Img src="/screenshots/studio/12-story-page.png"
              alt="Story sparks: Sukhi finds a secret door on the moon, with the story page ready to print"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
 
       <div class="co-shot reveal">
@@ -226,9 +227,9 @@ const schema = {
           <h2>Print it again, or change it first</h2>
           <p>After a print, the studio asks whether to keep it and what to call it. It keeps the settings, not a picture, so opening one brings the sheet back exactly as it was, ready to print or to change a word.</p>
         </div>
-        <img src="/screenshots/studio/09-my-prints.png"
+        <Img src="/screenshots/studio/09-my-prints.png"
              alt="My makes, with kept prints of bookmarks, stickers, a pencil pot wrap, a name poster and a secret message, each with an Open button"
-             width="1240" height="800" loading="lazy" decoding="async">
+             width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
       </div>
     </div>
   </section>
@@ -275,9 +276,9 @@ const schema = {
             <li><b>Computer</b> In Chrome or Edge, click the install icon in the address bar.</li>
           </ul>
         </div>
-        <img src="/screenshots/studio/08-on-a-phone.png"
+        <Img src="/screenshots/studio/08-on-a-phone.png"
              alt="Jazz's Studio on a phone: the greeting at the top and the six rooms as tiles below"
-             width="402" height="844" loading="lazy" decoding="async">
+             width="402" height="844" loading="lazy" decoding="async" sizes="(min-width: 900px) 300px, 80vw" />
       </div>
     </div>
   </section>

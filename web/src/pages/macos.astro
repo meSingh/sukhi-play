@@ -21,7 +21,7 @@ import Base from '../layouts/Base.astro';
     <div class="gt-top">
       <div class="gt-ring" aria-hidden="true"><svg viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="27"/><circle class="prog" cx="32" cy="32" r="27"/></svg><b class="gt-count">5</b><span class="gt-done">&check;</span></div>
       <div class="gt-text" aria-live="polite"><b class="gt-title">Your download starts in a moment</b><span class="gt-file"></span></div>
-      <div class="gt-actions"><a class="gt-now" href="#">Download now</a><button class="gt-cancel" type="button">Cancel</button></div>
+      <div class="gt-actions"><a class="gt-now" href="#" data-no-track>Download now</a><button class="gt-cancel" type="button" data-no-track>Cancel</button></div>
     </div>
     <div class="gt-note" data-for="*"><b>macOS will block it the first time. That is expected.</b><ol><li><span>Open it once and click <b>Done</b></span></li><li><span><b>System Settings</b> &rarr; <b>Privacy &amp; Security</b></span></li><li><span>Click <b>Open Anyway</b></span></li></ol><a href="#first-launch">Full steps &darr;</a></div>
   </div>
@@ -45,8 +45,10 @@ import Base from '../layouts/Base.astro';
     history.replaceState(null, '', location.pathname + location.hash);
 
     var left = 5, timer;
-    var start = function () {
+    var tries = 0;
+    var start = function (how) {
       clearInterval(timer);
+      if (window.sukhiDownload) window.sukhiDownload('start', key, pick.url, tries++ ? 'retry' : how);
       box.classList.add('started');
       title.textContent = 'Downloading';
       now.textContent = 'Didn’t start? Try again';
@@ -57,12 +59,13 @@ import Base from '../layouts/Base.astro';
     timer = setInterval(function () {
       left -= 1;
       count.textContent = left;
-      if (left <= 0) return start();
+      if (left <= 0) return start('countdown');
       title.textContent = 'Your download starts in ' + left + ' second' + (left === 1 ? '' : 's');
     }, 1000);
-    now.addEventListener('click', function (e) { e.preventDefault(); start(); });
+    now.addEventListener('click', function (e) { e.preventDefault(); start('now'); });
     box.querySelector('.gt-cancel').addEventListener('click', function () {
       clearInterval(timer);
+      if (window.sukhiDownload) window.sukhiDownload('cancel', key, pick.url, 'cancel');
       box.hidden = true;
     });
   })();
