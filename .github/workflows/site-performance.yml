@@ -1,0 +1,63 @@
+name: Website speed
+
+# Guards what PageSpeed Insights measures, so a heavy picture or a slow page
+# is caught in the commit that adds it rather than months later.
+#
+# Two checks, on the built site in docs/ exactly as GitHub Pages serves it:
+#
+#   Pictures   web/scripts/check-images.mjs. Every picture has a WebP copy, a
+#              width and height, and fits its budget. No browser, no noise:
+#              it fails only when something is actually wrong.
+#   Lighthouse lighthouserc.json. The same engine as PageSpeed, on a
+#              simulated phone, three runs a page. Scores wobble a little run
+#              to run, so the limits leave room; a failure is worth a look.
+#
+# It also runs every Monday, so a change outside this repository (a slower
+# GitHub Pages, a new Lighthouse rule) still shows up. The reports are kept as
+# a download on each run's page. Analytics is blocked during the runs, so
+# they never appear as visitors.
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**', 'web/**', 'lighthouserc.json', '.github/workflows/site-performance.yml']
+  pull_request:
+    paths: ['docs/**', 'web/**', 'lighthouserc.json', '.github/workflows/site-performance.yml']
+  schedule:
+    - cron: '41 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-performance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pictures:
+    name: Pictures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node web/scripts/check-images.mjs
+
+  lighthouse:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run Lighthouse on five pages
+        run: npx --yes @lhci/cli@0.15.x autorun
+      - name: Keep the reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci
+          retention-days: 30
