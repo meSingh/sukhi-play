@@ -1,0 +1,48 @@
+name: Count downloads
+
+# Once a week, the download counts GitHub keeps for every release file, added
+# as one row to downloads.csv on the stats branch. GitHub only keeps a running
+# total, so this is what turns it into "how many this week": subtract last
+# week's row. The same numbers are on the run's summary page.
+#
+# The stats branch holds nothing but that file, so the rows never touch main.
+# Run it by hand from the Actions tab to see today's numbers.
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  count:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Open the stats branch
+        run: |
+          if git fetch --depth=1 origin stats; then
+            git worktree add "$RUNNER_TEMP/stats" FETCH_HEAD
+            git -C "$RUNNER_TEMP/stats" switch -c stats
+          else
+            git worktree add --orphan -b stats "$RUNNER_TEMP/stats"
+          fi
+
+      - name: Count
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/downloads.mjs --summary --csv "$RUNNER_TEMP/stats/downloads.csv"
+
+      - name: Keep the row
+        working-directory: ${{ runner.temp }}/stats
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add downloads.csv
+          git commit -m "Downloads on $(date -u +%F)"
+          git push origin stats
