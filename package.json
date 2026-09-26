@@ -37,7 +37,8 @@
     "snap-template": "node scripts/snap-template.js",
     "playground": "node scripts/playground-app.mjs --all",
     "shots:colouring": "electron scripts/colouring-shots.js",
-    "shots:studio": "electron scripts/studio-shots.js"
+    "shots:studio": "electron scripts/studio-shots.js",
+    "shots:railway": "electron scripts/railway-shots.js"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

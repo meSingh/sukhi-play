@@ -18,6 +18,10 @@
  *                                 committed -- the site build regenerates it,
  *                                 and docs/ is where the published copy lives.
  *
+ * An app marked "sukhi": { "experiment": true } in its package.json goes to
+ * the website only. It is something children can try, not yet something
+ * Sukhi Play ships.
+ *
  * The sources under playground/ are separate repositories and the parent
  * ignores them, so this reads a working copy that may not be there. When it is
  * not, and apps/<name>/app already is, that is fine and this says so: the
@@ -89,8 +93,18 @@ function build (name) {
     throw new Error(`${name}: the build produced no dist/index.html`);
   }
 
-  copyTree(dist, shipped);
+  // An experiment is on the website only: children can try it there, and it
+  // is not in the download until it has earned a release. Marked in the
+  // app's own package.json as "sukhi": { "experiment": true }.
+  const experiment = JSON.parse(fs.readFileSync(path.join(source, 'package.json'), 'utf8')).sukhi?.experiment === true;
   copyTree(dist, path.join(SERVED, name));
+  if (experiment) {
+    const { files, bytes } = count(dist);
+    console.log(`${name}: an experiment, ${files} files, ${(bytes / 1024).toFixed(0)} kB`);
+    console.log(`  served from  web/public/playground/${name}/ (website only, not shipped)`);
+    return;
+  }
+  copyTree(dist, shipped);
 
   // The licence travels with what ships, next to app/, where the packager and
   // the tests expect it. Copied rather than written here, so it can never say
