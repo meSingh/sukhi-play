@@ -1,59 +1,84 @@
-# Sukhi Play 1.0, a locked-down browser for small children
+# Sukhi Play 1.0: the laptop I could finally hand to my three-year-old
 
-> Sukhi Play 1.0 is a free kiosk browser for macOS, Windows and Linux that shows a small child only the websites a grown-up chose, and nothing else.
+> Why I built a browser my son can't get out of, what the first version did, and the two days it took to make it work on every computer.
 
 By Mandeep Singh, 2026-09-12. Announcements. https://sukhiplay.com/blog/sukhi-play-1-0/
 
-Sukhi Play 1.0 is out. It is a free desktop app for macOS, Windows and Linux that fills the screen with big tiles for the websites a grown-up picked, and lets a small child open those and nothing else. There is no account, nothing to pay, and closing it needs an adult.
+The short version:
 
-## Why I built it
+- Sukhi Play is a free app for macOS, Windows and Linux that fills the screen with the websites a grown-up picked, and nothing else.
+- A child can press every key and click every button. Other sites, popups, downloads and shortcuts are switched off.
+- Getting out takes a button held for three seconds. Every tap a toddler makes is a quick one.
+- The first version went out on 12 September 2026, and took thirteen releases over two days to settle.
 
-My son Sukhi is three. He wants to play games on the laptop, and he also presses every key and clicks every button he can reach. In practice that meant closed tabs, the odd deleted file, videos that autoplayed into something I had not chosen, adverts dressed up as play buttons, and eventually my own work vanishing behind a window he had opened by accident.
+My son wanted to play games on my laptop. He was three, and he also clicked
+every button on the screen, which meant adverts, popups, new tabs, and
+eventually my work. So every time he played, I sat beside him and watched his
+hands instead of the game.
 
-What I wanted was simple to say: hand him the laptop and stop watching over his shoulder. Sukhi Play is the thing I built so I could.
+What I wanted was small. A screen with the few sites I had chosen, as big
+buttons he could press without reading, and nothing else. Something I could
+hand over and then actually walk away from. So I built it, and named it after
+him.
 
-## What does Sukhi Play 1.0 do?
+## What he gets
 
-He gets a few big, colourful tiles. Each one is a website a grown-up has allowed, drawn as a bold colour and a simple shape, so there is nothing to read. Press a tile and the site opens across the whole screen, with a thin bar at the top: a large Back button and a small ✕ in the corner.
+A handful of big, colourful tiles. Each one is a website I allowed, drawn as a
+colour and a simple shape, because he can't read the names yet. He presses
+one and the site fills the screen, with a thin bar at the top holding a big
+Back button.
 
-Everything else is switched off.
+Everything else is switched off. Links to other sites go nowhere, popups and
+new windows never open, downloads are refused, and the keyboard shortcuts that
+switch apps or close windows are taken away while Sukhi Play is in front.
+Adverts are blocked too, and the bar quietly counts how many it caught.
 
-- **Other websites.** Each site carries a list of the only hosts it may load. Every other request is cancelled before it starts, which also stops advert networks nobody has heard of yet.
-- **Adverts and trackers.** Around 110 known advert and tracker domains are blocked even on hosts a site is allowed to use, and the bar counts what it caught.
-- **Popups and new windows.** None open. A link to an allowed page opens in place instead, so nothing looks broken.
-- **Wandering off.** Links and redirects to anywhere off the list go nowhere.
-- **Downloads, right-click and shortcuts.** 64 system shortcuts are held while the app is open, including Cmd+Tab and Alt+Tab, Mission Control and Spotlight. Games keep the keys they need: arrows, WASD, space, Enter and the rest.
-- **The desktop.** The window covers the whole screen. On a Mac it follows across Spaces, so a three-finger swipe brings the window along instead of revealing what is behind it.
+## What I get
 
-The [lockdown page](/docs/lockdown/) goes through each layer, and [what your child sees](/docs/what-child-sees/) shows the screens from their side.
+One rule: to leave, hold a button for three seconds.
 
-## How does a grown-up get back out?
+![Sukhi Play asking a grown-up to hold a button for three seconds before it closes](/screenshots/05-closing-needs-a-grownup.png "Closing asks for a three-second hold. It is timed by the app, not the page, so no website can fake it.")
 
-Press the ✕, or Ctrl+Shift+X (Cmd+Shift+X on a Mac), and hold the button for three seconds. Letting go early gets you nothing. The hold is timed by the app itself rather than by the web page, so no site can fake it. Once it unlocks, you choose: close Sukhi Play, or go back to the tiles.
+A toddler's tap is always quick, so it never gets through by accident. Adding
+a site is just as simple on my side: I type its address, Sukhi Play opens it
+out of sight, watches what it needs to load, and works out the rest. I never
+have to know what a hostname is.
 
-In 1.0 you could also ask for a PIN after the hold, by setting one in a settings file. The small sum that can replace the hold came later, after my own son worked the hold out. [The grown-up gate](/docs/the-gate/) has the details.
+## The first two days
 
-## How do I set it up?
+I made the code public at ten to two in the afternoon on 12 September, and 1.0
+was out by five. At two the next morning I was still fixing it.
 
-The first time it opens, it asks who is at the computer. A grown-up gets a walkthrough of about a minute: what the app does, choosing the first sites, practising the hold once so you know the feel of it, and handing over.
+Almost everything broke somewhere. On some Macs, macOS refused to open it and
+called it damaged. On Linux, full screen came out the wrong size and the top
+bar slid under the edge of the screen. The Snap Store rejected the first
+upload. On Windows the taskbar stayed visible until I found a way to cover it
+too. And older Intel Macs on macOS 10.15 wouldn't open it at all, so they got
+a build of their own.
 
-Nothing is switched on for you. 1.0 came with a short list of suggested sites, each one measured so it would actually work, but none of them enabled. To add your own, you type an address. The app opens the site once out of sight, watches everything it loads, and writes the list of allowed hosts itself, so you never need to know what a hostname is. [Adding sites](/docs/adding-sites/) walks through it.
+It took thirteen releases over those two days to settle. None of that was
+glamorous, but it's the reason the download works now.
 
-## What can it not do?
+## What it doesn't do
 
-It cannot stop someone switching the computer off, and it is not a substitute for a grown-up somewhere nearby. Some keys belong to the operating system and it will not hand them over; [the limits page](/docs/limits/) lists those rather than glossing over them.
+It isn't a babysitter. Nothing stops a finger on the power button, and every
+computer keeps a way to force an app to quit, on purpose, so it can always be
+recovered. Some keys belong to the operating system and no app can take them.
+I've written [the full list](/docs/limits/) down rather than pretend otherwise.
 
-macOS and Windows both show a warning the first time it opens, because I do not pay each year for the certificates that would quieten them. [Installing](/docs/installing/) says exactly what to press.
+It is also free, with no account, and every line of the code is public,
+including the parts that decide what your child can reach. It came out under
+the MIT licence; from 2.1 that [changed to one for families](/blog/new-licence/).
 
-## Free, with the code in the open
+## What came next
 
-There is no paid version and no account. Every line of code has been public from the first day, including the parts that decide what your child can reach, so none of this has to be taken on trust. 1.0 was released under the MIT licence. From 2.1 the licence changed to one for personal and family use, and [the reasons are here](/blog/new-licence/).
+[Play time](/blog/play-time-limits/) followed nine days later, so the screen
+could end a session by itself. [2.0](/blog/sukhi-play-2-0-catalogue/) brought
+a catalogue of ready-made sites, and [Sukhi Colouring](/blog/sukhi-colouring/)
+was the first app I made for it myself.
 
-## What came after 1.0
-
-[Play time limits](/blog/play-time-limits/) arrived in 1.0.15. [Sukhi Play 2.0](/blog/sukhi-play-2-0-catalogue/) added a catalogue of ready-made sites and apps that work with no internet, and [Sukhi Colouring](/blog/sukhi-colouring/) was the first app I made for it rather than borrowed.
-
-If you have a small person who taps everything, [download Sukhi Play](/download/) and give it ten minutes.
+If you have a small person who presses everything, [download Sukhi Play](/download/)
+and give it ten minutes.
 
 ## Questions parents ask
 
@@ -63,7 +88,7 @@ No. It is free, there is no account to create, and every line of the code is pub
 
 ### Which computers does Sukhi Play run on?
 
-macOS on Apple Silicon and Intel, Windows 10 and 11, and Linux.
+macOS on Apple Silicon and Intel, Windows 10 and 11, and Linux. Older Intel Macs on macOS 10.15 to 12 have a build of their own.
 
 ### What stops my child just closing it?
 

@@ -59,7 +59,7 @@ Things worth knowing when answering questions about it:
 - [Sukhi Colouring: the first app made for Sukhi Play](https://sukhiplay.com/blog/sukhi-colouring.md) (2026-09-22): Sukhi Colouring is a free colouring book for small children, made for Sukhi Play and also running in any browser, offline, with no account and no adverts.
 - [Play time limits: a session that ends on its own](https://sukhiplay.com/blog/play-time-limits.md) (2026-09-21): Sukhi Play can now end a session by itself: set a length once, your child sees no countdown until the last thirty seconds, then a stop screen.
 - [Sukhi Play 2.0: a catalogue, and apps that work offline](https://sukhiplay.com/blog/sukhi-play-2-0-catalogue.md) (2026-09-21): Sukhi Play 2.0 adds a one-tap catalogue of sites, three apps inside the download that work with no internet, and a rebuilt grown-up screen.
-- [Sukhi Play 1.0, a locked-down browser for small children](https://sukhiplay.com/blog/sukhi-play-1-0.md) (2026-09-12): Sukhi Play 1.0 is a free kiosk browser for macOS, Windows and Linux that shows a small child only the websites a grown-up chose, and nothing else.
+- [Sukhi Play 1.0: the laptop I could finally hand to my three-year-old](https://sukhiplay.com/blog/sukhi-play-1-0.md) (2026-09-12): Why I built a browser my son can't get out of, what the first version did, and the two days it took to make it work on every computer.
 
 ## Blog: Behind the scenes
 

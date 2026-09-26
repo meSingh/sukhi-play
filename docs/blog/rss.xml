@@ -125,13 +125,13 @@
       <description>Sukhi Play 2.0 adds a one-tap catalogue of sites, three apps inside the download that work with no internet, and a rebuilt grown-up screen.</description>
     </item>
     <item>
-      <title>Sukhi Play 1.0, a locked-down browser for small children</title>
+      <title>Sukhi Play 1.0: the laptop I could finally hand to my three-year-old</title>
       <link>https://sukhiplay.com/blog/sukhi-play-1-0/</link>
       <guid isPermaLink="true">https://sukhiplay.com/blog/sukhi-play-1-0/</guid>
       <pubDate>Sat, 12 Sep 2026 00:00:00 GMT</pubDate>
       <dc:creator>Mandeep Singh</dc:creator>
       <category>Announcements</category>
-      <description>Sukhi Play 1.0 is a free kiosk browser for macOS, Windows and Linux that shows a small child only the websites a grown-up chose, and nothing else.</description>
+      <description>Why I built a browser my son can't get out of, what the first version did, and the two days it took to make it work on every computer.</description>
     </item>
   </channel>
 </rss>
