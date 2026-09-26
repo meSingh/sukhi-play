@@ -284,35 +284,41 @@ what is behind it.
 A site that asks for fullscreen with its own button still gets it. The bar
 slides away and **Esc** brings it back.
 
-## Getting in: the hold, and the sum
+## Getting in: the hold, or the sum
 
 Pressing **Close** or **Grown-ups** asks for a button held down for three
 seconds. A toddler does not manage that by accident, but a toddler who uses the
 app every day learns it eventually, which is exactly what happened here.
 
-So Settings offers a second step: **hold and a sum**. After the hold you answer
-a small addition, two numbers between two and nine. A wrong answer gets a fresh
-pair, three wrong answers wait ten seconds, and the question is made and marked
-in the main process, never in the page. A child who has learned to hold a
-button has not learned to add.
+So Settings offers the **sum** instead of the hold: a small addition, two
+numbers between two and nine. A wrong answer gets a fresh pair, three wrong
+answers wait ten seconds, and the question is made and marked in the main
+process, never in the page. A child who has learned to hold a button has not
+learned to add.
 
 A PIN still works for anyone who prefers one: set `gateMode` to `pin` and a
-`pin` in `settings.json`.
+`pin` in `settings.json`, and the hold is followed by the PIN.
 
-New installs finish the walkthrough on the recommended settings: twenty minutes
-of play, and the sum on the way in. Settings has a button to put them back.
+A new install starts on the hold and no time limit. Both are one tap to change
+on the grown-up screen.
 
 ## Play time
 
-Set a session length at the top of the grown-up screen: ten minutes to an
-hour, or no limit. A countdown sits in the bar where your child can see it,
-warnings come at five minutes and at one, and when the time is up they get a
-stop screen and nothing else opens.
+Set a session length on the **Play time** tab of the grown-up screen: a
+shortcut from ten minutes to an hour, any number of minutes up to four hours,
+or no limit. Your child sees no countdown while they play; it appears only in
+the last thirty seconds (the last ten, on a session of five minutes or less).
+A short note at five minutes and at one minute is there for the grown-up
+nearby, so they can give the usual warning. When the time is up your child
+gets a stop screen and nothing else opens.
 
-Only the three second hold starts another session. The clock is counted in the
-main process, never in the page: a site your child is on shares that page's
-process, and a clock a game could stop is not a clock. The gate and the portal
-pause it, so setting up a new site does not spend your child's afternoon.
+From the stop screen they can ask for more, and only a grown-up can answer:
+the same hold or sum as anywhere else, then fifteen minutes, an hour, or the
+rest of the day. That applies to this session only; the rule you set does not
+move. The clock is counted in the main process, never in the page: a site your
+child is on shares that page's process, and a clock a game could stop is not a
+clock. The gate and the portal pause it, so setting up a new site does not
+spend your child's afternoon.
 
 It is a session, not a day. Nothing is stored between runs, because a stored
 daily total invites the question "what counts as a day", and answering it
@@ -322,8 +328,9 @@ wrongly means telling a two-year-old their time is gone at breakfast.
 
 Press ✕, or **Ctrl+Shift+X** (**Cmd+Shift+X** on a Mac).
 
-**Grown-ups** opens the portal. **Close** quits. Either way you hold a button
-for 3 seconds first, and the gate says which one you asked for.
+**Grown-ups** opens the portal. **Close** quits. Either way you pass the gate
+first: the three-second hold, or the sum if you chose it in Settings. The gate
+says which one you asked for.
 
 The hold is **timed in the main process**, not the page. The animation is only
 for you to look at, and letting go early gets you nothing.
@@ -352,8 +359,9 @@ hold:
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `gateMode` | `"hold"` | `"hold"`, or `"pin"` to also require a PIN |
+| `gateMode` | `"hold"` | `"hold"`, `"sum"` to answer an addition instead, or `"pin"` to type a PIN after the hold |
 | `holdSeconds` | `3` | Seconds the exit button must be held (1–15) |
+| `sessionMinutes` | `0` | Minutes of play in a session, up to 240. `0` is no limit |
 | `kiosk` | `true` | Cover the whole screen, no window chrome |
 | `alwaysOnTop` | `true` | Keep the window above everything else |
 | `refocusOnBlur` | `true` | Pull the window back if the child clicks away |
