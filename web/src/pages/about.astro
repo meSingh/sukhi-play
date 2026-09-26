@@ -1,0 +1,94 @@
+---
+/**
+ * Who makes Sukhi Play: one parent, for his own children.
+ *
+ * A page a parent reads before trusting a stranger's software with their
+ * child's screen, and the page search engines and assistants use to answer
+ * "who is behind this". Marked up as a ProfilePage for the Person every post
+ * is written by, so the blog's author has somewhere to point.
+ */
+import Base from '../layouts/Base.astro';
+import Img from '../components/Img.astro';
+import { AUTHOR, longDate, posts } from '../blog';
+import { REPO, SITE } from '../site';
+
+const news = (await posts()).filter((p) => p.data.kind !== 'guide').reverse();
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  url: `${SITE}/about/`,
+  name: 'Who makes Sukhi Play',
+  mainEntity: {
+    ...AUTHOR,
+    description: 'A parent who builds Sukhi Play, a free locked-down browser for small children, and the playground apps for his own son and daughter.',
+    knowsAbout: ['kiosk browsers for children', 'screen time for toddlers', 'Electron', 'web apps for children']
+  },
+  about: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
+};
+---
+
+<Base
+  title="Who makes Sukhi Play"
+  description="Sukhi Play is made by Mandeep Singh, a parent, for his own children. No company, no investors, no adverts: one person, and every line of code public."
+  page="about"
+  schema={schema}>
+
+  <main class="wrap whois">
+    <header class="whois-hero">
+      <Img class="bob" src="/assets/cutout-proud.png" alt="Sukhi, the character Sukhi Play is named after, smiling" width="140" height="140" loading="eager" sizes="140px" />
+      <div>
+        <p class="f-kicker">Who makes it</p>
+        <h1>One parent, making things for his children</h1>
+        <p class="lede">I am Mandeep Singh. I built Sukhi Play for my son, and I
+          keep making things for him and his sister. Other families are welcome to
+          everything.</p>
+      </div>
+    </header>
+
+    <section class="whois-facts" aria-label="In short">
+      <div><b>No company</b><span>One person. No investors, no staff, nothing to sell.</span></div>
+      <div><b>No adverts</b><span>Not in the app, not in the playground, not on this site.</span></div>
+      <div><b>Nothing collected</b><span>No account. The app sends nothing about your child anywhere.</span></div>
+      <div><b>Code in public</b><span>Every line, including what decides what a child can reach.</span></div>
+    </section>
+
+    <div class="whois-body doc-body">
+      <h2>Why it exists</h2>
+      <p>My son Sukhraj, Sukhi to everyone, was three and wanted to play games on
+        my laptop. He also pressed every key and clicked every button he could
+        reach, which meant adverts, popups, new tabs, and eventually my work.</p>
+      <p>I wanted to hand him the laptop and stop watching over his shoulder. So I
+        built a screen where pressing every key is perfectly safe: the sites I
+        chose, as big tiles, and nothing else. That became
+        <a href="/blog/sukhi-play-1-0/">Sukhi Play 1.0</a>.</p>
+
+      <h2>What it grew into</h2>
+      <p>His sister Jazz is ten and loves stationery, so she got
+        <a href="/studio/">Jazz's Studio</a>. Sukhi got <a href="/colouring/">a
+        colouring book</a> of his own, and now <a href="/playground/#experiments">a
+        railway</a> I am still testing with him. The studio and the colouring book work
+        in any browser and inside Sukhi Play, with no internet; the railway stays on
+        the website until children show they love it.</p>
+
+      <h2>How to reach me</h2>
+      <p>The best way is <a href={`${REPO}/issues`}>an issue on GitHub</a>: a bug,
+        a site that does not work, or how an experiment went with your child.
+        There is more about me at <a href="https://www.msingh.com">msingh.com</a>.</p>
+    </div>
+
+    {news.length > 0 && (
+      <section class="whois-story" aria-labelledby="story-head">
+        <h2 id="story-head">So far</h2>
+        <ol class="whois-line">
+          {news.map((p) => (
+            <li>
+              <time datetime={p.data.date.toISOString().slice(0, 10)}>{longDate(p.data.date)}</time>
+              <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+  </main>
+</Base>

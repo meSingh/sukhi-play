@@ -1,0 +1,19 @@
+---
+/**
+ * A cover for a post with no picture of its own: its kind's colour and a
+ * large drawing, so a page of cards never has a grey hole in it. Decorative;
+ * the card's words say what it is.
+ */
+import { KINDS, type Kind } from '../../blog';
+interface Props { kind: Kind; title: string }
+const { kind } = Astro.props;
+const tone = KINDS[kind].tone;
+const ART: Record<Kind, string> = {
+  guide: '<circle cx="60" cy="44" r="18" fill="#10D6A0"/><path d="M30 104c4-22 16-34 30-34s26 12 30 34" fill="#10D6A0"/><circle cx="104" cy="62" r="12" fill="#FFBE18"/><path d="M86 104c2-14 9-22 18-22s16 8 18 22" fill="#FFBE18"/>',
+  announcement: '<path d="M24 60l56-26v72L24 80z" fill="#8B5CF6"/><rect x="80" y="40" width="14" height="60" rx="7" fill="#3B6BFF"/><path d="M36 82l8 26h14l-6-22" fill="#8B5CF6"/><path d="M104 56h14M104 70h18M104 84h14" stroke="#FFBE18" stroke-width="6" stroke-linecap="round"/>',
+  story: '<rect x="26" y="30" width="92" height="66" rx="12" fill="#FF8A3D"/><path d="M44 52l12 10-12 10M66 74h20" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><rect x="52" y="100" width="40" height="8" rx="4" fill="#17153A" opacity=".2"/>'
+};
+---
+<span class:list={['cover', `tone-${tone}`]} aria-hidden="true">
+  <svg viewBox="0 0 144 132" set:html={ART[kind]} />
+</span>

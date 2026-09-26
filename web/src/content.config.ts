@@ -45,6 +45,16 @@ const blog = defineCollection({
     /** A picture from public/, shown under the title and used for sharing. */
     image: z.string().optional(),
     imageAlt: z.string().optional(),
+    /** A line under the picture, when it needs one. */
+    imageCaption: z.string().optional(),
+    /**
+     * Three or four sentences a parent could stop after: shown at the top as
+     * "the short version". What an answer engine lifts, so each one stands
+     * alone.
+     */
+    points: z.array(z.string()).default([]),
+    /** Where a claim came from, listed at the end and marked up as citations. */
+    sources: z.array(z.object({ title: z.string(), url: z.string().url() })).default([]),
     /** Follow-up questions, shown at the end and marked up for search. */
     faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
     draft: z.boolean().default(false)

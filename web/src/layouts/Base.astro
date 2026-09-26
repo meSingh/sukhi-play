@@ -20,6 +20,8 @@ interface Props {
   page?: string;
   /** Overrides the social image for a page that has a better one. */
   image?: string;
+  /** Says what that image shows, for anyone who cannot see it. */
+  imageAlt?: string;
   /** Extra JSON-LD for this page, on top of the site-wide graph. */
   schema?: Record<string, unknown>;
   /** Keeps a page out of search results. Only the 404 wants this. */
@@ -27,7 +29,7 @@ interface Props {
   /** A blog post: shared as an article, with its dates and author. */
   article?: { published: string; modified?: string; section?: string; tags?: string[] };
 }
-const { title, description, page, image = '/social-preview.png', schema, noindex, article } = Astro.props;
+const { title, description, page, image = '/social-preview.png', imageAlt = 'Sukhi Play: big tiles for the websites a grown-up chose, and nothing else', schema, noindex, article } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE);
 const social = new URL(image, Astro.site ?? SITE);
@@ -50,6 +52,17 @@ const app = {
   downloadUrl: `${SITE}/download/`,
   codeRepository: REPO,
   author: { '@type': 'Person', name: 'Mandeep Singh', url: 'https://www.msingh.com' }
+};
+
+// The site itself, and who stands behind it: one person, not a company.
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Sukhi Play',
+  url: `${SITE}/`,
+  inLanguage: 'en-GB',
+  description: 'A free locked-down browser for small children, its playground of apps, and a blog for parents.',
+  publisher: { '@type': 'Person', '@id': 'https://www.msingh.com/#me', name: 'Mandeep Singh', url: `${SITE}/about/` }
 };
 ---
 <!doctype html>
@@ -81,11 +94,13 @@ const app = {
   <meta property="og:description" content={description}>
   <meta property="og:url" content={canonical}>
   <meta property="og:image" content={social}>
+  <meta property="og:image:alt" content={imageAlt}>
   <meta property="og:locale" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
   <meta name="twitter:image" content={social}>
+  <meta name="twitter:image:alt" content={imageAlt}>
 
   <!-- A plain-language brief for assistants, and the markdown this page is
        written in where there is one. Both are cheaper to read than the HTML. -->
@@ -93,6 +108,7 @@ const app = {
   <link rel="alternate" type="application/rss+xml" href="/blog/rss.xml" title="The Sukhi Play blog">
 
   <script type="application/ld+json" is:inline set:html={JSON.stringify(app)} />
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(website)} />
   {schema && <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />}
 
   <script is:inline>document.documentElement.classList.remove('no-js')</script>

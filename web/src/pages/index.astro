@@ -5,11 +5,13 @@
  */
 import Base from '../layouts/Base.astro';
 import Img from '../components/Img.astro';
-import { KINDS, longDate, posts } from '../blog';
+import { isoDate, longDate, minutes, posts } from '../blog';
 
-// The three newest posts, so the front page always has something recent and
-// every post is one link from the home page.
-const latest = (await posts()).slice(0, 3);
+// The latest announcements and guides, so the front page always says what
+// is new, and the newest posts are one link from the home page.
+const all = await posts();
+const announced = all.filter((p) => p.data.kind === 'announcement').slice(0, 3);
+const guides = all.filter((p) => p.data.kind === 'guide').slice(0, 3);
 ---
 
 <Base title="Sukhi Play, a locked-down browser for a small child" description="Hand a child the laptop without handing over your work. Sukhi Play locks the screen to the websites you chose. Free for families, with every line of code public, for macOS, Windows and Linux." page="index">
@@ -239,17 +241,24 @@ const latest = (await posts()).slice(0, 3);
     </div>
   </section>
 
-  <!-- The newest thing in the playground. Near the end on purpose: this page
-       is about Sukhi Play first, and a new app is news for somebody who has
-       already read that far. The download stays the very last thing. -->
-  <section class="news">
+  <!-- What is new: its own band, near the end on purpose. This page is about
+       Sukhi Play first; what changed lately is news for somebody who has read
+       that far. The newest app leads, the latest announcements and guides sit
+       under it, and the experiment has a line of its own. The download stays
+       the very last thing. -->
+  <section class="whatsnew" data-section="what's new">
     <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">What's new</span>
+        <h2>New in the playground, and on the blog</h2>
+      </div>
+
       <div class="news-card reveal">
         <div class="news-say">
-          <span class="news-new">New</span>
+          <span class="news-new">New app</span>
           <div class="news-name">
             <Img src="/assets/playground-studio.png" alt="" width="64" height="64" loading="lazy" sizes="64px" />
-            <h2>Introducing Jazz's&nbsp;Studio</h2>
+            <h3>Jazz's&nbsp;Studio</h3>
           </div>
           <p>For the bigger ones. Design stickers, labels, diaries and more, and print them at home.</p>
           <p class="news-facts">Ages 7 and up &middot; Free &middot; Built into Sukhi Play</p>
@@ -265,29 +274,45 @@ const latest = (await posts()).slice(0, 3);
           </span>
         </a>
       </div>
+
+      <div class="wn-cols reveal">
+        <div class="wn-col tone-violet">
+          <div class="wn-head"><h3>Announcements</h3><a href="/blog/announcements/">All of them</a></div>
+          <ol class="wn-list">
+            {announced.map((p) => (
+              <li><a href={`/blog/${p.id}/`}>
+                <time datetime={isoDate(p.data.date)}>{longDate(p.data.date)}</time>
+                <b>{p.data.title}</b>
+              </a></li>
+            ))}
+          </ol>
+        </div>
+        <div class="wn-col tone-mint">
+          <div class="wn-head"><h3>For parents</h3><a href="/blog/for-parents/">All the guides</a></div>
+          <ul class="wn-list wn-list--pics">
+            {guides.map((p) => (
+              <li><a href={`/blog/${p.id}/`}>
+                {p.data.image && <Img src={p.data.image} alt={p.data.imageAlt ?? ''} loading="lazy" sizes="96px" />}
+                <span><b>{p.data.title}</b><small>{minutes(p)} min read</small></span>
+              </a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- The experiment, drawn like the repository card: a note in passing,
+           not a feature. -->
+      <a class="lab reveal" href="/playground/#experiments">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M18 5h12M20 5v13L8 38a4 4 0 0 0 3.5 6h25a4 4 0 0 0 3.5-6L28 18V5" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 32h22l4 7a2 2 0 0 1-1.8 3H10.8A2 2 0 0 1 9 39z" fill="#10D6A0"/><circle cx="21" cy="36" r="2" fill="#fff"/><circle cx="28" cy="34" r="1.5" fill="#fff"/></svg>
+        <span>
+          <span class="lab-tag">Now experimenting</span>
+          <b>Sukhi's Railway, my first experiment</b>
+          <span class="lab-say">A track-building toy for ages 3 to 5. On the website only, while I find out whether children love it.</span>
+        </span>
+        <span class="cta">Try it</span>
+      </a>
     </div>
   </section>
-
-  {latest.length > 0 && (
-    <section class="home-blog" data-section="from the blog">
-      <div class="wrap">
-        <div class="section-head reveal">
-          <span class="kicker">From the blog</span>
-          <h2>Notes from one parent to another</h2>
-        </div>
-        <div class="blog-cards blog-cards--three reveal">
-          {latest.map((p) => (
-            <a class="blog-card" href={`/blog/${p.id}/`}>
-              <small>{KINDS[p.data.kind].plural} &middot; {longDate(p.data.date)}</small>
-              <b>{p.data.title}</b>
-              <span>{p.data.description}</span>
-            </a>
-          ))}
-        </div>
-        <p class="home-blog-all"><a href="/blog/">Everything on the blog</a></p>
-      </div>
-    </section>
-  )}
 
   <section style="padding-top:24px">
     <div class="wrap">

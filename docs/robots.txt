@@ -8,8 +8,22 @@ User-agent: *
 Allow: /
 Disallow: /*.html$
 
-# Assistants are welcome, and there is a short brief written for them.
-# See https://sukhiplay.com/llms.txt
+# Assistants and answer engines are welcome, by name as well as by the rule
+# above, and there is a short brief written for them at /llms.txt, with the
+# whole site as text at /llms-full.txt.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bingbot
+Allow: /
+Disallow: /*.html$
 
 # Both addresses work. /sitemap.xml is the one crawlers and checkers try
 # first; sitemap-index.xml is what the build generates and is kept for

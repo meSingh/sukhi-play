@@ -64,6 +64,37 @@
         "imageAlt": {
           "type": "string"
         },
+        "imageCaption": {
+          "type": "string"
+        },
+        "points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "title",
+              "url"
+            ],
+            "additionalProperties": false
+          },
+          "default": []
+        },
         "faq": {
           "type": "array",
           "items": {

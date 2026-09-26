@@ -2,16 +2,20 @@
 /**
  * One blog post.
  *
- * Built for two kinds of reader. A parent on a phone gets the answer first
- * (the description, set as a short answer under the title), then the post,
- * then the questions people ask next. A search engine or an assistant gets
- * the same thing marked up: BlogPosting with its author and dates, the
- * breadcrumb, and the questions as FAQPage. The markdown is also served as
- * itself at /blog/<slug>.md (see [slug].md.ts), which llms.txt points to.
+ * Built for two kinds of reader. A parent on a phone gets the point first: a
+ * standfirst, the picture, and the short version in three or four lines; then
+ * the post; then the questions people ask next. On a wide screen the headings
+ * sit beside it as a table of contents.
+ *
+ * A search engine or an assistant gets the same thing marked up: BlogPosting
+ * with its author, dates, picture and sources, the breadcrumb, and the
+ * questions as FAQPage. The markdown is also served as itself at
+ * /blog/<slug>.md (see [slug].md.ts), which llms.txt points to.
  */
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Img from '../../components/Img.astro';
+import PostCard from '../../components/blog/PostCard.astro';
 import { AUTHOR, KINDS, isoDate, longDate, minutes, posts, related, type Post } from '../../blog';
 import { SITE } from '../../site';
 
@@ -21,12 +25,19 @@ export async function getStaticPaths () {
 }
 
 const { post, all } = Astro.props as { post: Post; all: Post[] };
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const d = post.data;
 const url = new URL(`/blog/${post.id}/`, SITE).href;
 const kind = KINDS[d.kind];
 const more = related(all, post);
 const read = minutes(post);
+const toc = headings.filter((h) => h.depth === 2);
+
+// The previous and next post of the same kind, oldest to newest.
+const sameKind = all.filter((p) => p.data.kind === d.kind);
+const here = sameKind.findIndex((p) => p.id === post.id);
+const newer = sameKind[here - 1];
+const older = sameKind[here + 1];
 
 const schema = {
   '@context': 'https://schema.org',
@@ -36,17 +47,28 @@ const schema = {
       '@id': `${url}#post`,
       headline: d.title,
       description: d.description,
+      abstract: d.points.length ? d.points.join(' ') : d.description,
       url,
       mainEntityOfPage: url,
       datePublished: isoDate(d.date),
       dateModified: isoDate(d.updated ?? d.date),
-      author: AUTHOR,
+      author: { ...AUTHOR, url: `${SITE}/about/` },
       publisher: AUTHOR,
       inLanguage: 'en-GB',
       articleSection: kind.plural,
       keywords: d.topics.join(', '),
       wordCount: (post.body ?? '').split(/\s+/).filter(Boolean).length,
-      ...(d.image ? { image: new URL(d.image, SITE).href } : {}),
+      timeRequired: `PT${read}M`,
+      ...(d.image ? {
+        image: {
+          '@type': 'ImageObject',
+          url: new URL(d.image, SITE).href,
+          caption: d.imageCaption ?? d.imageAlt
+        }
+      } : {}),
+      ...(d.sources.length ? {
+        citation: d.sources.map((s) => ({ '@type': 'CreativeWork', name: s.title, url: s.url }))
+      } : {}),
       isPartOf: { '@type': 'Blog', '@id': `${SITE}/blog/#blog`, name: 'The Sukhi Play blog', url: `${SITE}/blog/` },
       about: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
     },
@@ -55,7 +77,8 @@ const schema = {
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Sukhi Play', item: `${SITE}/` },
         { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE}/blog/` },
-        { '@type': 'ListItem', position: 3, name: d.title, item: url }
+        { '@type': 'ListItem', position: 3, name: kind.plural, item: `${SITE}/blog/${kind.slug}/` },
+        { '@type': 'ListItem', position: 4, name: d.title, item: url }
       ]
     },
     ...(d.faq.length ? [{
@@ -68,11 +91,9 @@ const schema = {
 };
 
 // Where a reader goes next depends on what they came to read.
-const next = d.kind === 'guide'
-  ? { say: 'Sukhi Play is free for families, with no account and nothing to pay.', href: '/download/', go: 'Download Sukhi Play' }
-  : d.topics.includes('playground') || d.topics.includes('apps')
-    ? { say: 'Every app in the playground runs in a browser, free, with no sign-up.', href: '/playground/', go: 'Open the playground' }
-    : { say: 'Free for families, for macOS, Windows and Linux.', href: '/download/', go: 'Download Sukhi Play' };
+const next = d.topics.includes('playground') || d.topics.includes('apps')
+  ? { say: 'Every app in the playground runs in a browser, free, with no sign-up.', href: '/playground/', go: 'Open the playground' }
+  : { say: 'Sukhi Play is free for families, on macOS, Windows and Linux. No account.', href: '/download/', go: 'Download Sukhi Play' };
 ---
 
 <Base
@@ -80,43 +101,66 @@ const next = d.kind === 'guide'
   description={d.description}
   page="blog"
   image={d.image}
+  imageAlt={d.imageAlt}
   schema={schema}
   article={{ published: isoDate(d.date), modified: d.updated ? isoDate(d.updated) : undefined, section: kind.plural, tags: d.topics }}>
 
-  <main class="wrap post-wrap">
+  <main class={`wrap post-shell tone-${kind.tone}`}>
     <article class="post">
-      <nav class="crumbs" aria-label="Breadcrumb">
-        <a href="/blog/">Blog</a> <span aria-hidden="true">/</span> <span>{kind.plural}</span>
-      </nav>
-
-      <h1>{d.title}</h1>
-
-      <p class="post-by">
-        <span class="post-avatar" aria-hidden="true">MS</span>
-        <span><a href="https://www.msingh.com" rel="author">Mandeep Singh</a>
-          <small>
-            <time datetime={isoDate(d.date)}>{longDate(d.date)}</time>
-            {d.updated && <> &middot; updated <time datetime={isoDate(d.updated)}>{longDate(d.updated)}</time></>}
-            &middot; {read} min read
-          </small>
-        </span>
-      </p>
-
-      <p class="post-answer"><span class="post-answer-label">In short</span>{d.description}</p>
+      <header class="post-head">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/blog/">Blog</a> <span aria-hidden="true">/</span> <a href={`/blog/${kind.slug}/`}>{kind.plural}</a>
+        </nav>
+        <h1>{d.title}</h1>
+        <p class="post-dek">{d.description}</p>
+        <p class="post-by">
+          <span class="post-avatar" aria-hidden="true">MS</span>
+          <span>
+            <a href="/about/" rel="author">Mandeep Singh</a>
+            <small>
+              <time datetime={isoDate(d.date)}>{longDate(d.date)}</time>
+              {d.updated && <> &middot; updated <time datetime={isoDate(d.updated)}>{longDate(d.updated)}</time></>}
+              &middot; {read} min read
+            </small>
+          </span>
+        </p>
+      </header>
 
       {d.image && (
         <figure class="post-figure">
-          <Img src={d.image} alt={d.imageAlt ?? ''} loading="eager" sizes="(min-width: 800px) 740px, 92vw" />
+          <Img src={d.image} alt={d.imageAlt ?? ''} loading="eager" fetchpriority="high" sizes="(min-width: 1060px) 720px, 92vw" />
+          {d.imageCaption && <figcaption>{d.imageCaption}</figcaption>}
         </figure>
       )}
 
-      <div class="doc-body post-body">
+      {d.points.length > 0 && (
+        <aside class="post-points" aria-label="The short version">
+          <p class="post-points-head">The short version</p>
+          <ul>{d.points.map((pt) => <li>{pt}</li>)}</ul>
+        </aside>
+      )}
+
+      {toc.length > 2 && (
+        <details class="post-toc post-toc--inline">
+          <summary>On this page</summary>
+          <ol>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+        </details>
+      )}
+
+      <div class="post-body">
         <Content />
       </div>
 
+      {d.sources.length > 0 && (
+        <section class="post-sources" data-section="sources">
+          <h2>Sources</h2>
+          <ol>{d.sources.map((s) => <li><a href={s.url} rel="noopener">{s.title}</a></li>)}</ol>
+        </section>
+      )}
+
       {d.faq.length > 0 && (
         <section class="post-faq" data-section="questions">
-          <h2>Questions parents ask</h2>
+          <h2 id="questions">Questions parents ask</h2>
           {d.faq.map((f) => (
             <details>
               <summary>{f.q}</summary>
@@ -128,32 +172,67 @@ const next = d.kind === 'guide'
 
       <aside class="post-author" data-section="about the author">
         <span class="post-avatar post-avatar--big" aria-hidden="true">MS</span>
-        <p><b>Mandeep Singh</b> built Sukhi Play for his son, who was three and
-          pressed every key, and keeps making things for him and his sister.
-          Everything here is written by him, from one parent to another, not
-          medical or professional advice.
-          <a href="https://www.msingh.com">msingh.com</a></p>
+        <p><b>Written by Mandeep Singh.</b> I built Sukhi Play for my son when he
+          was three and pressed every key, and I keep making things for him and
+          his sister. This is one parent's experience, not medical or professional
+          advice. <a href="/about/">More about me</a></p>
       </aside>
 
       <aside class="post-next" data-section="next step">
         <p>{next.say}</p>
         <a class="go" href={next.href}>{next.go}</a>
       </aside>
+
+      {(newer || older) && (
+        <nav class="post-pager" aria-label={`More ${kind.plural.toLowerCase()}`}>
+          {older ? <a class="post-pager-old" href={`/blog/${older.id}/`}><small>Earlier</small>{older.data.title}</a> : <span></span>}
+          {newer && <a class="post-pager-new" href={`/blog/${newer.id}/`}><small>Later</small>{newer.data.title}</a>}
+        </nav>
+      )}
     </article>
 
-    {more.length > 0 && (
-      <section class="post-more" data-section="more from the blog">
-        <h2>More from the blog</h2>
-        <div class="blog-cards">
-          {more.map((p) => (
-            <a class="blog-card" href={`/blog/${p.id}/`}>
-              <small>{KINDS[p.data.kind].plural} &middot; {longDate(p.data.date)}</small>
-              <b>{p.data.title}</b>
-              <span>{p.data.description}</span>
-            </a>
-          ))}
-        </div>
-      </section>
-    )}
+    <aside class="post-side">
+      {toc.length > 2 && (
+        <nav class="post-toc" aria-label="On this page">
+          <p class="post-toc-head">On this page</p>
+          <ol>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+          {d.faq.length > 0 && <a class="post-toc-faq" href="#questions">Questions parents ask</a>}
+        </nav>
+      )}
+    </aside>
   </main>
+
+  {more.length > 0 && (
+    <section class="post-more" data-section="more from the blog">
+      <div class="wrap">
+        <div class="blog-sec-head">
+          <h2>More from the blog</h2>
+          <a href="/blog/">All posts</a>
+        </div>
+        <div class="post-grid">
+          {more.map((p) => <PostCard post={p} />)}
+        </div>
+      </div>
+    </section>
+  )}
 </Base>
+
+<script is:inline>
+  /* Marks the heading being read in the table of contents. Decoration only:
+     without it the links all still work. */
+  (function () {
+    var links = document.querySelectorAll('.post-side .post-toc a[href^="#"]');
+    if (!links.length || !('IntersectionObserver' in window)) return;
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (a) { a.removeAttribute('aria-current'); });
+        var a = map[e.target.id];
+        if (a) a.setAttribute('aria-current', 'true');
+      });
+    }, { rootMargin: '0px 0px -70% 0px' });
+    document.querySelectorAll('.post-body h2[id], #questions').forEach(function (h) { io.observe(h); });
+  })();
+</script>

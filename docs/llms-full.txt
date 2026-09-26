@@ -1,0 +1,1690 @@
+# Sukhi Play: the manual and the blog, in full
+
+> A free locked-down browser for small children, for macOS, Windows and Linux,
+> made by Mandeep Singh for his own son. This file holds every page of the
+> documentation and every blog post. The brief is at https://sukhiplay.com/llms.txt.
+
+## Installing
+
+https://sukhiplay.com/docs/installing/
+
+> Every way to install Sukhi Play on macOS, Windows and Linux, and what to expect the first time it opens.
+
+On Ubuntu and any other distribution with snap, this is the easiest way and it
+updates itself:
+
+```bash
+sudo snap install sukhi-play
+```
+
+One thing to know about the snap: it runs under strict confinement, which is
+what keeps its permissions restricted, and a confined snap is not allowed to
+change desktop settings. So it does not borrow Alt+Tab and the Super key the
+way the `.deb` and `.AppImage` do. Everything else is identical. If that layer
+matters to you, use one of those instead.
+
+On macOS, the two links below always point at the newest release. There is a
+[dedicated macOS page](/macos/) covering which one to pick and the
+first-launch warning.
+
+| Platform | File |
+| --- | --- |
+| macOS (Apple Silicon) | **[Sukhi-Play-macOS-AppleSilicon.dmg](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-AppleSilicon.dmg)** |
+| macOS (Intel) | **[Sukhi-Play-macOS-Intel.dmg](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-macOS-Intel.dmg)** |
+| Windows 10 / 11 | **[Sukhi-Play-Windows-Setup.exe](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-Windows-Setup.exe)**, or [portable](https://github.com/meSingh/sukhi-play/releases/latest/download/Sukhi-Play-Windows-Portable.exe) |
+| Ubuntu / Debian | `.deb` |
+| Other Linux | `.AppImage`, `chmod +x` then run |
+
+Everything else is on the
+**[latest release](https://github.com/meSingh/sukhi-play/releases/latest)**
+page.
+
+> **These builds are signed, but not notarised.** Notarising needs a paid
+> Apple Developer account and an EV certificate is needed for Windows, both
+> annual, and this is a free project. `SHA256SUMS.txt` is attached to every
+> release if you want to check what you downloaded.
+>
+> **macOS** blocks the first launch with *"Apple could not verify Sukhi Play is
+> free of malware"*. Control-clicking the app and choosing *Open* used to get
+> past this, but macOS 15 removed that. The route is **System Settings** →
+> **Privacy & Security** → **Open Anyway**, under *Security* at the bottom.
+> Once per install. [Full walkthrough, with the one-line
+> alternative](/macos/).
+>
+> **Windows** SmartScreen shows *"Windows protected your PC"*. Click **More
+> info**, then **Run anyway** — the button only appears after More info.
+> [Full walkthrough, including how to check the hash](/windows/).
+
+Or run it from source:
+
+```bash
+git clone https://github.com/meSingh/sukhi-play.git
+cd sukhi-play
+npm install
+npm start
+```
+
+## The first run
+
+https://sukhiplay.com/docs/first-run/
+
+> What the walkthrough asks you, and what happens once it is done.
+
+The first time you open Sukhi Play it asks **who is using the computer right
+now**: a grown-up setting it up, or someone just looking. Choose *I'm a
+grown-up* and it walks you through four short steps:
+
+1. **What this is.** What your child will and will not be able to reach.
+2. **Choose what they can open.** Pick one or two sites from the suggestions.
+3. **How you get back out.** It explains the ✕ and the three-second hold, and
+   lets you practise the hold once so you know the feel of it.
+4. **Hand it over.**
+
+That is the whole setup. Afterwards the walkthrough never appears again, and the
+tile screen is what opens.
+
+If the tile screen is ever empty it says so plainly and offers a button that
+takes you to the grown-up screen, with no hunting through files.
+
+## Adding and removing sites
+
+https://sukhiplay.com/docs/adding-sites/
+
+> Take one from the catalogue, or paste any address and let the app work out what it needs.
+
+**Sukhi Play does not pick websites for you.** What it ships enabled is three
+of the apps that live inside the download -- [Sukhi Colouring](/docs/sukhi-colouring/),
+a keyboard playground and first games -- because those are files on your own
+disk with no network behind them and nobody's terms to accept. A fourth,
+[Jazz's Studio](/docs/jazz-studio/), is for older children and waits in the
+catalogue until you add it. Every website is yours to
+add, and you never need to work out hostnames yourself.
+
+Open the grown-up screen (**Grown-ups**, hold 3 seconds). Four tabs: play time,
+installed apps, the catalogue, and settings.
+
+### The catalogue, in one tap
+
+Sites that are known to work, grouped by category and labelled **no ads**,
+**ads filtered** or **ads showing**. Tap one and it arrives on the tile screen
+with the hosts it needs already filled in.
+
+The list is not reproduced here: it would drift the moment it changed, and it
+has. It lives at **[sukhiplay.com/catalogue](https://sukhiplay.com/catalogue/)**
+and in [config/suggestions.json](https://github.com/meSingh/sukhi-play/blob/main/config/suggestions.json), which is the one file
+both the app and the site are built from.
+
+Nothing in it is endorsed by this project, and none of those sites is connected
+to it. Read [DISCLAIMER.md](https://github.com/meSingh/sukhi-play/blob/main/DISCLAIMER.md).
+
+### Create a custom app: type an address and it works out the rest
+
+Type `pbskids.org`. The app opens it once, watches every request it makes, and
+tells you:
+
+```
+Found 1 host. 2 looked like advertising or tracking and will be blocked.
+  pbskids.org
+```
+
+Give the tile a name, press **Save**, and it writes the allowlist for you. This
+is the same machinery as `npm run check`, driven from the interface. Pick one of
+the sixteen shapes and a colour for the tile: a site's own favicon is its
+trademark, and this project has no licence to put one on a tile or in a
+release.
+
+### Your apps: turn things on and off
+
+Each app is a card shaped like the tile your child sees. The switch in its
+corner decides whether it appears on their screen, and tapping the card opens
+everything else: name, picture, colour, address, allowed hosts and ad filtering,
+with Delete at the bottom.
+
+<div align="center">
+<picture><source type="image/webp" srcset="/img/screenshots/02-parent-portal-800.webp 800w, /img/screenshots/02-parent-portal-1240.webp 1240w, /img/screenshots/02-parent-portal-1400.webp 1400w" sizes="(min-width: 800px) 760px, 94vw">
+<img src="/screenshots/02-parent-portal.png" width="760" height="486" loading="lazy" alt="The grown-up screen: tabs for play time, installed apps, the catalogue and settings, with a card and an on/off switch for each app"></picture>
+</div>
+
+### Leaving a site as its operator intended
+
+Some sites say plainly in their terms that you may not interfere with their
+advertising. `blockAds: false` is available on any site you add, for exactly
+that case. Containment still applies in full: your child cannot leave the site,
+open a popup, or reach anything else.
+
+**youtube.com is deliberately not in the catalogue.** Recommendations, comments
+and autoplay make it unsuitable for a small child.
+
+## Play time
+
+https://sukhiplay.com/docs/play-time/
+
+> Set how long a session lasts, and what happens when it runs out.
+
+Set a session length on the **Play time** tab of the grown-up screen: any
+number of minutes up to four hours, or no limit at all. It is a standing rule,
+not a decision you make each time -- the clock starts again every time Sukhi
+Play opens.
+
+Your child sees no countdown while they play. It appears only in the last
+thirty seconds, or the last ten on a session of five minutes or less, so there
+is nothing to watch or bargain with. When the time is up they get a stop
+screen and nothing else opens.
+
+## Giving more time
+
+From the stop screen your child can ask, and only a grown-up can answer: the
+same hold or sum as anywhere else, and then a choice of fifteen minutes, an
+hour, or the rest of the day.
+
+Whatever you grant applies to **that session only**. Your usual limit does not
+move, so giving an hour today does not quietly make every day an hour. The
+next time the app opens it starts from your rule again.
+
+If you would rather not grant anything, the stop screen also has a way out for
+a grown-up to close Sukhi Play. The clock is counted in the
+main process, never in the page: a site your child is on shares that page's
+process, and a clock a game could stop is not a clock. The gate and the portal
+pause it, so setting up a new site does not spend your child's afternoon.
+
+It is a session, not a day. Nothing is stored between runs, because a stored
+daily total invites the question "what counts as a day", and answering it
+wrongly means telling a two-year-old their time is gone at breakfast.
+
+## The grown-up gate
+
+https://sukhiplay.com/docs/the-gate/
+
+> The hold, the sum, and everything that sits behind them.
+
+Press ✕, or **Ctrl+Shift+X** (**Cmd+Shift+X** on a Mac).
+
+**Grown-ups** opens the portal. **Close** quits. Either way you hold a button
+for 3 seconds first, and the gate says which one you asked for.
+
+The hold is **timed in the main process**, not the page. The animation is only
+for you to look at, and letting go early gets you nothing.
+
+## The sum, instead of the hold
+
+If your child ever works the hold out, switch **Getting in here** on the
+Settings tab from *Hold* to *Sum*. You are then asked a small addition instead,
+and holding the button stops opening anything at all -- it is one way in or the
+other, never both.
+
+Wrong answers get a fresh sum, and three of them in a row lock the gate for ten
+seconds.
+
+## The grown-up screen
+
+Four tabs: **Play time**, **Installed apps**, **Catalogue** and **Settings**.
+Quitting is in the corner rather than buried in a menu. Besides adding and
+editing apps:
+
+- **Check for updates** asks GitHub whether a newer release exists and links to
+  it. It reports only. Nothing is downloaded or installed, because a kiosk that
+  can rewrite itself is a worse problem than one that is out of date.
+- **Reset Sukhi Play to factory settings** wipes every app and setting and
+  restarts into the walkthrough. It asks twice and cannot be undone.
+
+> A `.deb` or `.dmg` you installed by hand is not tracked by your system's app
+> store, so it will never offer you an update. That is how manual packages
+> work rather than a fault in this app. Use **Check for updates** and download
+> the new one.
+
+A PIN is also available, for anyone who would rather type one. Unlike the sum,
+it comes *after* the hold rather than instead of it:
+
+```json
+{ "gateMode": "pin", "pin": "4821" }
+```
+
+### Settings
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| `gateMode` | `"hold"` | `"hold"`, `"sum"` to answer an addition instead, or `"pin"` to also require a PIN after the hold |
+| `holdSeconds` | `3` | Seconds the exit button must be held (1–15) |
+| `kiosk` | `true` | Cover the whole screen, no window chrome |
+| `alwaysOnTop` | `true` | Keep the window above everything else |
+| `refocusOnBlur` | `true` | Pull the window back if the child clicks away |
+| `showBlockCounter` | `true` | Show "N ads blocked" in the bar |
+| `onboarded` | `false` | Set to `false` to see the first-run walkthrough again |
+| `borrowDesktopShortcuts` | `true` | Linux/GNOME only. Switch the desktop's Alt+Tab and Super key off while the app runs, then restore them |
+
+`refocusOnBlur` switches itself off if it ever starts fighting another window,
+so it can never make the machine unusable.
+
+## What your child sees
+
+https://sukhiplay.com/docs/what-child-sees/
+
+> The tile screen, and what is deliberately not on it.
+
+1. **A loading screen.**
+2. **The picker.** Big square tiles, one per site, each a bold colour and a
+   simple shape. No reading needed.
+3. **The site**, with a thin bar on top: a large blue **Back** button and a small
+   grey **✕** in the corner.
+
+The tile screen scrolls once there are more games than fit on the screen, so
+nothing ends up stranded above or below where a small child cannot reach it.
+
+There is no fullscreen button. The app already covers the screen, and there is
+nothing a child can press to shrink it.
+
+## Sukhi Colouring
+
+https://sukhiplay.com/docs/sukhi-colouring/
+
+> The colouring book built into Sukhi Play: what it does, where drawings are kept, and how to use it on any device.
+
+Sukhi Colouring is the colouring book that comes with Sukhi Play. It is the
+first app in the [playground](/playground/): little apps we make ourselves for
+Sukhi Play, rather than websites you allow. More are on the way.
+
+## Where to find it
+
+- **In Sukhi Play** it is the **Colouring** tile, switched on from the start.
+  It is part of the download, so it works with no internet at all.
+- **On any other device** open
+  [sukhiplay.com/playground/colouring](/playground/colouring/) in a browser.
+  Nothing to install and nothing to sign up for.
+
+## What your child can do
+
+- **Pick a picture** with the pictures button: forty to choose from, or leave
+  it and draw on a blank page.
+- **Draw** with the pencil, the crayon or the rainbow, in three widths.
+- **Tap to fill** a shape inside the picture. Tapping the paper around it
+  colours the whole page instead.
+- **Mirror drawing**, the butterfly, copies everything onto the other side.
+- **Rub out** with the eraser under the colours.
+- **Back** and **Forward** undo and redo. **Start again** clears the page, and
+  asks first.
+
+## Saving their pictures
+
+Press **Keep it** and the picture goes into **My pictures**. Open one from there
+and it comes back exactly as it was left, ready to carry on colouring. The
+download button under each saves a copy as an image file, and the bin removes
+it, after asking.
+
+Pictures are kept **on that device only**. Nothing is uploaded, and there is no
+account for them to be tied to. My pictures holds the sixty most recent; the
+oldest make way for new ones. Clearing the browser's data for the site, or
+using a private window, clears them too.
+
+## Settings
+
+The cog holds the language, English or 한국어, and the sound on or off. It sits
+at the end of the tools, out of the way of the ones a child uses most.
+
+## On a phone or tablet
+
+It works the same on a small screen, with the tools along the top and the
+colours along the bottom.
+
+To keep it on the home screen, press **Add to home screen** in the app: the
+phone with an arrow in it, next to the cog. It shows the steps for the device
+you are on, and in Chrome or Edge it has an **Install** button that does it in
+one tap. The steps, in case you would rather do it yourself:
+
+- **iPhone and iPad:** open it in Safari, tap **Share**, then
+  **Add to Home Screen**.
+- **Android:** open it in Chrome, open the menu, then **Add to Home screen**.
+- **A computer:** in Chrome or Edge, click the install icon at the end of the
+  address bar.
+
+It then opens full screen like any other app, and keeps working without
+internet once it has been opened once.
+
+## Jazz's Studio
+
+https://sukhiplay.com/docs/jazz-studio/
+
+> The stationery studio built into Sukhi Play for older children: what it makes, how printing works, and where their things are kept.
+
+Jazz's Studio is the second app in the [playground](/playground/), and the
+first for older children, about seven and up. It was made for Jazz, who is
+ten, and your child can use all of it, with their own name on everything and,
+if you like, their own character in place of Jazz's.
+
+## Where to find it
+
+- **In Sukhi Play** it comes in the download but is **not switched on**, so a
+  younger child's screen stays as it was. Open the grown-up screen, go to the
+  catalogue, and add **Studio**. It works with no internet at all.
+- **On any other device** open
+  [sukhiplay.com/playground/studio](/playground/studio/) in a browser. Nothing
+  to install and nothing to sign up for.
+
+## What your child can do
+
+- **Stationery:** in five groups: stickers (of their characters, or in their
+  pattern), a diary cover and pages, name labels and gift tags, a week planner
+  and to-do lists, and bookmarks and door signs. Each sheet keeps its own
+  colours, lettering and pattern, and a sheet with several people on it has
+  each one's own name, changed right there.
+- **Make from a box:** pick a pencil pot, desk tidy, notebook cover or treasure
+  box, measure the tube or box, and print a wrap that fits it, with the steps.
+- **My brand:** a brand for each person, in four styles (badge, stamp, ribbon
+  and tag), business cards, and logo stickers cut out round the logo. A diary
+  with someone on it carries their brand.
+- **Play:** a poster of their name, secret messages in a real code with a key
+  for a friend, a story page built from who, what happens and where, a doodle
+  pad, and invite cards with a code a friend's phone opens the studio from.
+- **My makes:** their prints, kept to print again, and a shelf of the things
+  they made.
+- **Make it yours:** their character and name, and the look of the studio: its
+  colours, lettering and background. Start again is a tab of its own, and asks
+  first.
+
+## Printing
+
+Every sheet is drawn on A4 to the millimetre, and prints on one page. In a
+browser, print wraps for **Make from a box** at **actual size**, not "fit to
+page", so they fit the thing they were measured for; each wrap has a line that
+should measure exactly 5 cm, so a ruler can check.
+
+On an **iPad**, Safari prints the page's address and the date at the top and
+bottom and always prints a little smaller than actual size, so the sheet is
+fitted into what is left. That is fine for stickers and planners; for a wrap,
+measure the 5 cm line.
+
+**Inside Sukhi Play there is no print window.** A print window can save to a
+file or open another program, both ways out of the locked screen, so Sukhi
+Play sends the page straight to the computer's **default printer** instead,
+and the studio tells your child when it has gone, or to ask a grown-up if the
+printer did not answer. Two presses a few seconds apart print once.
+
+Only apps Sukhi Play made itself can print. A website that tries to print is
+refused.
+
+## The first time, and their characters
+
+The first time the studio opens it asks two things, either of which can be
+skipped: their **name**, so it says hello to them, and their **character**:
+Jazz, her brother Sukhi, or one of their own. **Start again** asks again.
+
+In **Make it yours**, the list at the top is every character, each switched on
+or off. **Add a character** is someone new: it takes a picture of a character
+on one plain colour, cuts the background out on the device, finds the face so
+stickers and labels frame it, and then asks **who this is**, their name or
+"It's me". Each person then has **Add a picture** for more of them, and their
+name goes with them onto their stickers, labels and tags. Pictures can be
+nudged if the face is framed badly, or removed.
+
+The studio has a **For grown-ups** guide that walks through making one from a
+photo with Google Gemini, with the prompts that made Jazz's. When you use
+Gemini the photo goes to Google; nothing you add to the studio leaves the
+device.
+
+Inside Sukhi Play no page may open a file browser, so there a grown-up copies
+the picture and presses **Ctrl+V** (**Cmd+V** on a Mac) in Make it yours.
+
+## Prints to use again
+
+After something is printed, the studio asks whether to keep it in **My makes**
+and what to call it; there is also a **Keep in My makes** button beside Print.
+It keeps the print's settings, not a picture of it: which sheet, the words,
+which character, and its colours, lettering and pattern. **Open** puts the
+tool back exactly as it was, to print again or change something first. A kept
+print keeps its colours even if the studio's change later.
+
+## Photos and their things
+
+**My makes** also keeps each thing they made: its name, a note, and a photo.
+In a browser a photo can be taken or chosen. Inside Sukhi Play, which never
+opens a file browser, a grown-up copies a photo and presses **Ctrl+V**
+(**Cmd+V** on a Mac) on My makes, or drags one onto the photo box. Doodles
+from the doodle pad keep their picture everywhere.
+
+Everything is kept **on that device only**: nothing is uploaded, and there is
+no account. Clearing the browser's data for the site, or using a private
+window, clears it too.
+
+## On a phone or tablet
+
+To keep it on the home screen:
+
+- **iPhone and iPad:** open it in Safari, tap **Share**, then
+  **Add to Home Screen**.
+- **Android:** open it in Chrome, open the menu, then **Add to Home screen**.
+- **A computer:** in Chrome or Edge, click the install icon at the end of the
+  address bar.
+
+It then opens full screen like any other app, and keeps working without
+internet once it has been opened once.
+
+## How the lockdown works
+
+https://sukhiplay.com/docs/lockdown/
+
+> Every layer between your child and the rest of the computer, and what each one actually does.
+
+Six independent layers, so no single mistake opens a hole.
+
+**1. An allowlist per site.** Each entry lists the only hosts allowed to load
+*anything at all*. Every other request is cancelled: image, script, frame, websocket. This layer does most of the work: it blocks ad networks nobody has
+heard of yet, because they are not on the list.
+
+**2. An ad and tracker blocklist.** ~110 known ad, tracker and popunder domains
+plus URL patterns, checked *even on allowed hosts*. This catches ad code served
+from a site's own CDN, which an allowlist alone cannot see.
+
+**3. No new windows.** Every popup, `target="_blank"` and `window.open` is
+denied. If the link was to an allowed page it opens in place instead, so nothing
+appears broken.
+
+**4. No navigating away.** Any attempt to move the page, a frame, or a redirect
+to a non-allowlisted host is cancelled. Non-web schemes (`mailto:`, `steam:`,
+`file:`) are refused, so no page can launch another program.
+
+**5. No keyboard escapes, but games keep their keys.** A page-level filter
+swallows modifier combinations, function keys, devtools and reload. A second
+OS-level layer takes 64 shortcuts away from the window manager itself, including
+`Cmd/Alt+Tab`, Mission Control and Spotlight.
+
+What still reaches the game: **arrow keys, WASD and every other letter, the
+digits, space, Enter, Escape, and Ctrl or Shift pressed on their own.** A
+modifier held by itself is a game action; only a modifier *combined* with
+another key is a shortcut. The page is given keyboard focus on load and whenever
+it returns from the exit gate.
+
+**6. Nothing else.** Downloads cancelled. Right-click, devtools and `alert()`
+traps disabled. All permissions denied except fullscreen and pointer lock. No
+app menu. Bad certificates never overridable. Its own browser profile, entirely
+separate from yours.
+
+## The window
+
+https://sukhiplay.com/docs/the-window/
+
+> Full screen, always on top, and how that differs on each operating system.
+
+The app does **not** use native fullscreen, deliberately. On macOS a
+native-fullscreen app gets its own Space, and a three-finger swipe slides
+straight past it to the desktop.
+
+Instead the window is frameless, fixed, sized to the whole display, and kept at
+`screen-saver` level so it sits above the Dock and menu bar. On macOS it also
+joins every Space, so swiping brings the window along rather than revealing
+what is behind it.
+
+A site that asks for fullscreen with its own button still gets it. The bar
+slides away and **Esc** brings it back.
+
+## Editing by hand
+
+https://sukhiplay.com/docs/config-files/
+
+> The configuration files, for anyone who would rather use a text editor.
+
+Everything above writes to `catalog.json`, which you can edit directly if you prefer.
+
+| Field | Meaning |
+| --- | --- |
+| `id` | Unique short name, no spaces |
+| `title` | Caption under the tile |
+| `url` | The page that opens |
+| `shape` | `star` `rocket` `ball` `blocks` `note` `leaf` `drop` `bolt` |
+| `color` | Tile colour, `#rrggbb` |
+| `allowHosts` | **Only** these hosts may load. `example.com` also covers `a.example.com`, never `evil-example.com` |
+| `denyHosts` | Overrides `allowHosts`, for ad subdomains of an allowed domain |
+| `blockAds` | `false` leaves the site's advertising alone |
+| `enabled` | `true` to show the tile |
+
+Check your work from a terminal:
+
+```bash
+npm run probe -- --probe=https://example.com   # what hosts does this site need?
+npm run check -- --check=my-games              # does my profile actually work?
+```
+
+## What this cannot do
+
+https://sukhiplay.com/docs/limits/
+
+> The honest list of what Sukhi Play does not protect against, written down rather than glossed over.
+
+**Blocked at the OS level while the app is in front:** `Cmd/Alt+Tab`, `F1`–`F20`,
+Mission Control and Spaces, Spotlight, `Cmd/Ctrl+Q W M H N T R P S O F J L D U`,
+devtools shortcuts, zoom, `Alt+F4`, and screen capture (`Print Screen` and its
+variants, `Cmd+Shift+3/4/5/6`). Released the moment the window loses focus.
+
+**Not blocked, on purpose:**
+
+- **Force Quit.** `Cmd+Alt+Esc` on macOS, `Ctrl+Alt+Del` on Windows, and
+  `Ctrl+Shift+Esc`. Left alone so the machine can always be recovered. Do not
+  add these.
+
+**Held a different way, because Windows will not hand it over:**
+
+- **The Windows key.** A bare `Super` accelerator is rejected by Electron
+  outright, and Windows refuses `Super+D`, `Super+E`, `Super+R`, `Super+L`,
+  `Super+Tab`, `Super+Shift+S` and the rest when asked for them. Only
+  `Super+V`, `Super+Plus` and `Super+-` are handed over, and those are taken.
+
+  So pressing it opens the Start menu over the kiosk, and asking for focus back
+  does nothing: Windows refuses a foreground request from a background process,
+  and Start is drawn above every application window regardless of always-on-top.
+
+  What works is Escape. While the lockdown is on, a PowerShell helper watches
+  for the Start menu, Search and the quick settings panel, presses Escape on
+  whichever appeared and brings the window back to the front, measured at about
+  a quarter of a second. Any other foreground window is left alone, so keys are
+  never sent into a dialog. The helper starts with the lockdown and stops with
+  the app; nothing is installed and nothing on the machine is changed.
+
+  Run `npm run start-probe` to watch it happen, and `npm run key-probe` to
+  re-measure which keys this OS hands over.
+
+**On Linux the desktop's own shortcuts are borrowed, not blocked.** Alt+Tab and
+the Super key belong to GNOME rather than to any application, and under
+**Wayland**, the default on current Ubuntu, an application cannot intercept keys
+at all: Electron's global shortcuts are an X11 facility, and on Wayland they
+report success and catch nothing.
+
+So on a GNOME session Sukhi Play switches those bindings off in GNOME's own
+settings while it runs, and puts them back exactly as they were when it quits.
+25 of them, including Alt+Tab, the Super key, workspace switching and the
+screenshot keys.
+
+Every original value is written to disk before anything changes, so a crash
+cannot leave you without Alt+Tab: the next start finds the backup and restores
+from it. Set `borrowDesktopShortcuts` to `false` in `settings.json` if you would
+rather it left your desktop alone.
+
+On a desktop other than GNOME, choose **Xorg** at the login screen (the gear on
+the password field) for the in-app layer to work at all. The app says which
+session it found:
+
+```
+[gnome] borrowed 25 desktop shortcuts, including Alt+Tab and the Super key
+[gnome] originals saved to ..., restored when this app quits
+```
+
+**Cannot be blocked by any application:**
+
+- **Hardware media keys.** On a Mac, F-keys report as brightness, volume or
+  Launchpad unless "Use F1, F2 as standard function keys" is on. The key never
+  arrives as `F4`, so nothing can catch it.
+- **Trackpad swipes between Spaces.** Handled by the window manager, never
+  delivered to applications. The window follows onto the new Space, so your
+  child still lands on Sukhi Play.
+
+For a guarantee rather than a very good default, use a **separate user account**
+for your child, or Windows **Assigned Access** (Settings → Accounts → Set up a
+kiosk). Both are per-account and leave your own login untouched.
+
+**This is not a substitute for supervision.** It reduces what a small child can
+reach; it does not childproof a computer.
+
+## If it ever locks you out
+
+https://sukhiplay.com/docs/locked-out/
+
+> Getting back in when the gate will not open, on every platform.
+
+The app is built to **fail open**. If the launcher does not appear within 12
+seconds, or its window crashes, everything unlocks by itself: the 64 keyboard
+shortcuts are handed back for the rest of the session, always-on-top and screen
+covering are switched off, the window becomes an ordinary one you can close, and
+a plain message explains what happened. A kiosk with no visible exit gate must
+not also be holding `Cmd+Q`.
+
+If you still need to get out:
+
+- **Force Quit.** `Cmd+Alt+Esc` on macOS, `Ctrl+Alt+Del` on Windows. Never
+  captured, on purpose.
+- **From a terminal**, if you can reach one: `pkill -f "Sukhi Play"`
+
+When testing changes, give any run a hard deadline so it cannot take over the
+machine:
+
+```bash
+SUKHI_EXIT_AFTER=15 npm start    # quits itself after 15 seconds
+npm run dev                      # no screen covering, no shortcut capture
+```
+
+## Sukhi's Railway: a train set on the screen, and my first experiment
+
+https://sukhiplay.com/blog/sukhis-railway-an-experiment/ (Announcements, 2026-09-26, by Mandeep Singh)
+
+> A free track-building toy for ages three to five. It is an experiment: on the website only, not in Sukhi Play, until I know children love it.
+
+- Sukhi's Railway is a free toy for children of about three to five: drag a finger to lay track, press Go, and Sukhi drives it.
+- It is an experiment. It lives on the website only, not inside Sukhi Play, so it can change every week.
+- It works on a phone, a tablet or a computer, needs no reading, and keeps working with no internet once opened.
+- If your child tries it, tell me how it went. That decides whether it becomes a proper app.
+
+My son had started to get bored of the colouring book. So I built him a
+railway on the screen: a grass board, a tray of track, and a big green button.
+He lays the track, presses Go, and a little version of him drives it round.
+
+Then I showed it to him, and learned that building the track is the hard part.
+
+## What it is
+
+Drag a finger across the grass and track follows it, putting in the straights
+and curves by itself. Press **Go** and Sukhi sets off, in a train, a car or a
+bus.
+
+![Sukhi's Railway on a phone, with the track turned upright to fit the screen and the controls below it](/screenshots/railway/02-on-a-phone.png "On a phone the board turns upright, so nothing is too small to press.")
+
+Along the way there are pieces that do something:
+
+| Piece | What happens |
+| --- | --- |
+| Station | Animals wait on the platform, then climb aboard |
+| Bridge | The wheels rattle and the water splashes |
+| Tunnel | Dark for a moment, and Sukhi pulls a silly face |
+| Ramp | A little jump, and a "wheee" |
+| Bell | It swings and rings as he passes |
+| Car wash | Bubbles, everywhere |
+
+There is a tortoise for slow and a hare for fast, an undo button that is
+always there, and every track saves itself under **My tracks**. No reading, no
+losing, nothing to buy.
+
+## Why it is an experiment
+
+When I showed it to my son, who is not yet four, laying the track was hard
+for him to understand. I think part of that is the device: he tried it on one
+he does not usually play on, and I expect him to work it out better on his
+own. But one child, one try, is not enough to know.
+
+So instead of putting it inside Sukhi Play, where every change waits for a
+release, it lives on the website, in a new **Experiments** section of the
+[playground](/playground/#experiments). Any child can try it there, and I can
+change it every week as I learn.
+
+## Try it with your child
+
+Open [sukhiplay.com/playground/railway](/playground/railway/) on whatever they
+usually play on. On a phone or tablet, add it to the home screen and it opens
+full screen, like any other app.
+
+Then watch where they get stuck, and [tell me on GitHub](https://github.com/meSingh/sukhi-play/issues):
+their age, the device, and whether they asked for it again. "It did not work
+for us" helps as much as "they loved it".
+
+If it sticks, it becomes a proper app in Sukhi Play. If it does not, it changes,
+or it goes.
+
+**Is Sukhi's Railway in Sukhi Play?** Not yet. It is on the website only, at sukhiplay.com/playground/railway/. If children keep coming back to it, it gets a release inside Sukhi Play.
+
+**What age is Sukhi's Railway for?** About three to five. Pressing Go and watching needs nothing at all; laying track needs a little more, and finding the age where that clicks is part of the experiment.
+
+**Does it work without internet?** Yes, once it has been opened once. Tracks are kept in that browser on that device, and nothing is sent anywhere.
+
+## Parental controls or a locked-down browser for an under-five?
+
+https://sukhiplay.com/blog/parental-controls-vs-kiosk-browser/ (For parents, 2026-09-26, by Mandeep Singh)
+
+> Parental controls filter what an older child finds online. An under-five needs containment: one screen, only the sites you chose, and no way out.
+
+Parental controls and content filters are built to keep an older child away from bad content while they browse on their own. An under-five has a different problem: they cannot read, they tap everything, and one wrong tap takes them off the page. What they need is containment, a single screen with only the things you chose and no way out, which is what a locked-down (kiosk) browser does.
+
+The two are not rivals. They solve different problems, and plenty of families end up using both.
+
+## What do parental controls actually do?
+
+Most parental controls are a mix of four things:
+
+- **Content filters.** Block categories of website, such as adult content or gambling, and turn on safe search.
+- **Time limits.** A daily allowance, or hours when the device is off.
+- **Approvals.** A grown-up says yes before an app is installed or something is bought.
+- **Reports.** What was used, and for how long.
+
+Good ones are built into everything already: Screen Time on Apple devices, Microsoft's family settings on Windows, Google Family Link on Android, and filtering in many home routers and broadband packages.
+
+They share an assumption: the child is using the device the way a grown-up does. They open a browser, go places, search. The filter's job is to catch the bad places. Everything else is allowed.
+
+## Why does a toddler need something different?
+
+Because a three-year-old is not browsing. They are pressing things to see what happens.
+
+- **They cannot read**, so an advert and a game's play button look the same.
+- **They tap everything**, including "skip", "install", "open in app" and the tiny cross that is really part of the advert.
+- **They escape the page**, with the back button, a closed window or a palm on the keyboard.
+- **Autoplay decides what comes next.** On video sites, the next thing is chosen for them.
+- **Adverts appear on perfectly respectable sites**, and a content filter has no reason to block a respectable site.
+
+None of this is inappropriate content, so a filter lets all of it through. The toddler still ends up somewhere they cannot get back from, upset, or on your email.
+
+## What is a kiosk browser?
+
+A browser that starts from "nothing" instead of "everything". It covers the screen, has no address bar or tabs, shows only what you listed, and needs a grown-up to close.
+
+In Sukhi Play that means six layers, described in full in [how the lockdown works](/docs/lockdown/):
+
+1. each site may only load from the hosts you allowed, so ad networks nobody has heard of are blocked simply because they are not on the list
+2. a blocklist of known ad and tracker domains, checked even on allowed sites
+3. no popups or new windows
+4. no navigating to anywhere off the list
+5. keyboard shortcuts taken away while it is in front, while game keys still work
+6. no downloads, no right-click, and its own browser profile, separate from yours
+
+## How do parental controls and a kiosk browser compare?
+
+| | Parental controls | Kiosk browser |
+| --- | --- | --- |
+| Starts from | Everything allowed, known bad blocked | Nothing allowed, your choices let in |
+| Built for | Children who read and browse | Children who cannot read yet |
+| Adverts | Usually not their job | Filtered, and cannot lead off the page |
+| Leaving the page | Allowed | Refused |
+| Shortcuts and desktop | Untouched | Taken away while it is in front |
+| Time limits | Usually per day | Sukhi Play: per session |
+| Grows with the child | Yes | Outgrown once they read |
+
+## When is each the right choice?
+
+A kiosk browser fits when:
+
+- your child is under five or so, and does not read yet
+- they use two or three sites, not the whole web
+- the computer is a shared laptop with your work on it
+
+Parental controls fit when:
+
+- your child reads and searches for things on purpose
+- they have their own device or account
+- you want reports, or limits across every app
+
+In between, there are good built-in options. On an iPad, Guided Access locks the screen to one app. For videos, YouTube Kids is a much better fit than YouTube, which Sukhi Play deliberately leaves out of its catalogue.
+
+## Can I use both together?
+
+Yes, and for a small child on a shared computer it is the strongest setup:
+
+1. **A separate account for your child,** so your files and logins are not behind whatever they are doing.
+2. **Parental controls on that account,** for time limits and anything outside the browser.
+3. **A kiosk browser as the thing they use,** so they stay on the screen you chose.
+
+The Sukhi Play docs recommend a separate user account, or Windows Assigned Access, for anyone who wants a guarantee rather than a very good default.
+
+## What does a kiosk browser not do?
+
+It is only fair to say. Sukhi Play does not judge whether a site you add is suitable; it only makes sure nothing else loads. It does not keep a daily total or send you reports. The Force Quit keys are left working so the machine can always be recovered, and on Windows the Start menu can flash up before the app closes it. [What this cannot do](/docs/limits/) lists the rest.
+
+And neither kind of tool replaces a grown-up in the room. They reduce what a small child can reach. They do not childproof a computer.
+
+If a kiosk browser sounds right, [how I set up Sukhi Play for my three-year-old](/blog/setting-up-sukhi-play-for-a-toddler/) is a good place to start, and [the download page](/download/) has it for macOS, Windows and Linux, free.
+
+**Do I still need parental controls if I use a kiosk browser?** Not for what happens inside it, because only the sites you added can load. They are still worth having on the child's account for everything outside it, such as other apps and the time spent on the computer overall.
+
+**Is a kiosk browser suitable for an older child?** It is safe, but it quickly becomes too small. Once a child reads and wants to search for things, parental controls and a conversation about what they find do more good than a screen of six tiles.
+
+**Does Sukhi Play block adverts?** Yes. Advert and tracker requests are cut before they load on every site you add. A few sites ask in their terms not to be filtered, and you can leave those alone; your child still cannot leave the site.
+
+**Can a toddler get out of a kiosk browser?** Not by tapping or by the usual shortcuts. The Force Quit keys are left working on purpose so a grown-up can always recover the computer, and on Windows the Start menu can appear for a moment before it is closed.
+
+## Printable name labels, stickers and bookmarks for children
+
+https://sukhiplay.com/blog/printables-for-kids-at-home/ (For parents, 2026-09-26, by Mandeep Singh)
+
+> Jazz's Studio is a free stationery maker for children of seven and up: name labels, stickers, bookmarks, gift tags and door signs, each on one A4 page.
+
+My daughter Jazz is ten and loves stationery, so I made her a studio where she designs her own name labels, stickers, bookmarks, gift tags and door signs, and prints them at home. It is called Jazz's Studio, it is free, it runs in any browser at [sukhiplay.com/playground/studio](/playground/studio/) with no account, and every sheet prints on one A4 page from an ordinary home printer.
+
+Your child can use all of it, with their own name on everything and, if they like, their own character in place of Jazz's.
+
+## What can children make and print at home?
+
+The **Stationery** part of the studio has five groups:
+
+- **Stickers:** "me stickers" of their character in different poses, or pattern stickers in circles, squares and hexagons to cut out.
+- **Diary:** a cover with their name and character on it, and pages with the date, a mood and lines to write on.
+- **Labels and tags:** name labels for books, boxes and pencil cases, and gift tags for presents.
+- **Planners and lists:** a week planner, and one to four to-do lists on a page with boxes to tick.
+- **Bookmarks and signs:** bookmarks, four to a page, and door signs that hang on a door handle.
+
+Each sheet keeps its own colours, lettering and pattern, so changing the bookmark does not change the stickers. Beyond stationery there are wraps to turn a toilet roll or a cereal box into a pencil pot or desk tidy, a logo for each person with business cards and logo stickers, a name poster, secret messages in a real code, and a story page to write and draw. [The studio page](/studio/) shows it all.
+
+## Who is it for?
+
+Children of about seven and up. It was made for a ten-year-old, and most of it involves typing words and choosing between options, so it suits a child who reads. For younger children, [Sukhi Colouring](/colouring/) needs no reading at all.
+
+## How do I make name labels for school things?
+
+1. Open the studio and choose **Stationery**, then **Labels and tags**, then **Name labels**.
+2. Type the name. The line above it starts as "This belongs to", and you can change it.
+3. Pick the colours and lettering, and whether their character goes on.
+4. Print, and cut the labels out.
+
+A sheet can hold several people, each with their own name, which is handy with brothers and sisters.
+
+Be realistic about where paper labels go. They are good on books, folders, pencil cases and boxes. They will not survive a washing machine or a dishwasher, so clothes and lunchboxes need proper labels made for that.
+
+## Do I need special sticker paper?
+
+No. Plain printer paper works for everything: cut the shapes out and use a glue stick or clear tape. A strip of clear tape over a name label on a book cover also makes it last much longer.
+
+If you want real stickers, the easy choice is whole-sheet sticker paper: one big sticky sheet that you print on and cut up yourself, so nothing has to line up with pre-cut shapes. Two things to check on the packet:
+
+- that it is made for your kind of printer, inkjet or laser
+- that your printer can take it (the printer's manual lists the paper it accepts)
+
+For bookmarks and door signs, thicker paper or thin card works best, if your printer will feed it. Covering a bookmark with clear tape on both sides makes a paper one survive a school bag.
+
+## How do I get it to print on one page?
+
+Everything is drawn on A4 to the millimetre and prints on one page, and nothing sits closer than 10 mm to the edge, so printers that cannot print right to the edge are fine.
+
+- **Box wraps** from Make from a box should be printed at **actual size** (100%), not "fit to page", so they fit the thing you measured. Each wrap has a line that should measure exactly 5 cm, so a ruler can check.
+- **On an iPad**, Safari adds the address and date at the top and bottom, and always prints a little smaller than actual size. That is fine for stickers and labels; for a wrap, measure the 5 cm line.
+- **If your printer uses US Letter paper**, look at the print preview before printing, because the sheets are drawn for A4.
+
+## Ideas for gift tags, bookmarks and door signs
+
+- **Gift tags** come eight to a sheet. Punch a hole and thread ribbon or string through. Leave the "To" and "From" empty and they can be written in by hand.
+- **Bookmarks** with their name, or a friend's, down the middle make a good small present.
+- **Door signs** come two to a sheet, shaped to hang on a door handle, with their own words on them.
+- **Kept prints** mean next term's labels are one press away. After printing, the studio offers to keep the print in **My makes**, and opening it later brings the sheet back exactly as it was.
+
+## Where are their designs kept?
+
+On that device only. Nothing is uploaded and there is no account. Clearing the browser's data for the site, or using a private window, clears it too.
+
+To keep it on a phone or tablet, open it and use **Add to Home Screen**. Once it has been opened, it works without internet. [Jazz's Studio in the docs](/docs/jazz-studio/) has the details.
+
+## Can I use it inside Sukhi Play?
+
+Yes. It comes in the [Sukhi Play](/download/) download but switched off, so a younger child's screen stays as it was. Open the grown-up screen, go to the catalogue and add **Studio**.
+
+Inside Sukhi Play there is no print window, because a print window can save a file or open another program, both ways out of a locked screen. The page goes straight to the computer's default printer, and the studio tells your child when it has gone, or to ask a grown-up if the printer did not answer.
+
+The [announcement for Jazz's Studio](/blog/jazzs-studio/) tells the story of why I made it.
+
+**Is Jazz's Studio free?** Yes. There is no account, no adverts and nothing to buy, and in a browser there is nothing to install either.
+
+**What age is it for?** About seven and up, because most of it means typing words and choosing between options. Younger children usually get more from Sukhi Colouring, which needs no reading at all.
+
+**Can my child put their own character on the stickers?** Yes. In Make it yours, Add a character takes a picture of a character on one plain colour, cuts the background out on the device and asks who it is. Nothing added to the studio leaves the device, though if you use Google Gemini to make a character from a photo, that photo goes to Google.
+
+**Why did my box wrap print the wrong size?** It was probably scaled to fit the page. Print it at actual size, or 100%, then measure the 5 cm line on the wrap with a ruler. An iPad always prints a little smaller than actual size.
+
+**Does it work on a phone or tablet?** Yes. Open it in the browser and use Add to Home Screen to keep it there; it works without internet once it has been opened. It prints from a phone or tablet too, on one A4 page.
+
+## Screen time for a three-year-old: the guidance and what works
+
+https://sukhiplay.com/blog/screen-time-three-year-old/ (For parents, 2026-09-26, by Mandeep Singh)
+
+> The WHO says no more than an hour of sedentary screen time a day for ages two to four, and less is better. Short sessions and a calm stop make it workable.
+
+The World Health Organization says children aged two to four should have no more than one hour of sedentary screen time a day, and that less is better. The American Academy of Pediatrics gives the same hour for ages two to five, of high-quality programmes, watched together where possible. What made that workable for me was less the number than the shape: short sessions, the same calm stop every time, and sites that do not shout.
+
+This is one parent's experience, not medical advice. If you are worried about your child, your GP or health visitor is the person to ask.
+
+## What does the WHO say about screen time for a three-year-old?
+
+The WHO's 2019 guidelines for children under five put it simply. For ages two to four, sedentary screen time should be no more than one hour a day, and less is better. For children under two it is not recommended at all.
+
+The guidance is as much about moving, playing and sleeping as it is about screens. Screens are counted as time spent sitting still, and the message is to sit less and play more. The [WHO news release](https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more) is short and worth reading in full.
+
+## What does the American Academy of Pediatrics recommend?
+
+For children aged two to five, the AAP suggests limiting screen use to about one hour a day of high-quality programming, and watching it with them where you can, so you can talk about what they are seeing. Their [advice for parents](https://www.healthychildren.org/English/family-life/Media/Pages/Where-We-Stand-TV-Viewing-Time.aspx) is on HealthyChildren.org.
+
+## Is one hour of screen time too much for a three-year-old?
+
+An hour is a ceiling, not a target. Both sets of guidance say less is better, and neither says a child needs screens at all.
+
+What matters as much in practice is what the time looks like. Twenty calm minutes with a grown-up nearby is a very different thing from an hour of something fast and loud, alone.
+
+## Is it better to have one long session or a few short ones?
+
+Short sessions, for a child this age. A three-year-old has no idea what "twenty minutes left today" means. A session, on the other hand, has a beginning and an end they can see: they sit down, they play, the screen says it is finished, they get up.
+
+It also makes the stop predictable. If every session is the same length, the end stops being a surprise and starts being a routine.
+
+## How do I warn a toddler that screen time is nearly over?
+
+With your voice, tied to something they understand. "When this picture is finished" or "after this one" lands better than a number.
+
+A countdown on the screen tends to do the opposite of what you want. It gives a child something to watch, and something to bargain with. That is why Sukhi Play shows no countdown at all until the last thirty seconds.
+
+## How do I end screen time without a meltdown?
+
+There is no trick that works every time, but these helped:
+
+1. **Let the stop come from the screen, not from you.** A stop screen that simply says play is over is hard to argue with, because there is nobody to argue with.
+2. **Keep the length the same every time.** Consistency does most of the work.
+3. **Have the next thing ready.** A snack, the garden, the bath. Ending is easier when it is also starting something.
+4. **Do not give more time on demand.** If you do give more, make it clearly your decision, not the result of a good argument.
+5. **Sit with them when you can.** Both for the reasons the AAP gives, and because you see the stop coming.
+
+## Which sites are calmer for small children?
+
+Look for things a child makes, rather than things that play at them:
+
+- no autoplay, and no "up next"
+- no adverts
+- no timers, streaks or flashing rewards
+- nothing that needs reading to get started
+
+Colouring, drawing, building and simple music toys tend to end more gently than videos, because there is no cliffhanger. If your child does watch videos, YouTube Kids is a better starting point than YouTube, and has parental settings of its own.
+
+## What free tools can end a session for me?
+
+Several are built in. On an iPad, Guided Access has a time limit option, and Screen Time can set limits on Apple devices. On Windows, Microsoft's family settings can limit screen time on a child's account, and Google Family Link does the same on Android.
+
+## How does Sukhi Play's play time work?
+
+On a laptop or desktop, [Sukhi Play](/download/) does this as part of the locked-down screen. On the grown-up screen's **Play time** tab, you set a session length once: any number of minutes up to four hours, or no limit. The clock starts again every time the app opens.
+
+Your child sees no countdown until the last thirty seconds. When the time is up, a stop screen says "That is all for now" and nothing else will open. They can ask for more, but only a grown-up can answer: fifteen minutes, an hour, or the rest of the day, for that session only. Your usual limit does not move.
+
+It is honest to say it counts a session, not a day. Close it and open it again after lunch and the clock starts fresh, so keeping the daily total is still your job. [Play time in the docs](/docs/play-time/) has the detail, and [the announcement](/blog/play-time-limits/) explains why it works this way.
+
+If you are setting it up for the first time, [how I set up Sukhi Play for my three-year-old](/blog/setting-up-sukhi-play-for-a-toddler/) covers the first few sessions.
+
+**Do educational apps count as screen time?** The WHO guideline is about sedentary screen time, whatever is on the screen, so yes. Choosing good content matters a great deal, but it does not make the hour longer.
+
+**Should I let my child finish the game when time runs out?** In Sukhi Play the stop screen arrives when the time is up, whatever is happening. If finishing a level matters to your child, give your spoken warning early enough for them to finish, or grant fifteen minutes yourself from the stop screen.
+
+**Does Sukhi Play keep a daily total?** No. The clock starts again from your rule every time the app opens, and nothing is stored between runs. That keeps it simple for a small child, but the daily total is yours to keep.
+
+**Is it all right if my three-year-old has no screen time at all?** Nothing in either guideline says a child needs screens. Less is better, and none is a perfectly good amount.
+
+## How I set up Sukhi Play for my three-year-old
+
+https://sukhiplay.com/blog/setting-up-sukhi-play-for-a-toddler/ (For parents, 2026-09-26, by Mandeep Singh)
+
+> Start with two or three tiles, sit beside them for the first sessions, set a short play time and add sites slowly. The setup I would repeat, step by step.
+
+Keep the first screen small: two or three tiles, a short play time, and you sitting beside them for the first few sessions. Show them the stop screen early so it becomes normal, change the way in if they learn it, and add sites one at a time as they grow. That is roughly how I set Sukhi Play up for my son, and what I would do again.
+
+Sukhi was around three when I built it. He pressed every key and clicked every button, which on a normal laptop means adverts, popups, new tabs and eventually my work. Here is the setup, in the order I would do it.
+
+## What do I need before I start?
+
+A Mac, a Windows PC or a Linux computer, and a few minutes. It is free, with no account and nothing to sign up for. The installers are on [the download page](/download/).
+
+The builds are signed but not notarised, so the first launch shows a warning on macOS and on Windows. [Installing](/docs/installing/) walks through getting past it, once per install.
+
+## How does the first run work?
+
+The first time it opens, it asks who is using the computer. Choose **I'm a grown-up** and it walks you through four short steps:
+
+1. What your child will and will not be able to reach.
+2. Choose what they can open.
+3. How you get back out, with a chance to practise the three-second hold.
+4. Hand it over.
+
+Do practise the hold. You want to know the feel of it before a small person is waiting. [The first run](/docs/first-run/) has the detail.
+
+## How many sites should a three-year-old start with?
+
+Two or three. More than that and a small child hops from tile to tile without settling on anything.
+
+Three apps come switched on already, and for a three-year-old they are a reasonable first screen on their own:
+
+- **Colouring**, Sukhi Colouring, with forty pictures to colour or a blank page
+- **Keyboard**, Magic Smash by Evandro Meneses, where pressing any key makes something happen
+- **First Games**, Little Explorer by pazarman, with counting, colours, shapes and animals and no reading needed
+
+All three live inside the download, so they work offline and have no adverts. The tiles are big, bright and marked with simple shapes, so your child does not need to read to choose one. [What your child sees](/docs/what-child-sees/) shows the rest.
+
+## Which sites should I keep off at first?
+
+Anything that asks more of a small child than tapping:
+
+- **Games that need reading** to get past a menu or understand the rules.
+- **Autoplay video.** youtube.com is deliberately not in the catalogue for this reason.
+- **Sites with adverts.** The catalogue labels each site no ads, ads filtered or ads showing, so you can choose.
+- **Logins, chat and purchases.** None of these belong on a toddler's screen.
+- **Anything fast, loud or timed.** Those tend to make the stop harder.
+
+## Should I sit with them the first time?
+
+Yes, for the first few sessions. Show them the tiles, and the big blue **Back** button at the top of every site that takes them home. Let them press the small ✕ and see that nothing happens without a grown-up.
+
+You will also learn which sites actually work for your child. One that looked lovely on the list may start with a menu they cannot read.
+
+## How long should play time be?
+
+Short, to begin with. On the grown-up screen's **Play time** tab, pick a length once and it applies every time the app opens. There are shortcuts from ten minutes to an hour, or you can type any number up to four hours.
+
+Your child sees no countdown until the last thirty seconds. [Screen time for a three-year-old](/blog/screen-time-three-year-old/) has what the WHO and the American Academy of Pediatrics suggest, and [play time](/docs/play-time/) has how it works.
+
+## How do I make the stop screen feel normal?
+
+Let an early session end on it while you are there. It says "That is all for now", and nothing else will open.
+
+Your child can press **Ask for more time**, but only you can answer, with fifteen minutes, an hour or the rest of the day, for that session only. If you do not want to give more, there is a button for a grown-up to close Sukhi Play from the same screen. It works best when the answer is usually no. The stop is then just what happens, not the start of a discussion.
+
+## What if my child learns the grown-up hold?
+
+They might. A toddler does not manage a three-second hold by accident, but one who uses the app every day learns it eventually, and mine did.
+
+When that happens, open **Settings** and switch **Getting in here** from *Hold* to *Sum*. You are then asked a small addition instead, and holding the button stops doing anything at all. Three wrong answers in a row lock the gate for ten seconds. [The grown-up gate](/docs/the-gate/) has the rest.
+
+## How do I add sites as they grow?
+
+Open **Grown-ups** and hold for three seconds, then:
+
+- **From the catalogue:** tap a site and it arrives on the tile screen with everything it needs already filled in. The same list is on [the catalogue page](/catalogue/).
+- **Any other site:** type its address. Sukhi Play opens it once, watches what it loads, and works out what to allow. Give the tile a name, a shape and a colour, and press **Save**.
+
+Each app has a switch on its card, so you can take a tile away for a while without deleting it. [Adding and removing sites](/docs/adding-sites/) covers it all.
+
+Jazz's Studio, the stationery app I made for my daughter, waits in the catalogue too. It is for children of about seven and up, so leave it off for now.
+
+## What will it not do?
+
+It is not a substitute for being nearby. The Force Quit keys are left working on purpose so you can always recover the computer, and on Windows the Start menu can appear for a moment before the app closes it. [What this cannot do](/docs/limits/) is the honest list, and [how to let a toddler use your laptop](/blog/toddler-laptop-without-losing-work/) covers the habits that go with it.
+
+**Which apps are switched on when Sukhi Play is first installed?** Three that come inside the download: Sukhi Colouring, a keyboard playground called Magic Smash, and a set of first games called Little Explorer. They are files on your own computer, so they work without internet.
+
+**Can I hide a tile without deleting it?** Yes. On the grown-up screen each app has a switch in the corner of its card. Turn it off and the tile leaves your child's screen, with everything about it kept for later.
+
+**What happens if the tile screen is empty?** It says so plainly and offers a button that takes you to the grown-up screen, where you can switch an app on or add one.
+
+**Can I start the setup again from scratch?** Yes. Reset Sukhi Play to factory settings, on the Settings tab, restarts into the walkthrough. It wipes every app and setting, asks twice, and cannot be undone.
+
+## Why toddlers bash the keyboard, and a safe place to let them
+
+https://sukhiplay.com/blog/toddler-keyboard-smashing/ (For parents, 2026-09-26, by Mandeep Singh)
+
+> Toddlers bash keys because every press does something and they copy you. On a normal computer that hits shortcuts; a locked-down screen makes it safe.
+
+Toddlers bash the keyboard because every press makes something happen, and because they have watched you use it all day. On a normal computer those presses land on shortcuts that close windows, switch apps and change settings. The answer is not to take the keyboard away, but to give them a screen where pressing everything is safe.
+
+My son Sukhi, at around three, pressed every key and clicked every button he could reach. Sukhi Play started as a screen where pressing all of them was fine.
+
+## Why does my toddler bash the keyboard?
+
+No study needed for this one, just a few afternoons of watching:
+
+- **Cause and effect.** Press a key, something changes. A keyboard has more buttons than anything else in the house, and they all click.
+- **Copying you.** They have seen grown-ups typing for as long as they can remember. The keyboard is obviously where the important things happen.
+- **Whole hands.** A small child does not press one key. They press five, with a flat palm, often twice.
+
+That last one is the problem.
+
+## Why is keyboard bashing risky on a normal computer?
+
+Because shortcuts are combinations, and a palm on the keyboard makes combinations all the time. A few that toddlers find without trying:
+
+- **Cmd+W or Ctrl+W** closes the tab, and **Cmd+Q** or **Alt+F4** closes the whole program.
+- **Cmd+Tab or Alt+Tab** switches to whatever else you had open.
+- **The Windows key** opens the Start menu.
+- **Ctrl+P or Cmd+P** starts printing.
+- **Shift pressed five times** on Windows asks about turning on Sticky Keys.
+
+A silicone keyboard cover does not help here. It keeps crumbs out, but every key underneath still presses.
+
+## What is a safe way to let a toddler bash the keyboard?
+
+For free, with nothing to install: open a blank document, make the text enormous, and let them press away while you sit next to them. Letters appear, which is exactly the point, and you can name them as they go. The catch is that every shortcut still works, so you have to be the lockdown.
+
+An old keyboard that is not plugged into anything is also a perfectly good toy for copying you.
+
+If you want them to play on their own, the keys themselves need to be made safe.
+
+## How does Sukhi Play make keyboard bashing safe?
+
+Two layers, described in [how the lockdown works](/docs/lockdown/):
+
+1. **Inside the page**, a filter swallows modifier combinations, function keys, developer tools and reload.
+2. **At the operating system**, while the app is in front, it takes 64 shortcuts away from the computer itself, including Cmd+Tab and Alt+Tab, Mission Control, Spotlight, the common Cmd and Ctrl shortcuts such as Q, W, T, N and P, Alt+F4, the function keys, zoom and screenshots.
+
+What still reaches the game is what a game needs: arrow keys, every letter, the digits, space, Enter, Escape, and Ctrl or Shift pressed on their own. A modifier held by itself is a game action. Only a modifier combined with another key counts as a shortcut, so leaning on Ctrl and W together closes nothing.
+
+## What can Sukhi Play not block?
+
+Some keys belong to the computer, not to any app. [What this cannot do](/docs/limits/) is the full list, but for a keyboard-basher these are the ones to know:
+
+- **Force Quit** (Cmd+Option+Esc on a Mac, Ctrl+Alt+Delete or Ctrl+Shift+Esc on Windows) is left alone on purpose, so a grown-up can always recover the machine. These open a window rather than closing anything, but you may need to press Cancel.
+- **The Windows key** opens the Start menu over the app. Sukhi Play closes the Start menu, Search and quick settings as soon as they appear, in about a quarter of a second, but Windows keeps its own Windows-key combinations for itself.
+- **A Mac's top row** controls brightness and volume unless it is set to act as standard function keys. No app can catch those, so set the volume and brightness first.
+- **On Linux**, Sukhi Play switches off the desktop's own Alt+Tab and Super key while it runs on GNOME, and puts them back afterwards. On other desktops, choose an Xorg session for its keyboard layer to work, and note the Snap version does not do this at all.
+
+And no app can stop someone pressing the power button.
+
+## Is there something inside Sukhi Play made for bashing keys?
+
+Yes. The **Keyboard** tile, switched on from the start, is **Magic Smash**, an open-source keyboard playground by Evandro Meneses that comes inside the download. Press any key and something happens: the key appears big on the screen with a burst of colour, and a gentle sound if you have it on, in themes from space to the ocean to animals.
+
+It works with no internet and has no adverts, because it is a set of files on your own computer. Next to it are **First Games**, Little Explorer by pazarman, with counting, colours, shapes and animals and no reading needed, and **Colouring**, the colouring book that comes with Sukhi Play. [The catalogue](/catalogue/) lists all of them.
+
+## A few habits that help
+
+1. **Save and close your own work first.** Always, whatever is running.
+2. **Turn the volume down** before a keyboard game, not after.
+3. **Sit with them the first few times.** Naming the letters they press turns bashing into a game you play together.
+4. **Keep drinks well away.**
+
+For the wider picture, [how to let a toddler use your laptop without losing your work](/blog/toddler-laptop-without-losing-work/) covers separate accounts and the rest, and [how I set up Sukhi Play for my three-year-old](/blog/setting-up-sukhi-play-for-a-toddler/) goes through the first sessions. It is free for macOS, Windows and Linux on [the download page](/download/).
+
+**Can my toddler close Sukhi Play by bashing the keyboard?** Not with the usual shortcuts; closing needs a button held for three seconds. The Force Quit keys are left working on purpose so a grown-up can always recover the computer, but they open a window of options rather than closing anything by themselves.
+
+**Does the keyboard playground need the internet?** No. Magic Smash comes inside the download as files on your own computer, so it works offline and has no adverts.
+
+**Why does the Start menu flash up on Windows?** Windows will not hand the Windows key to an application. Sukhi Play watches for the Start menu, closes it and brings its own window back, in about a quarter of a second.
+
+**Can my toddler change the brightness or volume on a Mac?** Yes. The top row of keys controls brightness and volume unless they are set to act as standard function keys, and no app can catch them. Set both before you hand the laptop over.
+
+## How to let a toddler use your laptop without losing your work
+
+https://sukhiplay.com/blog/toddler-laptop-without-losing-work/ (For parents, 2026-09-26, by Mandeep Singh)
+
+> Give them a space your work is not in: their own user account, a locked-down browser with only the sites you chose, and your work saved and closed first.
+
+- A toddler does not press one key, they press six with a flat hand. That is how shortcuts that close, send and delete get made.
+- A separate user account keeps your files, email and logins out of reach. It is free and built in.
+- A locked-down browser keeps the child inside the sites you chose, which an account alone does not.
+- Both together is the safest setup, and saving and closing your own work first still matters most.
+
+My son was three and wanted to play games on my laptop. He also clicked every
+button on the screen, which meant adverts, popups, new tabs, and eventually my
+work. He was not being naughty. He was pressing things, which is what
+three-year-olds are for.
+
+The fix is not to watch harder. It is to give them a space your work is not in.
+
+## What a toddler actually does to a laptop
+
+A small child does not press one key. They press a handful at once with a flat
+palm, and that is exactly how keyboard shortcuts are made. Without meaning to,
+they will:
+
+- **close** a tab, a window, or the document you had not saved
+- **send** a half-written email, or post a half-written message
+- **delete** or drag away files
+- **change** the brightness, the volume, the keyboard language
+- **leave**, by tapping an advert that looked like a play button
+
+## Your options, side by side
+
+| Option | Protects your work | Keeps them on the right sites | Cost |
+| --- | --- | --- | --- |
+| Full screen, and you sit with them | No | Until one press of Escape | Free |
+| A separate user account | Yes | No | Free, built in |
+| Windows kiosk mode (Assigned Access) | Yes | One app only | Free, on Pro and above |
+| A locked-down browser like Sukhi Play | Mostly | Yes | Free |
+| An account **and** a locked-down browser | Yes | Yes | Free |
+
+### A separate user account
+
+If you do one thing, do this. On a Mac, add a **Standard** user under Users &
+Groups in System Settings. On Windows, add another account under Accounts in
+Settings. Log in to it before you hand the laptop over, and your files, email
+and saved logins are not there to break.
+
+What an account does not do is keep a child anywhere. Inside it they can still
+open any app, wander the web and tap every advert. It is a wall around your
+things, not a fence around them.
+
+### A locked-down browser
+
+This is the fence. Sukhi Play fills the screen with big tiles for the sites you
+picked, and nothing else opens: each site can only load what it needs, popups
+and downloads are refused, and the shortcuts that close and switch apps are
+taken away while it is in front.
+
+![Sukhi Play asking a grown-up to hold a button for three seconds before it will close](/screenshots/05-closing-needs-a-grownup.png "Closing it takes a button held for three seconds. Every tap a toddler makes is a quick one.")
+
+It is honest about its limits. The keys to force an app to quit are left alone
+on purpose, so a computer can always be recovered, and nothing stops a finger
+on the power button. [The full list](/docs/limits/) is written down.
+
+## The safest setup
+
+1. A **separate account** for your child, with nothing of yours signed in.
+2. **Sukhi Play** in that account, with three or four sites they know.
+3. A **play time** limit, so the screen ends the session and you do not have to.
+4. Your own work **saved and closed** before you switch accounts.
+
+If they ever get past the app, what is behind it is their account, not yours.
+
+## Habits that matter more than any setting
+
+- Close anything with a **Send** button before you hand it over.
+- Set the **volume and brightness** first. Those keys belong to the computer.
+- Keep **drinks** on the other side of the table.
+- **Sit nearby** the first few times. Five minutes of watching teaches you more
+  than any guide, this one included.
+
+When you want to go further, [how I set up Sukhi Play for my three-year-old](/blog/setting-up-sukhi-play-for-a-toddler/)
+covers the first week, and Sukhi Play itself is a [free download](/download/)
+for macOS, Windows and Linux.
+
+**Is a keyboard cover enough to protect my laptop from a toddler?** It keeps crumbs and juice out, but every key underneath still presses, so every shortcut still works. It protects the keyboard, not your work.
+
+**Can a toddler delete files from a separate user account?** Only their own. A standard account cannot reach another account's files, so your documents, email and saved logins are simply not there.
+
+**What if my child still gets out of the locked-down browser?** Every computer keeps a way to force an app to quit, on purpose. In Sukhi Play that key is left alone, so run it inside the child's own account and whatever is behind it is theirs, not yours.
+
+**Does this work on a Chromebook?** Sukhi Play does not run on ChromeOS. A supervised child account through Google Family Link is the closest built-in option there.
+
+Sources:
+- Change Users & Groups settings on Mac (Apple): https://support.apple.com/guide/mac-help/add-a-user-or-group-mtusr001/mac
+- Manage user accounts in Windows (Microsoft): https://support.microsoft.com/en-us/account-billing/create-a-local-user-or-administrator-account-in-windows-20de74e0-ac7f-3502-a866-32915af2a34d
+- Assigned Access overview, Windows kiosk mode (Microsoft): https://learn.microsoft.com/en-us/windows/configuration/assigned-access/
+- Use Guided Access on iPhone or iPad (Apple): https://support.apple.com/en-us/111795
+
+## Jazz's Studio: stationery to design and print, for ages 7 and up
+
+https://sukhiplay.com/blog/jazzs-studio/ (Announcements, 2026-09-24, by Mandeep Singh)
+
+> Jazz's Studio, new in Sukhi Play 2.2 and grown up in 2.3, lets children of seven and up design and print their own stickers, labels, diaries and more.
+
+Jazz's Studio is a stationery studio for children of about seven and up: they design stickers, labels, bookmarks, gift tags, door signs and diaries with their own name and characters on them, and print them at home. It arrived in Sukhi Play 2.2.0 and grew up in 2.3.0. It is free, works without internet, and also runs in any browser at [sukhiplay.com/playground/studio](/playground/studio/).
+
+## Why I made it
+
+Sukhi Play started for my son, Sukhi, who is under four and presses every key and clicks everything. His sister Jazz is ten and loves stationery, so I made her a studio, and it has her name on it.
+
+It is the first thing in Sukhi Play for older children, and yours can use all of it.
+
+## What can children make in Jazz's Studio?
+
+- **Stationery**, in five groups: stickers, a diary cover and pages, name labels and gift tags, a week planner and to-do lists, and bookmarks and door signs. Each sheet keeps its own colours, lettering and pattern.
+- **Make from a box**: pick a pencil pot, desk tidy, notebook cover or treasure box, measure the toilet roll or cereal box, and print a wrap that fits it, with the steps.
+- **My brand**: a logo for each person, as a badge, stamp, ribbon or tag, with business cards and logo stickers cut out round the logo's shape.
+- **Play**: a poster of their name, secret messages in a real code with a key for a friend, story pages, a doodle pad, and invite cards.
+- **My makes**: their prints, kept to open again, and a shelf of the things they made, each with a photo and a note.
+- **Make it yours**: their character, their name, and the studio's colours, lettering and background.
+
+## What is new in 2.3?
+
+2.2.0 brought the studio into Sukhi Play. 2.3.0, out the same day, made it properly anyone's.
+
+- **It asks who they are.** The first time it opens, it asks the child's name and their character, so nobody else is greeted as Jazz. Both can be skipped and changed later.
+- **Sukhi joins Jazz**, with seven characters of his own.
+- **Families add their own characters.** A picture of a character on one plain colour goes in, the background is cut out on the device, and the studio asks who it is. Each person has their own pictures, their own name and their own brand, and can be switched off without losing them.
+- **Everyone on one sheet.** Stickers, labels, bookmarks, gift tags, door signs and box wraps take several people at once, each with their own words.
+- **Invite cards.** Eight to a sheet, each with a QR code a friend's phone camera opens the studio from. The code is made on the device, with their character in the middle of it.
+- **Story pages.** Who, what happens and where, chosen or spun, printed with a box to draw in and lines to write on.
+
+## Keeping a print to use again
+
+After a print, the studio asks whether to keep it in **My makes** and what to call it. It keeps the settings rather than a picture, so **Open** brings the sheet back exactly as it was, ready to print again or to change a word first.
+
+## How does printing work?
+
+Every sheet is drawn on A4 to the millimetre and prints on one page, on any printer, an iPad included. Print box wraps at actual size, not "fit to page"; each has a line that should measure exactly 5 cm. An iPad always prints a little smaller, which is fine for stickers but worth measuring for a wrap.
+
+**Inside Sukhi Play there is no print window.** A print window can save a file or open another program, and both are ways out of the locked screen. So Sukhi Play sends the page straight to the computer's default printer, and the studio tells your child when it has gone, or to ask a grown-up if the printer did not answer. Only apps Sukhi Play made itself can print; a website that tries is refused.
+
+## Where do I find it?
+
+- **In Sukhi Play** it comes in the download but is switched off, so a younger child's screen stays as it was. Open the grown-up screen, go to its catalogue, and add **Studio** ([how](/docs/jazz-studio/)). It works with no internet at all.
+- **On any other device**, open [/playground/studio/](/playground/studio/) in a browser. Nothing to install and nothing to sign up for. After one visit it works offline, and it can be added to the home screen of a phone or tablet.
+
+Everything is kept on that device only. Nothing is uploaded and there is no account. Clearing the browser's data for the site clears it too.
+
+One honest note: the studio has a guide for grown-ups on making a character from a photo using Google Gemini. If you use Gemini, the photo goes to Google. Nothing you add to the studio itself leaves the device.
+
+The [studio page](/studio/) has pictures of every part, and the [Jazz's Studio docs](/docs/jazz-studio/) go through printing, characters and where things are kept. If you want the studio inside Sukhi Play, it is on the [download page](/download/).
+
+**What age is Jazz's Studio for?** About seven and up. It comes in Sukhi Play switched off, so a younger child's screen stays exactly as it was until a parent adds it.
+
+**Can my child use Jazz's Studio on an iPad?** Yes. Open sukhiplay.com/playground/studio/ in Safari. It prints one A4 page, and Add to Home Screen keeps it there, working without internet after the first visit.
+
+**Is anything my child makes uploaded?** No. Prints, photos and doodles are kept on that device only, and there is no account to make.
+
+## Why Sukhi Play moved from MIT to a personal-use licence
+
+https://sukhiplay.com/blog/new-licence/ (Announcements, 2026-09-23, by Mandeep Singh)
+
+> From 2.1, Sukhi Play is free for families to use, change and share, but never for commercial use or organisations. 2.0.2 and earlier stay under MIT.
+
+From version 2.1, Sukhi Play and Sukhi Colouring are released under the Sukhi Play Personal Use Licence instead of MIT. They are free for individuals and families to use, change and share, and never for commercial use or for any organisation, schools and nurseries included. Everything up to and including 2.0.2 was released under MIT and stays under it.
+
+## What changes for a family using it at home?
+
+Nothing. Sukhi Play is still free, with no account and no paid version. You can set it up for your own children, change it to suit your family, study how it works, and give copies to other families, as long as you do not charge for them.
+
+The code is all still public. Every line, including the parts that decide what your child can reach, is there to read.
+
+## What is no longer allowed?
+
+Under the new terms, none of these is permitted, whether or not anyone pays:
+
+- **Anything commercial.** Selling it, charging for access to it, showing adverts in or around it, collecting data through it, or using it in, with or to promote a product or service.
+- **Use by an organisation.** That includes companies, schools, nurseries, childcare providers, charities, clubs, religious organisations and government bodies, and anyone acting on behalf of one.
+- **Hosting it for other people.** Making it, or anything based on it, available over a network to anyone outside your own household or family.
+
+The names Sukhi Play and Sukhi Colouring, the logo and the Sukhi character artwork are not licensed at all. The character artwork was never covered by MIT either; it was carved out from the first release.
+
+## Why change it?
+
+Sukhi Play is one parent's project. I built it for my son, and I give it away so other families can have the same thing.
+
+MIT is a generous licence, and it is the right one for a lot of software. It also lets anyone take the whole thing, put adverts around it, sell it, or fold it into a product. Those are the very things Sukhi Play exists to keep away from small children, and I would rather it could not be turned into one of them.
+
+Organisations are left out for a simpler reason. Sukhi Play was made for a household, a grown-up and their own child, and that is the only setting I am making it for.
+
+It also means the site no longer calls Sukhi Play "open source". A licence that rules out commercial use does not meet that definition, and I would rather not use the words loosely. What stays true is that every line of code is public.
+
+## What happens to older versions?
+
+Versions up to and including 2.0.2 were released under MIT. That cannot be taken back. If you have one of those, it stays under MIT, and everywhere the licence is mentioned on this site says so.
+
+## Where do the terms come from?
+
+I did not write a licence from nothing. The terms are adapted from PolyForm Noncommercial 1.0.0, a short standard licence drafted by lawyers. It allows charities, schools and government bodies, which is not what I want here, so the permitted purpose is narrowed to personal use by an individual for their own household, with organisations named as excluded and hosting for anyone outside the household excluded too. PolyForm's own terms allow their text to be adapted on condition that their name comes out of it, which is why it does not appear in the licence itself.
+
+## What if I want to contribute?
+
+Please do. Improvements reach everyone by coming back to the project rather than living in separate copies. The short terms are in CONTRIBUTING: a contribution comes with a permanent licence for me to use and relicense it, and you keep the copyright in what you wrote. If you would rather not agree to that, say so before you send anything.
+
+## Read the terms themselves
+
+This is a plain summary, not legal advice, and the licence text is what counts. It is on [the licence page](/licence/), with three plain lines above it. If you are wondering whether your situation is covered, [the FAQ](/faq/) answers the school and business question, and you can [download Sukhi Play](/download/) for your own family as before.
+
+**Can I still use Sukhi Play at home for free?** Yes. Using it for your own children, changing it for your family and sharing it with other families free of charge are all allowed, and there is still no account and nothing to pay.
+
+**Can my child's school or nursery use Sukhi Play?** No. The licence does not cover use by any organisation, including schools, nurseries, childcare providers and charities. Versions up to and including 2.0.2 were released under MIT and remain under it.
+
+**What about the version I already downloaded?** If it is 2.0.2 or earlier, it is under the MIT licence and stays that way. The new terms apply from 2.1 on.
+
+## Sukhi Colouring: the first app made for Sukhi Play
+
+https://sukhiplay.com/blog/sukhi-colouring/ (Announcements, 2026-09-22, by Mandeep Singh)
+
+> Sukhi Colouring is a free colouring book for small children, made for Sukhi Play and also running in any browser, offline, with no account and no adverts.
+
+Sukhi Colouring is a colouring book for small children, and the first app I have made for Sukhi Play rather than borrowed. It replaces the colouring app Sukhi Play used to ship, and it also runs in any browser at [sukhiplay.com/playground/colouring](/playground/colouring/), where it keeps working with no signal.
+
+## Why make one rather than borrow one?
+
+Since 2.0, Sukhi Play has shipped a colouring book that somebody else wrote, an open-source app. It was a good app and I chose it on purpose. But it was built for a different set of children, and it showed. The language switch had to be stripped out so a child could not get stuck behind it, some of its icons did not draw on smaller Linux distributions, there was no way to start from a blank page, and every change I wanted meant patching a build I did not control.
+
+So I wrote my own. The idea, the general shape and the sound it makes owe a lot to that app, and the credit for it stays in Sukhi Colouring's README and notices. None of its code came across, which means all of it can now be changed.
+
+It was built for one three-year-old in particular, which is most of why it looks the way it does: one picture at a time, nothing that needs reading, and nothing a small hand can do that cannot be undone.
+
+## What can my child do in it?
+
+- **Pick a picture** from forty, including animals, cars and flowers, or leave it and draw on a blank page.
+- **Draw** with the pencil, the crayon or the rainbow, in three widths. Each pen looks and sounds different.
+- **Tap to fill** a shape. Tapping the paper around the picture colours the whole page instead.
+- **Mirror drawing**, the butterfly, copies everything onto the other side.
+- **Rub out** with the eraser, and go **Back** or **Forward** to undo and redo. **Start again** clears the page, and asks first.
+- **Keep it**, which puts the picture in **My pictures**. Open one later and it comes back exactly as it was left.
+
+The cog holds the language, English or 한국어, and the sound. It sits at the end of the tools, out of the way of the ones a child uses most.
+
+## Can I use it without Sukhi Play?
+
+Yes. Open [the app](/playground/colouring/) in a browser on a phone, a tablet or a computer. There is no account, no adverts and nothing to buy, and there is nothing to tap that leads to another website.
+
+To keep it on the home screen, press **Add to home screen** in the app: the phone with an arrow in it, next to the cog. It shows the steps for the device you are on. If you would rather do it yourself:
+
+- **iPhone and iPad:** open it in Safari, tap **Share**, then **Add to Home Screen**.
+- **Android:** open it in Chrome, open the menu, then **Add to Home screen**.
+- **A computer:** in Chrome or Edge, click the install icon at the end of the address bar.
+
+It then opens full screen, with no address bar for a small finger to land in, and keeps working without internet once it has been opened once.
+
+## What changes inside Sukhi Play?
+
+The **Colouring** tile is switched on from the start, as before. It is part of the download, so it needs no internet.
+
+From 2.1, apps I made for Sukhi Play carry an **Official** badge on the grown-up screen, and where other apps show an address, this one says "By Sukhi Play · No ads · No tracking". Official is not a setting. It comes from the app's own packaging, so nothing a text editor can reach, including your own settings files, can give that badge to anything else.
+
+## What it does not do yet
+
+Pictures stay on the device they were made on. There is no account, so there is no way to move them between a laptop and a phone. My pictures holds the sixty most recent, and the oldest make way for new ones.
+
+## Where next
+
+[The Sukhi Colouring page](/colouring/) shows it properly, [the manual](/docs/sukhi-colouring/) has the details, and [the playground](/playground/) is where the next apps will appear. If you do not have Sukhi Play yet, it is on the [download page](/download/).
+
+**Do I need Sukhi Play to use Sukhi Colouring?** No. Open sukhiplay.com/playground/colouring/ in any browser. There is nothing to install and nothing to sign up for, and you can add it to a phone or tablet's home screen.
+
+**Where are my child's pictures kept?** On that device only. Nothing is uploaded and there is no account. My pictures keeps the sixty most recent, and clearing the browser's data for the site, or using a private window, clears them too.
+
+**Does Sukhi Colouring work without the internet?** Yes. Inside Sukhi Play it is part of the download and never needs a connection. In a browser it keeps working offline once it has been opened once.
+
+## What went wrong with Sukhi Play 2.0, and what I changed
+
+https://sukhiplay.com/blog/what-went-wrong-with-2-0/ (Behind the scenes, 2026-09-22, by Mandeep Singh)
+
+> Three things went wrong around Sukhi Play 2.0: a version number I could not use, a Linux snap that never opened, and download buttons that led nowhere.
+
+Three things went wrong around Sukhi Play 2.0. The release had to go out as 2.0.1 because GitHub would not let me use the name 2.0.0 a second time, the Ubuntu snap in the Snap Store had never actually opened, and six download buttons on this website led to a missing page. All three are fixed, and each one now has a check that should stop it happening again.
+
+If you were one of the people who hit any of this, I am sorry. You tried something I made for your child and it did not work, and that is on me. Here is what happened: a sentence each, then a little more for the curious.
+
+## Why is there no Sukhi Play 2.0.0?
+
+**Short version:** with a certain GitHub setting on, a release name can only ever be used once, and I used it, deleted it, and then wanted it back.
+
+Every release on GitHub hangs off a name called a tag, like `v2.0.0`. I had turned on immutable releases, which means that once a release is out, nobody, me included, can quietly swap the files underneath it. That is a good thing for something you download. I published 2.0.0, deleted it to put it out again, and found the name was gone.
+
+I thought turning the setting off would free it, and briefly moved everything back to 2.0.0. It did not: GitHub still refused the name, while a test name made and deleted in the same session went through without complaint. So 2.0 shipped as 2.0.1. Only the number changed.
+
+**What I changed:** release tags are now signed automatically on my machine, and my release instructions say plainly that a tag has to be right the first time, because a wrong one cannot be corrected, only replaced with the next number up.
+
+## Why did the Sukhi Play snap not open on Ubuntu?
+
+**Short version:** the snap is built from a ready-made template, and the step that should have unpacked it never ran, so the snap shipped with a sealed parcel inside instead of the start-up files that were in the parcel.
+
+If you installed Sukhi Play from the Snap Store before 2.0.2, clicked it, and nothing happened, that was not you or your computer. It had never opened, on any machine, since it first went into the store.
+
+For the curious: Sukhi Play is built with electron-builder, whose snap template comes as a tar file inside a 7z file. The build unwrapped the 7z and stopped, leaving the tar whole, and packed that into the snap. Opening the snap first runs a small script called `desktop-init.sh`, which was still inside the unopened tar, so it gave up before Sukhi Play got a chance to start. That is why nothing appeared and nothing was logged.
+
+My checks confirmed that a snap had been built and that its details read correctly. Both passed on a snap that could not start.
+
+**What I changed:**
+
+- A step before the Linux build now unpacks the template properly. On Ubuntu 24.04 the snap installs and opens.
+- The build now installs the snap and runs it, and fails if the Sukhi Play screen does not appear.
+- That test installs it the way the Snap Store does, and checks that a page inside can draw 3D graphics, which Scratch needs.
+- There is a way to push a fixed snap on its own, and it refuses to upload one it could not start.
+
+2.0.2 exists because of this. The app inside is the same as 2.0.1; the new number let the working snap go out through the normal release, rather than being slipped in under a version that had never worked.
+
+## Why did the download buttons not work?
+
+**Short version:** when I moved the website to tidier addresses, six buttons on the download page kept an old kind of link that, from the new page, pointed at pages that had never existed.
+
+For about a day, the Apple Silicon, Installer and .deb buttons on the [download page](/download/) went to "page not found". The files were fine all along; nobody was getting as far as them.
+
+**What I changed:** a test now opens every page of the built site and follows every link the way a browser would. The old check only looked at the links in the header. And a wrong address now lands on a proper page of this site, with the four places you most likely wanted, instead of GitHub's own error page with no way back here.
+
+## What the three have in common
+
+Each time, a check passed that was checking something next to the real thing. The snap was built, but nobody opened it. The links were tested, but only the ones at the top. So most of what changed is one idea: test what a parent actually does. Install it, open it, press the button.
+
+If something still does not work for you, please [open an issue on GitHub](https://github.com/meSingh/sukhi-play/issues) and tell me your system and what you saw. The [installing guide](/docs/installing/) covers each platform, and the current version is always on the [download page](/download/).
+
+**I installed Sukhi Play from the Snap Store and it did nothing. What should I do?** Update it. Every version from 2.0.2 on opens. Snaps update themselves, and running sudo snap refresh sukhi-play in a terminal fetches the new one straight away.
+
+**Was anything wrong with the app itself in 2.0.1?** No. 2.0.1 is the 2.0 release under a different number, and only the snap's packaging was wrong. 2.0.2 is the same app again, released so the fixed snap could go out properly.
+
+## Play time limits: a session that ends on its own
+
+https://sukhiplay.com/blog/play-time-limits/ (Announcements, 2026-09-21, by Mandeep Singh)
+
+> Sukhi Play can now end a session by itself: set a length once, your child sees no countdown until the last thirty seconds, then a stop screen.
+
+Sukhi Play 1.0.15 adds play time: a grown-up sets how long a session lasts, and when it runs out the child gets a stop screen and nothing else will open. 1.0.16 followed the same day to make the stop screen actually appear, and to hide the countdown until the very end.
+
+A limit the app keeps means the grown-up is not the one saying "time's up" in the middle of a game.
+
+## How do I set a play time limit?
+
+Open the grown-up screen and it is the first thing there, on the **Play time** tab. That is on purpose: a limit nobody notices is a limit nobody sets.
+
+At release you could pick from ten minutes to an hour, or no limit. Since 2.0 the presets are shortcuts and you can type any number of minutes up to four hours.
+
+It is a standing rule, not a decision you make each time. Set it once and the clock starts again every time Sukhi Play opens.
+
+## What does my child see while they play?
+
+Almost nothing, and that was a change of mind.
+
+In 1.0.15 the countdown sat in the bar where a child could watch it. Then I watched it run. A clock on screen all afternoon becomes a thing to stare at, and then a thing to argue about. From 1.0.16 it stays hidden until the last thirty seconds, or the last ten on a session of five minutes or less.
+
+A short note appears at five minutes and at one minute. That is mostly for the grown-up in the room, so you can give the usual "two more minutes" before it ends rather than after.
+
+## What happens when time runs out?
+
+The stop screen says "That is all for now" and "Play time is over", and nothing else opens. The app refuses to launch anything from that point, so the answer does not depend on a web page agreeing with it.
+
+I should be honest about 1.0.15: its stop screen never showed. It was laid out below the bottom of the window, the right size and completely invisible. 1.0.16 fixes that by putting it over everything else.
+
+The stop screen also stopped mentioning that a grown-up could start more. To a three-year-old that reads as an invitation rather than an answer.
+
+## Can I give more time?
+
+Yes, from 2.0. The stop screen has an **Ask for more time** button your child can press, and only a grown-up can answer it: the same hold or sum as anywhere else, then a choice of fifteen minutes, an hour, or the rest of the day.
+
+Whatever you grant is for **that session only**. Your usual limit does not move, so an hour today does not quietly become an hour every day. If you would rather not grant anything, there is also a button for a grown-up to close Sukhi Play from the stop screen.
+
+## Why a session and not a daily allowance?
+
+A stored daily total means deciding what counts as a day, and getting that wrong means telling a two-year-old their time is gone at breakfast. So nothing is stored between runs. Each time the app opens, a new session starts from your rule.
+
+That does mean Sukhi Play is not keeping a tally across the day for you. If you want a daily total, you are the tally.
+
+## Why the clock is kept by the app
+
+The time is counted by the app itself, never by the web page your child is on. A game shares its page's process, and a clock a game could stop is not a clock.
+
+The clock also pauses while the grown-up gate or the grown-up screen is open, so setting up a new site does not spend your child's afternoon.
+
+## Where to go next
+
+[Play time](/docs/play-time/) in the manual has the current details. If you are thinking about how much is right for a very young child, I wrote about that in [screen time for a three-year-old](/blog/screen-time-three-year-old/). And if you have not tried Sukhi Play yet, it is on the [download page](/download/).
+
+**Does my child see a timer while they play?** No. The countdown only appears in the last thirty seconds, or the last ten on a session of five minutes or less. Until then there is nothing on screen to watch or bargain with.
+
+**If I give an extra hour today, does that become the new limit?** No. More time applies to that session only. The next time Sukhi Play opens it starts from your usual limit again.
+
+**Can my child start a new session by closing and reopening the app?** Not without you. Closing Sukhi Play needs the same grown-up hold or sum as everything else, and each time it opens the clock starts from your rule.
+
+## Sukhi Play 2.0: a catalogue, and apps that work offline
+
+https://sukhiplay.com/blog/sukhi-play-2-0-catalogue/ (Announcements, 2026-09-21, by Mandeep Singh)
+
+> Sukhi Play 2.0 adds a one-tap catalogue of sites, three apps inside the download that work with no internet, and a rebuilt grown-up screen.
+
+Sukhi Play 2.0 is out. It adds a catalogue of sites a parent can switch on with one tap, three apps that come inside the download and work with no internet at all, and a grown-up screen rebuilt from the ground up. It shipped as 2.0.1, and then 2.0.2 the next day, for reasons I have written up separately.
+
+## What is the catalogue?
+
+It is a list of sites known to work in Sukhi Play, on its own tab of the grown-up screen. Each one is grouped by category and says on its card whether it has no adverts, has adverts that Sukhi Play filters, or has adverts that are left showing. Tap one and it arrives on your child's tile screen with the hosts it needs already filled in.
+
+At 2.0 there were nine: Scratch, PBS Kids, NASA Space Place, Starfall, National Geographic Kids, ABCya, Toy Theater, Poki and Chrome Music Lab.
+
+The same list is published on this site as [the catalogue](/catalogue/). Both are built from one file, so the page and the app cannot drift apart. A site you want that is not in it can still be added by typing its address.
+
+Writing the list out in public showed up three mistakes in what had been shipping, and I fixed them rather than quietly moving on:
+
+- **Toy Theater's note said it carries no advertising.** It does. A test now checks that every ad-supported site says so.
+- **National Geographic Kids shipped with ad filtering on.** Its terms forbid interfering with how the site works, so it now ships with filtering off, and its note says why. Your child still cannot leave the site.
+- **YouTube Kids came out.** It had the most restrictive terms of anything on the list. It returned in 2.1, with ad filtering off.
+
+The catalogue is not a list of recommendations. It says which sites work, not which are good for your child, and Sukhi Play is not connected to any of them.
+
+## Which apps work without the internet?
+
+Until now everything in Sukhi Play needed a connection. Open it on a train, or in a house with poor broadband, and you got a screen of tiles that all failed. So 2.0 ships three apps inside the download:
+
+- **Colouring**, an open-source colouring book, since replaced by [Sukhi Colouring](/blog/sukhi-colouring/): colour in animals, flowers and rockets, or just draw.
+- **Keyboard**, Magic Smash by Evandro Meneses: press any key and something happens.
+- **First Games**, Little Explorer by pazarman: counting, colours, shapes and animals, with no reading needed.
+
+All three are open source under MIT, and their authors are credited in the notices that ship with them. They are the only things Sukhi Play switches on for you in a fresh install, because they are files on your own disk with no network behind them and nobody's terms to agree to. Each one can read its own files and nothing else: not the internet, and not another app's files. Websites are still yours to add.
+
+A picture your child saves from the colouring book lands in a **Sukhi Play** folder inside your Pictures folder, and they see "Picture saved" instead of nothing happening.
+
+The colouring book has since been replaced by one I wrote myself, [Sukhi Colouring](/blog/sukhi-colouring/).
+
+## What changed on the grown-up screen?
+
+It is now a page with four tabs: **Play time**, **Installed apps**, **Catalogue** and **Settings**. Every panel scrolls. Before this, the Save button on the add-a-site form could sit below the bottom of the window with no way to reach it, which made adding a site impossible rather than awkward.
+
+- **Play time** takes any number of minutes up to four hours, with the old presets as shortcuts.
+- **More time** is its own thing. When a session ends your child can ask, and a grown-up can grant fifteen minutes, an hour or the rest of the day, for that session only. Your usual limit does not change. [Play time limits](/blog/play-time-limits/) has more.
+- **The stop screen** has a way for a grown-up to close the app without granting anything.
+- **The way in** is a choice of two cards: hold the button, or answer a small sum. The sum now replaces the hold rather than following it.
+- **Both exits** are in the header and say where they go: back to the play zone, or quit Sukhi Play.
+- **Tiles** are always one of sixteen shapes in a colour you pick. Sites' own icons are gone, because they are other people's trademarks.
+- **While a site loads**, your child sees a screen in that tile's colour and shape instead of a blank rectangle, which to a small child looks exactly like broken.
+
+## Why 2.0.1, and then 2.0.2?
+
+The version number 2.0.0 was used once and could not be used again, and the Ubuntu snap turned out not to open. Nothing in the app changed between 2.0.1 and 2.0.2. The whole story is in [what went wrong with 2.0](/blog/what-went-wrong-with-2-0/).
+
+## Try it
+
+[Download Sukhi Play](/download/), or browse [the catalogue](/catalogue/) first to see what you could switch on. [Adding sites](/docs/adding-sites/) covers everything else.
+
+**Is there a Sukhi Play 2.0.0?** No. 2.0.0 was published and withdrawn, and GitHub will not let that name be used twice, so the 2.0 release is 2.0.1. 2.0.2 followed a day later to fix the Ubuntu snap; the app itself did not change.
+
+**Do the apps inside the download need the internet?** No. They are files on your own computer and they are not allowed to reach the internet at all, so they work on a train, in the car, or when the broadband is having a bad day.
+
+**Does being in the catalogue mean a site has been checked for children?** No. The catalogue is a list of sites known to work in Sukhi Play, with the hosts each one needs. I do not check what they show, so have a look yourself before you switch one on.
+
+## Sukhi Play 1.0, a locked-down browser for small children
+
+https://sukhiplay.com/blog/sukhi-play-1-0/ (Announcements, 2026-09-12, by Mandeep Singh)
+
+> Sukhi Play 1.0 is a free kiosk browser for macOS, Windows and Linux that shows a small child only the websites a grown-up chose, and nothing else.
+
+Sukhi Play 1.0 is out. It is a free desktop app for macOS, Windows and Linux that fills the screen with big tiles for the websites a grown-up picked, and lets a small child open those and nothing else. There is no account, nothing to pay, and closing it needs an adult.
+
+## Why I built it
+
+My son Sukhi is three. He wants to play games on the laptop, and he also presses every key and clicks every button he can reach. In practice that meant closed tabs, the odd deleted file, videos that autoplayed into something I had not chosen, adverts dressed up as play buttons, and eventually my own work vanishing behind a window he had opened by accident.
+
+What I wanted was simple to say: hand him the laptop and stop watching over his shoulder. Sukhi Play is the thing I built so I could.
+
+## What does Sukhi Play 1.0 do?
+
+He gets a few big, colourful tiles. Each one is a website a grown-up has allowed, drawn as a bold colour and a simple shape, so there is nothing to read. Press a tile and the site opens across the whole screen, with a thin bar at the top: a large Back button and a small ✕ in the corner.
+
+Everything else is switched off.
+
+- **Other websites.** Each site carries a list of the only hosts it may load. Every other request is cancelled before it starts, which also stops advert networks nobody has heard of yet.
+- **Adverts and trackers.** Around 110 known advert and tracker domains are blocked even on hosts a site is allowed to use, and the bar counts what it caught.
+- **Popups and new windows.** None open. A link to an allowed page opens in place instead, so nothing looks broken.
+- **Wandering off.** Links and redirects to anywhere off the list go nowhere.
+- **Downloads, right-click and shortcuts.** 64 system shortcuts are held while the app is open, including Cmd+Tab and Alt+Tab, Mission Control and Spotlight. Games keep the keys they need: arrows, WASD, space, Enter and the rest.
+- **The desktop.** The window covers the whole screen. On a Mac it follows across Spaces, so a three-finger swipe brings the window along instead of revealing what is behind it.
+
+The [lockdown page](/docs/lockdown/) goes through each layer, and [what your child sees](/docs/what-child-sees/) shows the screens from their side.
+
+## How does a grown-up get back out?
+
+Press the ✕, or Ctrl+Shift+X (Cmd+Shift+X on a Mac), and hold the button for three seconds. Letting go early gets you nothing. The hold is timed by the app itself rather than by the web page, so no site can fake it. Once it unlocks, you choose: close Sukhi Play, or go back to the tiles.
+
+In 1.0 you could also ask for a PIN after the hold, by setting one in a settings file. The small sum that can replace the hold came later, after my own son worked the hold out. [The grown-up gate](/docs/the-gate/) has the details.
+
+## How do I set it up?
+
+The first time it opens, it asks who is at the computer. A grown-up gets a walkthrough of about a minute: what the app does, choosing the first sites, practising the hold once so you know the feel of it, and handing over.
+
+Nothing is switched on for you. 1.0 came with a short list of suggested sites, each one measured so it would actually work, but none of them enabled. To add your own, you type an address. The app opens the site once out of sight, watches everything it loads, and writes the list of allowed hosts itself, so you never need to know what a hostname is. [Adding sites](/docs/adding-sites/) walks through it.
+
+## What can it not do?
+
+It cannot stop someone switching the computer off, and it is not a substitute for a grown-up somewhere nearby. Some keys belong to the operating system and it will not hand them over; [the limits page](/docs/limits/) lists those rather than glossing over them.
+
+macOS and Windows both show a warning the first time it opens, because I do not pay each year for the certificates that would quieten them. [Installing](/docs/installing/) says exactly what to press.
+
+## Free, with the code in the open
+
+There is no paid version and no account. Every line of code has been public from the first day, including the parts that decide what your child can reach, so none of this has to be taken on trust. 1.0 was released under the MIT licence. From 2.1 the licence changed to one for personal and family use, and [the reasons are here](/blog/new-licence/).
+
+## What came after 1.0
+
+[Play time limits](/blog/play-time-limits/) arrived in 1.0.15. [Sukhi Play 2.0](/blog/sukhi-play-2-0-catalogue/) added a catalogue of ready-made sites and apps that work with no internet, and [Sukhi Colouring](/blog/sukhi-colouring/) was the first app I made for it rather than borrowed.
+
+If you have a small person who taps everything, [download Sukhi Play](/download/) and give it ten minutes.
+
+**Does Sukhi Play cost anything?** No. It is free, there is no account to create, and every line of the code is public.
+
+**Which computers does Sukhi Play run on?** macOS on Apple Silicon and Intel, Windows 10 and 11, and Linux.
+
+**What stops my child just closing it?** Closing needs a grown-up. You hold a button for three seconds, and a quick tap, which is every tap a small child makes, does nothing at all.

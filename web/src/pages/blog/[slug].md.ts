@@ -17,6 +17,8 @@ export const GET: APIRoute = ({ props }) => {
   const faq = d.faq.length
     ? `\n\n## Questions parents ask\n\n${d.faq.map((f) => `### ${f.q}\n\n${f.a}`).join('\n\n')}`
     : '';
-  const text = `# ${d.title}\n\n> ${d.description}\n\nBy Mandeep Singh, ${isoDate(d.date)}. ${KINDS[d.kind].plural}. ${SITE}/blog/${post.id}/\n\n${(post.body ?? '').trim()}${faq}\n`;
+  const points = d.points.length ? `The short version:\n\n${d.points.map((p) => `- ${p}`).join('\n')}\n\n` : '';
+  const sources = d.sources.length ? `\n\n## Sources\n\n${d.sources.map((s) => `- [${s.title}](${s.url})`).join('\n')}` : '';
+  const text = `# ${d.title}\n\n> ${d.description}\n\nBy Mandeep Singh, ${isoDate(d.date)}. ${KINDS[d.kind].plural}. ${SITE}/blog/${post.id}/\n\n${points}${(post.body ?? '').trim()}${sources}${faq}\n`;
   return new Response(text, { headers: { 'content-type': 'text/markdown; charset=utf-8' } });
 };

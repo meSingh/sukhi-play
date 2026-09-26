@@ -1,0 +1,62 @@
+---
+/**
+ * One kind of post on a page of its own: /blog/for-parents/,
+ * /blog/announcements/ and /blog/behind-the-scenes/. A landing page a search
+ * can send a parent to, listing every post of that kind, newest first.
+ */
+import Base from '../../layouts/Base.astro';
+import PostCard from './PostCard.astro';
+import BlogNav from './BlogNav.astro';
+import { AUTHOR, KINDS, isoDate, posts, type Kind } from '../../blog';
+import { SITE } from '../../site';
+
+interface Props { kind: Kind }
+const { kind } = Astro.props;
+const k = KINDS[kind];
+const list = (await posts()).filter((p) => p.data.kind === kind);
+const url = `${SITE}/blog/${k.slug}/`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'CollectionPage',
+      '@id': url,
+      url,
+      name: `${k.plural}: the Sukhi Play blog`,
+      description: k.blurb,
+      inLanguage: 'en-GB',
+      author: AUTHOR,
+      isPartOf: { '@type': 'Blog', '@id': `${SITE}/blog/#blog` },
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: list.map((p, i) => ({
+          '@type': 'ListItem', position: i + 1, url: `${SITE}/blog/${p.id}/`, name: p.data.title
+        }))
+      }
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Sukhi Play', item: `${SITE}/` },
+        { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE}/blog/` },
+        { '@type': 'ListItem', position: 3, name: k.plural, item: url }
+      ]
+    }
+  ]
+};
+---
+<Base title={`${k.plural} | The Sukhi Play blog`} description={k.blurb} page="blog" schema={schema}>
+  <main class="wrap blog-page">
+    <header class="blog-head">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/blog/">Blog</a> <span aria-hidden="true">/</span> <span>{k.plural}</span></nav>
+      <h1>{k.plural}</h1>
+      <p class="lede">{k.blurb}</p>
+      <BlogNav current={kind} />
+    </header>
+    <div class="post-grid">
+      {list.map((p, i) => <PostCard post={p} eager={i < 3} />)}
+    </div>
+    <p class="blog-updated">{list.length} {list.length === 1 ? 'post' : 'posts'}, the newest from <time datetime={list[0] && isoDate(list[0].data.date)}>{list[0]?.data.date.getUTCFullYear()}</time>.</p>
+  </main>
+</Base>

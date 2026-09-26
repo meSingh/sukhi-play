@@ -1,0 +1,30 @@
+---
+/**
+ * A post as a card: its picture (or a cover drawn for it), what kind of post
+ * it is, when, the title and the short answer. The whole card is one link.
+ *
+ * `size` is "wide" for the lead post on a page, laid out picture beside words.
+ */
+import Img from '../Img.astro';
+import Cover from './Cover.astro';
+import { KINDS, isoDate, longDate, minutes, type Post } from '../../blog';
+
+interface Props { post: Post; size?: 'wide' | 'card'; eager?: boolean }
+const { post, size = 'card', eager = false } = Astro.props;
+const d = post.data;
+const kind = KINDS[d.kind];
+---
+<a class:list={['post-card', `post-card--${size}`, `tone-${kind.tone}`]} href={`/blog/${post.id}/`}>
+  <span class="post-card-pic">
+    {d.image
+      ? <Img src={d.image} alt={d.imageAlt ?? ''} loading={eager ? 'eager' : 'lazy'}
+             sizes={size === 'wide' ? '(min-width: 900px) 560px, 92vw' : '(min-width: 900px) 320px, 92vw'} />
+      : <Cover kind={d.kind} title={d.title} />}
+  </span>
+  <span class="post-card-say">
+    <span class="post-card-meta"><span class="kind-chip">{kind.label}</span><time datetime={isoDate(d.date)}>{longDate(d.date)}</time></span>
+    <b>{d.title}</b>
+    <span class="post-card-dek">{d.description}</span>
+    <span class="post-card-foot">{minutes(post)} min read</span>
+  </span>
+</a>

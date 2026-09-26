@@ -7,12 +7,27 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type Post = CollectionEntry<'blog'>;
 
-/** What each kind is called where a parent reads it. */
+/**
+ * What each kind is called where a parent reads it, the address of its own
+ * page, and the colour its covers and labels use.
+ */
 export const KINDS = {
-  guide: { label: 'For parents', plural: 'For parents' },
-  announcement: { label: 'Announcement', plural: 'Announcements' },
-  story: { label: 'Behind the scenes', plural: 'Behind the scenes' }
+  guide: {
+    label: 'For parents', plural: 'For parents', slug: 'for-parents', tone: 'mint',
+    blurb: 'What works with small children and computers: screen time, laptops, keyboards and printing, from one parent to another.'
+  },
+  announcement: {
+    label: 'Announcement', plural: 'Announcements', slug: 'announcements', tone: 'violet',
+    blurb: 'Every new version of Sukhi Play, every new app in the playground, and every change that matters to a family using it.'
+  },
+  story: {
+    label: 'Behind the scenes', plural: 'Behind the scenes', slug: 'behind-the-scenes', tone: 'amber',
+    blurb: 'How it is made, and what went wrong on the way, told plainly.'
+  }
 } as const;
+
+export type Kind = keyof typeof KINDS;
+export const KIND_ORDER: Kind[] = ['guide', 'announcement', 'story'];
 
 export const AUTHOR = {
   '@type': 'Person',

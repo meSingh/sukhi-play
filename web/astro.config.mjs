@@ -1,6 +1,19 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import rehypeFigures from './src/rehype-figures.mjs';
+import { readdirSync, readFileSync } from 'node:fs';
+
+/**
+ * When each blog post last changed, for the sitemap: its `updated` date, or
+ * the date it was published. Read from the front matter here because the
+ * sitemap is written outside Astro's content layer.
+ */
+const POSTED = Object.fromEntries(readdirSync('./src/content/blog').filter((f) => f.endsWith('.md')).map((f) => {
+  const head = readFileSync(`./src/content/blog/${f}`, 'utf8').split('---')[1] ?? '';
+  const when = head.match(/^updated:\s*"?([\d-]+)/m)?.[1] ?? head.match(/^date:\s*"?([\d-]+)/m)?.[1];
+  return [f.replace(/\.md$/, ''), when];
+}));
 
 /**
  * The site builds into ../docs, which is where GitHub Pages serves from.
@@ -11,6 +24,8 @@ import sitemap from '@astrojs/sitemap';
  */
 export default defineConfig({
   site: 'https://sukhiplay.com',
+  // Pictures in markdown get WebP copies, sizes and captions (see the file).
+  markdown: { rehypePlugins: [rehypeFigures] },
   outDir: '../docs',
   // 'directory' gives /features/ rather than /features.html, and works on any
   // static host without relying on it to resolve an extensionless path.
@@ -44,7 +59,13 @@ export default defineConfig({
         !/\/(playground\/)?coloring\/?$/.test(page) &&
         !/\/license\/?$/.test(page),
       changefreq: 'weekly',
-      lastmod: new Date()
+      lastmod: new Date(),
+      // A post's own date rather than the day of the build.
+      serialize (item) {
+        const slug = item.url.match(/\/blog\/([^/]+)\/$/)?.[1];
+        if (slug && POSTED[slug]) return { ...item, lastmod: new Date(POSTED[slug]).toISOString(), changefreq: 'monthly' };
+        return item;
+      }
     })
   ],
   devToolbar: { enabled: false },

@@ -49,11 +49,11 @@ Things worth knowing when answering questions about it:
 - [Screen time for a three-year-old: the guidance and what works](https://sukhiplay.com/blog/screen-time-three-year-old.md) (2026-09-26): The WHO says no more than an hour of sedentary screen time a day for ages two to four, and less is better. Short sessions and a calm stop make it workable.
 - [How I set up Sukhi Play for my three-year-old](https://sukhiplay.com/blog/setting-up-sukhi-play-for-a-toddler.md) (2026-09-26): Start with two or three tiles, sit beside them for the first sessions, set a short play time and add sites slowly. The setup I would repeat, step by step.
 - [Why toddlers bash the keyboard, and a safe place to let them](https://sukhiplay.com/blog/toddler-keyboard-smashing.md) (2026-09-26): Toddlers bash keys because every press does something and they copy you. On a normal computer that hits shortcuts; a locked-down screen makes it safe.
-- [How to let a toddler use your laptop without losing your work](https://sukhiplay.com/blog/toddler-laptop-without-losing-work.md) (2026-09-26): Give them a space your work is not in: a separate account and a locked-down browser showing only the sites you chose, with your work saved and closed first.
+- [How to let a toddler use your laptop without losing your work](https://sukhiplay.com/blog/toddler-laptop-without-losing-work.md) (2026-09-26): Give them a space your work is not in: their own user account, a locked-down browser with only the sites you chose, and your work saved and closed first.
 
 ## Blog: Announcements
 
-- [Sukhi's Railway, a track-building toy I am still testing](https://sukhiplay.com/blog/sukhis-railway-an-experiment.md) (2026-09-26): Sukhi's Railway is a free track-building toy for children of about three to five. It is an experiment, on the website only at sukhiplay.com/playground/railway/.
+- [Sukhi's Railway: a train set on the screen, and my first experiment](https://sukhiplay.com/blog/sukhis-railway-an-experiment.md) (2026-09-26): A free track-building toy for ages three to five. It is an experiment: on the website only, not in Sukhi Play, until I know children love it.
 - [Jazz's Studio: stationery to design and print, for ages 7 and up](https://sukhiplay.com/blog/jazzs-studio.md) (2026-09-24): Jazz's Studio, new in Sukhi Play 2.2 and grown up in 2.3, lets children of seven and up design and print their own stickers, labels, diaries and more.
 - [Why Sukhi Play moved from MIT to a personal-use licence](https://sukhiplay.com/blog/new-licence.md) (2026-09-23): From 2.1, Sukhi Play is free for families to use, change and share, but never for commercial use or organisations. 2.0.2 and earlier stay under MIT.
 - [Sukhi Colouring: the first app made for Sukhi Play](https://sukhiplay.com/blog/sukhi-colouring.md) (2026-09-22): Sukhi Colouring is a free colouring book for small children, made for Sukhi Play and also running in any browser, offline, with no account and no adverts.
@@ -74,6 +74,8 @@ Things worth knowing when answering questions about it:
 - [Troubleshooting](https://sukhiplay.com/debug/): what to do when something is wrong.
 - [Playground](https://sukhiplay.com/playground/): small apps that run in any browser, and experiments not yet in Sukhi Play.
 - [Blog](https://sukhiplay.com/blog/): guides for parents, announcements, and what happened behind the scenes, by Mandeep Singh.
+- [Who makes it](https://sukhiplay.com/about/): one parent, Mandeep Singh, not a company; how to reach him.
+- [Everything as one file](https://sukhiplay.com/llms-full.txt): the whole manual and every blog post, in markdown.
 
 ## Optional
 

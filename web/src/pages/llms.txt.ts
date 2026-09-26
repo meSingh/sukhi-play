@@ -77,6 +77,8 @@ export const GET: APIRoute = async () => {
     `- [Troubleshooting](${SITE}/debug/): what to do when something is wrong.`,
     `- [Playground](${SITE}/playground/): small apps that run in any browser, and experiments not yet in Sukhi Play.`,
     `- [Blog](${SITE}/blog/): guides for parents, announcements, and what happened behind the scenes, by Mandeep Singh.`,
+    `- [Who makes it](${SITE}/about/): one parent, Mandeep Singh, not a company; how to reach him.`,
+    `- [Everything as one file](${SITE}/llms-full.txt): the whole manual and every blog post, in markdown.`,
     '',
     '## Optional',
     '',

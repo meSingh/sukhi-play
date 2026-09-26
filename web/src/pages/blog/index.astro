@@ -1,22 +1,26 @@
 ---
 /**
- * The blog's front page: the newest post large, then everything by kind.
+ * The blog's front page.
  *
- * Guides come first among the groups, because they are what a parent arrives
- * from a search looking for; announcements and the stories behind them
- * follow. Every post is a plain link, so the whole blog is crawlable from
- * here with no script.
+ * The newest post large, then the three kinds in the order a visitor from a
+ * search wants them: guides for parents as cards with pictures, the
+ * announcements as a timeline, since they are a history, and the stories
+ * behind them. Every post is a plain link, so the whole blog is crawlable
+ * from here with no script.
  */
 import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/blog/PostCard.astro';
+import BlogNav from '../../components/blog/BlogNav.astro';
 import Img from '../../components/Img.astro';
+import Cover from '../../components/blog/Cover.astro';
 import { AUTHOR, KINDS, isoDate, longDate, posts } from '../../blog';
 import { SITE } from '../../site';
 
 const all = await posts();
-const [newest, ...rest] = all;
-const groups = (['guide', 'announcement', 'story'] as const)
-  .map((k) => ({ key: k, name: KINDS[k].plural, items: rest.filter((p) => p.data.kind === k) }))
-  .filter((g) => g.items.length);
+const [lead, ...rest] = all;
+const guides = rest.filter((p) => p.data.kind === 'guide');
+const news = rest.filter((p) => p.data.kind === 'announcement');
+const stories = rest.filter((p) => p.data.kind === 'story');
 
 const schema = {
   '@context': 'https://schema.org',
@@ -24,60 +28,91 @@ const schema = {
   '@id': `${SITE}/blog/#blog`,
   name: 'The Sukhi Play blog',
   url: `${SITE}/blog/`,
-  description: 'Announcements, guides for parents of small children, and what happened behind the scenes, by Mandeep Singh.',
+  description: 'Guides for parents of small children on screens and computers, announcements about Sukhi Play and its apps, and what happened behind the scenes. By Mandeep Singh.',
   inLanguage: 'en-GB',
   author: AUTHOR,
+  publisher: AUTHOR,
   blogPost: all.map((p) => ({
     '@type': 'BlogPosting',
     headline: p.data.title,
     url: `${SITE}/blog/${p.id}/`,
     datePublished: isoDate(p.data.date),
-    description: p.data.description
+    description: p.data.description,
+    ...(p.data.image ? { image: new URL(p.data.image, SITE).href } : {})
   }))
 };
 ---
 
 <Base
   title="The Sukhi Play blog: small children, screens, and what I am making"
-  description="Guides for parents of small children on screens and laptops, announcements about Sukhi Play and its apps, and what went on behind the scenes. By Mandeep Singh."
+  description="Guides for parents of small children on screens, laptops and screen time, plus announcements about Sukhi Play and its apps. By Mandeep Singh."
   page="blog"
   schema={schema}>
 
-  <main class="wrap blog-index">
-    <header class="hero hero--page">
+  <main class="wrap blog-page">
+    <header class="blog-head">
       <p class="f-kicker">The blog</p>
-      <h1>Small children, screens, and what I am making</h1>
-      <p class="lede">I built Sukhi Play for my son. Here I write about what
-        works with small children and computers, what is new, and what went
-        wrong along the way.</p>
-      <p class="blog-feed"><a href="/blog/rss.xml">Follow by RSS</a></p>
+      <h1>Notes from one parent to another</h1>
+      <p class="lede">I built Sukhi Play for my son. Here I write about what works
+        with small children and computers, what is new, and what went wrong on
+        the way.</p>
+      <BlogNav />
     </header>
 
-    {newest && (
-      <a class="blog-lead" href={`/blog/${newest.id}/`}>
-        {newest.data.image && <Img src={newest.data.image} alt="" loading="eager" sizes="(min-width: 900px) 520px, 92vw" />}
-        <span class="blog-lead-say">
-          <small>{KINDS[newest.data.kind].plural} &middot; {longDate(newest.data.date)}</small>
-          <b>{newest.data.title}</b>
-          <span>{newest.data.description}</span>
-          <em>Read it</em>
-        </span>
-      </a>
-    )}
+    {lead && <PostCard post={lead} size="wide" eager />}
 
-    {groups.map((g) => (
-      <section class="blog-group" data-section={g.name.toLowerCase()}>
-        <h2>{g.name}</h2>
-        <div class="blog-cards">
-          {g.items.map((p) => (
-            <a class="blog-card" href={`/blog/${p.id}/`}>
-              <small><time datetime={isoDate(p.data.date)}>{longDate(p.data.date)}</time></small>
-              <b>{p.data.title}</b>
-              <span>{p.data.description}</span>
-            </a>
-          ))}
+    {guides.length > 0 && (
+      <section class="blog-sec" data-section="for parents">
+        <div class="blog-sec-head">
+          <h2>For parents</h2>
+          <a href={`/blog/${KINDS.guide.slug}/`}>All guides</a>
+        </div>
+        <div class="post-grid">
+          {guides.map((p) => <PostCard post={p} />)}
         </div>
       </section>
-    ))}
+    )}
+
+    {news.length > 0 && (
+      <section class="blog-sec" data-section="announcements">
+        <div class="blog-sec-head">
+          <h2>Announcements</h2>
+          <a href={`/blog/${KINDS.announcement.slug}/`}>All announcements</a>
+        </div>
+        <ol class="timeline">
+          {news.map((p) => (
+            <li>
+              <a class="timeline-item" href={`/blog/${p.id}/`}>
+                <time datetime={isoDate(p.data.date)}>{longDate(p.data.date)}</time>
+                <span class="timeline-pic">
+                  {p.data.image
+                    ? <Img src={p.data.image} alt={p.data.imageAlt ?? ''} loading="lazy" sizes="140px" />
+                    : <Cover kind={p.data.kind} title={p.data.title} />}
+                </span>
+                <span class="timeline-say"><b>{p.data.title}</b><span>{p.data.description}</span></span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    {stories.length > 0 && (
+      <section class="blog-sec" data-section="behind the scenes">
+        <div class="blog-sec-head">
+          <h2>Behind the scenes</h2>
+          <a href={`/blog/${KINDS.story.slug}/`}>All of them</a>
+        </div>
+        <div class="post-grid">
+          {stories.map((p) => <PostCard post={p} />)}
+        </div>
+      </section>
+    )}
+
+    <aside class="blog-follow" data-section="follow">
+      <p><b>New posts, without checking back.</b> Follow the blog in any feed
+        reader, or see <a href="/about/">who writes it</a>.</p>
+      <a class="go go--ghost" href="/blog/rss.xml">RSS feed</a>
+    </aside>
   </main>
 </Base>

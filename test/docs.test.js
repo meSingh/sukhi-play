@@ -195,10 +195,12 @@ test('every page carries the same navigation', () => {
     return text.slice(from, to);
   };
 
-  // Each page marks its own link and, on the download pages, lights the
-  // download pill. Both are per-page state, so compare with them removed.
+  // Each page marks its own link, lights the menu group it belongs to (Apps,
+  // Help) and, on the download pages, the download pill. All of that is
+  // per-page state, so compare with it removed.
   const strip = (nav) => nav
     .replace(/ aria-current="page"/g, '')
+    .replace(/class="nav-group is-current"/g, 'class="nav-group"')
     .replace(/class="nav-dl is-current"/g, 'class="nav-dl"');
   const first = strip(navOf(fs.readFileSync(pages[0].file, 'utf8')));
 
@@ -217,8 +219,10 @@ test('the navigation only points at pages that exist', () => {
 
   for (const href of (nav.match(/href="([^"]+)"/g) || []).map((m) => m.slice(6, -1))) {
     if (href.startsWith('http') || href.startsWith('/assets/')) continue;
-    // Clean URLs: /debug/ is the directory holding that page's index.html.
-    assert.ok(href === '/' || /^\/[a-z-]+\/(#.*)?$/.test(href),
+    // Clean URLs: /debug/ is the directory holding that page's index.html,
+    // and /docs/installing/ one inside another, now the menus reach into the
+    // manual.
+    assert.ok(href === '/' || /^\/[a-z-]+\/([a-z-]+\/)?(#.*)?$/.test(href),
       `${href} should be a clean path ending in a slash`);
     const dir = href === '/' ? '' : href.replace(/^\//, '').split('#')[0];
     assert.ok(fs.existsSync(path.join(docsDir, dir, 'index.html')),
