@@ -1958,8 +1958,8 @@ footer.foot a:hover { color: var(--ink); }
 
 /* ================= who makes it ================= */
 .whois { max-width: 860px; padding-block: 48px 90px; }
-.whois-hero { display: grid; grid-template-columns: 140px 1fr; gap: 32px; align-items: center; }
-.whois-hero img { width: 140px; height: 140px; object-fit: contain; }
+.whois-hero { display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: center; }
+.whois-hero img { width: 180px; height: 180px; object-fit: contain; }
 .whois-hero h1 { font-size: clamp(32px, 5vw, 48px); margin: 6px 0 14px; }
 .whois-hero .lede { margin: 0; text-align: left; }
 .whois-facts {
@@ -2278,3 +2278,25 @@ footer.foot a:hover { color: var(--ink); }
 @media (max-width: 900px) { .cat-next { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .cat-next { grid-template-columns: 1fr; } }
 .post-fig--tall img { max-width: 320px; margin-inline: auto; border-radius: 26px; }
+
+/* The footer's brand row ends with the two ways out: the code, and the download. */
+.foot-go { display: flex; align-items: center; gap: 10px; margin-left: auto; flex: none; }
+footer.foot a.foot-gh { display: inline-flex; align-items: center; gap: 7px; }
+.foot-gh svg { width: 17px; height: 17px; fill: currentColor; }
+.foot-end-links { display: inline-flex; align-items: center; gap: 22px; margin-left: auto; }
+.foot-end-links a { margin-left: 0 !important; }
+/* The name stays on one line, however narrow the row gets. */
+.foot-grid .foot-mark { flex: none; white-space: nowrap; }
+.foot-mark img { border-radius: 0; object-fit: contain; }
+footer.foot a.foot-dl {
+  display: grid; justify-items: center; gap: 1px; padding: 8px 22px 7px; border-radius: 14px;
+  background: var(--ink); color: #fff; box-shadow: var(--drop); font-size: 16px; font-weight: 800; line-height: 1.15;
+}
+footer.foot a.foot-dl:hover { color: #fff; transform: translateY(-1px); }
+.foot-dl small { font-size: 11.5px; font-weight: 700; opacity: .72; }
+@media (max-width: 620px) {
+  .foot-go { margin-left: 0; margin-top: 6px; }
+}
+/* The author's own picture, drawn like Sukhi and Jazz. */
+img.post-avatar { display: block; flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--wash-violet); object-fit: cover; }
+img.post-avatar--big { width: 64px; height: 64px; }

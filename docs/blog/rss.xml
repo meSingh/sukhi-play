@@ -98,13 +98,13 @@
       <description>Sukhi Colouring is a free colouring book for small children, made for Sukhi Play and also running in any browser, offline, with no account and no adverts.</description>
     </item>
     <item>
-      <title>What went wrong with Sukhi Play 2.0, and what I changed</title>
+      <title>What went wrong with Sukhi Play 2.0, and why it's missing from the release page</title>
       <link>https://sukhiplay.com/blog/what-went-wrong-with-2-0/</link>
       <guid isPermaLink="true">https://sukhiplay.com/blog/what-went-wrong-with-2-0/</guid>
       <pubDate>Tue, 22 Sep 2026 00:00:00 GMT</pubDate>
       <dc:creator>Mandeep Singh</dc:creator>
       <category>Behind the scenes</category>
-      <description>Three things went wrong around Sukhi Play 2.0: a version number I could not use, a Linux snap that never opened, and download buttons that led nowhere.</description>
+      <description>Look for 2.0.0 on the releases page and it isn't there. Here's why, and the two other things that went wrong around the same release.</description>
     </item>
     <item>
       <title>Play time limits: a session that ends on its own</title>

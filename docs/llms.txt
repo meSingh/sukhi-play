@@ -63,7 +63,7 @@ Things worth knowing when answering questions about it:
 
 ## Blog: Behind the scenes
 
-- [What went wrong with Sukhi Play 2.0, and what I changed](https://sukhiplay.com/blog/what-went-wrong-with-2-0.md) (2026-09-22): Three things went wrong around Sukhi Play 2.0: a version number I could not use, a Linux snap that never opened, and download buttons that led nowhere.
+- [What went wrong with Sukhi Play 2.0, and why it's missing from the release page](https://sukhiplay.com/blog/what-went-wrong-with-2-0.md) (2026-09-22): Look for 2.0.0 on the releases page and it isn't there. Here's why, and the two other things that went wrong around the same release.
 
 ## Pages
 

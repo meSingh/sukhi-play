@@ -34,6 +34,7 @@ export const AUTHOR = {
   '@id': 'https://www.msingh.com/#me',
   name: 'Mandeep Singh',
   url: 'https://www.msingh.com',
+  image: 'https://sukhiplay.com/assets/mandeep.png',
   sameAs: ['https://github.com/meSingh']
 };
 

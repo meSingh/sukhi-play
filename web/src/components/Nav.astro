@@ -6,7 +6,6 @@
  * existed only because this markup used to be pasted into each of eight
  * files and drift between them was invisible until somebody clicked.
  */
-import { REPO } from '../site';
 
 interface Props {
   /** The page being rendered, e.g. "docs" — used to mark the current link. */
@@ -24,12 +23,11 @@ const GROUPS = [
     items: [
       { href: '/studio/', icon: '/assets/playground-studio.png', name: "Jazz's Studio", note: 'Design and print stationery. Ages 7 and up' },
       { href: '/colouring/', icon: '/assets/playground-colouring.png', name: 'Sukhi Colouring', note: 'Pick a picture and colour it in' },
-      { href: '/playground/#experiments', icon: '/assets/playground-railway.png', name: "Sukhi's Railway", note: 'Build a track, press go', chip: 'Experiment' }
+      { href: '/playground/#experiments', icon: '/assets/playground-railway.png', name: "Sukhi's Railway", note: 'Build a track, press go', chip: 'Experiment' },
+      { href: '/playground/', glyph: 'grid', name: 'All apps', note: 'Everything in the playground, in any browser' },
+      { href: '/catalogue/', glyph: 'globe', name: 'Catalogue', note: 'Websites known to work, ready to switch on' }
     ],
-    more: [
-      { href: '/playground/', label: 'The playground' },
-      { href: '/catalogue/', label: 'Sites that work with it' }
-    ]
+    more: []
   },
   {
     key: 'help', label: 'Help',
@@ -51,6 +49,8 @@ const GLYPHS: Record<string, string> = {
   book: '<path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5z"/><path d="M5 20.5A2.5 2.5 0 0 0 7.5 23H19v-5"/>',
   down: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
   ask: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3M12 17h.01"/>',
+  grid: '<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>',
   fix: '<path d="M14.5 5.5a4 4 0 0 0 4.9 4.9l-9 9a2 2 0 1 1-2.8-2.8l9-9a4 4 0 0 0-2.1-2.1z"/>'
 };
 
@@ -97,17 +97,12 @@ import Img from '../components/Img.astro';
               </a>
             ))}
           </div>
-          <p class="nav-panel-more">{g.more.map((m) => <a href={m.href}>{m.label}</a>)}</p>
+          {g.more.length > 0 && <p class="nav-panel-more">{g.more.map((m) => <a href={m.href}>{m.label}</a>)}</p>}
         </div>
       </div>
     ))}
 
     <a class="nav-blog" href="/blog/" aria-current={page === 'blog' ? 'page' : undefined}>Blog</a>
-
-    <a class="nav-gh" href={REPO}>
-      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-      <span>GitHub</span>
-    </a>
 
     <!-- Two controls in one pill: a link that goes to the download page,
          because that is what a button marked Download should do, and a caret
