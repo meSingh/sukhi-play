@@ -4,3 +4,6 @@
 [submodule "playground/studio"]
 	path = playground/studio
 	url = https://github.com/meSingh/jazz-studio.git
+[submodule "playground/railway"]
+	path = playground/railway
+	url = https://github.com/meSingh/sukhi-railway.git

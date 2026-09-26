@@ -15,9 +15,16 @@ rest of the web.
 | --- | --- | --- |
 | [`colouring/`](https://github.com/meSingh/sukhi-colouring) | **Sukhi Colouring** — pick a picture and colour it in, or start on a blank page. | Released, and a submodule here |
 | [`studio/`](https://github.com/meSingh/jazz-studio) | **Jazz's Studio** — design and print stationery, make things from boxes, a brand of your own. For older children. | Released, and a submodule here |
+| [`railway/`](https://github.com/meSingh/sukhi-railway) | **Sukhi's Railway** — build a track, press go, and watch Sukhi drive it. For about three to five. | An experiment: on the website only, and a submodule here |
 
 More will follow. Each is added here first, grows until it is worth its own
 release, and then moves to its own repository and comes back as a submodule.
+
+An app can also be an **experiment**: `"sukhi": { "experiment": true }` in its
+package.json. `scripts/playground-app.mjs` then builds it for the website only,
+under the Playground's Experiments section, and never copies it into `apps/`,
+so it is not in the download. It stays that way until children show they come
+back to it.
 
 ## Why a playground rather than a folder of vendored code
 
