@@ -24,8 +24,10 @@ interface Props {
   schema?: Record<string, unknown>;
   /** Keeps a page out of search results. Only the 404 wants this. */
   noindex?: boolean;
+  /** A blog post: shared as an article, with its dates and author. */
+  article?: { published: string; modified?: string; section?: string; tags?: string[] };
 }
-const { title, description, page, image = '/social-preview.png', schema, noindex } = Astro.props;
+const { title, description, page, image = '/social-preview.png', schema, noindex, article } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE);
 const social = new URL(image, Astro.site ?? SITE);
@@ -65,7 +67,15 @@ const app = {
     ? 'noindex, follow'
     : 'index, follow, max-image-preview:large, max-snippet:-1'}>
 
-  <meta property="og:type" content="website">
+  <meta property="og:type" content={article ? 'article' : 'website'}>
+  {article && <>
+    <meta name="author" content="Mandeep Singh">
+    <meta property="article:published_time" content={article.published}>
+    {article.modified && <meta property="article:modified_time" content={article.modified}>}
+    <meta property="article:author" content="https://www.msingh.com">
+    {article.section && <meta property="article:section" content={article.section}>}
+    {article.tags?.map((t) => <meta property="article:tag" content={t}>)}
+  </>}
   <meta property="og:site_name" content="Sukhi Play">
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
@@ -80,6 +90,7 @@ const app = {
   <!-- A plain-language brief for assistants, and the markdown this page is
        written in where there is one. Both are cheaper to read than the HTML. -->
   <link rel="alternate" type="text/markdown" href="/llms.txt" title="Brief for language models">
+  <link rel="alternate" type="application/rss+xml" href="/blog/rss.xml" title="The Sukhi Play blog">
 
   <script type="application/ld+json" is:inline set:html={JSON.stringify(app)} />
   {schema && <script type="application/ld+json" is:inline set:html={JSON.stringify(schema)} />}

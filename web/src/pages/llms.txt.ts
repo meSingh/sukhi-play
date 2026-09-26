@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { SITE, REPO } from '../site';
+import { KINDS, isoDate, posts } from '../blog';
 
 /**
  * A short brief for language models, in the format at llmstxt.org.
@@ -54,6 +55,17 @@ export const GET: APIRoute = async () => {
     lines.push(`- [${doc.data.title}](${SITE}/docs/${doc.id}.md): ${doc.data.summary}`);
   }
 
+  // The blog, guides first: those answer the questions people arrive with.
+  const blog = await posts();
+  for (const kind of ['guide', 'announcement', 'story'] as const) {
+    const these = blog.filter((p) => p.data.kind === kind);
+    if (!these.length) continue;
+    lines.push('', `## Blog: ${KINDS[kind].plural}`, '');
+    for (const p of these) {
+      lines.push(`- [${p.data.title}](${SITE}/blog/${p.id}.md) (${isoDate(p.data.date)}): ${p.data.description}`);
+    }
+  }
+
   lines.push(
     '',
     '## Pages',
@@ -63,6 +75,8 @@ export const GET: APIRoute = async () => {
     `- [Download](${SITE}/download/): builds for macOS, Windows and Linux, with checksums.`,
     `- [Questions](${SITE}/faq/): the ten things people ask most, answered in a paragraph each.`,
     `- [Troubleshooting](${SITE}/debug/): what to do when something is wrong.`,
+    `- [Playground](${SITE}/playground/): small apps that run in any browser, and experiments not yet in Sukhi Play.`,
+    `- [Blog](${SITE}/blog/): guides for parents, announcements, and what happened behind the scenes, by Mandeep Singh.`,
     '',
     '## Optional',
     '',

@@ -52,7 +52,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run Lighthouse on five pages
+      - name: Run Lighthouse on seven pages
         run: npx --yes @lhci/cli@0.15.x autorun
       - name: Keep the reports
         if: always()

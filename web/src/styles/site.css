@@ -1528,6 +1528,11 @@ footer.foot a:hover { color: var(--ink); }
 .pg-app-name h2 { margin: 0; }
 .pg-app-say > p { margin: 12px 0 0; font-size: 18px; color: var(--ink-soft); }
 .pg-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px !important; }
+/* An experiment: the same card, drawn in pencil rather than ink. */
+.pg-exp { padding-top: 72px; }
+.pg-app--exp { background: transparent; box-shadow: none; border: 2.5px dashed var(--ink-faint); }
+.pg-app--exp .pg-badge { background: var(--wash-cyan); }
+.pg-facts { margin: 8px 0 0 !important; font-size: 14px !important; font-weight: 700; color: var(--ink-faint) !important; }
 
 .pg-how {
   list-style: none; padding: 0; margin: 0 auto; max-width: 900px;
@@ -1872,3 +1877,95 @@ footer.foot a:hover { color: var(--ink); }
 .licence-text code { font-size: .9em; }
 .licence-text hr { border: 0; border-top: 1px solid var(--line); margin: 28px 0 16px; }
 @media (max-width: 560px) { .licence-text { padding: 20px; } }
+
+/* ================= the blog ================= */
+/* Posts read like the docs (the same .doc-body prose), in one narrow column
+   with the answer first. The index and the "more" lists use the docs cards'
+   shape, so the blog looks like part of the same site. */
+.blog-index { padding-bottom: 80px; }
+.blog-feed { margin: 0; font-size: 14.5px; font-weight: 800; }
+.blog-feed a { color: var(--ink-soft); }
+
+.blog-lead {
+  display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 32px; align-items: center;
+  margin: 28px 0 8px; padding: 22px; border-radius: 28px;
+  background: var(--paper); box-shadow: var(--drop); text-decoration: none; color: inherit;
+  transition: transform .18s var(--spring), box-shadow .18s;
+}
+.blog-lead:hover { transform: translateY(-3px); box-shadow: var(--drop-lift); }
+.blog-lead img { display: block; width: 100%; height: auto; border-radius: 16px; }
+.blog-lead-say { display: grid; gap: 10px; padding: 6px 8px; }
+.blog-lead-say b { font-size: clamp(24px, 3vw, 32px); line-height: 1.15; color: var(--ink); letter-spacing: -.5px; }
+.blog-lead-say span { font-size: 17px; line-height: 1.55; color: var(--ink-soft); }
+.blog-lead-say em { font-style: normal; font-weight: 800; color: var(--blue); }
+.blog-lead:not(:has(img)) { grid-template-columns: minmax(0, 1fr); }
+
+.blog-group { margin-top: 52px; }
+.blog-group h2 { font-size: 26px; margin: 0 0 16px; }
+.blog-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.blog-card {
+  display: grid; gap: 7px; align-content: start; padding: 20px 22px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 18px;
+  text-decoration: none; transition: border-color .14s, box-shadow .14s, transform .14s;
+}
+.blog-card:hover { border-color: #C7BFF6; box-shadow: 0 10px 24px rgba(23,21,58,.12); transform: translateY(-2px); }
+.blog-card small, .blog-lead-say small {
+  font-size: 12px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-faint);
+}
+.blog-card b { font-size: 18.5px; line-height: 1.3; color: var(--ink); }
+.blog-card span { font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+
+.post-wrap { max-width: 800px; padding-block: 40px 80px; }
+.post h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.1; margin: 0 0 18px; letter-spacing: -1.2px; }
+.post-by { display: flex; align-items: center; gap: 12px; margin: 0 0 22px; }
+.post-by a { font-weight: 800; color: var(--ink); text-decoration: none; }
+.post-by small { display: block; font-size: 13.5px; color: var(--ink-faint); font-weight: 700; }
+.post-avatar {
+  display: inline-grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 50%;
+  background: var(--wash-violet); color: var(--ink); font-size: 14px; font-weight: 900; letter-spacing: .5px;
+}
+.post-avatar--big { width: 56px; height: 56px; font-size: 17px; }
+.post-answer {
+  margin: 0 0 28px; padding: 18px 22px; border-radius: 18px;
+  background: var(--wash-amber); color: var(--ink); font-size: 18.5px; line-height: 1.55; font-weight: 600;
+}
+.post-figure { margin: 0 0 30px; }
+.post-figure img { display: block; width: 100%; height: auto; border-radius: 18px; box-shadow: var(--drop); }
+.post-body a { color: var(--blue); font-weight: 700; }
+
+.post-faq { margin-top: 44px; }
+.post-faq h2 { font-size: 26px; margin: 0 0 14px; }
+.post-faq details { border-top: 1px solid var(--line); }
+.post-faq details:last-child { border-bottom: 1px solid var(--line); }
+.post-faq summary { cursor: pointer; padding: 16px 2px; font-size: 17.5px; font-weight: 800; color: var(--ink); }
+.post-faq details p { margin: 0 2px 18px; font-size: 16.5px; line-height: 1.6; color: var(--ink-soft); }
+
+.post-author {
+  display: flex; gap: 16px; align-items: flex-start; margin-top: 44px; padding: 20px 22px;
+  border-radius: 18px; background: var(--paper); border: 1px solid var(--line);
+}
+.post-author p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--ink-soft); }
+.post-author b { color: var(--ink); }
+.post-next {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+  margin-top: 18px; padding: 20px 22px; border-radius: 18px; background: var(--wash-violet);
+}
+.post-next p { margin: 0; font-size: 16.5px; font-weight: 700; color: var(--ink); }
+.post-more { margin-top: 56px; }
+.post-more h2 { font-size: 24px; margin: 0 0 16px; }
+
+@media (max-width: 760px) {
+  .blog-lead { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 14px; }
+  .blog-cards { grid-template-columns: minmax(0, 1fr); }
+  .post-answer { font-size: 17px; }
+}
+.blog-cards--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-blog { padding-top: 24px; }
+.home-blog-all { text-align: center; margin: 22px 0 0; font-weight: 800; }
+@media (max-width: 900px) { .blog-cards--three { grid-template-columns: minmax(0, 1fr); } }
+.post-answer-label {
+  display: block; margin-bottom: 4px; font-size: 12px; font-weight: 900;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--ink-soft);
+}
+/* These are <section>s for their meaning, not bands: no page-section padding. */
+.blog-group, .post-faq, .post-more { padding-block: 0; }

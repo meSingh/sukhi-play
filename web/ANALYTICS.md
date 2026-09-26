@@ -36,7 +36,7 @@ And, where they apply:
 | `method` | `download_start` | `countdown`, `now`, `retry`, `link` |
 | `from_path` | countdown events | `/` — the page on this site where the visitor picked it |
 | `app` | `open_app` | `studio`, `colouring` |
-| `recommended` | the home page's platform cards | `yes` when it was the card marked *Your computer* |
+| `your_computer` | the home page's platform cards | `yes` when it was the card marked *Your computer* |
 | `open` | FAQ questions | `opened` or `closed` |
 
 The page itself (address, title, the site that sent the visitor) is on every
@@ -50,7 +50,7 @@ the moment they are created**; nothing sent before then is recoverable.
 1. **Register the parameters.** Admin → Data display → Custom definitions →
    *Create custom dimension*, scope **Event**, one for each:
    `link_group`, `section`, `platform`, `variant`, `method`, `from_path`, `app`,
-   `recommended`. Use the parameter name as the dimension name, so the two are
+   `your_computer`. Use the parameter name as the dimension name, so the two are
    never confused. `link_text`, `link_url` and `file_name` are usually offered
    already (Analytics collects them for its own link tracking); if a report
    does not list them, register them the same way.

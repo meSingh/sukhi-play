@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>The Sukhi Play blog</title>
+    <link>https://sukhiplay.com/blog/</link>
+    <atom:link href="https://sukhiplay.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
+    <description>Announcements, guides for parents of small children, and what happened behind the scenes, by Mandeep Singh.</description>
+    <language>en-gb</language>
+    <lastBuildDate>Sat, 26 Sep 2026 00:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Sukhi's Railway, a track-building toy I am still testing</title>
+      <link>https://sukhiplay.com/blog/sukhis-railway-an-experiment/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/sukhis-railway-an-experiment/</guid>
+      <pubDate>Sat, 26 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>Announcements</category>
+      <description>Sukhi's Railway is a free track-building toy for children of about three to five. It is an experiment, on the website only at sukhiplay.com/playground/railway/.</description>
+    </item>
+    <item>
+      <title>Parental controls or a locked-down browser for an under-five?</title>
+      <link>https://sukhiplay.com/blog/parental-controls-vs-kiosk-browser/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/parental-controls-vs-kiosk-browser/</guid>
+      <pubDate>Sat, 26 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>For parents</category>
+      <description>Parental controls filter what an older child finds online. An under-five needs containment: one screen, only the sites you chose, and no way out.</description>
+    </item>
+    <item>
+      <title>Printable name labels, stickers and bookmarks for children</title>
+      <link>https://sukhiplay.com/blog/printables-for-kids-at-home/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/printables-for-kids-at-home/</guid>
+      <pubDate>Sat, 26 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>For parents</category>
+      <description>Jazz's Studio is a free stationery maker for children of seven and up: name labels, stickers, bookmarks, gift tags and door signs, each on one A4 page.</description>
+    </item>
+    <item>
+      <title>Screen time for a three-year-old: the guidance and what works</title>
+      <link>https://sukhiplay.com/blog/screen-time-three-year-old/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/screen-time-three-year-old/</guid>
+      <pubDate>Sat, 26 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>For parents</category>
+      <description>The WHO says no more than an hour of sedentary screen time a day for ages two to four, and less is better. Short sessions and a calm stop make it workable.</description>
+    </item>
+    <item>
+      <title>How I set up Sukhi Play for my three-year-old</title>
+      <link>https://sukhiplay.com/blog/setting-up-sukhi-play-for-a-toddler/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/setting-up-sukhi-play-for-a-toddler/</guid>
+      <pubDate>Sat, 26 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>For parents</category>
+      <description>Start with two or three tiles, sit beside them for the first sessions, set a short play time and add sites slowly. The setup I would repeat, step by step.</description>
+    </item>
+    <item>
+      <title>Why toddlers bash the keyboard, and a safe place to let them</title>
+      <link>https://sukhiplay.com/blog/toddler-keyboard-smashing/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/toddler-keyboard-smashing/</guid>
+      <pubDate>Sat, 26 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>For parents</category>
+      <description>Toddlers bash keys because every press does something and they copy you. On a normal computer that hits shortcuts; a locked-down screen makes it safe.</description>
+    </item>
+    <item>
+      <title>How to let a toddler use your laptop without losing your work</title>
+      <link>https://sukhiplay.com/blog/toddler-laptop-without-losing-work/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/toddler-laptop-without-losing-work/</guid>
+      <pubDate>Sat, 26 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>For parents</category>
+      <description>Give them a space your work is not in: a separate account and a locked-down browser showing only the sites you chose, with your work saved and closed first.</description>
+    </item>
+    <item>
+      <title>Jazz's Studio: stationery to design and print, for ages 7 and up</title>
+      <link>https://sukhiplay.com/blog/jazzs-studio/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/jazzs-studio/</guid>
+      <pubDate>Thu, 24 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>Announcements</category>
+      <description>Jazz's Studio, new in Sukhi Play 2.2 and grown up in 2.3, lets children of seven and up design and print their own stickers, labels, diaries and more.</description>
+    </item>
+    <item>
+      <title>Why Sukhi Play moved from MIT to a personal-use licence</title>
+      <link>https://sukhiplay.com/blog/new-licence/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/new-licence/</guid>
+      <pubDate>Wed, 23 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>Announcements</category>
+      <description>From 2.1, Sukhi Play is free for families to use, change and share, but never for commercial use or organisations. 2.0.2 and earlier stay under MIT.</description>
+    </item>
+    <item>
+      <title>Sukhi Colouring: the first app made for Sukhi Play</title>
+      <link>https://sukhiplay.com/blog/sukhi-colouring/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/sukhi-colouring/</guid>
+      <pubDate>Tue, 22 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>Announcements</category>
+      <description>Sukhi Colouring is a free colouring book for small children, made for Sukhi Play and also running in any browser, offline, with no account and no adverts.</description>
+    </item>
+    <item>
+      <title>What went wrong with Sukhi Play 2.0, and what I changed</title>
+      <link>https://sukhiplay.com/blog/what-went-wrong-with-2-0/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/what-went-wrong-with-2-0/</guid>
+      <pubDate>Tue, 22 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>Behind the scenes</category>
+      <description>Three things went wrong around Sukhi Play 2.0: a version number I could not use, a Linux snap that never opened, and download buttons that led nowhere.</description>
+    </item>
+    <item>
+      <title>Play time limits: a session that ends on its own</title>
+      <link>https://sukhiplay.com/blog/play-time-limits/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/play-time-limits/</guid>
+      <pubDate>Mon, 21 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>Announcements</category>
+      <description>Sukhi Play can now end a session by itself: set a length once, your child sees no countdown until the last thirty seconds, then a stop screen.</description>
+    </item>
+    <item>
+      <title>Sukhi Play 2.0: a catalogue, and apps that work offline</title>
+      <link>https://sukhiplay.com/blog/sukhi-play-2-0-catalogue/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/sukhi-play-2-0-catalogue/</guid>
+      <pubDate>Mon, 21 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>Announcements</category>
+      <description>Sukhi Play 2.0 adds a one-tap catalogue of sites, three apps inside the download that work with no internet, and a rebuilt grown-up screen.</description>
+    </item>
+    <item>
+      <title>Sukhi Play 1.0, a locked-down browser for small children</title>
+      <link>https://sukhiplay.com/blog/sukhi-play-1-0/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/sukhi-play-1-0/</guid>
+      <pubDate>Sat, 12 Sep 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Mandeep Singh</dc:creator>
+      <category>Announcements</category>
+      <description>Sukhi Play 1.0 is a free kiosk browser for macOS, Windows and Linux that shows a small child only the websites a grown-up chose, and nothing else.</description>
+    </item>
+  </channel>
+</rss>

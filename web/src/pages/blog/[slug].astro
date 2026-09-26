@@ -1,0 +1,159 @@
+---
+/**
+ * One blog post.
+ *
+ * Built for two kinds of reader. A parent on a phone gets the answer first
+ * (the description, set as a short answer under the title), then the post,
+ * then the questions people ask next. A search engine or an assistant gets
+ * the same thing marked up: BlogPosting with its author and dates, the
+ * breadcrumb, and the questions as FAQPage. The markdown is also served as
+ * itself at /blog/<slug>.md (see [slug].md.ts), which llms.txt points to.
+ */
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Img from '../../components/Img.astro';
+import { AUTHOR, KINDS, isoDate, longDate, minutes, posts, related, type Post } from '../../blog';
+import { SITE } from '../../site';
+
+export async function getStaticPaths () {
+  const all = await posts();
+  return all.map((post) => ({ params: { slug: post.id }, props: { post, all } }));
+}
+
+const { post, all } = Astro.props as { post: Post; all: Post[] };
+const { Content } = await render(post);
+const d = post.data;
+const url = new URL(`/blog/${post.id}/`, SITE).href;
+const kind = KINDS[d.kind];
+const more = related(all, post);
+const read = minutes(post);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BlogPosting',
+      '@id': `${url}#post`,
+      headline: d.title,
+      description: d.description,
+      url,
+      mainEntityOfPage: url,
+      datePublished: isoDate(d.date),
+      dateModified: isoDate(d.updated ?? d.date),
+      author: AUTHOR,
+      publisher: AUTHOR,
+      inLanguage: 'en-GB',
+      articleSection: kind.plural,
+      keywords: d.topics.join(', '),
+      wordCount: (post.body ?? '').split(/\s+/).filter(Boolean).length,
+      ...(d.image ? { image: new URL(d.image, SITE).href } : {}),
+      isPartOf: { '@type': 'Blog', '@id': `${SITE}/blog/#blog`, name: 'The Sukhi Play blog', url: `${SITE}/blog/` },
+      about: { '@type': 'SoftwareApplication', name: 'Sukhi Play', url: SITE }
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Sukhi Play', item: `${SITE}/` },
+        { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE}/blog/` },
+        { '@type': 'ListItem', position: 3, name: d.title, item: url }
+      ]
+    },
+    ...(d.faq.length ? [{
+      '@type': 'FAQPage',
+      mainEntity: d.faq.map((f) => ({
+        '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a }
+      }))
+    }] : [])
+  ]
+};
+
+// Where a reader goes next depends on what they came to read.
+const next = d.kind === 'guide'
+  ? { say: 'Sukhi Play is free for families, with no account and nothing to pay.', href: '/download/', go: 'Download Sukhi Play' }
+  : d.topics.includes('playground') || d.topics.includes('apps')
+    ? { say: 'Every app in the playground runs in a browser, free, with no sign-up.', href: '/playground/', go: 'Open the playground' }
+    : { say: 'Free for families, for macOS, Windows and Linux.', href: '/download/', go: 'Download Sukhi Play' };
+---
+
+<Base
+  title={`${d.title} | Sukhi Play blog`}
+  description={d.description}
+  page="blog"
+  image={d.image}
+  schema={schema}
+  article={{ published: isoDate(d.date), modified: d.updated ? isoDate(d.updated) : undefined, section: kind.plural, tags: d.topics }}>
+
+  <main class="wrap post-wrap">
+    <article class="post">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/blog/">Blog</a> <span aria-hidden="true">/</span> <span>{kind.plural}</span>
+      </nav>
+
+      <h1>{d.title}</h1>
+
+      <p class="post-by">
+        <span class="post-avatar" aria-hidden="true">MS</span>
+        <span><a href="https://www.msingh.com" rel="author">Mandeep Singh</a>
+          <small>
+            <time datetime={isoDate(d.date)}>{longDate(d.date)}</time>
+            {d.updated && <> &middot; updated <time datetime={isoDate(d.updated)}>{longDate(d.updated)}</time></>}
+            &middot; {read} min read
+          </small>
+        </span>
+      </p>
+
+      <p class="post-answer"><span class="post-answer-label">In short</span>{d.description}</p>
+
+      {d.image && (
+        <figure class="post-figure">
+          <Img src={d.image} alt={d.imageAlt ?? ''} loading="eager" sizes="(min-width: 800px) 740px, 92vw" />
+        </figure>
+      )}
+
+      <div class="doc-body post-body">
+        <Content />
+      </div>
+
+      {d.faq.length > 0 && (
+        <section class="post-faq" data-section="questions">
+          <h2>Questions parents ask</h2>
+          {d.faq.map((f) => (
+            <details>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </section>
+      )}
+
+      <aside class="post-author" data-section="about the author">
+        <span class="post-avatar post-avatar--big" aria-hidden="true">MS</span>
+        <p><b>Mandeep Singh</b> built Sukhi Play for his son, who was three and
+          pressed every key, and keeps making things for him and his sister.
+          Everything here is written by him, from one parent to another, not
+          medical or professional advice.
+          <a href="https://www.msingh.com">msingh.com</a></p>
+      </aside>
+
+      <aside class="post-next" data-section="next step">
+        <p>{next.say}</p>
+        <a class="go" href={next.href}>{next.go}</a>
+      </aside>
+    </article>
+
+    {more.length > 0 && (
+      <section class="post-more" data-section="more from the blog">
+        <h2>More from the blog</h2>
+        <div class="blog-cards">
+          {more.map((p) => (
+            <a class="blog-card" href={`/blog/${p.id}/`}>
+              <small>{KINDS[p.data.kind].plural} &middot; {longDate(p.data.date)}</small>
+              <b>{p.data.title}</b>
+              <span>{p.data.description}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </main>
+</Base>

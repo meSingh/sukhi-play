@@ -111,7 +111,7 @@
     if (el.tagName === 'A') p.link_url = el.href.split('?')[0].slice(0, 100);
     // The home page marks the card for the visitor's own computer.
     var yours = el.querySelector('.yours');
-    if (yours) p.recommended = yours.hidden ? 'no' : 'yes';
+    if (yours) p.your_computer = yours.hidden ? 'no' : 'yes';
     send(ev[0], p);
   }, true);
 

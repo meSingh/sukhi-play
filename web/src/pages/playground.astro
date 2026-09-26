@@ -7,6 +7,10 @@
  * the apps that are here, show how to keep them on a home screen, and show
  * that more are on the way.
  *
+ * Experiments sit in a section of their own below the apps: things still
+ * being tried with children, on this website only and not in Sukhi Play. One
+ * that sticks gets a release and moves up into APPS.
+ *
  * Every app gets two links that say plainly what they do. "Open the app" goes
  * into the app itself, in a new tab so this page is still here afterwards.
  * "Read more" goes to that app's own page on this site.
@@ -39,6 +43,19 @@ const APPS = [
   }
 ];
 
+const EXPERIMENTS = [
+  {
+    name: "Sukhi's Railway",
+    badge: 'Experiment',
+    say: 'Build a track, press go, and watch Sukhi drive it. For ages 3 to 5.',
+    facts: 'On this website only \u00b7 Not in Sukhi Play yet',
+    icon: '/assets/playground-railway.png',
+    shot: '/screenshots/railway/01-a-track.png',
+    open: '/playground/railway/',
+    more: '/blog/sukhis-railway-an-experiment/'
+  }
+];
+
 const PALETTE = ['#FF5C5C', '#FFBE18', '#8BD64B', '#10D6A0', '#3B6BFF', '#8B5CF6', '#D96FD6'];
 
 const schema = {
@@ -46,7 +63,7 @@ const schema = {
   '@type': 'CollectionPage',
   name: 'The Sukhi Play playground',
   url: new URL('/playground/', SITE).href,
-  hasPart: APPS.map((a) => ({
+  hasPart: [...APPS, ...EXPERIMENTS].map((a) => ({
     '@type': 'WebApplication',
     name: a.name,
     url: new URL(a.open, SITE).href,
@@ -90,12 +107,44 @@ import Img from '../components/Img.astro';
           <p>{a.say}</p>
           <p class="pg-links">
             <a class="go" href={a.open} target="_blank" rel="noopener">Open the app</a>
-            <a class="go go--ghost" href={a.more}>Read more</a>
+            <a class="go go--ghost" href={a.more}>About {a.name}</a>
           </p>
         </div>
       </article>
     ))}
   </div>
+
+  <section class="pg-exp" data-section="experiments">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="kicker">Try them early</span>
+        <h2>Experiments</h2>
+        <p>Things I am still trying out with my own children. They are here on the
+          website only, not in Sukhi Play, and they may change or go away. If
+          children keep coming back to one, it gets a proper release.</p>
+      </div>
+      {EXPERIMENTS.map((a) => (
+        <article class="pg-app pg-app--exp reveal">
+          <a class="pg-app-shot" href={a.open} target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+            <Img src={a.shot} alt="" width="1240" height="800" loading="lazy" decoding="async" sizes="(min-width: 900px) 560px, 92vw" />
+          </a>
+          <div class="pg-app-say">
+            <span class="pg-badge">{a.badge}</span>
+            <div class="pg-app-name">
+              <Img src={a.icon} alt="" width="64" height="64" loading="lazy" sizes="64px" />
+              <h2>{a.name}</h2>
+            </div>
+            <p>{a.say}</p>
+            <p class="pg-facts">{a.facts}</p>
+            <p class="pg-links">
+              <a class="go" href={a.open} target="_blank" rel="noopener">Try the experiment</a>
+              <a class="go go--ghost" href={a.more}>Why it is an experiment</a>
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
 
   <section class="band band--violet" style="margin-top:72px">
     <div class="wrap">

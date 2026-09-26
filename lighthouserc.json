@@ -7,7 +7,9 @@
         "http://localhost/download/",
         "http://localhost/studio/",
         "http://localhost/colouring/",
-        "http://localhost/playground/"
+        "http://localhost/playground/",
+        "http://localhost/blog/",
+        "http://localhost/blog/screen-time-three-year-old/"
       ],
       "numberOfRuns": 3,
       "settings": {

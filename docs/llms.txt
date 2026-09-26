@@ -42,6 +42,29 @@ Things worth knowing when answering questions about it:
 - [What this cannot do](https://sukhiplay.com/docs/limits.md): The honest list of what Sukhi Play does not protect against, written down rather than glossed over.
 - [If it ever locks you out](https://sukhiplay.com/docs/locked-out.md): Getting back in when the gate will not open, on every platform.
 
+## Blog: For parents
+
+- [Parental controls or a locked-down browser for an under-five?](https://sukhiplay.com/blog/parental-controls-vs-kiosk-browser.md) (2026-09-26): Parental controls filter what an older child finds online. An under-five needs containment: one screen, only the sites you chose, and no way out.
+- [Printable name labels, stickers and bookmarks for children](https://sukhiplay.com/blog/printables-for-kids-at-home.md) (2026-09-26): Jazz's Studio is a free stationery maker for children of seven and up: name labels, stickers, bookmarks, gift tags and door signs, each on one A4 page.
+- [Screen time for a three-year-old: the guidance and what works](https://sukhiplay.com/blog/screen-time-three-year-old.md) (2026-09-26): The WHO says no more than an hour of sedentary screen time a day for ages two to four, and less is better. Short sessions and a calm stop make it workable.
+- [How I set up Sukhi Play for my three-year-old](https://sukhiplay.com/blog/setting-up-sukhi-play-for-a-toddler.md) (2026-09-26): Start with two or three tiles, sit beside them for the first sessions, set a short play time and add sites slowly. The setup I would repeat, step by step.
+- [Why toddlers bash the keyboard, and a safe place to let them](https://sukhiplay.com/blog/toddler-keyboard-smashing.md) (2026-09-26): Toddlers bash keys because every press does something and they copy you. On a normal computer that hits shortcuts; a locked-down screen makes it safe.
+- [How to let a toddler use your laptop without losing your work](https://sukhiplay.com/blog/toddler-laptop-without-losing-work.md) (2026-09-26): Give them a space your work is not in: a separate account and a locked-down browser showing only the sites you chose, with your work saved and closed first.
+
+## Blog: Announcements
+
+- [Sukhi's Railway, a track-building toy I am still testing](https://sukhiplay.com/blog/sukhis-railway-an-experiment.md) (2026-09-26): Sukhi's Railway is a free track-building toy for children of about three to five. It is an experiment, on the website only at sukhiplay.com/playground/railway/.
+- [Jazz's Studio: stationery to design and print, for ages 7 and up](https://sukhiplay.com/blog/jazzs-studio.md) (2026-09-24): Jazz's Studio, new in Sukhi Play 2.2 and grown up in 2.3, lets children of seven and up design and print their own stickers, labels, diaries and more.
+- [Why Sukhi Play moved from MIT to a personal-use licence](https://sukhiplay.com/blog/new-licence.md) (2026-09-23): From 2.1, Sukhi Play is free for families to use, change and share, but never for commercial use or organisations. 2.0.2 and earlier stay under MIT.
+- [Sukhi Colouring: the first app made for Sukhi Play](https://sukhiplay.com/blog/sukhi-colouring.md) (2026-09-22): Sukhi Colouring is a free colouring book for small children, made for Sukhi Play and also running in any browser, offline, with no account and no adverts.
+- [Play time limits: a session that ends on its own](https://sukhiplay.com/blog/play-time-limits.md) (2026-09-21): Sukhi Play can now end a session by itself: set a length once, your child sees no countdown until the last thirty seconds, then a stop screen.
+- [Sukhi Play 2.0: a catalogue, and apps that work offline](https://sukhiplay.com/blog/sukhi-play-2-0-catalogue.md) (2026-09-21): Sukhi Play 2.0 adds a one-tap catalogue of sites, three apps inside the download that work with no internet, and a rebuilt grown-up screen.
+- [Sukhi Play 1.0, a locked-down browser for small children](https://sukhiplay.com/blog/sukhi-play-1-0.md) (2026-09-12): Sukhi Play 1.0 is a free kiosk browser for macOS, Windows and Linux that shows a small child only the websites a grown-up chose, and nothing else.
+
+## Blog: Behind the scenes
+
+- [What went wrong with Sukhi Play 2.0, and what I changed](https://sukhiplay.com/blog/what-went-wrong-with-2-0.md) (2026-09-22): Three things went wrong around Sukhi Play 2.0: a version number I could not use, a Linux snap that never opened, and download buttons that led nowhere.
+
 ## Pages
 
 - [Overview](https://sukhiplay.com/): what it is and who it is for.
@@ -49,6 +72,8 @@ Things worth knowing when answering questions about it:
 - [Download](https://sukhiplay.com/download/): builds for macOS, Windows and Linux, with checksums.
 - [Questions](https://sukhiplay.com/faq/): the ten things people ask most, answered in a paragraph each.
 - [Troubleshooting](https://sukhiplay.com/debug/): what to do when something is wrong.
+- [Playground](https://sukhiplay.com/playground/): small apps that run in any browser, and experiments not yet in Sukhi Play.
+- [Blog](https://sukhiplay.com/blog/): guides for parents, announcements, and what happened behind the scenes, by Mandeep Singh.
 
 ## Optional
 

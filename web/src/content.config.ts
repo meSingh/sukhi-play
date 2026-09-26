@@ -22,4 +22,33 @@ const docs = defineCollection({
   })
 });
 
-export const collections = { docs };
+/**
+ * The blog: announcements, guides for parents, and what happened behind the
+ * scenes, all written by Mandeep in the first person.
+ *
+ * Markdown for the same reasons as the docs, and served as markdown too at
+ * /blog/<slug>.md. The description doubles as the short answer at the top of
+ * the post, which is the sentence a search result or an assistant quotes, so
+ * it is written to stand on its own.
+ */
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    /** One or two sentences: the meta description, and the short answer. */
+    description: z.string().max(200),
+    date: z.coerce.date(),
+    /** Set when a post is changed in substance after it was published. */
+    updated: z.coerce.date().optional(),
+    kind: z.enum(['announcement', 'guide', 'story']),
+    topics: z.array(z.string()).default([]),
+    /** A picture from public/, shown under the title and used for sharing. */
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
+    /** Follow-up questions, shown at the end and marked up for search. */
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
+    draft: z.boolean().default(false)
+  })
+});
+
+export const collections = { docs, blog };
