@@ -10,9 +10,9 @@
 import Base from '../layouts/Base.astro';
 import Img from '../components/Img.astro';
 import { AUTHOR, longDate, posts } from '../blog';
-import { REPO, SITE } from '../site';
+import { REPO, SITE, BLOG_PUBLIC } from '../site';
 
-const news = (await posts()).filter((p) => p.data.kind !== 'guide').reverse();
+const news = BLOG_PUBLIC ? (await posts()).filter((p) => p.data.kind !== 'guide').reverse() : [];
 
 const schema = {
   '@context': 'https://schema.org',
@@ -61,7 +61,7 @@ const schema = {
       <p>I wanted to hand him the laptop and stop watching over his shoulder. So I
         built a screen where pressing every key is perfectly safe: the sites I
         chose, as big tiles, and nothing else. That became
-        <a href="/blog/introducing-sukhi-play/">Sukhi Play</a>.</p>
+        {BLOG_PUBLIC ? <a href="/blog/introducing-sukhi-play/">Sukhi Play</a> : <a href="/">Sukhi Play</a>}.</p>
 
       <h2>What it grew into</h2>
       <p>His sister Jazz is ten and loves stationery, so she got

@@ -7,7 +7,7 @@
  * a reader: you look at the heading that matches what you want, not at every
  * link in turn.
  */
-import { REPO } from '../site';
+import { REPO, BLOG_PUBLIC } from '../site';
 import { posts } from '../blog';
 
 // Behind the scenes is listed once there is a story in it (and its page is back:
@@ -50,7 +50,7 @@ const COLUMNS = [
       { href: '/docs/locked-out/', label: 'Locked out?' }
     ]
   },
-  {
+  ...(!BLOG_PUBLIC ? [] : [{
     name: 'Blog',
     links: [
       { href: '/blog/', label: 'All posts' },
@@ -59,7 +59,7 @@ const COLUMNS = [
       ...(hasStories ? [{ href: '/blog/behind-the-scenes/', label: 'Behind the scenes' }] : []),
       { href: '/blog/rss.xml', label: 'RSS feed' }
     ]
-  },
+  }]),
   {
     name: 'About',
     links: [
@@ -84,7 +84,7 @@ import Img from '../components/Img.astro';
 
 <footer class="foot">
   <div class="wrap">
-    <div class="foot-grid">
+    <div class="foot-grid" style={`--cols:${COLUMNS.length}`}>
       <div class="foot-brand">
         <a class="foot-mark" href="/">
           <Img src="/assets/cutout-proud.png" alt="" width="38" height="38" sizes="38px" />Sukhi Play

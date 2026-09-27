@@ -10,4 +10,5 @@ export const RELEASES = `${REPO}/releases/latest/download`;
  * visits. It is public by nature -- it ends up in the page for anyone who
  * accepts -- so there is nothing to keep out of the repository.
  */
+export { BLOG_PUBLIC } from './blog-public.mjs';
 export const GA_ID = 'G-GXYHXFDLR8';

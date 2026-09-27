@@ -20,7 +20,7 @@
  * web/public/playground/<name>/, which is generated and not committed.
  */
 import Base from '../layouts/Base.astro';
-import { SITE } from '../site';
+import { SITE, BLOG_PUBLIC } from '../site';
 
 const APPS = [
   {
@@ -138,7 +138,7 @@ import Img from '../components/Img.astro';
             <p class="pg-facts">{a.facts}</p>
             <p class="pg-links">
               <a class="go" href={a.open} target="_blank" rel="noopener">Try the experiment</a>
-              <a class="go go--ghost" href={a.more}>Why it is an experiment</a>
+              {BLOG_PUBLIC && <a class="go go--ghost" href={a.more}>Why it is an experiment</a>}
             </p>
           </div>
         </article>

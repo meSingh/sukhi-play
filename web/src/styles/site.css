@@ -704,7 +704,7 @@ footer.foot { padding: 40px 0 36px; color: var(--ink-faint); font-size: 14.5px; 
 footer.foot a { color: var(--ink-soft); text-decoration: none; font-weight: 700; }
 footer.foot a:hover { color: var(--ink); }
 
-.foot-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 32px 28px; align-items: start; }
+.foot-grid { display: grid; grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr)); gap: 32px 28px; align-items: start; }
 .foot-grid .foot-brand { grid-column: 1 / -1; display: flex; align-items: center; gap: 22px; max-width: none; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
 .foot-grid .foot-brand p { margin: 0; max-width: 560px; }
 
@@ -2300,3 +2300,4 @@ footer.foot a.foot-dl:hover { color: #fff; transform: translateY(-1px); }
 /* The author's own picture, drawn like Sukhi and Jazz. */
 img.post-avatar { display: block; flex: none; width: 44px; height: 44px; border-radius: 50%; background: var(--wash-violet); object-fit: cover; }
 img.post-avatar--big { width: 64px; height: 64px; }
+.cat-next--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }

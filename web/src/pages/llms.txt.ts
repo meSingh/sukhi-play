@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
-import { SITE, REPO } from '../site';
+import { SITE, REPO, BLOG_PUBLIC } from '../site';
 import { KINDS, isoDate, posts } from '../blog';
 
 /**
@@ -56,7 +56,7 @@ export const GET: APIRoute = async () => {
   }
 
   // The blog, guides first: those answer the questions people arrive with.
-  const blog = await posts();
+  const blog = BLOG_PUBLIC ? await posts() : [];
   for (const kind of ['guide', 'announcement', 'story'] as const) {
     const these = blog.filter((p) => p.data.kind === kind);
     if (!these.length) continue;
@@ -76,9 +76,9 @@ export const GET: APIRoute = async () => {
     `- [Questions](${SITE}/faq/): the ten things people ask most, answered in a paragraph each.`,
     `- [Troubleshooting](${SITE}/debug/): what to do when something is wrong.`,
     `- [Playground](${SITE}/playground/): small apps that run in any browser, and experiments not yet in Sukhi Play.`,
-    `- [Blog](${SITE}/blog/): guides for parents, announcements, and what happened behind the scenes, by Mandeep Singh.`,
+    ...(BLOG_PUBLIC ? [`- [Blog](${SITE}/blog/): guides for parents, announcements, and what happened behind the scenes, by Mandeep Singh.`] : []),
     `- [Who makes it](${SITE}/about/): one parent, Mandeep Singh, not a company; how to reach him.`,
-    `- [Everything as one file](${SITE}/llms-full.txt): the whole manual and every blog post, in markdown.`,
+    `- [Everything as one file](${SITE}/llms-full.txt): the whole manual${BLOG_PUBLIC ? ' and every blog post' : ''}, in markdown.`,
     '',
     '## Optional',
     '',

@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import rehypeFigures from './src/rehype-figures.mjs';
+import { BLOG_PUBLIC } from './src/blog-public.mjs';
 import { readdirSync, readFileSync } from 'node:fs';
 
 /**
@@ -57,7 +58,9 @@ export default defineConfig({
         !/\/404\/?$/.test(page) &&
         // The misspellings above are redirects, not addresses.
         !/\/(playground\/)?coloring\/?$/.test(page) &&
-        !/\/license\/?$/.test(page),
+        !/\/license\/?$/.test(page) &&
+        // The blog stays out of the sitemap until it is released.
+        (BLOG_PUBLIC || !/\/blog\//.test(page)),
       changefreq: 'weekly',
       lastmod: new Date(),
       // A post's own date rather than the day of the build.

@@ -6,6 +6,7 @@
 import Base from '../layouts/Base.astro';
 import Img from '../components/Img.astro';
 import { isoDate, longDate, minutes, posts } from '../blog';
+import { BLOG_PUBLIC } from '../site';
 
 // The latest announcements and guides, so the front page always says what
 // is new, and the newest posts are one link from the home page.
@@ -250,7 +251,7 @@ const guides = all.filter((p) => p.data.kind === 'guide').slice(0, 3);
     <div class="wrap">
       <div class="section-head reveal">
         <span class="kicker">What's new</span>
-        <h2>New in the playground, and on the blog</h2>
+        <h2>{BLOG_PUBLIC ? 'New in the playground, and on the blog' : 'New in the playground'}</h2>
       </div>
 
       <div class="news-card reveal">
@@ -275,6 +276,7 @@ const guides = all.filter((p) => p.data.kind === 'guide').slice(0, 3);
         </a>
       </div>
 
+      {BLOG_PUBLIC && (
       <div class="wn-cols reveal">
         <div class="wn-col tone-violet">
           <div class="wn-head"><h3>Announcements</h3><a href="/blog/announcements/">All of them</a></div>
@@ -299,6 +301,7 @@ const guides = all.filter((p) => p.data.kind === 'guide').slice(0, 3);
           </ul>
         </div>
       </div>
+      )}
 
       <!-- The experiment, drawn like the repository card: a note in passing,
            not a feature. -->

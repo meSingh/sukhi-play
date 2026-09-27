@@ -16,6 +16,8 @@ const { page = '' } = Astro.props;
 // The pages in two groups, each a panel under one word, so the bar stays
 // short as the site grows: the apps (and the sites the catalogue lists), and
 // the help. Blog and GitHub stand on their own. The brand is the way home.
+import { BLOG_PUBLIC } from '../site';
+
 const GROUPS = [
   {
     key: 'apps', label: 'Apps',
@@ -102,7 +104,7 @@ import Img from '../components/Img.astro';
       </div>
     ))}
 
-    <a class="nav-blog" href="/blog/" aria-current={page === 'blog' ? 'page' : undefined}>Blog</a>
+    {BLOG_PUBLIC && <a class="nav-blog" href="/blog/" aria-current={page === 'blog' ? 'page' : undefined}>Blog</a>}
 
     <!-- Two controls in one pill: a link that goes to the download page,
          because that is what a button marked Download should do, and a caret

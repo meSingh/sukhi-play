@@ -11,7 +11,7 @@
  */
 import Base from '../layouts/Base.astro';
 import { SHAPES } from '../shapes';
-import { REPO } from '../site';
+import { REPO, BLOG_PUBLIC } from '../site';
 import data from '../../../config/suggestions.json';
 import bundledData from '../../../config/bundled.json';
 
@@ -191,11 +191,11 @@ import Img from '../components/Img.astro';
 
     <!-- Where to go from a list of sites: how to add one, how to choose, and
          the apps that are not websites at all. -->
-    <nav class="cat-next" aria-label="Next steps" data-section="next steps">
+    <nav class={BLOG_PUBLIC ? 'cat-next' : 'cat-next cat-next--two'} aria-label="Next steps" data-section="next steps">
       <a href="/docs/adding-sites/"><b>Add a site of your own</b><span>Type an address and Sukhi Play works out the rest.</span></a>
-      <a href="/blog/setting-up-sukhi-play-for-a-toddler/"><b>How I set it up</b><span>Which sites to start with, and the first week.</span></a>
+      {BLOG_PUBLIC && <a href="/blog/setting-up-sukhi-play-for-a-toddler/"><b>How I set it up</b><span>Which sites to start with, and the first week.</span></a>}
       <a href="/playground/"><b>The playground</b><span>Apps made for Sukhi Play, and <em>Sukhi's Railway</em>, an experiment.</span></a>
-      <a href="/blog/for-parents/"><b>Guides for parents</b><span>Screen time, laptops and keyboards, from one parent.</span></a>
+      {BLOG_PUBLIC && <a href="/blog/for-parents/"><b>Guides for parents</b><span>Screen time, laptops and keyboards, from one parent.</span></a>}
     </nav>
   </main>
 </Base>

@@ -11,7 +11,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Consent from '../components/Consent.astro';
 import Track from '../components/Track.astro';
-import { REPO, SITE } from '../site';
+import { REPO, SITE, BLOG_PUBLIC } from '../site';
 import '../styles/site.css';
 
 interface Props {
@@ -29,7 +29,9 @@ interface Props {
   /** A blog post: shared as an article, with its dates and author. */
   article?: { published: string; modified?: string; section?: string; tags?: string[] };
 }
-const { title, description, page, image = '/social-preview.png', imageAlt = 'Sukhi Play: big tiles for the websites a grown-up chose, and nothing else', schema, noindex, article } = Astro.props;
+const { title, description, page, image = '/social-preview.png', imageAlt = 'Sukhi Play: big tiles for the websites a grown-up chose, and nothing else', schema, noindex: askedNoindex, article } = Astro.props;
+// While the blog is being reviewed its pages are reachable but not indexed.
+const noindex = askedNoindex || (page === 'blog' && !BLOG_PUBLIC);
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE);
 const social = new URL(image, Astro.site ?? SITE);
@@ -105,7 +107,7 @@ const website = {
   <!-- A plain-language brief for assistants, and the markdown this page is
        written in where there is one. Both are cheaper to read than the HTML. -->
   <link rel="alternate" type="text/markdown" href="/llms.txt" title="Brief for language models">
-  <link rel="alternate" type="application/rss+xml" href="/blog/rss.xml" title="The Sukhi Play blog">
+  {BLOG_PUBLIC && <link rel="alternate" type="application/rss+xml" href="/blog/rss.xml" title="The Sukhi Play blog">}
 
   <script type="application/ld+json" is:inline set:html={JSON.stringify(app)} />
   <script type="application/ld+json" is:inline set:html={JSON.stringify(website)} />

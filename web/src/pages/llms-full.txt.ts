@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
-import { SITE } from '../site';
+import { SITE, BLOG_PUBLIC } from '../site';
 import { KINDS, isoDate, posts } from '../blog';
 
 /**
@@ -10,13 +10,13 @@ import { KINDS, isoDate, posts } from '../blog';
  */
 export const GET: APIRoute = async () => {
   const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
-  const blog = await posts();
+  const blog = BLOG_PUBLIC ? await posts() : [];
   const out = [
     '# Sukhi Play: the manual and the blog, in full',
     '',
     '> A free locked-down browser for small children, for macOS, Windows and Linux,',
     '> made by Mandeep Singh for his own son. This file holds every page of the',
-    `> documentation and every blog post. The brief is at ${SITE}/llms.txt.`,
+    `> documentation${BLOG_PUBLIC ? ' and every blog post' : ''}. The brief is at ${SITE}/llms.txt.`,
     ''
   ];
   for (const d of docs) {
