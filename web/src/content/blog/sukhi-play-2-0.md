@@ -1,7 +1,7 @@
 ---
 title: "Sukhi Play 2.0: ready-made sites, and apps that work offline"
 description: "Sukhi Play 2.0 adds a catalogue of sites you can switch on in one tap, three apps that work with no internet at all, and a simpler grown-up screen."
-date: 2026-09-22
+date: 2026-09-22T05:44:12Z
 kind: announcement
 topics: ["releases", "catalogue", "offline apps"]
 image: "/screenshots/04-catalogue.png"

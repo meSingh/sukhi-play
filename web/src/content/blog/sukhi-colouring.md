@@ -1,63 +1,66 @@
 ---
-title: "Sukhi Colouring: the first app made for Sukhi Play"
-description: "Sukhi Colouring is a free colouring book for small children, made for Sukhi Play and also running in any browser, offline, with no account and no adverts."
-date: 2026-09-22
+title: "Meet Sukhi Colouring, the first app I made for Sukhi Play"
+description: "Sukhi Colouring is a free colouring book for small children: forty pictures or a blank page, big colours, nothing to read. In Sukhi Play and in any browser."
+date: 2026-09-23T04:01:19Z
 kind: announcement
 topics: ["apps", "colouring", "offline"]
 image: "/screenshots/colouring/01-a-page-in-progress.png"
 imageAlt: "A tortoise picture with its shell coloured in, colours down the left and the tools down the right"
+imageCaption: "One picture at a time, twenty colours in reach, and an undo for every mistake."
+points:
+  - "Sukhi Colouring is a colouring book made for small children: forty pictures or a blank page, and nothing that needs reading."
+  - "It comes inside Sukhi Play, switched on and working with no internet."
+  - "It also runs in any browser, and can sit on a phone or tablet's home screen like any other app."
+  - "No account, no adverts, and nothing a small hand can do that can't be undone."
 faq:
   - q: "Do I need Sukhi Play to use Sukhi Colouring?"
-    a: "No. Open sukhiplay.com/playground/colouring/ in any browser. There is nothing to install and nothing to sign up for, and you can add it to a phone or tablet's home screen."
+    a: "No. Open sukhiplay.com/playground/colouring/ in any browser. There is nothing to install and nothing to sign up for."
   - q: "Where are my child's pictures kept?"
-    a: "On that device only. Nothing is uploaded and there is no account. My pictures keeps the sixty most recent, and clearing the browser's data for the site, or using a private window, clears them too."
+    a: "On that device only. Nothing is uploaded and there is no account."
   - q: "Does Sukhi Colouring work without the internet?"
-    a: "Yes. Inside Sukhi Play it is part of the download and never needs a connection. In a browser it keeps working offline once it has been opened once."
+    a: "Yes. Inside Sukhi Play it never needs a connection, and in a browser it keeps working with no signal once it has been opened."
 ---
 
-Sukhi Colouring is a colouring book for small children, and the first app I have made for Sukhi Play rather than borrowed. It replaces the colouring app Sukhi Play used to ship, and it also runs in any browser at [sukhiplay.com/playground/colouring](/playground/colouring/), where it keeps working with no signal.
+Sukhi Play already had a colouring book in it, a good one that somebody else
+had written, but it was made for other children. Its language switch had to
+come out before it suited a small child, some of its icons went missing on
+some Linux computers, and there was no way to start from a blank page. Every change
+I wanted meant patching an app I didn't control.
 
-## Why make one rather than borrow one?
+So I made my son one of his own. Today it's in Sukhi Play, and it's called Sukhi
+Colouring.
 
-Since 2.0, Sukhi Play has shipped a colouring book that somebody else wrote, an open-source app. It was a good app and I chose it on purpose. But it was built for a different set of children, and it showed. The language switch had to be stripped out so a child could not get stuck behind it, some of its icons did not draw on smaller Linux distributions, there was no way to start from a blank page, and every change I wanted meant patching a build I did not control.
+## Made for a three-year-old
 
-So I wrote my own. The idea, the general shape and the sound it makes owe a lot to that app, and the credit for it stays in Sukhi Colouring's README and notices. None of its code came across, which means all of it can now be changed.
+I built it for one three-year-old in particular, and that shaped everything:
+one picture at a time, nothing that needs reading, and nothing a small hand can
+do that can't be undone.
 
-It was built for one three-year-old in particular, which is most of why it looks the way it does: one picture at a time, nothing that needs reading, and nothing a small hand can do that cannot be undone.
+- **Forty pictures** to choose from, animals, cars, flowers and more, or a
+  blank page to draw on.
+- **Three pens**, the pencil, the crayon and the rainbow, and each one looks
+  and sounds different.
+- **Tap to fill** colours a whole shape in one go.
+- **Mirror drawing** copies whatever they draw onto the other side, like a
+  butterfly.
+- **Undo** is always there, for every mistake.
+- **Keep it**, and the picture waits on the shelf to be opened again exactly as
+  it was left.
 
-## What can my child do in it?
+![Sukhi Colouring's picture chooser: a grid of animals, vehicles and other outline drawings](/screenshots/colouring/02-forty-pictures.png "Forty pictures, and a blank page for the days they want to draw their own.")
 
-- **Pick a picture** from forty, including animals, cars and flowers, or leave it and draw on a blank page.
-- **Draw** with the pencil, the crayon or the rainbow, in three widths. Each pen looks and sounds different.
-- **Tap to fill** a shape. Tapping the paper around the picture colours the whole page instead.
-- **Mirror drawing**, the butterfly, copies everything onto the other side.
-- **Rub out** with the eraser, and go **Back** or **Forward** to undo and redo. **Start again** clears the page, and asks first.
-- **Keep it**, which puts the picture in **My pictures**. Open one later and it comes back exactly as it was left.
+## Inside Sukhi Play, and anywhere else
 
-The cog holds the language, English or 한국어, and the sound. It sits at the end of the tools, out of the way of the ones a child uses most.
+In Sukhi Play, Colouring is on the tiles from the start and needs no internet
+at all. On the grown-up screen it carries an **Official** badge, and where
+other apps show a web address, it says "By Sukhi Play · No ads · No tracking",
+because those are the two things you'd want to check.
 
-## Can I use it without Sukhi Play?
+It also runs in any browser, on a phone, a tablet or a computer, at
+[sukhiplay.com/playground/colouring](/playground/colouring/). Add it to the
+home screen and it opens full screen like any other app, and keeps working with
+no signal. There's no account, no adverts, and nothing to tap that leads to
+another website.
 
-Yes. Open [the app](/playground/colouring/) in a browser on a phone, a tablet or a computer. There is no account, no adverts and nothing to buy, and there is nothing to tap that leads to another website.
-
-To keep it on the home screen, press **Add to home screen** in the app: the phone with an arrow in it, next to the cog. It shows the steps for the device you are on. If you would rather do it yourself:
-
-- **iPhone and iPad:** open it in Safari, tap **Share**, then **Add to Home Screen**.
-- **Android:** open it in Chrome, open the menu, then **Add to Home screen**.
-- **A computer:** in Chrome or Edge, click the install icon at the end of the address bar.
-
-It then opens full screen, with no address bar for a small finger to land in, and keeps working without internet once it has been opened once.
-
-## What changes inside Sukhi Play?
-
-The **Colouring** tile is switched on from the start, as before. It is part of the download, so it needs no internet.
-
-From 2.1, apps I made for Sukhi Play carry an **Official** badge on the grown-up screen, and where other apps show an address, this one says "By Sukhi Play · No ads · No tracking". Official is not a setting. It comes from the app's own packaging, so nothing a text editor can reach, including your own settings files, can give that badge to anything else.
-
-## What it does not do yet
-
-Pictures stay on the device they were made on. There is no account, so there is no way to move them between a laptop and a phone. My pictures holds the sixty most recent, and the oldest make way for new ones.
-
-## Where next
-
-[The Sukhi Colouring page](/colouring/) shows it properly, [the manual](/docs/sukhi-colouring/) has the details, and [the playground](/playground/) is where the next apps will appear. If you do not have Sukhi Play yet, it is on the [download page](/download/).
+[The Sukhi Colouring page](/colouring/) has more pictures of it. Or just
+[open it](/playground/colouring/) and hand it over.

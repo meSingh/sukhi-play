@@ -1,7 +1,7 @@
 ---
 title: "Introducing Sukhi Play: hand your child the laptop, and keep your work"
 description: "Sukhi Play is a free app that turns your laptop into a safe place for a small child to play: only the websites you chose, big and simple, and nothing else."
-date: 2026-09-12
+date: 2026-09-12T11:20:47Z
 kind: announcement
 topics: ["launch", "kiosk browser", "toddlers"]
 image: "/screenshots/01-launcher.png"

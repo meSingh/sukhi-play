@@ -1,58 +1,65 @@
-# Play time limits: a session that ends on its own
+# Play time: let the screen say when it's over
 
-> Sukhi Play can now end a session by itself: set a length once, your child sees no countdown until the last thirty seconds, then a stop screen.
+> Sukhi Play can now end a play session by itself. Set how long once, and when time is up your child gets a friendly stop screen, not an argument.
 
 By Mandeep Singh, 2026-09-21. Announcements. https://sukhiplay.com/blog/play-time-limits/
 
-Sukhi Play 1.0.15 adds play time: a grown-up sets how long a session lasts, and when it runs out the child gets a stop screen and nothing else will open. 1.0.16 followed the same day to make the stop screen actually appear, and to hide the countdown until the very end.
+The short version:
 
-A limit the app keeps means the grown-up is not the one saying "time's up" in the middle of a game.
+- Set a session length once, from ten minutes to an hour, or no limit. It applies every time Sukhi Play opens.
+- Your child sees no clock while they play. A countdown appears only in the last thirty seconds.
+- When time is up a stop screen appears, and nothing else will open until a grown-up says so.
+- Setting things up on the grown-up screen doesn't use up your child's time.
 
-## How do I set a play time limit?
+The hardest part of screen time isn't starting it. It's the end. "Two more
+minutes" turns into five, the game is always at the best bit, and whoever says
+"time's up" becomes the villain of the afternoon.
 
-Open the grown-up screen and it is the first thing there, on the **Play time** tab. That is on purpose: a limit nobody notices is a limit nobody sets.
+So I've given that job to the screen. From today, Sukhi Play can end a play
+session by itself.
 
-At release you could pick from ten minutes to an hour, or no limit. Since 2.0 the presets are shortcuts and you can type any number of minutes up to four hours.
+## Set it once
 
-It is a standing rule, not a decision you make each time. Set it once and the clock starts again every time Sukhi Play opens.
+Open the grown-up screen and play time is the first thing there. That's on
+purpose: a limit nobody notices is a limit nobody sets. Choose anything from
+ten minutes to an hour, or no limit.
 
-## What does my child see while they play?
+It's a standing rule, not a decision you make every time. Set it once, and
+every time Sukhi Play opens, the clock starts from your rule.
 
-Almost nothing, and that was a change of mind.
+## No clock to stare at
 
-In 1.0.15 the countdown sat in the bar where a child could watch it. Then I watched it run. A clock on screen all afternoon becomes a thing to stare at, and then a thing to argue about. From 1.0.16 it stays hidden until the last thirty seconds, or the last ten on a session of five minutes or less.
+My first version put a countdown in the bar where a child could see it. Then I
+watched it run. A clock on screen all afternoon becomes a thing to stare at,
+and then a thing to argue about.
 
-A short note appears at five minutes and at one minute. That is mostly for the grown-up in the room, so you can give the usual "two more minutes" before it ends rather than after.
+So the countdown stays hidden. It appears only in the last thirty seconds (the
+last ten, on a session of five minutes or less), just enough to see the end
+coming. A short note at five minutes and at one minute is there for you, so you
+can give the usual warning before it ends rather than after.
 
-## What happens when time runs out?
+## A stop screen, not a fight
 
-The stop screen says "That is all for now" and "Play time is over", and nothing else opens. The app refuses to launch anything from that point, so the answer does not depend on a web page agreeing with it.
+When the time is up, a stop screen says play time is over, and nothing else
+will open. It isn't a web page that a game could talk its way past: Sukhi Play
+itself refuses to open anything more until a grown-up holds the button.
 
-I should be honest about 1.0.15: its stop screen never showed. It was laid out below the bottom of the window, the right size and completely invisible. 1.0.16 fixes that by putting it over everything else.
+The stop screen doesn't mention that a grown-up could start more, either. To a
+three-year-old, that reads as an invitation to go and ask, and it's meant to
+be an answer.
 
-The stop screen also stopped mentioning that a grown-up could start more. To a three-year-old that reads as an invitation rather than an answer.
+## Fair on the grown-up too
 
-## Can I give more time?
+The clock is kept by Sukhi Play itself, not by the site your child is on, so no
+game can pause it. And it stops while you're on the grown-up screen, so
+setting up a new site doesn't eat into your child's time.
 
-Yes, from 2.0. The stop screen has an **Ask for more time** button your child can press, and only a grown-up can answer it: the same hold or sum as anywhere else, then a choice of fifteen minutes, an hour, or the rest of the day.
+It counts a session, not a whole day. A daily allowance means deciding what a
+day is, and getting that wrong means telling a two-year-old their time is gone
+at breakfast.
 
-Whatever you grant is for **that session only**. Your usual limit does not move, so an hour today does not quietly become an hour every day. If you would rather not grant anything, there is also a button for a grown-up to close Sukhi Play from the stop screen.
-
-## Why a session and not a daily allowance?
-
-A stored daily total means deciding what counts as a day, and getting that wrong means telling a two-year-old their time is gone at breakfast. So nothing is stored between runs. Each time the app opens, a new session starts from your rule.
-
-That does mean Sukhi Play is not keeping a tally across the day for you. If you want a daily total, you are the tally.
-
-## Why the clock is kept by the app
-
-The time is counted by the app itself, never by the web page your child is on. A game shares its page's process, and a clock a game could stop is not a clock.
-
-The clock also pauses while the grown-up gate or the grown-up screen is open, so setting up a new site does not spend your child's afternoon.
-
-## Where to go next
-
-[Play time](/docs/play-time/) in the manual has the current details. If you are thinking about how much is right for a very young child, I wrote about that in [screen time for a three-year-old](/blog/screen-time-three-year-old/). And if you have not tried Sukhi Play yet, it is on the [download page](/download/).
+[Download Sukhi Play](/download/), set a time that suits your family, and let
+the screen be the one who says time's up.
 
 ## Questions parents ask
 
@@ -60,10 +67,10 @@ The clock also pauses while the grown-up gate or the grown-up screen is open, so
 
 No. The countdown only appears in the last thirty seconds, or the last ten on a session of five minutes or less. Until then there is nothing on screen to watch or bargain with.
 
-### If I give an extra hour today, does that become the new limit?
+### Do I have to set the limit every time?
 
-No. More time applies to that session only. The next time Sukhi Play opens it starts from your usual limit again.
+No. It is a standing rule. Set it once on the grown-up screen and every session starts from it.
 
 ### Can my child start a new session by closing and reopening the app?
 
-Not without you. Closing Sukhi Play needs the same grown-up hold or sum as everything else, and each time it opens the clock starts from your rule.
+Not without you. Closing Sukhi Play needs the grown-up hold, and every time it opens the clock starts from your rule.
