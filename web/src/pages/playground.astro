@@ -53,6 +53,16 @@ const EXPERIMENTS = [
     shot: '/screenshots/railway/01-a-track.png',
     open: '/playground/railway/',
     more: '/blog/sukhis-railway-an-experiment/'
+  },
+  {
+    name: "Sukhi's Run",
+    badge: 'Experiment',
+    say: 'Sukhi runs, something chases him, and being caught is the fun part. Steer with swipes, arrows or big buttons.',
+    facts: 'On this website only \u00b7 Not in Sukhi Play yet',
+    icon: '/assets/playground-run.png',
+    shot: '/screenshots/run/01-running.png',
+    open: '/playground/run/',
+    more: ''
   }
 ];
 
@@ -138,7 +148,7 @@ import Img from '../components/Img.astro';
             <p class="pg-facts">{a.facts}</p>
             <p class="pg-links">
               <a class="go" href={a.open} target="_blank" rel="noopener">Try the experiment</a>
-              {BLOG_PUBLIC && <a class="go go--ghost" href={a.more}>Why it is an experiment</a>}
+              {BLOG_PUBLIC && a.more && <a class="go go--ghost" href={a.more}>Why it is an experiment</a>}
             </p>
           </div>
         </article>

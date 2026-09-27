@@ -1,0 +1,21 @@
+{
+  "name": "Sukhi's Run",
+  "short_name": "Sukhi's Run",
+  "description": "Sukhi runs, something chases him, and being caught is the fun part. For small children. Nothing is collected, nothing is sent anywhere, and it works with no internet.",
+  "id": "./",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#141433",
+  "theme_color": "#141433",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["games", "entertainment", "kids"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
