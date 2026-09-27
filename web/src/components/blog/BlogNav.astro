@@ -1,12 +1,15 @@
 ---
 /** The blog's sections as a row of chips, so every page of it links to the rest. */
-import { KINDS, KIND_ORDER, type Kind } from '../../blog';
+import { KINDS, KIND_ORDER, posts, type Kind } from '../../blog';
 interface Props { current?: Kind | 'all' }
 const { current = 'all' } = Astro.props;
+// Only the sections that have something in them.
+const all = await posts();
+const kinds = KIND_ORDER.filter((k) => all.some((p) => p.data.kind === k));
 ---
 <nav class="blog-nav" aria-label="Blog sections">
   <a href="/blog/" aria-current={current === 'all' ? 'page' : undefined}>All posts</a>
-  {KIND_ORDER.map((k) => (
+  {kinds.map((k) => (
     <a class={`tone-${KINDS[k].tone}`} href={`/blog/${KINDS[k].slug}/`} aria-current={current === k ? 'page' : undefined}>{KINDS[k].plural}</a>
   ))}
   <a class="blog-nav-rss" href="/blog/rss.xml">RSS</a>

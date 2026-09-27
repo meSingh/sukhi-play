@@ -57,13 +57,9 @@ Things worth knowing when answering questions about it:
 - [Jazz's Studio: stationery to design and print, for ages 7 and up](https://sukhiplay.com/blog/jazzs-studio.md) (2026-09-24): Jazz's Studio, new in Sukhi Play 2.2 and grown up in 2.3, lets children of seven and up design and print their own stickers, labels, diaries and more.
 - [Why Sukhi Play moved from MIT to a personal-use licence](https://sukhiplay.com/blog/new-licence.md) (2026-09-23): From 2.1, Sukhi Play is free for families to use, change and share, but never for commercial use or organisations. 2.0.2 and earlier stay under MIT.
 - [Sukhi Colouring: the first app made for Sukhi Play](https://sukhiplay.com/blog/sukhi-colouring.md) (2026-09-22): Sukhi Colouring is a free colouring book for small children, made for Sukhi Play and also running in any browser, offline, with no account and no adverts.
+- [Sukhi Play 2.0: ready-made sites, and apps that work offline](https://sukhiplay.com/blog/sukhi-play-2-0.md) (2026-09-22): Sukhi Play 2.0 adds a catalogue of sites you can switch on in one tap, three apps that work with no internet at all, and a simpler grown-up screen.
 - [Play time limits: a session that ends on its own](https://sukhiplay.com/blog/play-time-limits.md) (2026-09-21): Sukhi Play can now end a session by itself: set a length once, your child sees no countdown until the last thirty seconds, then a stop screen.
-- [Sukhi Play 2.0: a catalogue, and apps that work offline](https://sukhiplay.com/blog/sukhi-play-2-0-catalogue.md) (2026-09-21): Sukhi Play 2.0 adds a one-tap catalogue of sites, three apps inside the download that work with no internet, and a rebuilt grown-up screen.
-- [Sukhi Play 1.0: the laptop I could finally hand to my three-year-old](https://sukhiplay.com/blog/sukhi-play-1-0.md) (2026-09-12): Why I built a browser my son can't get out of, what the first version did, and the two days it took to make it work on every computer.
-
-## Blog: Behind the scenes
-
-- [What went wrong with Sukhi Play 2.0, and why it's missing from the release page](https://sukhiplay.com/blog/what-went-wrong-with-2-0.md) (2026-09-22): Look for 2.0.0 on the releases page and it isn't there. Here's why, and the two other things that went wrong around the same release.
+- [Introducing Sukhi Play: hand your child the laptop, and keep your work](https://sukhiplay.com/blog/introducing-sukhi-play.md) (2026-09-12): Sukhi Play is a free app that turns your laptop into a safe place for a small child to play: only the websites you chose, big and simple, and nothing else.
 
 ## Pages
 

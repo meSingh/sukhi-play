@@ -1443,86 +1443,76 @@ Pictures stay on the device they were made on. There is no account, so there is 
 
 **Does Sukhi Colouring work without the internet?** Yes. Inside Sukhi Play it is part of the download and never needs a connection. In a browser it keeps working offline once it has been opened once.
 
-## What went wrong with Sukhi Play 2.0, and why it's missing from the release page
+## Sukhi Play 2.0: ready-made sites, and apps that work offline
 
-https://sukhiplay.com/blog/what-went-wrong-with-2-0/ (Behind the scenes, 2026-09-22, by Mandeep Singh)
+https://sukhiplay.com/blog/sukhi-play-2-0/ (Announcements, 2026-09-22, by Mandeep Singh)
 
-> Look for 2.0.0 on the releases page and it isn't there. Here's why, and the two other things that went wrong around the same release.
+> Sukhi Play 2.0 adds a catalogue of sites you can switch on in one tap, three apps that work with no internet at all, and a simpler grown-up screen.
 
-- There is no 2.0.0 because GitHub never lets a release use the same name twice. 2.0 came out as 2.0.1, with nothing changed but the number.
-- The Linux snap in the Snap Store had never opened, on any computer. 2.0.2 is the same app, released to fix it.
-- For about a day, three download buttons on this site led to a missing page.
-- Each of the three now has a check that stops it happening again.
+- A catalogue of sites known to work, which you add to your child's screen in one tap.
+- Three apps that come inside the download and work with no internet: colouring, a keyboard playground and first games.
+- A grown-up screen with everything on four tabs, and play time that can be any length.
+- The version to download is 2.0.2.
 
-2.0 was the biggest release Sukhi Play had had: a catalogue of ready-made
-sites, apps that work with no internet, and a rebuilt grown-up screen. It also
-went wrong in three separate ways, and if you go looking for it on the
-releases page, you won't find it.
+Setting up Sukhi Play used to mean knowing which sites to add, and it needed an
+internet connection for everything. 2.0 takes care of both. You can pick sites
+from a ready-made list, and three apps now come inside the download, so there
+is always something to play, signal or no signal.
 
-## The version that isn't there
+You'll find it as 2.0.2 on the download page. A hiccup while publishing used up
+the first numbers, so that is the one to install.
 
-I published 2.0.0, and something about it wasn't right, so I deleted it to put
-it out again. That's normally a two-minute job. This time GitHub said no.
+## Sites in one tap
 
-I'd switched on a setting called immutable releases. It's a good setting: once
-a release is out, nobody, me included, can quietly swap the files underneath
-it, which is exactly what you want from something you install on your child's
-computer. What I hadn't understood was the other half. Once a release has used
-a name, the name is spent. Deleting the release doesn't give it back, and
-neither does turning the setting off. I tried both, and a throwaway test name
-went through without a murmur, just to make the point.
+The grown-up screen now has a **Catalogue** tab: sites known to work well in
+Sukhi Play, each on its own card. A card tells you up front whether the site
+has adverts, and whether Sukhi Play filters them. Tap **Add** and it's on your
+child's tiles, already set up. Nine sites are in it to start with.
 
-So 2.0 came out as 2.0.1. Nothing inside it changed, only the number. The rule
-I follow now is short: the tag has to be right the first time, because there
-isn't a second time.
+The same list is on this website, as [the catalogue](/catalogue/), so you can
+look before you download. And any site that isn't there can still be added by
+typing its address.
 
-## The snap that never opened
+## Apps that work with no internet
 
-I'm less happy about this one. If you installed Sukhi Play from the Snap Store
-on Ubuntu before 2.0.2, clicked it, and nothing happened, that wasn't you or
-your computer. It had never opened, on any machine, since the day it went into
-the store.
+This is the part I'm happiest about. Three apps now come inside the download
+and run from your own computer, so they work on a train, on a plane, or when
+the broadband is down:
 
-The snap is built from a ready-made template that comes wrapped twice, a
-parcel inside a parcel. The build opened the outer one and packed the inner one
-still sealed, with everything the snap needs to start shut away inside it. My
-checks confirmed that a snap had been built and that its details were right,
-and they were. None of them opened it.
+- **Colouring**: colour in animals, flowers and rockets, or just draw. A saved
+  picture lands in a Sukhi Play folder in your Pictures.
+- **Keyboard** ([Magic Smash](https://github.com/Evandro/MagicSmash)): press
+  any key and something happens on screen, so keyboard bashing is the whole game.
+- **First Games** (Little Explorer): counting, colours, shapes and animals,
+  with nothing to read.
 
-2.0.2 is the same app as 2.0.1. It exists so the fixed snap could go out
-through a normal release, rather than being slipped in underneath a version
-that never worked. The build now installs the snap the way the Snap Store does
-and opens it, and it refuses to upload one that doesn't start.
+They're switched on from the start, so a fresh install already has something
+to play. Each one can only read its own files, and nothing else on your
+computer.
 
-## The buttons that went nowhere
+## A simpler grown-up screen
 
-The last one was the smallest. When I tidied up the website's addresses, six
-links on the download page kept an old form that pointed at pages which had
-never existed. For about a day the Apple Silicon, Installer and .deb buttons
-led to "page not found". The files themselves were fine; nobody could get to
-them.
+Everything a grown-up needs now sits on four tabs: **Play time**, **Installed
+apps**, **Catalogue** and **Settings**.
 
-A test now opens every page of the site and follows every link the way a
-browser would. The old one only looked at the links in the header. And a wrong
-address now lands on a proper page of this site, not GitHub's error page with
-no way back.
+- **Play time** can be any length up to four hours, and when it runs out your
+  child can ask for more. You decide: fifteen minutes, an hour, or the rest of
+  the day, just for that session.
+- **Getting in** can be the three-second hold, or a small sum instead, for the
+  day your child works out the hold.
+- **Tiles** are one of sixteen shapes in a colour you choose, and while a site
+  loads your child sees their tile's colour instead of a blank screen.
 
-## What the three had in common
+## Try it
 
-Each time, a check passed while checking the thing next to the real thing. The
-snap was built, but nobody opened it. The links were tested, but only the ones
-at the top of the page. Most of what changed since is a single habit: do what a
-parent would do. Install it, open it, press the button.
+[Download Sukhi Play 2.0](/download/), or browse [the catalogue](/catalogue/)
+first to see what you could switch on.
 
-If you ran into any of this, I'm sorry. And if something still doesn't work
-for you, [tell me on GitHub](https://github.com/meSingh/sukhi-play/issues) with
-your system and what you saw.
+**Do the offline apps need an internet connection?** No. They are part of the download and run from your own computer, so they work on a train, on a plane, or when the broadband is down.
 
-**Why is there no Sukhi Play 2.0.0 on the releases page?** It was published and deleted, and GitHub keeps a release's name reserved forever once it has been used with immutable releases switched on. 2.0 was released as 2.0.1 instead, with nothing changed but the number.
+**Why does the download say 2.0.2?** A hiccup while publishing used up the first numbers, so 2.0.2 is the one to install. It is the full 2.0 release.
 
-**I installed Sukhi Play from the Snap Store and it did nothing. What should I do?** Update it. Every version from 2.0.2 on opens. Snaps update themselves, and running sudo snap refresh sukhi-play in a terminal fetches the new one straight away.
-
-**Was anything wrong with the app itself in 2.0.1?** No. Only the snap's packaging was wrong. 2.0.2 is the same app again, released so the fixed snap could go out properly.
+**Can I still add sites that are not in the catalogue?** Yes. Type any address, as before, and Sukhi Play sets it up for you.
 
 ## Play time limits: a session that ends on its own
 
@@ -1586,152 +1576,87 @@ The clock also pauses while the grown-up gate or the grown-up screen is open, so
 
 **Can my child start a new session by closing and reopening the app?** Not without you. Closing Sukhi Play needs the same grown-up hold or sum as everything else, and each time it opens the clock starts from your rule.
 
-## Sukhi Play 2.0: a catalogue, and apps that work offline
+## Introducing Sukhi Play: hand your child the laptop, and keep your work
 
-https://sukhiplay.com/blog/sukhi-play-2-0-catalogue/ (Announcements, 2026-09-21, by Mandeep Singh)
+https://sukhiplay.com/blog/introducing-sukhi-play/ (Announcements, 2026-09-12, by Mandeep Singh)
 
-> Sukhi Play 2.0 adds a one-tap catalogue of sites, three apps inside the download that work with no internet, and a rebuilt grown-up screen.
+> Sukhi Play is a free app that turns your laptop into a safe place for a small child to play: only the websites you chose, big and simple, and nothing else.
 
-Sukhi Play 2.0 is out. It adds a catalogue of sites a parent can switch on with one tap, three apps that come inside the download and work with no internet at all, and a grown-up screen rebuilt from the ground up. It shipped as 2.0.1, and then 2.0.2 the next day, for reasons I have written up separately.
+- Small children press everything. On a normal laptop that means closed tabs, adverts, sites you never chose, and sooner or later your own work.
+- Sukhi Play fills the screen with big tiles for the websites you picked, and nothing else opens.
+- Getting out takes a button held for three seconds, which a small child's quick taps never manage.
+- It is free for macOS, Windows and Linux, with no account and nothing to sign up for.
 
-## What is the catalogue?
+My son is three, and he loves playing games on my laptop. He also clicks every
+button on the screen, which means adverts, popups, new tabs, and eventually my
+work. So every time he played, I sat beside him and watched his hands instead
+of the game.
 
-It is a list of sites known to work in Sukhi Play, on its own tab of the grown-up screen. Each one is grouped by category and says on its card whether it has no adverts, has adverts that Sukhi Play filters, or has adverts that are left showing. Tap one and it arrives on your child's tile screen with the hosts it needs already filled in.
+I wanted something simple. The few sites I had chosen, as big buttons he could
+press without reading, and nothing else. Something I could hand over and
+actually walk away from. That is Sukhi Play, and today it's ready for other
+families too.
 
-At 2.0 there were nine: Scratch, PBS Kids, NASA Space Place, Starfall, National Geographic Kids, ABCya, Toy Theater, Poki and Chrome Music Lab.
+## A laptop is built for grown-ups
 
-The same list is published on this site as [the catalogue](/catalogue/). Both are built from one file, so the page and the app cannot drift apart. A site you want that is not in it can still be added by typing its address.
+Every key on a laptop does something, and a small child doesn't press one key
+at a time. They press a handful at once with a flat hand, which is exactly how
+the shortcuts that close windows and switch apps are made. Adverts are drawn
+to look like play buttons. A video that ends rolls into another one you never
+picked. And whatever you were working on is always one stray click away.
 
-Writing the list out in public showed up three mistakes in what had been shipping, and I fixed them rather than quietly moving on:
+None of that is the child's fault. They are pressing things, which is what
+three-year-olds are for. The laptop just wasn't made for them.
 
-- **Toy Theater's note said it carries no advertising.** It does. A test now checks that every ad-supported site says so.
-- **National Geographic Kids shipped with ad filtering on.** Its terms forbid interfering with how the site works, so it now ships with filtering off, and its note says why. Your child still cannot leave the site.
-- **YouTube Kids came out.** It had the most restrictive terms of anything on the list. It returned in 2.1, with ad filtering off.
+## What Sukhi Play does about it
 
-The catalogue is not a list of recommendations. It says which sites work, not which are good for your child, and Sukhi Play is not connected to any of them.
-
-## Which apps work without the internet?
-
-Until now everything in Sukhi Play needed a connection. Open it on a train, or in a house with poor broadband, and you got a screen of tiles that all failed. So 2.0 ships three apps inside the download:
-
-- **Colouring**, an open-source colouring book, since replaced by [Sukhi Colouring](/blog/sukhi-colouring/): colour in animals, flowers and rockets, or just draw.
-- **Keyboard**, Magic Smash by Evandro Meneses: press any key and something happens.
-- **First Games**, Little Explorer by pazarman: counting, colours, shapes and animals, with no reading needed.
-
-All three are open source under MIT, and their authors are credited in the notices that ship with them. They are the only things Sukhi Play switches on for you in a fresh install, because they are files on your own disk with no network behind them and nobody's terms to agree to. Each one can read its own files and nothing else: not the internet, and not another app's files. Websites are still yours to add.
-
-A picture your child saves from the colouring book lands in a **Sukhi Play** folder inside your Pictures folder, and they see "Picture saved" instead of nothing happening.
-
-The colouring book has since been replaced by one I wrote myself, [Sukhi Colouring](/blog/sukhi-colouring/).
-
-## What changed on the grown-up screen?
-
-It is now a page with four tabs: **Play time**, **Installed apps**, **Catalogue** and **Settings**. Every panel scrolls. Before this, the Save button on the add-a-site form could sit below the bottom of the window with no way to reach it, which made adding a site impossible rather than awkward.
-
-- **Play time** takes any number of minutes up to four hours, with the old presets as shortcuts.
-- **More time** is its own thing. When a session ends your child can ask, and a grown-up can grant fifteen minutes, an hour or the rest of the day, for that session only. Your usual limit does not change. [Play time limits](/blog/play-time-limits/) has more.
-- **The stop screen** has a way for a grown-up to close the app without granting anything.
-- **The way in** is a choice of two cards: hold the button, or answer a small sum. The sum now replaces the hold rather than following it.
-- **Both exits** are in the header and say where they go: back to the play zone, or quit Sukhi Play.
-- **Tiles** are always one of sixteen shapes in a colour you pick. Sites' own icons are gone, because they are other people's trademarks.
-- **While a site loads**, your child sees a screen in that tile's colour and shape instead of a blank rectangle, which to a small child looks exactly like broken.
-
-## Why 2.0.1, and then 2.0.2?
-
-The version number 2.0.0 was used once and could not be used again, and the Ubuntu snap turned out not to open. Nothing in the app changed between 2.0.1 and 2.0.2. The whole story is in [what went wrong with 2.0](/blog/what-went-wrong-with-2-0/).
-
-## Try it
-
-[Download Sukhi Play](/download/), or browse [the catalogue](/catalogue/) first to see what you could switch on. [Adding sites](/docs/adding-sites/) covers everything else.
-
-**Is there a Sukhi Play 2.0.0?** No. 2.0.0 was published and withdrawn, and GitHub will not let that name be used twice, so the 2.0 release is 2.0.1. 2.0.2 followed a day later to fix the Ubuntu snap; the app itself did not change.
-
-**Do the apps inside the download need the internet?** No. They are files on your own computer and they are not allowed to reach the internet at all, so they work on a train, in the car, or when the broadband is having a bad day.
-
-**Does being in the catalogue mean a site has been checked for children?** No. The catalogue is a list of sites known to work in Sukhi Play, with the hosts each one needs. I do not check what they show, so have a look yourself before you switch one on.
-
-## Sukhi Play 1.0: the laptop I could finally hand to my three-year-old
-
-https://sukhiplay.com/blog/sukhi-play-1-0/ (Announcements, 2026-09-12, by Mandeep Singh)
-
-> Why I built a browser my son can't get out of, what the first version did, and the two days it took to make it work on every computer.
-
-- Sukhi Play is a free app for macOS, Windows and Linux that fills the screen with the websites a grown-up picked, and nothing else.
-- A child can press every key and click every button. Other sites, popups, downloads and shortcuts are switched off.
-- Getting out takes a button held for three seconds. Every tap a toddler makes is a quick one.
-- The first version went out on 12 September 2026, and took thirteen releases over two days to settle.
-
-My son wanted to play games on my laptop. He was three, and he also clicked
-every button on the screen, which meant adverts, popups, new tabs, and
-eventually my work. So every time he played, I sat beside him and watched his
-hands instead of the game.
-
-What I wanted was small. A screen with the few sites I had chosen, as big
-buttons he could press without reading, and nothing else. Something I could
-hand over and then actually walk away from. So I built it, and named it after
-him.
-
-## What he gets
-
-A handful of big, colourful tiles. Each one is a website I allowed, drawn as a
-colour and a simple shape, because he can't read the names yet. He presses
-one and the site fills the screen, with a thin bar at the top holding a big
-Back button.
+It fills the whole screen with a few big, colourful tiles. Each one is a
+website you chose, drawn as a colour and a simple shape, because a child who
+can't read can still remember that their game is the blue one. They press a
+tile, the site opens full screen, and a big Back button takes them home again.
 
 Everything else is switched off. Links to other sites go nowhere, popups and
-new windows never open, downloads are refused, and the keyboard shortcuts that
-switch apps or close windows are taken away while Sukhi Play is in front.
-Adverts are blocked too, and the bar quietly counts how many it caught.
+new windows never open, and downloads are refused. The keyboard shortcuts that
+close windows or switch to another app stop working while Sukhi Play is in
+front. Adverts are blocked as well, and the bar at the top quietly counts how
+many it caught.
 
-## What I get
+So your child can press every key and click every button, and the worst that
+happens is they end up back on their tiles.
 
-One rule: to leave, hold a button for three seconds.
+## One rule for grown-ups
 
-![Sukhi Play asking a grown-up to hold a button for three seconds before it closes](/screenshots/05-closing-needs-a-grownup.png "Closing asks for a three-second hold. It is timed by the app, not the page, so no website can fake it.")
+To leave, hold a button for three seconds.
 
-A toddler's tap is always quick, so it never gets through by accident. Adding
-a site is just as simple on my side: I type its address, Sukhi Play opens it
-out of sight, watches what it needs to load, and works out the rest. I never
-have to know what a hostname is.
+![Sukhi Play asking a grown-up to hold a button for three seconds before it closes](/screenshots/05-closing-needs-a-grownup.png "Closing asks for a three-second hold. A small child's taps are always quick, so they never get through.")
 
-## The first two days
+A small child's taps are always quick, so they never get through by accident.
+You hold, and you are back in charge: close Sukhi Play, or change what's on the
+tiles.
 
-I made the code public at ten to two in the afternoon on 12 September, and 1.0
-was out by five. At two the next morning I was still fixing it.
+## Setting it up takes a minute
 
-Almost everything broke somewhere. On some Macs, macOS refused to open it and
-called it damaged. On Linux, full screen came out the wrong size and the top
-bar slid under the edge of the screen. The Snap Store rejected the first
-upload. On Windows the taskbar stayed visible until I found a way to cover it
-too. And older Intel Macs on macOS 10.15 wouldn't open it at all, so they got
-a build of their own.
+The first time it opens, Sukhi Play asks who's at the computer. A grown-up gets
+a short walkthrough: choose the first sites, practise the hold once so you
+know how it feels, and hand it over.
 
-It took thirteen releases over those two days to settle. None of that was
-glamorous, but it's the reason the download works now.
+Adding any other site is just as easy. Type its address, and Sukhi Play opens
+it out of sight, watches what it needs to work, and sets it up for you. You
+never need to know what a hostname is.
 
-## What it doesn't do
+## Why it's called Sukhi Play
 
-It isn't a babysitter. Nothing stops a finger on the power button, and every
-computer keeps a way to force an app to quit, on purpose, so it can always be
-recovered. Some keys belong to the operating system and no app can take them.
-I've written [the full list](/docs/limits/) down rather than pretend otherwise.
+It's named after my son, Sukhi, and the little character on the icon is him.
+I built it for him first. If it helps your family too, that's the best thing
+that could happen to it.
 
-It is also free, with no account, and every line of the code is public,
-including the parts that decide what your child can reach. It came out under
-the MIT licence; from 2.1 that [changed to one for families](/blog/new-licence/).
+It's free on Macs, Windows and Linux, with no account and nothing to sign up
+for, and all of the code is public for anyone who wants to check how it works.
+If you have a small person who presses everything,
+[download Sukhi Play](/download/) and give it ten minutes.
 
-## What came next
+**Does Sukhi Play cost anything?** No. It is free, there is no account to create, and nothing to sign up for.
 
-[Play time](/blog/play-time-limits/) followed nine days later, so the screen
-could end a session by itself. [2.0](/blog/sukhi-play-2-0-catalogue/) brought
-a catalogue of ready-made sites, and [Sukhi Colouring](/blog/sukhi-colouring/)
-was the first app I made for it myself.
-
-If you have a small person who presses everything, [download Sukhi Play](/download/)
-and give it ten minutes.
-
-**Does Sukhi Play cost anything?** No. It is free, there is no account to create, and every line of the code is public.
-
-**Which computers does Sukhi Play run on?** macOS on Apple Silicon and Intel, Windows 10 and 11, and Linux. Older Intel Macs on macOS 10.15 to 12 have a build of their own.
+**Which computers does Sukhi Play run on?** Macs, Windows 10 and 11, and Linux.
 
 **What stops my child just closing it?** Closing needs a grown-up. You hold a button for three seconds, and a quick tap, which is every tap a small child makes, does nothing at all.

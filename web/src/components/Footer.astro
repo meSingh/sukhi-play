@@ -8,6 +8,11 @@
  * link in turn.
  */
 import { REPO } from '../site';
+import { posts } from '../blog';
+
+// Behind the scenes is listed once there is a story in it (and its page is back:
+// pages/blog/behind-the-scenes.astro, one line, like the other two).
+const hasStories = (await posts()).some((p) => p.data.kind === 'story');
 
 // Every page on the site, one click from any other, in the column a parent
 // would look in. The header only has room for the few most asked for; this
@@ -51,7 +56,7 @@ const COLUMNS = [
       { href: '/blog/', label: 'All posts' },
       { href: '/blog/for-parents/', label: 'For parents' },
       { href: '/blog/announcements/', label: 'Announcements' },
-      { href: '/blog/behind-the-scenes/', label: 'Behind the scenes' },
+      ...(hasStories ? [{ href: '/blog/behind-the-scenes/', label: 'Behind the scenes' }] : []),
       { href: '/blog/rss.xml', label: 'RSS feed' }
     ]
   },

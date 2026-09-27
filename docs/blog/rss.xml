@@ -98,13 +98,13 @@
       <description>Sukhi Colouring is a free colouring book for small children, made for Sukhi Play and also running in any browser, offline, with no account and no adverts.</description>
     </item>
     <item>
-      <title>What went wrong with Sukhi Play 2.0, and why it's missing from the release page</title>
-      <link>https://sukhiplay.com/blog/what-went-wrong-with-2-0/</link>
-      <guid isPermaLink="true">https://sukhiplay.com/blog/what-went-wrong-with-2-0/</guid>
+      <title>Sukhi Play 2.0: ready-made sites, and apps that work offline</title>
+      <link>https://sukhiplay.com/blog/sukhi-play-2-0/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/sukhi-play-2-0/</guid>
       <pubDate>Tue, 22 Sep 2026 00:00:00 GMT</pubDate>
       <dc:creator>Mandeep Singh</dc:creator>
-      <category>Behind the scenes</category>
-      <description>Look for 2.0.0 on the releases page and it isn't there. Here's why, and the two other things that went wrong around the same release.</description>
+      <category>Announcements</category>
+      <description>Sukhi Play 2.0 adds a catalogue of sites you can switch on in one tap, three apps that work with no internet at all, and a simpler grown-up screen.</description>
     </item>
     <item>
       <title>Play time limits: a session that ends on its own</title>
@@ -116,22 +116,13 @@
       <description>Sukhi Play can now end a session by itself: set a length once, your child sees no countdown until the last thirty seconds, then a stop screen.</description>
     </item>
     <item>
-      <title>Sukhi Play 2.0: a catalogue, and apps that work offline</title>
-      <link>https://sukhiplay.com/blog/sukhi-play-2-0-catalogue/</link>
-      <guid isPermaLink="true">https://sukhiplay.com/blog/sukhi-play-2-0-catalogue/</guid>
-      <pubDate>Mon, 21 Sep 2026 00:00:00 GMT</pubDate>
-      <dc:creator>Mandeep Singh</dc:creator>
-      <category>Announcements</category>
-      <description>Sukhi Play 2.0 adds a one-tap catalogue of sites, three apps inside the download that work with no internet, and a rebuilt grown-up screen.</description>
-    </item>
-    <item>
-      <title>Sukhi Play 1.0: the laptop I could finally hand to my three-year-old</title>
-      <link>https://sukhiplay.com/blog/sukhi-play-1-0/</link>
-      <guid isPermaLink="true">https://sukhiplay.com/blog/sukhi-play-1-0/</guid>
+      <title>Introducing Sukhi Play: hand your child the laptop, and keep your work</title>
+      <link>https://sukhiplay.com/blog/introducing-sukhi-play/</link>
+      <guid isPermaLink="true">https://sukhiplay.com/blog/introducing-sukhi-play/</guid>
       <pubDate>Sat, 12 Sep 2026 00:00:00 GMT</pubDate>
       <dc:creator>Mandeep Singh</dc:creator>
       <category>Announcements</category>
-      <description>Why I built a browser my son can't get out of, what the first version did, and the two days it took to make it work on every computer.</description>
+      <description>Sukhi Play is a free app that turns your laptop into a safe place for a small child to play: only the websites you chose, big and simple, and nothing else.</description>
     </item>
   </channel>
 </rss>
