@@ -16,7 +16,7 @@
  *     pictures arrive.
  *
  * It needs nothing but Node and runs in a second, so it goes first in CI and
- * is worth running before a commit. Lighthouse (lighthouserc.json) measures
+ * is worth running before a commit. Lighthouse (lighthouserc.js) measures
  * the pages as a phone would see them; this is the part that should never be
  * noisy.
  */
