@@ -53,6 +53,32 @@
       ],
       "port": 5179,
       "cwd": "playground/studio"
+    },
+    {
+      "name": "railway",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "vite",
+        "--port",
+        "5180",
+        "--strictPort"
+      ],
+      "port": 5180,
+      "cwd": "playground/railway"
+    },
+    {
+      "name": "run",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "vite",
+        "--port",
+        "5181",
+        "--strictPort"
+      ],
+      "port": 5181,
+      "cwd": "playground/run"
     }
   ]
 }
