@@ -7,3 +7,6 @@
 [submodule "playground/railway"]
 	path = playground/railway
 	url = https://github.com/meSingh/sukhi-railway.git
+[submodule "playground/run"]
+	path = playground/run
+	url = https://github.com/meSingh/sukhi-run.git

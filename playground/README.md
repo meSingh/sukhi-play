@@ -16,7 +16,7 @@ rest of the web.
 | [`colouring/`](https://github.com/meSingh/sukhi-colouring) | **Sukhi Colouring** — pick a picture and colour it in, or start on a blank page. | Released, and a submodule here |
 | [`studio/`](https://github.com/meSingh/jazz-studio) | **Jazz's Studio** — design and print stationery, make things from boxes, a brand of your own. For older children. | Released, and a submodule here |
 | [`railway/`](https://github.com/meSingh/sukhi-railway) | **Sukhi's Railway** — build a track, press go, and watch Sukhi drive it. For about three to five. | An experiment: on the website only, and a submodule here |
-| `run/` | **Sukhi's Run** — Sukhi runs, something chases him, and being caught is the fun part. For about four. | An experiment: on the website only; a local repository, with no remote yet |
+| [`run/`](https://github.com/meSingh/sukhi-run) | **Sukhi's Run** — Sukhi runs, something chases him, and being caught is the fun part. For about four. | An experiment: on the website only, and a submodule here |
 
 More will follow. Each is added here first, grows until it is worth its own
 release, and then moves to its own repository and comes back as a submodule.
